@@ -68,10 +68,9 @@
     activities: { type: 'ARRAY', items: { type: 'OBJECT', required: ['title', 'desc'], properties: { title: S_TXT, desc: S_TXT, video: S_TXT } } },
     enfoque: { type: 'STRING', enum: ['lectura', 'andamios', 'casos', 'experimento'] },
     ticket: { type: 'ARRAY', items: { type: 'OBJECT', required: ['q', 'options', 'answer'], properties: { q: S_TXT, options: S_ARR, answer: { type: 'INTEGER' }, why: S_TXT } } } } };
-  const ESQ_FICHA = { type: 'OBJECT', required: ['title', 'blocks', 'tasks'], properties: { title: S_TXT, subtitle: S_TXT, reading: S_TXT,
-    blocks: { type: 'ARRAY', items: { type: 'OBJECT', required: ['heading', 'text'], properties: { heading: S_TXT, text: S_TXT } } },
-    tasks: { type: 'ARRAY', items: { type: 'OBJECT', required: ['q'], properties: { act: { type: 'INTEGER' }, q: S_TXT, help: S_TXT, frame: S_TXT, cols: S_ARR, rows: { type: 'INTEGER' } } } },
-    sabias: S_TXT } };
+  const ESQ_FICHA = { type: 'OBJECT', required: ['title', 'sections'], properties: { title: S_TXT, subtitle: S_TXT, sabias: S_TXT,
+    sections: { type: 'ARRAY', items: { type: 'OBJECT', required: ['kind'], properties: { kind: { type: 'STRING', enum: ['texto', 'pregunta', 'tabla', 'lista'] }, heading: S_TXT, text: S_TXT, act: { type: 'INTEGER' },
+      help: S_TXT, frame: S_TXT, cols: S_ARR, rows: { type: 'INTEGER' }, items: S_ARR, own: { type: 'BOOLEAN' } } } } } };
   const mezclar = q => { const o = q.options.map((t, i) => ({ t, ok: i === q.answer })); for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return { q: q.q, options: o.map(x => x.t), answer: o.findIndex(x => x.ok), why: q.why || '' }; };
 
   // ---- leer archivos: imágenes (achicadas), PDF, Word (.docx) y texto ----
@@ -93,14 +92,15 @@
     }
     throw new Error('DOCX');
   }
-  async function partes(files) {
-    const P = [];
-    for (const f of files) {
+  async function partes(files) {                                     // todas las partes y, aparte, las de cada archivo (para dárselas a su sesión)
+    const P = []; P.de = new Map();
+    for (const f of files) { const n0 = P.length;
       const et = `[${/pdf$/i.test(f.name) ? 'PDF' : /docx$/i.test(f.name) ? 'Word' : /^image/.test(f.type) ? 'Imagen' : 'Texto'} adjunto: ${f.name}]${f._s ? ` (Sesión ${f._s})` : ''}`;
       if (/^image\//.test(f.type)) P.push({ text: et }, { inlineData: { mimeType: 'image/jpeg', data: await imagen(f) } });
       else if (/\.pdf$/i.test(f.name) || f.type === 'application/pdf') P.push({ text: et }, { inlineData: { mimeType: 'application/pdf', data: b64(await f.arrayBuffer()) } });
       else if (/\.docx$/i.test(f.name)) P.push({ text: et + '\n' + await docx(f) });
       else P.push({ text: et + '\n' + (await f.text()).slice(0, 30000) });
+      P.de.set(f, P.slice(n0));
     }
     return P;
   }
@@ -151,17 +151,21 @@ ${ESTILO}CÓMO ARMAR LA UNIDAD COMPLETA:
 8) Revisa CADA captura o página: no te saltes ninguna sesión que aparezca en los materiales.
 Indicaciones del profesor: «${nota || '(ninguna)'}»
 Devuelve "units" (una sola unidad) con "num", "title" (título corto), "product", "rubricName", "rubric" (criterios cortos) y "sessions": cada sesión con "meta" (una oración que empieza con verbo), "criteria" (exactamente 3 criterios cortos que empiezan con verbo), "rubric" (el criterio de la rúbrica que trabaja), "hoyT"/"hoyD" (flipped para hoy: título y descripción, o vacíos) y "sigT"/"sigD" (flipped para la siguiente sesión, o vacíos). Entre 2 y 14 sesiones. Además "aviso": 1 o 2 oraciones para el profesor sobre lo que faltó o tuviste que deducir (vacío si todo estaba completo).
-IMPORTANTE: en cada sesión pon también "mat": un resumen (máximo 800 caracteres) de lo que dicen los materiales sobre ESA sesión, porque después armaré cada sesión SIN volver a ver los archivos.`, ESQ_PLAN,
+IMPORTANTE: en cada sesión pon también "mat": un resumen (máximo 1500 caracteres) de lo que dicen los materiales sobre ESA sesión (sus actividades, textos, preguntas y su Exit ticket si lo trae).`, ESQ_PLAN,
           { maxTokens: 12288, timeout: 150000, parar, alReintentar: reint, validar: v => { const u = v && Array.isArray(v.units) && v.units[0]; if (!u || !Array.isArray(u.sessions) || u.sessions.length < 1) return null;
-            u.sessions = u.sessions.slice(0, 14).map(s => ({ meta: cut(s.meta, 240), criteria: [...(s.criteria || []).map(c => cut(c, 120)), '', '', ''].slice(0, 3), rubric: cut(s.rubric, 200), mat: cut(s.mat, 900), hoyT: cut(s.hoyT, 80), hoyD: cut(s.hoyD, 300), sigT: cut(s.sigT, 80), sigD: cut(s.sigD, 300) })).filter(s => L(s.meta));
+            u.sessions = u.sessions.slice(0, 14).map(s => ({ meta: cut(s.meta, 240), criteria: [...(s.criteria || []).map(c => cut(c, 120)), '', '', ''].slice(0, 3), rubric: cut(s.rubric, 200), mat: cut(s.mat, 1600), hoyT: cut(s.hoyT, 80), hoyD: cut(s.hoyD, 300), sigT: cut(s.sigT, 80), sigD: cut(s.sigD, 300) })).filter(s => L(s.meta));
             return u.sessions.length ? v : null; } });
         const U0 = plan.units[0], N = U0.sessions.length, pasos = N * (fichas ? 2 : 1); let hecho = 0;
+        const etiquetados = W.files.some(f => f._s);
+        const deSesion = k => { const F = W.files.filter(f => f._s === k); if (F.length) return { P: F.flatMap(f => P.de.get(f) || []), nota: '' };   // los archivos de esa sesión, completos
+          return etiquetados ? { P: [], nota: '' } : { P, nota: `\nLos materiales adjuntos son de toda la unidad: usa SOLO lo que corresponde a la sesión ${k} («${U0.sessions[k - 1].meta}»).` }; };
         const sesiones = [];
         for (let s = 0; s < N; s++) {
           if (W.stop) throw new Error('STOP');
           const o = U0.sessions[s]; prog(`Sesión ${s + 1} de ${N}: actividades y Exit ticket…`, o.meta, .1 + .88 * hecho / pasos);
           const lista = U0.sessions.map((x, k) => `${k + 1}. ${x.meta}${k === s ? '  ← ESTA SESIÓN' : ''}`).join('\n');
-          const r = await MD.pensarCon([], `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú.
+          const SP = deSesion(s + 1);
+          const r = await MD.pensarCon(SP.P, `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú.${SP.nota}
 ${ESTILO}Unidad ${U0.num}: «${U0.title}». Producto: «${U0.product}». Rúbrica: ${(U0.rubric || []).join(' · ')}.
 Sesiones de la unidad:
 ${lista}
@@ -170,7 +174,8 @@ Indicaciones del profesor: «${nota || '(ninguna)'}»
 Crea:
 - "activities": EXACTAMENTE 3: la 1 individual (presenta el material: casos, lectura, observación o video), la 2 colaborativa en equipos, la 3 individual (cada estudiante escribe su parte del producto con un andamio). Cada una con "title" (2 a 6 palabras, primera persona del plural, en presente), "desc" (máximo 200 caracteres, empieza con «En esta actividad» y sigue en FUTURO)${videos ? ' y "video": una búsqueda corta para YouTube (3 a 7 palabras, en español) de un video corto y apto para niños que ayude en esa actividad, o vacío si no hace falta (máximo 2 videos por sesión)' : ''}.
 - "enfoque": "lectura", "andamios", "casos" o "experimento" según lo que prioriza la sesión.
-- "ticket": 5 preguntas de opción múltiple (máximo 14 palabras) con 4 opciones MUY cortas (máximo 6 palabras), "answer" (0 a 3) y "why" (una oración). Español sencillo para 11 y 12 años.`, ESQ_SES,
+- "ticket": 5 preguntas de opción múltiple (máximo 14 palabras) con 4 opciones MUY cortas (máximo 6 palabras), "answer" (0 a 3) y "why" (una oración). Español sencillo para 11 y 12 años.
+RESPETA LA FICHA DEL COLEGIO: si los materiales de esta sesión traen sus actividades, usa esas mismas actividades en el mismo orden (con su sentido y contenido). Si traen su propio Exit ticket o preguntas de evaluación, úsalas tal cual (sólo adáptalas a 4 opciones si hace falta).`, ESQ_SES,
             { maxTokens: 4096, timeout: 90000, parar, alReintentar: reint, validar: v => { const a = (v && v.activities || []).slice(0, 3).filter(x => L(x.title)), q = (v && v.ticket || []).filter(x => L(x.q) && (x.options || []).filter(L).length >= 3);
               return a.length >= 2 && q.length >= 3 ? { a, q, enf: v.enfoque } : null; } });
           hecho++;
@@ -181,15 +186,22 @@ Crea:
             if (W.stop) throw new Error('STOP');
             prog(`Sesión ${s + 1} de ${N}: la ficha…`, ses.activities.map(a => a.title).join(' · '), .1 + .88 * hecho / pasos);
             try {
-              const fx = await MD.pensarCon([], `Eres una docente experta de Ciencia y Tecnología de 6.° grado en Perú. Escribe la FICHA de la sesión ${s + 1} (una sola ficha para sus 3 actividades) que los estudiantes verán dentro de su cuaderno.
-${ESTILO}Meta: «${o.meta}». Criterios: ${o.criteria.filter(L).join(' | ')}. Enfoque: ${r.enf || 'andamios'}.${o.mat ? `\nMateriales del colegio para esta sesión: «${o.mat}»` : ''}
+              const fx = await MD.pensarCon(SP.P, `Eres una docente experta de Ciencia y Tecnología de 6.° grado en Perú. Arma la FICHA de la sesión ${s + 1} que los estudiantes verán dentro de su cuaderno (y que también se imprime).${SP.nota}
+Meta: «${o.meta}». Criterios: ${o.criteria.filter(L).join(' | ')}. Enfoque: ${r.enf || 'andamios'}.${o.mat ? `\nLo que dicen los materiales del colegio sobre esta sesión: «${o.mat}»` : ''}
 Actividades:
 ${ses.activities.map((a, k) => `${k + 1}) (${a.mode === 'group' ? 'en equipos' : 'individual'}) «${a.title}»: ${a.desc}`).join('\n')}
-Devuelve: "title" (título de la ficha), "subtitle" (una línea), "reading" (vacío o una lectura corta si el enfoque es lectura), "blocks" (1 a 4 bloques de información con "heading" y "text" de máximo 700 caracteres, claros y verdaderos), "tasks" (4 a 8 consignas en orden: cada una con "act" (1, 2 o 3), "q" (la consigna), "help" (una pista corta o vacío), "frame" (un inicio de oración para responder o vacío), "cols" (si es una tabla: 2 o 3 encabezados; si no, vacío) y "rows" (filas de la tabla, 2 a 6)), y "sabias": un dato curioso real y corto.`, ESQ_FICHA,
-                { maxTokens: 6144, timeout: 90000, parar, alReintentar: reint, validar: v => v && L(v.title) && Array.isArray(v.tasks) && v.tasks.length ? v : null });
-              ses.fx = { t: cut(fx.title, 90), st: cut(fx.subtitle, 140), rd: cut(fx.reading, 1500), b: (fx.blocks || []).slice(0, 4).map(x => ({ h: cut(x.heading, 80), t: cut(x.text, 800) })).filter(x => L(x.t)),
-                k: (fx.tasks || []).slice(0, 8).map(x => ({ a: +x.act || 0, q: cut(x.q, 240), h: cut(x.help, 200), f: cut(x.frame, 160), c: (x.cols || []).filter(L).slice(0, 3).map(c => cut(c, 40)), r: Math.max(2, Math.min(6, +x.rows || 3)) })).filter(x => L(x.q)),
-                sb: cut(fx.sabias, 240) };
+REGLA DE ORO — RESPETA LA FICHA DEL COLEGIO: si los materiales traen la ficha de esta sesión, copia FIELMENTE su información y su estructura: los mismos apartados, en el MISMO orden, con sus textos informativos completos, sus consignas, sus preguntas y sus tablas (con los mismos encabezados). No resumas, no cambies datos, no inventes; sólo corrige la ortografía. Si una parte es una imagen o un dibujo, descríbela en una línea entre corchetes, por ejemplo [Imagen: ciclo del agua].
+CÓMO SEPARAR: cada pregunta o consigna numerada de la ficha es UNA sección "pregunta" aparte (nunca juntes varias preguntas en una sola), sin su número al inicio. El encabezado (nombre del colegio, número de ficha) NO va como sección: úsalo para el "title". NO copies el Exit ticket de la ficha dentro de las secciones (va aparte, al final, en la tarjeta).
+TABLAS: en "cols" van los encabezados exactos y en "items" lo que ya viene escrito en la primera columna de cada fila (por ejemplo los nombres), en orden; "rows" es el número de filas.
+A TU ESTILO (Molí), OBLIGATORIO y sin quitar nada: un "title" atractivo y corto, un "subtitle" de una línea, en CADA pregunta abierta una pista corta ("help") y un inicio de oración para responder ("frame"), y un "sabias" (dato curioso real y corto sobre el tema). Marca con "own": true cada sección que agregues tú y que NO esté en la ficha del colegio.
+Si NO hay ficha del colegio para esta sesión, créala tú con la misma estructura de las fichas del colegio (información primero y luego las preguntas en el orden de las actividades).
+Devuelve "sections" en orden; cada una con "kind": "texto" (información: "heading" y "text" completo), "pregunta" (la consigna en "text", con "act" 1, 2 o 3, "help" y "frame"), "tabla" ("text" con la consigna, "cols" con los encabezados y "rows" con el número de filas, 2 a 8) o "lista" ("heading" e "items").`, ESQ_FICHA,
+                { maxTokens: 8192, timeout: 120000, parar, alReintentar: reint, validar: v => v && L(v.title) && Array.isArray(v.sections) && v.sections.length ? v : null });
+              let tot = 0;
+              ses.fx = { v: 2, t: cut(fx.title, 90), st: cut(fx.subtitle, 160), sb: cut(fx.sabias, 260),
+                s: (fx.sections || []).slice(0, 24).map(x => ({ k: ['texto', 'pregunta', 'tabla', 'lista'].includes(x.kind) ? x.kind : 'texto', h: cut(x.heading, 100), t: cut(x.text, 2200), a: +x.act || 0, hp: cut(x.help, 200), f: cut(x.frame, 160),
+                  c: (x.cols || []).filter(L).slice(0, 5).map(c => cut(c, 50)), r: Math.max(2, Math.min(8, +x.rows || 3)), it: (x.items || []).filter(L).slice(0, 12).map(t => cut(t, 200)), o: x.own ? 1 : 0 })).map(x => ({ ...x, t: x.k === 'pregunta' ? x.t.replace(/^\s*\d+\s*[.)-]\s*/, '') : x.t }))
+                  .filter(x => L(x.t) || L(x.h) || x.it.length).filter(x => (tot += JSON.stringify(x).length) < 14000) };
               ses.activities.forEach(a => { a.ficha = 'Ficha de la sesión'; });
             } catch (x) { if (x.message === 'STOP') throw x; }
             hecho++;

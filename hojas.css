@@ -423,3 +423,8 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 #ed .ed-av { position: absolute; top: 56px; left: 50%; transform: translate(-50%, -20px); opacity: 0; transition: all .3s; padding: 8px 14px; border-radius: 12px; background: #fff; border: 2.5px solid #2b2547; font-weight: 800; font-size: 13px; color: #1e3a8a; pointer-events: none; max-width: 90vw; text-align: center; }
 #ed .ed-av.on { opacity: 1; transform: translate(-50%, 0); }
 #ed .ed-volver { position: absolute; top: 10px; right: 10px; background: #ff7a1a !important; color: #fff !important; }
+.bk .fx-mol { font-size: .7em; color: #7c3aed; font-weight: 800; }
+.bk .fx-bl ul { margin: .2em 0; padding-left: 1.2em; font-size: .92em; }
+.bk .fx-cierre { margin: .5em 0; padding: .45em .6em; border: 2px dashed #16a34a; border-radius: .6em; background: rgba(220,252,231,.45); }
+.bk .fx-cierre > b { color: #15803d; } .bk .fx-cierre small { color: #64748b; }
+.bk .fx-cr { display: flex; align-items: center; gap: .4em; margin: .25em 0; font-size: .9em; } .bk .fx-cr span { flex: 1; } .bk .fx-cr i { font-style: normal; width: 1.6em; height: 1.6em; border: 1.5px solid #94a3b8; border-radius: .3em; display: grid; place-items: center; font-size: .85em; }

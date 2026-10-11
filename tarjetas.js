@@ -62,5 +62,53 @@
       <script>setTimeout(() => print(), 600)<\/script></body></html>`);
     w.document.close();
   }
-  window.Tarjetas = { elementos, svgTarjeta, preguntasHtml, imprimir, bits };
+  // ---- imprimir la FICHA de la sesión (como la del colegio, con el estilo de Molí) y al final su cierre con la tarjeta ----
+  function fichaPrint(fx) {
+    const P = [], tabla = (c, r, it = []) => `<table class="t"><tr>${c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => '<tr>' + c.map((_, j) => `<td>${j === 0 && it[i] ? esc(it[i]) : ''}</td>`).join('') + '</tr>').join('')}</table>`;
+    const lineas = (k, f) => `<div class="ln">${f ? `<span>${esc(f)}</span>` : ''}</div>`.repeat(1) + '<div class="ln"></div>'.repeat(k - 1);
+    let nq = 0, a0 = 0;
+    if (fx.v === 2) (fx.s || []).forEach(x => {
+      if (x.a && x.a !== a0 && x.k !== 'texto') { a0 = x.a; P.push(`<h3>Actividad ${x.a}</h3>`); }
+      if (x.k === 'texto') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}<p>${esc(x.t).replace(/\n/g, '<br>')}</p></div>`);
+      else if (x.k === 'lista') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}${x.t ? `<p>${esc(x.t)}</p>` : ''}<ul>${(x.it || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`);
+      else if (x.k === 'tabla') P.push(`<div class="q"><b>${++nq}.</b> ${esc(x.t || x.h)}${x.c && x.c.length ? tabla(x.c, x.r, x.it || []) : ''}</div>`);
+      else P.push(`<div class="q"><b>${++nq}.</b> ${esc(x.t || x.h)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}${lineas(3, x.f)}</div>`);
+    });
+    else { (fx.b || []).forEach(x => P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}<p>${esc(x.t)}</p></div>`));
+      (fx.k || []).forEach(x => { if (x.a && x.a !== a0) { a0 = x.a; P.push(`<h3>Actividad ${x.a}</h3>`); } P.push(`<div class="q"><b>${++nq}.</b> ${esc(x.q)}${x.h ? `<small>${esc(x.h)}</small>` : ''}${x.c && x.c.length ? tabla(x.c, x.r) : lineas(3, x.f)}</div>`); }); }
+    if (fx.sb) P.push(`<div class="sb"><b>¿Sabías que…?</b> ${esc(String(fx.sb).replace(/^\s*¿?\s*sab[ií]as\s+que\s*(…|\.\.\.)?\s*/i, ''))}</div>`);
+    return P.join('');
+  }
+  function imprimirFicha(u, n) {
+    const s = u.sessions[n - 1]; if (!s || !s.fx) return alert('Esta sesión no tiene ficha.');
+    const cr = (s.criteria || []).filter(x => String(x || '').trim()), f = s.flipped && s.flipped.enabled ? s.flipped : null, hayT = MD.preguntas(s).length;
+    const w = window.open('', '_blank'); if (!w) return alert('Permite las ventanas emergentes para imprimir la ficha.');
+    w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ficha · U${esc(u.num)} S${n}</title><style>
+      @page { size: A4; margin: 12mm 12mm 12mm 12mm; } * { box-sizing: border-box; } body { margin: 0; font: 11pt Arial, Helvetica, sans-serif; color: #111; }
+      .cab { display: flex; justify-content: space-between; font-size: 9pt; color: #444; border-bottom: .4mm solid #111; padding-bottom: 1.5mm; }
+      h1 { font-size: 17pt; margin: 3mm 0 1mm; } .sub { margin: 0 0 2mm; font-style: italic; color: #333; } .dat { display: flex; gap: 6mm; font-size: 10pt; margin-bottom: 3mm; } .dat span { flex: 1; border-bottom: .3mm solid #555; }
+      h3 { font-size: 12pt; margin: 4mm 0 1.5mm; padding: 1mm 2mm; background: #eee; } h4 { margin: 2mm 0 1mm; font-size: 11.5pt; }
+      .tx p { margin: 0 0 2mm; text-align: justify; line-height: 1.35; } .q { margin: 2.5mm 0; page-break-inside: avoid; } .q small { display: block; color: #555; font-size: 9pt; margin-top: .5mm; }
+      .ln { height: 7mm; border-bottom: .3mm solid #999; } .ln span { color: #666; font-size: 10pt; }
+      .t { width: 100%; border-collapse: collapse; margin-top: 1.5mm; } .t th, .t td { border: .3mm solid #333; padding: 1mm 1.5mm; height: 8mm; font-size: 10pt; } .t th { background: #eee; }
+      .sb { margin: 3mm 0; padding: 2mm 3mm; border: .3mm dashed #555; font-size: 10pt; }
+      .cierre { page-break-inside: avoid; margin-top: 5mm; border-top: .5mm solid #111; padding-top: 2mm; } .cierre h3 { background: none; padding: 0; }
+      .cc { width: 100%; border-collapse: collapse; } .cc td, .cc th { border: .3mm solid #333; padding: 1.2mm 2mm; font-size: 10pt; } .cc th { width: 22mm; }
+      .exit { display: flex; gap: 4mm; align-items: flex-start; margin-top: 3mm; padding: 2mm; border: .3mm dashed #888; page-break-inside: avoid; } .exit svg { width: 96mm; height: 90mm; flex: none; }
+      .tq { flex: 1; font-size: 9pt; } .tq-t { display: block; font-size: 10pt; margin-bottom: 1.5mm; } .tq-q { margin: 0 0 2mm; } .tq-q div { display: flex; flex-wrap: wrap; gap: .8mm 3mm; margin-top: .8mm; }
+      .tq-q i { font-style: normal; font-weight: 700; display: inline-grid; place-items: center; width: 3.6mm; height: 3.6mm; border: .25mm solid #333; border-radius: 50%; font-size: 2.4mm; margin-right: 1mm; }
+      .ayuda { padding: 4mm; background: #fef3c7; font-size: 10pt; } @media print { .ayuda { display: none; } }
+    </style></head><body><div class="ayuda">🖨️ Imprime en A4, escala 100 %. <button onclick="print()">Imprimir</button></div>
+      <div class="cab"><span>Ciencia y Tecnología · 6.° grado · Unidad ${esc(u.num)}${u.title ? ': ' + esc(u.title) : ''}</span><span>Sesión ${n}</span></div>
+      <h1>${esc(s.fx.t || 'Ficha de la sesión')}</h1>${s.fx.st ? `<p class="sub">${esc(s.fx.st)}</p>` : ''}
+      <div class="dat">Nombre: <span></span> Sección: <span style="flex:.25"></span> Fecha: <span style="flex:.4"></span></div>
+      ${s.meta ? `<p><b>Meta:</b> ${esc(s.meta)}</p>` : ''}
+      ${fichaPrint(s.fx)}
+      <div class="cierre">${cr.length ? `<h3>¿Cómo me fue hoy?</h3><table class="cc"><tr><td><b>Criterio de éxito</b></td><th>Lo logré</th><th>En proceso</th></tr>${cr.map(c => `<tr><td>${esc(c)}</td><th></th><th></th></tr>`).join('')}</table>` : ''}
+        ${f && (f.title || f.desc) ? `<p><b>Para la siguiente clase:</b> ${esc(f.title || '')}${f.desc ? ' — ' + esc(f.desc) : ''}</p>` : ''}
+        ${hayT ? `<div class="exit">${svgTarjeta(u, n, s)}${preguntasHtml(u, n, s)}</div>` : ''}</div>
+      <script>setTimeout(() => print(), 700)<\/script></body></html>`);
+    w.document.close();
+  }
+  window.Tarjetas = { elementos, svgTarjeta, preguntasHtml, imprimir, imprimirFicha, bits };
 })();
