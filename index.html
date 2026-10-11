@@ -103,8 +103,9 @@
   @keyframes pop2 { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
   #moliTalk { position: fixed; z-index: 45; max-width: min(340px, 38vw); background: #fff; color: #1e3a8a; border: 3px solid #2b2547; border-radius: 22px; padding: 12px 16px 14px;
     font: 800 clamp(13px, 1.9vw, 17px)/1.4 "Trebuchet MS", system-ui, sans-serif; box-shadow: 0 7px 0 rgba(43,37,71,.2), 0 14px 30px rgba(0,0,0,.2);
-    opacity: 0; transform: scale(.5); transform-origin: 85% 100%; transition: opacity .25s, transform .4s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+    left: 0; top: 0; will-change: translate, transform; opacity: 0; transform: scale(.5); transform-origin: var(--ox, 85%) 100%; transition: opacity .25s, transform .4s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
   #moliTalk.on { opacity: 1; transform: scale(1); }
+  #moliTalk .ch { opacity: 0; transition: opacity .18s; } #moliTalk .ch.v { opacity: 1; }
   #moliTalk::after { content: ''; position: absolute; right: var(--tail, 40px); bottom: -14px; width: 20px; height: 20px; background: #fff; border-right: 3px solid #2b2547; border-bottom: 3px solid #2b2547; transform: rotate(45deg) skewX(-8deg); }
   #moliTalk b { color: #ff7a2f; }
   #rotate { position: fixed; inset: 0; z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; color: #fff; padding: 24px;
@@ -2214,11 +2215,19 @@ const talkEl = document.getElementById('moliTalk');
 function decir(html) {                                               // globo con texto que se escribe solo; termina al acabar + una pausa (o al tocar ▶)
   if (MO.talking) MO.talking.fin();
   return new Promise(res => {
-    const plain = Array.from(html.replace(/<[^>]+>/g, '')); let i = 0, done = false, tm = 0, iv = 0;   // (por letras completas: los emojis no se cortan)
-    const fin = () => { if (done) return; done = true; clearInterval(iv); clearTimeout(tm); talkEl.innerHTML = html; moli.hablar(false); MO.talking = null; res(); };
-    MO.talking = { fin, skip: () => { if (i < plain.length) { i = plain.length; talkEl.innerHTML = html; moli.hablar(false); clearInterval(iv); tm = setTimeout(fin, 900); } else fin(); } };
-    talkEl.innerHTML = ''; talkEl.classList.add('on'); moli.hablar(true);
-    iv = setInterval(() => { i++; talkEl.textContent = plain.slice(0, i).join(''); if (i >= plain.length) { clearInterval(iv); talkEl.innerHTML = html; moli.hablar(false); tm = setTimeout(fin, 1600 + plain.length * 12); } }, 28);
+    // el globo ya nace con su tamaño final (las letras están, pero invisibles) y se van mostrando: así no crece ni salta
+    const tmp = document.createElement('div'); tmp.innerHTML = html;
+    const tw = document.createTreeWalker(tmp, NodeFilter.SHOW_TEXT), txt = []; while (tw.nextNode()) txt.push(tw.currentNode);
+    txt.forEach(n => { const f = document.createDocumentFragment();
+      Array.from(n.textContent).forEach(c => { if (/\s/.test(c)) f.appendChild(document.createTextNode(c)); else { const e = document.createElement('span'); e.className = 'ch'; e.textContent = c; f.appendChild(e); } });
+      n.replaceWith(f); });
+    talkEl.innerHTML = ''; talkEl.append(...tmp.childNodes);
+    const chs = talkEl.querySelectorAll('.ch'); let i = 0, done = false, tm = 0, iv = 0;
+    const todo = () => { chs.forEach(c => c.classList.add('v')); i = chs.length; clearInterval(iv); moli.hablar(false); };
+    const fin = () => { if (done) return; done = true; clearTimeout(tm); todo(); MO.talking = null; res(); };
+    MO.talking = { fin, skip: () => { if (i < chs.length) { todo(); tm = setTimeout(fin, 900); } else fin(); } };
+    MO.bubSnap = !talkEl.classList.contains('on'); talkEl.classList.add('on'); moli.hablar(true);
+    iv = setInterval(() => { if (i < chs.length) chs[i++].classList.add('v'); if (i >= chs.length) { todo(); tm = setTimeout(fin, 1600 + chs.length * 12); } }, 28);
   });
 }
 function callar() { if (MO.talking) MO.talking.fin(); talkEl.classList.remove('on'); }
@@ -2253,11 +2262,16 @@ animHooks.push((t, dt) => {
   mRim.position.copy(MO.pos).add(lv2.set(2, 1.6, -3).applyQuaternion(camera.quaternion));
   if (moliFloor) { const h = MO.pos.y - MO.ground; moliFloor.position.y = -h / MSC; moliFloor.visible = h > -0.05 && h < 1.4; }
   moli.update(t, dt, MO.mov);
-  if (talkEl.classList.contains('on')) {                              // el globo sale arriba de su cabeza
+  if (talkEl.classList.contains('on')) {                              // el globo sale arriba de su cabeza y la sigue suavecito (sin temblar)
+    moli.root.updateMatrixWorld(); camera.updateMatrixWorld();         // (con la posición de ESTE cuadro, no la del anterior)
     headV.set(0, 2.02, 0).applyMatrix4(moli.root.matrixWorld).project(camera);
     const x = (headV.x + 1) / 2 * innerWidth, y = (1 - headV.y) / 2 * innerHeight, w = talkEl.offsetWidth, h = talkEl.offsetHeight;
     const left = Math.max(8, Math.min(innerWidth - w - 8, x - w + 56)), top = Math.max(8, Math.min(innerHeight - h - 70, y - h - 12));
-    talkEl.style.left = left + 'px'; talkEl.style.top = top + 'px'; talkEl.style.setProperty('--tail', Math.max(16, Math.min(w - 36, left + w - x - 10)) + 'px');
+    const tail = Math.max(16, Math.min(w - 36, left + w - x - 10)), B = MO.bub || (MO.bub = { x: left, y: top, t: tail });
+    const k = MO.bubSnap ? 1 : 1 - Math.exp(-14 * dt); MO.bubSnap = false;
+    B.x += (left - B.x) * k; B.y += (top - B.y) * k; B.t += (tail - B.t) * k;
+    talkEl.style.translate = B.x.toFixed(1) + 'px ' + B.y.toFixed(1) + 'px';
+    talkEl.style.setProperty('--tail', B.t.toFixed(1) + 'px'); talkEl.style.setProperty('--ox', (w - B.t - 10).toFixed(0) + 'px');
   }
 });
 afterRender.push(() => { renderer.autoClear = false; renderer.render(moliScene, camera); renderer.autoClear = true; });
