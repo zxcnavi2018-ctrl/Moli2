@@ -147,7 +147,7 @@
 <link rel="stylesheet" href="hojas.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="datos.js"></script>
-<script src="hojas.js"></script>
+<script src="hojas.js"></script><script src="fotocheck.js"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -1902,12 +1902,13 @@ async function fly(st, dir = 1) {                                   // vuelo en 
 async function go(dir) {
   if (MO.tut && dir !== 1) return;                                   // tutorial obligatorio: sólo se avanza con ▶ (no se regresa ni se salta)
   if (TOUR.busy) { TOUR.q = dir; if (MO.talking) MO.talking.skip(); return; }      // si Molí está hablando, tocar ▶ adelanta su texto
-  callar();
+  callar(); Foto.mostrar(false);
   TOUR.busy = true;
   try {
     const cur = STOPS[TOUR.i]; hideTitle(); if (cur.leave && cur.abierto) { cur.abierto = false; await cur.leave(); }
     TOUR.i = (TOUR.i + dir + STOPS.length) % STOPS.length; showStop();
     const st = STOPS[TOUR.i]; if (MO.tut) moliIr(st, Math.min(2000, 900 + TOUR.pos.distanceTo(fromOf(st)) * 150) * 1.08); await fly(st, dir); if (!MO.tut && TOUR.i === 0) { const home = spotFor(STOPS[0]).pos; if (home.distanceTo(MO.target) > 0.3) moliIr(STOPS[0], 1400); moli.accion('saludar', -1); } if (st.title) showTitle(st.title, TOUR.i);
+    if (TOUR.i === 0) setTimeout(() => Foto.mostrar(TOUR.i === 0), 700);   // el fotocheck cuelga sólo en «Mi aula»
     if (st.enter) { const k = TOUR.i, tut = MO.tut; await st.enter(); st.abierto = true;
       if (tut && MO.tut && st.leave) { await wait(2600); if (TOUR.i === k && st.abierto) { st.abierto = false; await st.leave(); } } }   // en el tutorial: Molí lo abre, lo muestra y lo cierra solito
     else await guiar();   // al llegar: el nombre de la escena, el objeto se abre y Molí explica
@@ -2367,7 +2368,7 @@ try { renderer.compile(scene, camera); renderer.compile(moliScene, camera); } ca
 window.SPLASH.then(function arrancar() {                                               // empieza con «Mi aula» cuando ya se mueve fluido; Molí entra volando por la derecha
   const t0 = performance.now(); let n = 0, last = t0;
   const tick = (now) => { n = now - last < 90 ? n + 1 : 0; last = now;
-    if (n >= 4 || now - t0 > 4000) setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) { const sp = spotCerca(); MO.pos.copy(sp.entra); MO.target.copy(sp.entra); MO.vel.set(0, 0, 0); moliIr(STOPS[0], 1700, sp); showTitle(STOPS[0].title, 0); guiar(); } }, 250);
+    if (n >= 4 || now - t0 > 4000) setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) { const sp = spotCerca(); MO.pos.copy(sp.entra); MO.target.copy(sp.entra); MO.vel.set(0, 0, 0); moliIr(STOPS[0], 1700, sp); showTitle(STOPS[0].title, 0); setTimeout(() => Foto.mostrar(TOUR.i === 0), 900); guiar(); } }, 250);
     else requestAnimationFrame(tick); };
   requestAnimationFrame(tick);
 });

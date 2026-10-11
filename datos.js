@@ -54,6 +54,7 @@
     LS.set(ME_KEY, me); return me;
   }
   function salir() { try { localStorage.removeItem(ME_KEY); } catch (e) {} }
+  const esDocente = () => { const m = yo(); return !!(m && (m.docente || m.teacher)); };
 
   // ---- contenido: unidades y sesiones ----
   let contenido = null, misiones = null;
@@ -151,6 +152,6 @@
     throw new Error('IA');
   }
 
-  window.MD = { FB, yo, entrar, salir, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
+  window.MD = { FB, yo, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
     PART, PROD, CUAD, COND, cargarMisiones, misionesDe, avance, marcarActividad, misionCompleta, pensar, LS, lleno, contenido: () => contenido };
 })();
