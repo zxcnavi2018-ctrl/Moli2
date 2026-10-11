@@ -124,6 +124,12 @@
     await commit([{ update: { name, fields: toF(rec) }, currentDocument: { exists: false } }]);
     return { ...rec, createdAt: Date.now() };
   }
+  async function crearTicket(u, n, s, answers) {                    // Exit ticket leído con el escáner (se crea una sola vez, como en Molí)
+    const id = `${u.key}-s${n}-${s.key}`, score = answers.filter(Boolean).length;
+    const rec = { unit: u.key, unitNum: String(u.num), session: n, grade: '6to', section: s.section, name: s.name, student: s.key, dni: s.dni, score, total: answers.length, answers, createdAt: new Date() };
+    const r = await fetch(`${BASE}:commit?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ writes: [{ update: { name: DOC('exitTickets', id), fields: toF(rec) }, currentDocument: { exists: false } }] }) });
+    if (r.ok) return 'ok'; const j = await r.json().catch(() => ({})), st = j.error && j.error.status; if (st === 'ALREADY_EXISTS' || st === 'FAILED_PRECONDITION') return 'dup'; throw new Error(st || 'RED');
+  }
   async function crearEstudiante(dni, name, section) {
     dni = String(dni || '').replace(/\D/g, ''); if (!/^\d{8}$/.test(dni)) throw new Error('DNI');
     name = String(name || '').trim().replace(/\s+/g, ' '); if (name.length < 3 || name.length > 60) throw new Error('NOMBRE');
@@ -134,6 +140,6 @@
   }
 
   window.Docente = { FB, BASE, DOC, toF, fromDoc, kid, quien, conClave, conCorreo, conGoogle, conectado, token, salirCuenta: () => LS.del(AUTH),
-    lista, consulta, commit, estudiantes, ticketsUnidad, misionesTodos, guardarNota, crearEstudiante, OWNER_EMAIL,
+    lista, consulta, commit, estudiantes, ticketsUnidad, misionesTodos, guardarNota, crearEstudiante, crearTicket, OWNER_EMAIL,
     correo: () => (LS.get(AUTH, null) || {}).email || '' };
 })();
