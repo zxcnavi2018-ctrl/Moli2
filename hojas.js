@@ -136,6 +136,24 @@
       r: `<h2 class="w">📚 Elige tu unidad</h2>${U.length ? U.map(u => `<button class="row w" data-a="unidad" data-k="${esc(u.key)}"><span class="ico" style="font-size:1.6em">${esc(u.icon || '📘')}</span><span class="rt"><b>Unidad ${esc(u.num)}</b><small>${esc(u.title)}</small></span><span>›</span></button>`).join('') : '<p class="hand w">Todavía no hay unidades visibles.</p>'}` };
   };
 
+  // ---- la ficha de la sesión (la arma «Trabajar con Molí»): va dentro del cuaderno, en sus propias hojas ----
+  const fichaHtml = (fx, n) => {
+    if (!fx) return '';
+    const P = [`<div class="crumb w">📄 Ficha · Sesión ${n}</div>`, `<h1 class="w">${esc(fx.t || 'Ficha de la sesión')}</h1>`];
+    if (L(fx.st)) P.push(`<p class="hand w">${esc(fx.st)}</p>`);
+    const trozos = t => { const o = [], fr = String(t || '').match(/[^.!?]+[.!?]*\s*/g) || []; let c = ''; fr.forEach(f => { if ((c + f).length > 300 && c) { o.push(c.trim()); c = ''; } c += f; }); if (c.trim()) o.push(c.trim()); return o; };
+    const bloque = (cls, tit, t) => trozos(t).forEach((x, k) => P.push(`<div class="${cls} w">${!k && tit ? `<b>${tit}</b>` : ''}<p>${esc(x)}</p></div>`));   // en trocitos: si no entra, sigue en la otra hoja
+    if (L(fx.rd)) bloque('fx-lee', '📖 Lectura', fx.rd);
+    (fx.b || []).forEach(x => bloque('fx-bl', L(x.h) ? esc(x.h) : '', x.t));
+    if (L(fx.sb)) P.push(`<div class="box tip w">💡 <b>¿Sabías que…?</b> <span class="hand">${esc(String(fx.sb).replace(/^\s*¿?\s*sab[ií]as\s+que\s*(…|\.\.\.)?\s*/i, ''))}</span></div>`);
+    let a0 = 0;
+    (fx.k || []).forEach((x, i) => {
+      if (x.a && x.a !== a0) { a0 = x.a; P.push(`<h3 class="w">🧪 Actividad ${x.a}</h3>`); }
+      P.push(`<div class="fx-q w"><b class="n">${i + 1}</b><div><p>${esc(x.q)}</p>${L(x.h) ? `<small>💬 ${esc(x.h)}</small>` : ''}${x.c && x.c.length ? `<table class="fx-t"><tr>${x.c.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${'<tr>' + x.c.map(() => '<td></td>').join('') + '</tr>'.repeat(1)}${Array.from({ length: Math.max(1, (x.r || 3) - 1) }, () => '<tr>' + x.c.map(() => '<td></td>').join('') + '</tr>').join('')}</table>` : `<div class="fx-ln">${L(x.f) ? `<span>${esc(x.f)}</span>` : ''}</div>`}</div></div>`);
+    });
+    return P.join('');
+  };
+
   // =================================================================
   //  1) MIS SESIONES DE UNIDAD (cuaderno verde de la mesa)
   // =================================================================
@@ -157,6 +175,7 @@
           r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${Hojas.videoHtml ? Hojas.videoHtml(a) : ''}`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
             ${tareas.map(f => `<div class="box tip w"><b>🏠 Para la casa:</b> <span class="hand">${esc(f.title)}${L(f.desc) ? ' — ' + esc(f.desc) : ''}</span></div>`).join('')}
             ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} ${q === 1 ? 'pregunta' : 'preguntas'}<br><span class="hand">Respóndelo en tu portafolio verde del locker.</span></div>` : ''}` });
+        if (s.fx) H.push({ l: fichaHtml(s.fx, n), r: null });
       });
       return H;
     };
@@ -538,7 +557,7 @@ Devuelve JSON:
       const tema = { cuaderno: 'ses', folder: 'exit', docente: 'notas', mision: 'mis' }[kind];
       Libro(host, tema, F); actual = F; F.iniciar && F.iniciar();
     },
-    _: { Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades },
+    _: { Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml },
     cerrar() { if (actual) { actual.libro && actual.libro.ro && actual.libro.ro.disconnect(); actual.cerrar && actual.cerrar(); actual = null; } }
   };
 })();

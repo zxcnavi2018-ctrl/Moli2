@@ -160,6 +160,29 @@
 
   // ---- Molí piensa (Gemini por Firebase, el mismo que usa Molí); si no responde, se usan preguntas de plantilla ----
   const MODELOS = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+  // con archivos (imágenes, PDF, texto) y más espacio: lo usa «Trabajar con Molí»
+  async function pensarCon(parts, prompt, schema, opt = {}) {
+    const body = JSON.stringify({ contents: [{ role: 'user', parts: [...parts, { text: prompt }] }],
+      generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: .8, maxOutputTokens: opt.maxTokens || 8192 } });
+    const lista = [...MODELOS], vistos = new Set(); let ultimo = 'IA';
+    for (let vuelta = 0; vuelta < (opt.intentos || 3); vuelta++) {
+      for (const m of lista) {
+        if (opt.parar && opt.parar()) throw new Error('STOP');
+        const ac = new AbortController(), to = setTimeout(() => ac.abort(), opt.timeout || 120000);
+        let r; try { r = await fetch(`https://firebasevertexai.googleapis.com/v1beta/projects/${FB.projectId}/models/${m}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': FB.apiKey }, body, signal: ac.signal }); }
+        catch (e) { clearTimeout(to); ultimo = 'BUSY'; continue; } clearTimeout(to);
+        const j = await r.json().catch(() => ({}));
+        if (r.status === 404) { (JSON.stringify(j).match(/models\/(gemini-[\w.-]+)/g) || []).map(x => x.slice(7)).forEach(x => { if (!vistos.has(x)) { vistos.add(x); lista.push(x); } }); continue; }
+        if (r.status === 429) { ultimo = 'QUOTA'; continue; }
+        if (!r.ok) { ultimo = 'BUSY'; continue; }
+        const t = (((j.candidates || [])[0] || {}).content || {}).parts, txt = t && t.map(p => p.text || '').join('');
+        try { const v = JSON.parse(txt); const ok = opt.validar ? opt.validar(v) : v; if (ok) return ok; ultimo = 'EMPTY'; } catch (e) { ultimo = 'EMPTY'; }
+      }
+      opt.alReintentar && opt.alReintentar(vuelta + 1, ultimo);
+      await new Promise(r => setTimeout(r, ultimo === 'QUOTA' ? 60000 : [5000, 15000, 30000][vuelta] || 30000));
+    }
+    throw new Error(ultimo);
+  }
   async function pensar(prompt, schema) {
     const body = JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: schema ? { responseMimeType: 'application/json', responseSchema: schema, temperature: .8, maxOutputTokens: 4096 } : { temperature: .4, maxOutputTokens: 2048 } });
@@ -179,6 +202,6 @@
     throw new Error('IA');
   }
 
-  window.MD = { _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
+  window.MD = { pensarCon, _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
     PART, PROD, CUAD, COND, cargarMisiones, misionesDe, avance, marcarActividad, misionCompleta, pensar, LS, lleno, contenido: () => contenido };
 })();

@@ -7,7 +7,7 @@
 //   · Laptop                    → avance de cada estudiante en el Laboratorio de Molí
 // ===================================================================
 (function () {
-  const { Libro, esc, L, IMG, cargando, nivelChip, temaDe, MODOS, hojaUnidades } = Hojas._;
+  const { Libro, esc, L, IMG, cargando, nivelChip, temaDe, MODOS, hojaUnidades, fichaHtml } = Hojas._;
   const SECS = ['A', 'B', 'C', 'D'];
   const LSd = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
   const PAV = ['', '1', '2', '3', '+4'], CONDK = ['', 'C', 'B', 'A', 'AD'];
@@ -179,6 +179,7 @@
             <p class="center w"><button class="bt or" data-a="editar" data-n="${n}">✏️ Editar sesión</button></p>`,
           r: `<h2 class="w">🧪 Actividades</h2>${acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${videoHtml(a)}`).join('') || '<p class="hand w">Sin actividades todavía.</p>'}
             ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} preguntas</div>` : ''}` });
+        if (s.fx) H.push({ l: fichaHtml(s.fx, n), r: null });
       });
       return H;
     };

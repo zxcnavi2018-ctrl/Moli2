@@ -1,0 +1,219 @@
+// ===================================================================
+//  MOLÍ 2 · HERRAMIENTAS DE LA DOCENTE (se abren desde su fotocheck)
+//   🤖 Crear cuenta con Molí · ✨ Trabajar con Molí · 📷 Escanear · 📱 Control remoto · 💻 Laptop o celular
+// ===================================================================
+(function () {
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const L = t => !!String(t || '').trim();
+  const cut = (t, n) => String(t || '').replace(/\s+/g, ' ').trim().slice(0, n);
+  const panel = document.createElement('div'); panel.id = 'herr';
+  const montarPanel = () => { if (!panel.isConnected && document.body) document.body.appendChild(panel); };
+  document.addEventListener('DOMContentLoaded', montarPanel); montarPanel();
+  let cerrarActual = null;
+  function abrir(titulo, sub, img, html, ancho) {
+    montarPanel(); if (cerrarActual) { const c = cerrarActual; cerrarActual = null; c(); }
+    panel.innerHTML = `<div class="hp-c${ancho ? ' ancho' : ''}"><button class="hp-x" data-h="x" aria-label="Cerrar">✕</button>
+      <div class="hp-h"><img src="img/moli/${img}.webp" alt=""><div><b>${titulo}</b><span>${sub}</span></div></div><div class="hp-b">${html}</div></div>`;
+    panel.classList.add('on'); return panel.querySelector('.hp-b');
+  }
+  function cerrar() { panel.classList.remove('on'); if (cerrarActual) { const c = cerrarActual; cerrarActual = null; c(); } }
+  panel.addEventListener('click', e => { if (e.target === panel || e.target.closest('[data-h="x"]')) cerrar(); });
+  const errTxt = e => e && e.message === 'AUTH' ? '🔐 Conecta tu cuenta de docente: toca tu fotocheck → «Conectar mi cuenta».' : e && e.message === 'QUOTA' ? '⏳ Google está al límite por ahora. Intenta en un minuto.' : '📶 No se pudo. Revisa tu internet e intenta otra vez.';
+
+  // =================================================================
+  //  🤖 CREAR CUENTA CON MOLÍ
+  // =================================================================
+  function crearCuenta() {
+    const b = abrir('🤖 Crear cuenta con Molí', 'Tus estudiantes entran con su DNI (como en Molí 1).', 'feliz', `
+      <form class="hp-f" data-f="uno"><div class="hp-row"><input name="dni" inputmode="numeric" maxlength="8" placeholder="DNI (8 números)" required>
+        <select name="sec">${['A', 'B', 'C', 'D'].map(x => `<option>${x}</option>`).join('')}</select></div>
+        <input name="nom" maxlength="60" placeholder="Nombre completo" required><button class="hp-ok" type="submit">➕ Crear cuenta</button><p class="hp-msg"></p></form>
+      <details class="hp-mas"><summary>📋 Varios a la vez (pegar de Excel)</summary>
+        <p class="hp-tip">Pega una fila por estudiante: <b>DNI</b> · <b>Nombre completo</b> · <b>Sección</b> (A, B, C o D). Puedes copiarlas directo de Excel.</p>
+        <textarea rows="6" placeholder="71234567	Ana Pérez Ríos	A&#10;72345678	Bruno Díaz Soto	B"></textarea><button class="hp-ok" data-h="varios">➕ Crear todas</button><p class="hp-msg2"></p></details>
+      <div class="hp-lista"><b>👥 Estudiantes</b><div class="hp-secs">${['A', 'B', 'C', 'D'].map(x => `<button data-h="ver" data-k="${x}">6° ${x}</button>`).join('')}</div><div class="hp-ls"></div></div>`);
+    const ver = async sec => { const ls = b.querySelector('.hp-ls'); b.querySelectorAll('[data-h="ver"]').forEach(x => x.classList.toggle('on', x.dataset.k === sec)); ls.innerHTML = '<small>Cargando…</small>';
+      try { const E = (await Docente.estudiantes(true)).filter(e => e.section === sec); ls.innerHTML = E.length ? `<small>${E.length} estudiantes</small><ol>${E.map(e => `<li>${esc(e.name)} <small>••••${esc(String(e.dni).slice(-4))}</small></li>`).join('')}</ol>` : '<small>Sin estudiantes todavía.</small>'; }
+      catch (e) { ls.innerHTML = `<small>${errTxt(e)}</small>`; } };
+    b.addEventListener('submit', async e => { e.preventDefault(); const f = e.target, m = f.querySelector('.hp-msg'), bt = f.querySelector('button'); bt.disabled = true; m.textContent = 'Creando…';
+      try { const s = await Docente.crearEstudiante(f.dni.value, f.nom.value, f.sec.value); m.innerHTML = `✅ Cuenta de <b>${esc(s.name)}</b> (6° ${s.section}) creada. Ya puede entrar con su DNI.`; f.dni.value = ''; f.nom.value = ''; ver(s.section); }
+      catch (x) { m.textContent = x.message === 'DNI' ? 'El DNI debe tener 8 números.' : x.message === 'NOMBRE' ? 'Escribe el nombre completo (3 a 60 letras).' : x.message === 'YAEXISTE' ? 'Ese DNI ya tiene cuenta.' : errTxt(x); }
+      bt.disabled = false; });
+    b.addEventListener('click', async e => { const k = e.target.closest('[data-h]'); if (!k) return;
+      if (k.dataset.h === 'ver') ver(k.dataset.k);
+      if (k.dataset.h === 'varios') { const m = b.querySelector('.hp-msg2'), filas = b.querySelector('textarea').value.split(/\r?\n/).map(l => l.split(/\t|;|,/).map(x => x.trim())).filter(r => r.length >= 3 && r[0]);
+        let ok = 0, mal = []; k.disabled = true;
+        for (const [d, n, s] of filas) { m.textContent = `Creando ${ok + mal.length + 1} de ${filas.length}…`; const sec = String(s).toUpperCase().replace(/[^A-D]/g, '').slice(-1);
+          try { if (!sec) throw new Error('SEC'); await Docente.crearEstudiante(d, n, sec); ok++; } catch (x) { mal.push(`${d} (${x.message === 'YAEXISTE' ? 'ya existe' : x.message === 'DNI' ? 'DNI' : x.message === 'SEC' ? 'sección' : x.message === 'AUTH' ? 'cuenta' : 'error'})`); if (x.message === 'AUTH') break; } }
+        m.innerHTML = `✅ ${ok} creadas.${mal.length ? ' ⚠️ No se crearon: ' + esc(mal.join(', ')) : ''}`; k.disabled = false; } });
+    ver('A');
+  }
+
+  // =================================================================
+  //  ✨ TRABAJAR CON MOLÍ: arma la unidad con tus fotos, PDF o Word y la pone tal cual en el cuaderno
+  // =================================================================
+  const ESTILO = `ESTILO DEL PROFESOR (síguelo siempre):
+- EXIT TICKET: 5 preguntas de opción múltiple con 4 opciones (A, B, C, D), preguntas de máximo 14 palabras y opciones de máximo 6 palabras del mismo largo; evalúan la meta y lo que se hizo en las actividades de la sesión, de la más fácil a la más difícil; las opciones incorrectas son errores típicos de los niños; nada de «todas las anteriores».
+- ACTIVIDAD Y FICHA SIEMPRE IGUALES: la ficha hace exactamente lo que dicen el título y la descripción de la actividad.
+- ESPACIO Y TEXTO: la información va primero y bien desarrollada; las preguntas van después. Cada pregunta abierta es corta y clara.
+- FICHA O PAPELOTE: en las actividades en equipo, si construyen un producto para presentar lo hacen en un PAPELOTE y la ficha solo indica «En equipo, en un papelote…»; si es un trabajo corto se hace en la ficha.
+- UNA FICHA POR SESIÓN: cada sesión lleva UNA sola ficha que sirve para sus 3 actividades.
+- Todo en español sencillo para niñas y niños de 11 y 12 años de Perú; cuida la seguridad en los experimentos.
+`;
+  const S_TXT = { type: 'STRING' }, S_ARR = { type: 'ARRAY', items: { type: 'STRING' } };
+  const ESQ_PLAN = { type: 'OBJECT', required: ['units', 'aviso'], properties: { aviso: S_TXT, units: { type: 'ARRAY', items: { type: 'OBJECT', required: ['num', 'title', 'product', 'rubric', 'sessions'],
+    properties: { num: S_TXT, title: S_TXT, product: S_TXT, rubricName: S_TXT, rubric: S_ARR, sessions: { type: 'ARRAY', items: { type: 'OBJECT', required: ['meta', 'criteria', 'rubric'],
+      properties: { meta: S_TXT, criteria: S_ARR, rubric: S_TXT, mat: S_TXT, hoyT: S_TXT, hoyD: S_TXT, sigT: S_TXT, sigD: S_TXT } } } } } } } };
+  const ESQ_SES = { type: 'OBJECT', required: ['activities', 'enfoque', 'ticket'], properties: {
+    activities: { type: 'ARRAY', items: { type: 'OBJECT', required: ['title', 'desc'], properties: { title: S_TXT, desc: S_TXT, video: S_TXT } } },
+    enfoque: { type: 'STRING', enum: ['lectura', 'andamios', 'casos', 'experimento'] },
+    ticket: { type: 'ARRAY', items: { type: 'OBJECT', required: ['q', 'options', 'answer'], properties: { q: S_TXT, options: S_ARR, answer: { type: 'INTEGER' }, why: S_TXT } } } } };
+  const ESQ_FICHA = { type: 'OBJECT', required: ['title', 'blocks', 'tasks'], properties: { title: S_TXT, subtitle: S_TXT, reading: S_TXT,
+    blocks: { type: 'ARRAY', items: { type: 'OBJECT', required: ['heading', 'text'], properties: { heading: S_TXT, text: S_TXT } } },
+    tasks: { type: 'ARRAY', items: { type: 'OBJECT', required: ['q'], properties: { act: { type: 'INTEGER' }, q: S_TXT, help: S_TXT, frame: S_TXT, cols: S_ARR, rows: { type: 'INTEGER' } } } },
+    sabias: S_TXT } };
+  const mezclar = q => { const o = q.options.map((t, i) => ({ t, ok: i === q.answer })); for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return { q: q.q, options: o.map(x => x.t), answer: o.findIndex(x => x.ok), why: q.why || '' }; };
+
+  // ---- leer archivos: imágenes (achicadas), PDF, Word (.docx) y texto ----
+  const b64 = buf => { let s = '', u = new Uint8Array(buf); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+  async function imagen(f) { const bm = await createImageBitmap(f), k = Math.min(1, 1280 / Math.max(bm.width, bm.height)), c = document.createElement('canvas'); c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k);
+    c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', .72).split(',')[1]; }
+  async function docx(f) {                                           // Word: se lee word/document.xml del ZIP
+    const buf = await f.arrayBuffer(), dv = new DataView(buf), u8 = new Uint8Array(buf);
+    let eocd = -1; for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 66000); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new Error('DOCX');
+    let p = dv.getUint32(eocd + 16, true); const n = dv.getUint16(eocd + 10, true);
+    for (let k = 0; k < n; k++) {
+      const met = dv.getUint16(p + 10, true), csz = dv.getUint32(p + 20, true), fl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+      const name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + fl)); p += 46 + fl + xl + cl;
+      if (name !== 'word/document.xml') continue;
+      const lfl = dv.getUint16(off + 26, true), lxl = dv.getUint16(off + 28, true), data = u8.subarray(off + 30 + lfl + lxl, off + 30 + lfl + lxl + csz);
+      const xml = met === 0 ? new TextDecoder().decode(data) : await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+      return xml.replace(/<\/w:p>/g, '\n').replace(/<w:tab\/>/g, '\t').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\n{3,}/g, '\n\n').trim().slice(0, 30000);
+    }
+    throw new Error('DOCX');
+  }
+  async function partes(files) {
+    const P = [];
+    for (const f of files) {
+      const et = `[${/pdf$/i.test(f.name) ? 'PDF' : /docx$/i.test(f.name) ? 'Word' : /^image/.test(f.type) ? 'Imagen' : 'Texto'} adjunto: ${f.name}]${f._s ? ` (Sesión ${f._s})` : ''}`;
+      if (/^image\//.test(f.type)) P.push({ text: et }, { inlineData: { mimeType: 'image/jpeg', data: await imagen(f) } });
+      else if (/\.pdf$/i.test(f.name) || f.type === 'application/pdf') P.push({ text: et }, { inlineData: { mimeType: 'application/pdf', data: b64(await f.arrayBuffer()) } });
+      else if (/\.docx$/i.test(f.name)) P.push({ text: et + '\n' + await docx(f) });
+      else P.push({ text: et + '\n' + (await f.text()).slice(0, 30000) });
+    }
+    return P;
+  }
+  const sesDeNombre = n => { const m = String(n).match(/(?:s|ses|sesi[oó]n)[\s._-]*0?(\d{1,2})/i); return m ? +m[1] : 0; };
+
+  const trabajar = () => MD.cargar().then(trabajarUI).catch(() => abrir('✨ Trabajar con Molí', '', 'pensativa', '<p>📶 No pude cargar las unidades. Revisa tu internet.</p>'));
+  function trabajarUI() {
+    const U = (MD.contenido() ? MD.contenido().units : []).filter(u => /^unit\d+$/.test(u.key));
+    const W = { files: [], stop: false, run: false };
+    const b = abrir('✨ Trabajar con Molí', 'Molí arma tu unidad con tus fotos, PDF o Word y la pone tal cual en el cuaderno.', 'idea', `
+      <div class="hp-f"><label>📘 Unidad</label><select class="tw-u">${U.map(u => `<option value="${esc(u.key)}">Unidad ${esc(u.num)}${L(u.title) ? ' · ' + esc(u.title) : ''}${(u.sessions || []).some(s => L(s.meta)) ? ' (se reemplaza)' : ''}</option>`).join('')}</select>
+        <label>📝 Indicaciones para Molí</label><textarea class="tw-n" rows="3" placeholder="Por ejemplo: son 10 sesiones; la sesión 4 es de laboratorio; usa los anexos del PDF…"></textarea>
+        <label>📎 Materiales (fotos, PDF, Word)</label><input class="tw-f" type="file" multiple accept="image/*,.pdf,.docx,.txt"><div class="tw-fl"></div>
+        <label class="hp-ck"><input type="checkbox" class="tw-fi" checked> 📄 Crear también la ficha de cada sesión (va dentro del cuaderno)</label>
+        <label class="hp-ck"><input type="checkbox" class="tw-v" checked> 🎬 Dejar espacios para videos</label>
+        <button class="hp-ok tw-go">✨ ¡Molí, arma la unidad!</button><p class="hp-msg tw-m"></p></div>
+      <div class="tw-w" hidden><div class="tw-bar"><i></i></div><p class="tw-msg"></p><p class="tw-sub"></p><button class="hp-no tw-stop">⏹ Detener</button></div>
+      <div class="tw-r" hidden></div>`, true);
+    const $ = s => b.querySelector(s);
+    const pintaFiles = () => { $('.tw-fl').innerHTML = W.files.map((f, i) => `<div class="tw-fi1"><span>${/pdf$/i.test(f.name) ? '📕' : /docx$/i.test(f.name) ? '📘' : /^image/.test(f.type) ? '🖼️' : '📄'} ${esc(f.name)}</span>
+      <select data-i="${i}"><option value="0">General</option>${Array.from({ length: 14 }, (_, k) => `<option value="${k + 1}"${f._s === k + 1 ? ' selected' : ''}>Sesión ${k + 1}</option>`).join('')}</select><button data-q="${i}">✕</button></div>`).join(''); };
+    $('.tw-f').addEventListener('change', e => { [...e.target.files].forEach(f => { if (f.size > 15e6) return; f._s = sesDeNombre(f.name); W.files.push(f); }); e.target.value = ''; pintaFiles(); });
+    $('.tw-fl').addEventListener('change', e => { const s = e.target.closest('select'); if (s) W.files[+s.dataset.i]._s = +s.value; });
+    $('.tw-fl').addEventListener('click', e => { const q = e.target.closest('[data-q]'); if (q) { W.files.splice(+q.dataset.q, 1); pintaFiles(); } });
+    $('.tw-stop').addEventListener('click', () => { W.stop = true; $('.tw-msg').textContent = 'Deteniendo…'; });
+    cerrarActual = () => { W.stop = true; };
+    const prog = (msg, sub, k) => { $('.tw-msg').textContent = msg; $('.tw-sub').textContent = sub || ''; if (k != null) $('.tw-bar i').style.width = Math.round(k * 100) + '%'; };
+    $('.tw-go').addEventListener('click', async () => {
+      if (W.run) return; const uKey = $('.tw-u').value, unit = U.find(u => u.key === uKey); if (!unit) return;
+      if (!Docente.conectado()) { $('.tw-m').textContent = errTxt({ message: 'AUTH' }); return; }
+      if (!W.files.length && !L($('.tw-n').value)) { $('.tw-m').textContent = 'Sube tus materiales o escribe indicaciones para Molí.'; return; }
+      W.run = true; W.stop = false; $('.hp-f').hidden = true; $('.tw-w').hidden = false; $('.tw-r').hidden = true;
+      const fichas = $('.tw-fi').checked, videos = $('.tw-v').checked, nota = cut($('.tw-n').value, 3000), parar = () => W.stop;
+      const reint = (k, why) => prog($('.tw-msg').textContent, `⏳ ${why === 'QUOTA' ? 'Límite por minuto de Google: Molí espera 1 minuto' : 'Google está ocupado'} y reintenta (${k})…`);
+      try {
+        prog('Molí está leyendo tus materiales…', `${W.files.length} archivo(s)`, .03);
+        const P = await partes(W.files);
+        prog('Molí arma el plan de la unidad…', 'Metas, criterios y rúbrica de cada sesión', .08);
+        const plan = await MD.pensarCon(P, `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú. Vas a armar la UNIDAD ${unit.num}${L(unit.title) ? ` («${unit.title}»)` : ''} completa (pon "num": "${unit.num}").
+${ESTILO}CÓMO ARMAR LA UNIDAD COMPLETA:
+1) Lee TODOS los materiales adjuntos y las indicaciones del profesor. Las indicaciones del profesor mandan sobre todo lo demás. Si un archivo dice «(Sesión N)», es material de la sesión N.
+2) Identifica el propósito, el producto final y la rúbrica con sus criterios.
+3) Toma la meta y los criterios de éxito de cada sesión tal como vienen en los materiales (si son largos, resúmelos en 3 criterios cortos que empiezan con verbo).
+4) Si faltan sesiones o metas, créalas siguiendo la lógica del producto (indagación: observar, preguntar, hipótesis, variables, diseño, experimento, datos, interpretación, conclusión; o explicar: conocer, describir, relacionar, opinar, producir).
+5) A cada sesión asígnale el criterio de la rúbrica que trabaja.
+6) Propón flipped «para hoy» y «para la siguiente sesión» solo cuando hagan falta.
+7) Las metas van en tercera persona y presente (Describe, Explica, Elabora), nunca en infinitivo.
+8) Revisa CADA captura o página: no te saltes ninguna sesión que aparezca en los materiales.
+Indicaciones del profesor: «${nota || '(ninguna)'}»
+Devuelve "units" (una sola unidad) con "num", "title" (título corto), "product", "rubricName", "rubric" (criterios cortos) y "sessions": cada sesión con "meta" (una oración que empieza con verbo), "criteria" (exactamente 3 criterios cortos que empiezan con verbo), "rubric" (el criterio de la rúbrica que trabaja), "hoyT"/"hoyD" (flipped para hoy: título y descripción, o vacíos) y "sigT"/"sigD" (flipped para la siguiente sesión, o vacíos). Entre 2 y 14 sesiones. Además "aviso": 1 o 2 oraciones para el profesor sobre lo que faltó o tuviste que deducir (vacío si todo estaba completo).
+IMPORTANTE: en cada sesión pon también "mat": un resumen (máximo 800 caracteres) de lo que dicen los materiales sobre ESA sesión, porque después armaré cada sesión SIN volver a ver los archivos.`, ESQ_PLAN,
+          { maxTokens: 12288, timeout: 150000, parar, alReintentar: reint, validar: v => { const u = v && Array.isArray(v.units) && v.units[0]; if (!u || !Array.isArray(u.sessions) || u.sessions.length < 1) return null;
+            u.sessions = u.sessions.slice(0, 14).map(s => ({ meta: cut(s.meta, 240), criteria: [...(s.criteria || []).map(c => cut(c, 120)), '', '', ''].slice(0, 3), rubric: cut(s.rubric, 200), mat: cut(s.mat, 900), hoyT: cut(s.hoyT, 80), hoyD: cut(s.hoyD, 300), sigT: cut(s.sigT, 80), sigD: cut(s.sigD, 300) })).filter(s => L(s.meta));
+            return u.sessions.length ? v : null; } });
+        const U0 = plan.units[0], N = U0.sessions.length, pasos = N * (fichas ? 2 : 1); let hecho = 0;
+        const sesiones = [];
+        for (let s = 0; s < N; s++) {
+          if (W.stop) throw new Error('STOP');
+          const o = U0.sessions[s]; prog(`Sesión ${s + 1} de ${N}: actividades y Exit ticket…`, o.meta, .1 + .88 * hecho / pasos);
+          const lista = U0.sessions.map((x, k) => `${k + 1}. ${x.meta}${k === s ? '  ← ESTA SESIÓN' : ''}`).join('\n');
+          const r = await MD.pensarCon([], `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú.
+${ESTILO}Unidad ${U0.num}: «${U0.title}». Producto: «${U0.product}». Rúbrica: ${(U0.rubric || []).join(' · ')}.
+Sesiones de la unidad:
+${lista}
+ESTA SESIÓN (${s + 1}): meta «${o.meta}»; criterios de éxito: ${o.criteria.filter(L).join(' | ')}; criterio de la rúbrica: «${o.rubric}».${o.mat ? `\nLo que dicen los materiales del colegio sobre esta sesión (RESPÉTALO): «${o.mat}»` : ''}
+Indicaciones del profesor: «${nota || '(ninguna)'}»
+Crea:
+- "activities": EXACTAMENTE 3: la 1 individual (presenta el material: casos, lectura, observación o video), la 2 colaborativa en equipos, la 3 individual (cada estudiante escribe su parte del producto con un andamio). Cada una con "title" (2 a 6 palabras, primera persona del plural, en presente), "desc" (máximo 200 caracteres, empieza con «En esta actividad» y sigue en FUTURO)${videos ? ' y "video": una búsqueda corta para YouTube (3 a 7 palabras, en español) de un video corto y apto para niños que ayude en esa actividad, o vacío si no hace falta (máximo 2 videos por sesión)' : ''}.
+- "enfoque": "lectura", "andamios", "casos" o "experimento" según lo que prioriza la sesión.
+- "ticket": 5 preguntas de opción múltiple (máximo 14 palabras) con 4 opciones MUY cortas (máximo 6 palabras), "answer" (0 a 3) y "why" (una oración). Español sencillo para 11 y 12 años.`, ESQ_SES,
+            { maxTokens: 4096, timeout: 90000, parar, alReintentar: reint, validar: v => { const a = (v && v.activities || []).slice(0, 3).filter(x => L(x.title)), q = (v && v.ticket || []).filter(x => L(x.q) && (x.options || []).filter(L).length >= 3);
+              return a.length >= 2 && q.length >= 3 ? { a, q, enf: v.enfoque } : null; } });
+          hecho++;
+          const ses = { title: '', meta: o.meta, criteria: o.criteria, rubric: o.rubric, flipped2: { enabled: L(o.hoyT), title: o.hoyT, desc: o.hoyD, file: '' }, flipped: { enabled: L(o.sigT), title: o.sigT, desc: o.sigD, file: '' },
+            activities: r.a.map((x, k) => ({ mode: k === 1 ? 'group' : 'individual', title: cut(x.title, 80), desc: cut(x.desc, 220), ficha: '', file: '', ...(videos && L(x.video) ? { ytq: cut(x.video, 80) } : {}) })),
+            ticket: { questions: r.q.slice(0, 5).map(x => mezclar({ q: cut(x.q, 160), options: x.options.filter(L).slice(0, 4).map(t => cut(t, 60)), answer: Math.max(0, Math.min(3, +x.answer || 0)), why: cut(x.why, 200) })) }, hidden: false };
+          if (fichas) {
+            if (W.stop) throw new Error('STOP');
+            prog(`Sesión ${s + 1} de ${N}: la ficha…`, ses.activities.map(a => a.title).join(' · '), .1 + .88 * hecho / pasos);
+            try {
+              const fx = await MD.pensarCon([], `Eres una docente experta de Ciencia y Tecnología de 6.° grado en Perú. Escribe la FICHA de la sesión ${s + 1} (una sola ficha para sus 3 actividades) que los estudiantes verán dentro de su cuaderno.
+${ESTILO}Meta: «${o.meta}». Criterios: ${o.criteria.filter(L).join(' | ')}. Enfoque: ${r.enf || 'andamios'}.${o.mat ? `\nMateriales del colegio para esta sesión: «${o.mat}»` : ''}
+Actividades:
+${ses.activities.map((a, k) => `${k + 1}) (${a.mode === 'group' ? 'en equipos' : 'individual'}) «${a.title}»: ${a.desc}`).join('\n')}
+Devuelve: "title" (título de la ficha), "subtitle" (una línea), "reading" (vacío o una lectura corta si el enfoque es lectura), "blocks" (1 a 4 bloques de información con "heading" y "text" de máximo 700 caracteres, claros y verdaderos), "tasks" (4 a 8 consignas en orden: cada una con "act" (1, 2 o 3), "q" (la consigna), "help" (una pista corta o vacío), "frame" (un inicio de oración para responder o vacío), "cols" (si es una tabla: 2 o 3 encabezados; si no, vacío) y "rows" (filas de la tabla, 2 a 6)), y "sabias": un dato curioso real y corto.`, ESQ_FICHA,
+                { maxTokens: 6144, timeout: 90000, parar, alReintentar: reint, validar: v => v && L(v.title) && Array.isArray(v.tasks) && v.tasks.length ? v : null });
+              ses.fx = { t: cut(fx.title, 90), st: cut(fx.subtitle, 140), rd: cut(fx.reading, 1500), b: (fx.blocks || []).slice(0, 4).map(x => ({ h: cut(x.heading, 80), t: cut(x.text, 800) })).filter(x => L(x.t)),
+                k: (fx.tasks || []).slice(0, 8).map(x => ({ a: +x.act || 0, q: cut(x.q, 240), h: cut(x.help, 200), f: cut(x.frame, 160), c: (x.cols || []).filter(L).slice(0, 3).map(c => cut(c, 40)), r: Math.max(2, Math.min(6, +x.rows || 3)) })).filter(x => L(x.q)),
+                sb: cut(fx.sabias, 240) };
+              ses.activities.forEach(a => { a.ficha = 'Ficha de la sesión'; });
+            } catch (x) { if (x.message === 'STOP') throw x; }
+            hecho++;
+          }
+          sesiones.push(ses);
+        }
+        prog('Publicando en el cuaderno de tus estudiantes…', '', .99);
+        await MD.publicar(units => { const u = units.find(x => x.key === uKey); if (!u) throw new Error('NOUNIT'); u.sessions = sesiones; if (!L(u.title)) u.title = cut(U0.title, 80); u.hidden = false; });
+        prog('¡Listo!', '', 1);
+        $('.tw-w').hidden = true; const R = $('.tw-r'); R.hidden = false;
+        R.innerHTML = `<div class="tw-ok"><img src="img/moli/estrellas.webp" alt=""><div><b>✅ ¡Unidad ${esc(U0.num)} lista y publicada!</b><span>Ya está en el cuaderno de sesiones de tus estudiantes: ${N} sesiones${fichas ? ' con su ficha' : ''}${videos ? ' y espacios para videos' : ''}.</span></div></div>
+          ${L(plan.aviso) ? `<p class="hp-tip">💬 Molí: ${esc(cut(plan.aviso, 300))}</p>` : ''}
+          <ol class="tw-ls">${sesiones.map((s, k) => `<li><b>Sesión ${k + 1}.</b> ${esc(s.meta)}<br><small>${s.activities.map(a => esc(a.title)).join(' · ')} · 🎟️ ${s.ticket.questions.length} preguntas${s.fx ? ' · 📄 ficha' : ''}${s.activities.some(a => a.ytq) ? ' · 🎬 video' : ''}</small></li>`).join('')}</ol>
+          <p class="hp-tip">✏️ Si quieres cambiar algo, abre el cuaderno de sesiones y toca «Editar sesión». Para los videos, pega el enlace de YouTube que elijas.</p>`;
+      } catch (e) {
+        $('.tw-w').hidden = true; $('.hp-f').hidden = false;
+        $('.tw-m').textContent = e.message === 'STOP' ? '⏹ Detenido. No se cambió nada en el cuaderno.' : e.message === 'GRANDE' ? 'El cuaderno quedó muy grande: desmarca las fichas e intenta otra vez.' : errTxt(e);
+      }
+      W.run = false;
+    });
+  }
+
+  // ---- qué abre cada botón del fotocheck ----
+  const H = { cuenta: crearCuenta, trabajar };
+  addEventListener('moli2:herramienta', e => { const f = H[e.detail] || (window.Herramientas && window.Herramientas.extra && window.Herramientas.extra[e.detail]); if (f) f(); });
+  window.Herramientas = { abrir, cerrar, esc, extra: {}, set cerrarActual(f) { cerrarActual = f; } };
+})();
