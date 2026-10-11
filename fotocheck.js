@@ -60,19 +60,30 @@
         <button class="fp-ok" type="submit">Conectar ✓</button></form>
       <p class="fp-me"><button data-f="google">Entrar con Google</button> · <button data-f="despues">Después</button></p>`);
   }
+  function menuEstudiante() {
+    const me = MD.yo();
+    abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
+      <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || '').split(' ')[0])}! 👋</b><span>${esc(me.name)} · 6° ${esc(me.section || '')}</span></div></div>
+      <button class="fp-out" data-f="salir1">🚪 Salir de cuenta</button>`);
+  }
+  function confirmarSalir() {
+    abrir(`<div class="fp-h"><img src="img/moli/pensativa.webp" alt=""><div><b>¿Salir de tu cuenta?</b><span>Para volver a entrar tendrás que escribir tu DNI otra vez.</span></div></div>
+      <div class="fp-dos"><button class="fp-no" data-f="x">Cancelar</button><button class="fp-out" data-f="salir">🚪 Sí, salir</button></div>`);
+  }
   function menuDocente() {
     const me = MD.yo();
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
       <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || 'profe').split(' ')[0])}! 👩‍🏫</b><span>Tus herramientas de docente.</span></div></div>
       <div class="fp-g">${HERR.map(([k, ic, t, d]) => `<button data-f="h" data-k="${k}"><i>${ic}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div>
-      <p class="fp-me">${Docente.conectado() ? '✅ Cuenta conectada · ' + esc(Docente.correo()) : '<button data-f="conectar">🔌 Conectar mi cuenta</button>'}<br>${esc(me.name)} · <button data-f="salir">Cerrar sesión</button></p>`);
+      <p class="fp-me">${Docente.conectado() ? '✅ Cuenta conectada · ' + esc(Docente.correo()) : '<button data-f="conectar">🔌 Conectar mi cuenta</button>'}<br>${esc(me.name)} · <button data-f="salir1">🚪 Salir de cuenta</button></p>`);
   }
   card.addEventListener('click', e => {
     e.stopPropagation();
     const me = MD.yo();
     if (!me) return pedirDni();
     if (MD.esDocente()) return menuDocente();
-    el.classList.remove('meneo'); void el.offsetWidth; el.classList.add('meneo');   // estudiante: sólo se mece
+    el.classList.remove('meneo'); void el.offsetWidth; el.classList.add('meneo');   // estudiante: se mece y puede salir de su cuenta
+    menuEstudiante();
   });
   panel.addEventListener('click', e => {
     if (e.target === panel) return cerrar();
@@ -80,6 +91,7 @@
     e.stopPropagation();
     const f = b.dataset.f;
     if (f === 'x') return cerrar();
+    if (f === 'salir1') return confirmarSalir();
     if (f === 'salir') { MD.salir(); cerrar(); pintar(); window.dispatchEvent(new Event('moli2:me')); return; }
     if (f === 'h') { cerrar(); window.dispatchEvent(new CustomEvent('moli2:herramienta', { detail: b.dataset.k })); }
     if (f === 'conectar') return pedirCuenta();

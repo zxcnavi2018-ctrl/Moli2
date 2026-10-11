@@ -400,3 +400,6 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
 #herr .sc-row.ok { border-color: #86efac; background: #f0fdf4; } #herr .sc-row.dup { border-color: #93c5fd; } #herr .sc-row.warn { border-color: #fcd34d; background: #fffbeb; }
 #herr .sc-row > div { flex: 1; min-width: 0; } #herr .sc-row small { display: block; color: #64748b; } #herr .sc-row strong, #herr .sc-row em { font-weight: 900; color: #15803d; font-style: normal; }
 #herr .sc-lista { margin-top: 6px; } #herr .sc-pick { padding: 8px; border: 2px solid #f59e0b; border-radius: 12px; background: #fffbeb; margin: 6px 0; } #herr .sc-pick button { margin: 3px; padding: 6px 10px; border: 2px solid #2b2547; border-radius: 10px; background: #fff; font-weight: 800; cursor: pointer; }
+#fcPanel .fp-out { display: block; width: 100%; margin-top: 8px; border: 0; border-radius: 14px; padding: 12px; background: #ef4444; color: #fff; font: 900 16px system-ui; box-shadow: 0 4px 0 #991b1b; cursor: pointer; }
+#fcPanel .fp-no { flex: 1; margin-top: 8px; border: 2.5px solid #2b2547; border-radius: 14px; padding: 10px; background: #fff; font: 900 15px system-ui; cursor: pointer; }
+#fcPanel .fp-dos { display: flex; gap: 8px; } #fcPanel .fp-dos .fp-out { flex: 1; width: auto; }
