@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Teatro de la vulnerabilidad · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.app{position:relative;z-index:1;flex:1;min-height:0;overflow:auto;padding:6px 14px 28px}
+.wrapc{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1.t{margin:4px 0 0;font-size:clamp(24px,4vw,40px);font-weight:900;text-align:center}
+p.s{margin:0;text-align:center;color:var(--ink2);font-weight:800}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px}
+.ch{position:relative;display:flex;flex-direction:column;gap:6px;min-height:180px;padding:16px;border:0;border-radius:24px;color:#fff;text-align:left;font:inherit;cursor:pointer;background:var(--g);box-shadow:0 16px 30px -12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .2s}
+.ch:hover{transform:translateY(-4px)}.ch .e{font-size:52px;line-height:1}.ch b{font-size:19px;font-weight:900}.ch small{font-weight:800;opacity:.92;font-size:14px}
+.ch .ok{position:absolute;top:10px;right:12px;padding:3px 10px;border-radius:99px;background:rgba(0,0,0,.3);font-size:12px;font-weight:900}
+.nar{display:flex;align-items:flex-end;gap:10px}
+.nar img{width:clamp(76px,12vw,112px);flex:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));animation:mbob 3s ease-in-out infinite}
+.bub{flex:1;padding:14px 18px;border-radius:20px 20px 20px 6px;background:#fff;color:#14224a;font-weight:800;font-size:clamp(15px,2.1vw,21px);line-height:1.35;box-shadow:0 12px 26px rgba(0,0,0,.35);animation:sayIn .35s cubic-bezier(.2,1.4,.4,1)}
+.bub b{color:#b91c1c}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{padding:12px 20px;border-radius:16px;border:0;font:inherit;font-weight:900;font-size:16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#ef4444,#991b1b);box-shadow:0 10px 20px -8px rgba(0,0,0,.6)}
+.btn.y{background:linear-gradient(135deg,#fde047,#f59e0b);color:#450a0a}.btn.g{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25)}
+.btn:active{transform:scale(.96)}
+.theater{position:relative;display:grid;grid-template-columns:1fr 64px;gap:12px;align-items:stretch}
+.stage{position:relative;aspect-ratio:16/9;max-height:52vh;border-radius:22px 22px 12px 12px;overflow:hidden;background:var(--bg);box-shadow:0 18px 40px -16px rgba(0,0,0,.7)}
+.stage::before,.stage::after{content:"";position:absolute;top:0;bottom:0;width:13%;z-index:4;background:repeating-linear-gradient(90deg,#991b1b 0 10px,#7f1d1d 10px 20px);box-shadow:0 0 20px rgba(0,0,0,.6);transition:width .9s ease}
+.stage::before{left:0;border-radius:0 0 40% 0}.stage::after{right:0;border-radius:0 0 0 40%}
+.stage.closed::before,.stage.closed::after{width:51%}
+.stage .top{position:absolute;top:0;left:0;right:0;height:9%;z-index:5;background:repeating-linear-gradient(90deg,#b91c1c 0 26px,#991b1b 26px 52px);border-bottom:4px solid #fbbf24}
+.floor{position:absolute;left:0;right:0;bottom:0;height:16%;background:linear-gradient(#92400e,#451a03);z-index:1}
+.prop{position:absolute;z-index:2;line-height:1;transition:transform .5s,filter .5s}
+.actor{position:absolute;z-index:3;bottom:12%;font-size:clamp(34px,6vw,64px);line-height:1;animation:act 2.4s ease-in-out infinite}
+@keyframes act{50%{transform:translateY(-6px)}}
+.stage.quake .prop,.stage.quake .actor{animation:qk .12s linear infinite}
+@keyframes qk{0%{transform:translate(-4px,1px) rotate(-1deg)}50%{transform:translate(4px,-1px) rotate(1deg)}100%{transform:translate(-3px,2px)}}
+.prop.fall{transform:rotate(80deg) translateY(30%)!important;filter:grayscale(.6)}
+.stitle{position:absolute;top:12%;left:50%;translate:-50% 0;z-index:3;padding:6px 14px;border-radius:99px;background:rgba(0,0,0,.45);color:#fff;font-weight:900;font-size:clamp(12px,1.8vw,17px);white-space:nowrap}
+.meter{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
+.meter small{font-weight:900;font-size:11px;text-align:center;color:var(--ink2);line-height:1.1}
+.tube{position:relative;flex:1;width:30px;min-height:200px;border-radius:99px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);overflow:hidden}
+.tube i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(0deg,#22c55e,#facc15 50%,#ef4444);transition:height .8s cubic-bezier(.2,1.4,.4,1)}
+.meter b{font-size:18px;font-weight:900}
+.dec{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.dec h3{margin:0;font-size:clamp(17px,2.4vw,22px)}
+.dec .num{color:#fca5a5;font-size:13px;letter-spacing:.1em}
+.opt{padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-weight:800;font-size:15px;text-align:left;cursor:pointer}
+.opt:hover{border-color:#fde047}
+.fb{padding:12px 16px;border-radius:16px;font-weight:800;font-size:15px;line-height:1.4;animation:sayIn .3s}
+.fb.up{background:rgba(239,68,68,.22);border:2px solid #f87171}.fb.dn{background:rgba(34,197,94,.2);border:2px solid #4ade80}
+.delta{position:absolute;right:-6px;top:30%;z-index:6;font-weight:900;font-size:22px;animation:popUp 1.4s ease forwards}
+@keyframes popUp{to{transform:translateY(-60px);opacity:0}}
+.learn{padding:16px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(220,38,38,.3),rgba(14,165,233,.22));border:1px solid rgba(255,255,255,.2);font-weight:800;line-height:1.45;font-size:clamp(15px,2vw,19px)}
+.learn h3{margin:0 0 6px;font-size:clamp(18px,2.6vw,24px)}
+.res{padding:18px;border-radius:22px;text-align:center;font-weight:900;font-size:clamp(18px,2.6vw,26px)}
+.res.ok{background:linear-gradient(135deg,#16a34a,#0d9488)}.res.mid{background:linear-gradient(135deg,#f59e0b,#b45309)}.res.bad{background:linear-gradient(135deg,#dc2626,#7f1d1d)}
+.res small{display:block;font-size:clamp(14px,1.8vw,17px);font-weight:800;opacity:.95;margin-top:6px}
+@media (max-width:640px){.theater{grid-template-columns:1fr 46px}.tube{width:22px;min-height:150px}.stage{aspect-ratio:4/3}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🎭 Teatro de la vulnerabilidad</b><span class="chip" id="prog"></span></header>
+<main class="app" id="app"></main>
+<script>
+const U=new URLSearchParams(location.search).get('u')||'anon',KEY='lab:'+U+':vuln';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}},save=v=>{try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}};{const o=load(),K=['casa','cole','merc','costa'],n={};K.forEach(k=>o[k]&&(n[k]=true));Object.keys(o).length!==Object.keys(n).length&&save(n)}
+const A=document.getElementById('app'),M=n=>`../img/moli/${n}.webp`,nar=(i,h)=>`<div class="nar"><img src="${M(i)}" alt="Molí"><div class="bub">${h}</div></div>`;
+function snd(f,t=.12,ty='triangle'){try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),v=a.createGain();o.type=ty;o.frequency.value=f;v.gain.setValueAtTime(.07,a.currentTime);v.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t);o.connect(v).connect(a.destination);o.start();o.stop(a.currentTime+t)}catch(e){}}
+const C=[
+{k:'casa',e:'🏠',t:'La casa de la familia Quispe',s:'Una casa en la ladera del cerro',g:'linear-gradient(150deg,#f97316,#7c2d12)',bg:'linear-gradient(#bae6fd,#fef3c7)',v:50,
+ props:[['⛰️','2%','14%','clamp(70px,13vw,140px)'],['🏚️','40%','16%','clamp(50px,9vw,96px)'],['🗄️','62%','16%','clamp(34px,6vw,60px)'],['🌳','80%','16%','clamp(40px,7vw,70px)']],actors:['👨','👩','👧'],
+ intro:'La familia Quispe quiere construir su casita en un cerro de Lima. 🇵🇪 El Perú está en el <b>Cinturón de Fuego del Pacífico</b>: aquí tiembla seguido. ¡Ayúdalos a decidir bien para que sean <b>menos vulnerables</b>!',
+ d:[['¿Dónde construyen su casa?',[['En la ladera empinada, sobre relleno de arena y desmonte.',20,'Los suelos de relleno y laderas se derrumban con el sismo. ¡Más peligro!'],['En un terreno firme y plano, lejos del borde del cerro.',-15,'¡Bien! Un suelo firme resiste mejor el movimiento.']]],
+  ['¿Con qué la construyen?',[['Ladrillo "como salga", sin columnas ni vigas.',15,'Sin columnas ni vigas, las paredes se caen fácilmente.'],['Material noble con columnas y vigas, guiados por un ingeniero.',-20,'¡Excelente! Una casa bien construida resiste el sismo.'],['Adobe sin ningún refuerzo.',10,'El adobe sin refuerzo se agrieta y cae en los sismos fuertes.']]],
+  ['¿Cómo ordenan el cuarto?',[['Roperos altos sin asegurar junto a las camas.',10,'¡Un ropero puede caer sobre alguien mientras duerme!'],['Aseguran los muebles a la pared y dejan el camino a la puerta libre.',-10,'¡Muy bien! Así nada cae encima y pueden salir rápido.']]],
+  ['¿Están preparados?',[['Mochila de emergencia lista y plan familiar: saben dónde reunirse.',-15,'¡Perfecto! Agua, linterna, botiquín y un plan salvan vidas.'],['"Eso no pasa aquí", no preparan nada.',10,'Sin plan, en el susto todos se confunden.']]]],
+ learn:'<b>Factores físicos</b>: <b>dónde</b> está la casa (ladera, relleno, cerca de un río) y <b>cómo</b> está construida (con columnas y vigas, o no). Y también estar preparados en familia.'},
+{k:'cole',e:'🏫',t:'El colegio',s:'¡Simulacro de sismo!',g:'linear-gradient(150deg,#3b82f6,#1e3a8a)',bg:'linear-gradient(#e0f2fe,#fef9c3)',v:50,
+ props:[['🏫','8%','16%','clamp(60px,11vw,110px)'],['🚪','46%','16%','clamp(40px,7vw,70px)'],['🎒','60%','16%','clamp(26px,4.5vw,44px)'],['🪑','70%','16%','clamp(30px,5vw,50px)']],actors:['👦','👧','👩‍🏫'],
+ intro:'Es lunes en el colegio de 6.° grado. ¡Hoy toca <b>simulacro</b>! ¿Qué decisiones hacen que el colegio sea <b>más seguro</b>?',
+ d:[['¿Conocen las zonas seguras y rutas de evacuación?',[['Sí: hay señales verdes de "Zona segura" y todos las conocen.',-15,'¡Bien! Las señales guían a todos sin dudar.'],['No hay señales; cada uno corre a donde puede.',10,'Sin rutas claras, todos chocan y se pierden.']]],
+  ['¿Cómo es la puerta del aula?',[['Abre hacia afuera y no tiene candado durante la clase.',-10,'¡Correcto! Así se sale rápido sin trabarse.'],['Está cerrada con candado "para que no salgan".',15,'¡Peligro! En un sismo nadie podría salir.']]],
+  ['¿Cómo están los pasillos?',[['Llenos de mochilas y sillas.',10,'Alguien podría tropezar y caer al salir.'],['Libres, sin nada en el camino.',-10,'¡Bien! El camino libre es salida segura.']]],
+  ['¿Cómo hacen el simulacro?',[['Lo toman en serio: salen sin correr, sin gritar y sin empujar.',-15,'¡Excelente! "No corro, no grito, no empujo".'],['Lo toman a juego, corren y se empujan.',15,'En un sismo real, correr y empujar causa heridos.']]]],
+ learn:'<b>Factores educativos y sociales</b>: saber qué hacer, practicar simulacros y tener rutas y zonas seguras señalizadas reduce mucho la vulnerabilidad.'},
+{k:'merc',e:'🏪',t:'El mercado del barrio',s:'Cables, gas y pisos de más',g:'linear-gradient(150deg,#a855f7,#581c87)',bg:'linear-gradient(#fae8ff,#fef3c7)',v:55,
+ props:[['🏪','6%','16%','clamp(60px,11vw,110px)'],['🏢','32%','16%','clamp(60px,11vw,110px)'],['⚡','56%','52%','clamp(30px,5vw,50px)'],['🛢️','70%','16%','clamp(30px,5vw,50px)']],actors:['🧑‍🍳','👵','👨‍🔧'],
+ intro:'En el mercado del barrio hay mucha gente todos los días. Los vecinos deben decidir cómo hacerlo <b>más seguro</b> antes de que llegue un sismo.',
+ d:[['Hay cables de luz colgando y conexiones "jaladas" de otros puestos.',[['Dejarlo así, total funciona.',15,'Con el sismo, los cables pueden causar un incendio.'],['Llamar a un electricista para ordenar y arreglar las conexiones.',-10,'¡Bien! Menos riesgo de incendio.']]],
+  ['¿Dónde ponen los balones de gas?',[['Al lado de la cocina caliente, sin revisarlos.',10,'Un balón que cae o tiene fuga puede explotar.'],['En un lugar ventilado, asegurados y revisados.',-10,'¡Muy bien! Así el gas no es un peligro.']]],
+  ['El dueño quiere construir 2 pisos más sobre el mercado, sin licencia.',[['Que construya nomás, así gana más.',15,'Construir pisos sin estudio puede hacer colapsar todo el edificio.'],['Pedir a Defensa Civil y a la municipalidad que evalúen el edificio.',-15,'¡Excelente! Los expertos dicen si el edificio es seguro.']]],
+  ['¿Cómo se organizan los vecinos?',[['Forman brigadas, marcan un punto de reunión y tienen extintores.',-15,'¡Perfecto! Organizados se ayudan unos a otros.'],['Cada uno por su cuenta.',10,'Sin organización, nadie sabe qué hacer.']]]],
+ learn:'<b>Factores económicos y de organización</b>: por ahorrar dinero se construye sin licencia o con conexiones peligrosas. Los vecinos organizados y con apoyo de <b>Defensa Civil</b> son mucho menos vulnerables.'},
+{k:'costa',e:'🌊',t:'El pueblo de la costa',s:'¡Cuidado con el tsunami!',g:'linear-gradient(150deg,#06b6d4,#164e63)',bg:'linear-gradient(#bae6fd 55%,#38bdf8 55%)',v:55,
+ props:[['🏖️','4%','16%','clamp(50px,9vw,90px)'],['🏠','30%','16%','clamp(44px,8vw,80px)'],['⛰️','70%','16%','clamp(70px,12vw,130px)'],['📻','52%','16%','clamp(28px,5vw,46px)']],actors:['🧒','👨‍🦳','🐕'],
+ intro:'Un pueblo de pescadores vive junto al mar. 🌊 Después de un sismo muy fuerte en la costa, puede venir un <b>tsunami</b> (olas gigantes). ¿Qué decisiones los protegen?',
+ d:[['Hay un sismo muy fuerte y estás en la playa. ¿Qué haces?',[['Me quedo a mirar cómo el mar se retira.',20,'¡Muy peligroso! Si el mar se retira, se viene una ola gigante.'],['Subo de inmediato a una zona alta siguiendo las señales de evacuación.',-20,'¡Correcto! Siempre a lo alto, lejos del mar.']]],
+  ['¿Dónde construyen las casas nuevas?',[['En la misma orilla, para estar cerca del mar.',10,'La orilla es la primera zona en inundarse.'],['Más lejos de la orilla, en una zona alta.',-10,'¡Bien! Lejos y alto es más seguro.']]],
+  ['¿Cómo se enteran de las alertas?',[['Tienen una radio a pilas y conocen las alertas de tsunami.',-10,'¡Muy bien! Aunque se vaya la luz, se enteran.'],['Esperan que alguien les avise por el celular.',5,'Tras un sismo, a veces no hay señal ni luz.']]],
+  ['¿Qué sabe la comunidad?',[['Hacen charlas y simulacros de evacuación juntos.',-15,'¡Excelente! Todos saben a dónde correr.'],['Nadie sabe qué hacer.',15,'Sin saber, la gente se confunde y pierde tiempo.']]]],
+ learn:'<b>Factores ambientales y sociales</b>: vivir junto al mar (zona de riesgo de tsunami) aumenta la vulnerabilidad, pero conocer las rutas, las alertas y practicar la evacuación la reduce.'}
+];
+function prog(){const d=load();document.getElementById('prog').textContent=`⭐ ${C.filter(c=>d[c.k]).length}/${C.length}`}
+function menu(){const d=load();A.innerHTML=`<div class="wrapc"><h1 class="t">🎭 Teatro de la vulnerabilidad</h1><p class="s">La <b>vulnerabilidad</b> es qué tan fácil puede dañarnos un peligro, como un sismo. ¡Depende de nuestras decisiones!</p>${nar('decidida','Hoy tú diriges la obra. 🎬 En cada caso toma decisiones: el <b>medidor rojo</b> sube si nos ponemos en peligro y baja si nos protegemos. Al final… ¡llega el sismo! Termina con la vulnerabilidad <b>baja</b> para ganar.')}<div class="menu">${C.map(c=>`<button class="ch" style="--g:${c.g}" data-c="${c.k}">${d[c.k]?'<span class="ok">✅ Superado</span>':''}<span class="e">${c.e}</span><b>${c.t}</b><small>${c.s}</small></button>`).join('')}</div></div>`;A.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>play(C.find(c=>c.k===b.dataset.c)))}
+function play(c){let v=c.v,i=0;
+A.innerHTML=`<div class="wrapc"><h1 class="t">${c.e} ${c.t}</h1><div class="theater"><div class="stage closed" id="st" style="--bg:${c.bg}"><div class="top"></div><span class="stitle">🎬 ${c.t}</span>${c.props.map(p=>`<span class="prop" style="left:${p[1]};bottom:${p[2]};font-size:${p[3]}">${p[0]}</span>`).join('')}${c.actors.map((a,k)=>`<span class="actor" style="left:${22+k*12}%;animation-delay:${k*.3}s">${a}</span>`).join('')}<div class="floor"></div></div>
+<div class="meter"><small>Vulne-<br>rabilidad</small><div class="tube"><i id="lv"></i></div><b id="lvn"></b></div></div><div id="pane"></div></div>`;
+const st=document.getElementById('st'),pane=document.getElementById('pane'),lv=document.getElementById('lv'),lvn=document.getElementById('lvn');
+const show=()=>{lv.style.height=v+'%';lvn.textContent=v;lvn.style.color=v>60?'#f87171':v>40?'#fde047':'#4ade80'};show();
+setTimeout(()=>{st.classList.remove('closed');snd(330,.3)},300);
+pane.innerHTML=nar('curiosa',c.intro)+'<div class="row"><button class="btn y" id="go">🎬 ¡Que empiece la obra!</button></div>';document.getElementById('go').onclick=step;
+function step(){if(i>=c.d.length)return quake();const[q,os]=c.d[i],ord=os.map((o,k)=>k).sort(()=>Math.random()-.5);
+pane.innerHTML=`<div class="dec"><span class="num">ESCENA ${i+1} DE ${c.d.length}</span><h3>${q}</h3>${ord.map(k=>`<button class="opt" data-k="${k}">${os[k][0]}</button>`).join('')}</div>`;
+pane.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const o=os[+b.dataset.k],dv=o[1];v=Math.max(0,Math.min(100,v+dv));show();snd(dv>0?200:700,.2);
+const d=document.createElement('span');d.className='delta';d.style.color=dv>0?'#f87171':'#4ade80';d.textContent=(dv>0?'+':'')+dv;st.parentElement.appendChild(d);setTimeout(()=>d.remove(),1400);
+pane.innerHTML=`<div class="fb ${dv>0?'up':'dn'}">${dv>0?'⬆️ La vulnerabilidad SUBE':'⬇️ La vulnerabilidad BAJA'}: ${o[2]}</div><div class="row"><button class="btn y" id="nx">${i+1<c.d.length?'Siguiente escena ›':'🌎 ¿Y si llega el sismo?'}</button></div>`;i++;document.getElementById('nx').onclick=step})}
+function quake(){pane.innerHTML=nar('asustada','¡Atención! <b>¡Está temblando!</b> 🌎 Veamos qué pasa con todo lo que decidieron…');st.classList.add('quake');let n=0;const t=setInterval(()=>{snd(60+Math.random()*40,.2,'sawtooth');if(++n>12)clearInterval(t)},160);navigator.vibrate&&navigator.vibrate([300,100,300]);
+setTimeout(()=>{st.classList.remove('quake');const props=[...st.querySelectorAll('.prop')];if(v>60)props.forEach(p=>p.classList.add('fall'));else if(v>40)props[1]&&props[1].classList.add('fall');
+const ok=v<=40,cls=v<=40?'ok':v<=60?'mid':'bad';pane.innerHTML=`<div class="res ${cls}">${v<=40?'🎉 ¡Todos a salvo!':v<=60?'😟 Hubo daños y algunos heridos':'🚨 Muchos daños y personas en peligro'}<small>Vulnerabilidad final: ${v}. ${ok?'Sus buenas decisiones los protegieron.':'Prueba otra vez y elige decisiones que la bajen a 40 o menos.'}</small></div><div class="learn"><h3>🧠 ¿Qué factores de vulnerabilidad vimos?</h3>${c.learn}<br><br>Recuerda: <b>el sismo es el peligro</b>, pero <b>el daño depende de qué tan vulnerables seamos</b>. ¡Y eso sí lo podemos cambiar!</div><div class="row">${ok?'':'<button class="btn y" id="re">↻ Intentar de nuevo</button>'}${ok&&nextC()?`<button class="btn y" id="nx">Siguiente caso: ${nextC().e} ${nextC().t} ›</button>`:''}<button class="btn g" id="mn">Elegir otro caso</button></div>`;
+if(ok){const d=load();d[c.k]=true;save(d);prog();snd(990,.35)}document.getElementById('mn').onclick=menu;const re=document.getElementById('re');re&&(re.onclick=()=>play(c));const nx=document.getElementById('nx');nx&&(nx.onclick=()=>play(nextC()))},2600)}
+function nextC(){return C[C.indexOf(c)+1]}}
+prog();menu();
+</script>
+</body>
+</html>

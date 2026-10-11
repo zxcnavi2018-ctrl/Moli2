@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lamarck: uso y desuso · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.app{position:relative;z-index:1;flex:1;min-height:0;overflow:auto;padding:6px 14px 28px}
+.wrapc{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1.t{margin:4px 0 0;font-size:clamp(24px,4vw,40px);font-weight:900;text-align:center}
+p.s{margin:0;text-align:center;color:var(--ink2);font-weight:800}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.ch{position:relative;display:flex;flex-direction:column;gap:6px;min-height:190px;padding:16px;border:0;border-radius:24px;color:#fff;text-align:left;font:inherit;cursor:pointer;background:var(--g);box-shadow:0 16px 30px -12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .2s}
+.ch:hover{transform:translateY(-4px)}.ch .e{font-size:58px;line-height:1}.ch b{font-size:20px;font-weight:900}.ch small{font-weight:800;opacity:.92;font-size:14px}
+.ch .ok{position:absolute;top:10px;right:12px;padding:3px 10px;border-radius:99px;background:rgba(0,0,0,.3);font-size:12px;font-weight:900}
+.nar{display:flex;align-items:flex-end;gap:10px}
+.nar img{width:clamp(80px,13vw,120px);flex:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));animation:mbob 3s ease-in-out infinite}
+.bub{flex:1;padding:14px 18px;border-radius:20px 20px 20px 6px;background:#fff;color:#14224a;font-weight:800;font-size:clamp(15px,2.1vw,21px);line-height:1.35;box-shadow:0 12px 26px rgba(0,0,0,.35);animation:sayIn .35s cubic-bezier(.2,1.4,.4,1)}
+.bub b{color:#c2410c}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{padding:12px 20px;border-radius:16px;border:0;font:inherit;font-weight:900;font-size:16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#fb923c,#c2410c);box-shadow:0 10px 20px -8px rgba(0,0,0,.6)}
+.btn.y{background:linear-gradient(135deg,#fde047,#f59e0b);color:#431407}.btn.g{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25)}
+.btn:active{transform:scale(.96)}.btn:disabled{opacity:.45}
+.big{font-size:clamp(20px,3vw,28px);padding:18px 30px;border-radius:22px;touch-action:manipulation}
+.big.go{animation:pulse 1s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.06)}}
+.stage{position:relative;width:100%;aspect-ratio:4/3;max-height:58vh;border-radius:24px;overflow:hidden;box-shadow:0 18px 40px -16px rgba(0,0,0,.7)}
+.stage svg{width:100%;height:100%;display:block}
+.hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;pointer-events:none}
+.hud span{padding:6px 12px;border-radius:99px;background:rgba(0,0,0,.5);font-weight:900;font-size:14px}
+.bar{height:12px;border-radius:99px;background:rgba(255,255,255,.15);overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#fde047,#f97316);transition:width .1s linear}
+.gens{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.gens i{font-style:normal;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.1);font-weight:900;opacity:.4}.gens i.on{opacity:1;background:linear-gradient(135deg,#fb923c,#c2410c)}.gens i.ok{opacity:1;background:linear-gradient(135deg,#22c55e,#15803d)}
+.learn{padding:16px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(234,88,12,.35),rgba(124,58,237,.25));border:1px solid rgba(255,255,255,.2);font-weight:800;line-height:1.45;font-size:clamp(15px,2vw,19px)}
+.learn h3{margin:0 0 6px;font-size:clamp(18px,2.6vw,24px)}
+.q{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.q h3{margin:0;font-size:clamp(17px,2.4vw,22px)}
+.opt{padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-weight:800;font-size:15px;text-align:left;cursor:pointer}
+.opt.ok{border-color:#4ade80;background:rgba(34,197,94,.25)}.opt.no{border-color:#f87171;background:rgba(239,68,68,.2)}
+.trait{transition:all .5s cubic-bezier(.2,1.4,.4,1)}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🦒 Lamarck: uso y desuso</b><span class="chip" id="prog"></span></header>
+<main class="app" id="app"></main>
+<script>
+const U=new URLSearchParams(location.search).get('u')||'anon',KEY='lab:'+U+':lama';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}},save=v=>{try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}};{const o=load(),K=['jir','top','ser'],n={};K.forEach(k=>o[k]&&(n[k]=true));Object.keys(o).length!==Object.keys(n).length&&save(n)}
+const A=document.getElementById('app'),M=n=>`../img/moli/${n}.webp`,nar=(i,h)=>`<div class="nar"><img src="${M(i)}" alt="Molí"><div class="bub">${h}</div></div>`;
+function snd(f,t=.1){try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),v=a.createGain();o.type='triangle';o.frequency.value=f;v.gain.setValueAtTime(.06,a.currentTime);v.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t);o.connect(v).connect(a.destination);o.start();o.stop(a.currentTime+t)}catch(e){}}
+const AN={
+ jir:{e:'🦒',t:'La jirafa',s:'¡Estira el cuello para comer!',g:'linear-gradient(150deg,#f59e0b,#92400e)',bg:'linear-gradient(#bae6fd 90%,#84cc16 90%)',
+  intro:'Hace mucho tiempo, las <b>jirafas tenían el cuello corto</b>. Pero los árboles crecían y las hojas quedaban cada vez más altas… Según <b>Lamarck</b>, la jirafa <b>estiraba el cuello</b> para alcanzarlas, ¡y sus crías nacían con el cuello más largo! Toca rápido <b>¡Estírate!</b> para alcanzar las hojas.',
+  act:'🦒 ¡Estírate!',goal:g=>`Alcanza las hojas del árbol (generación ${g})`,
+  learnUse:'Usó mucho el <b>cuello</b> → creció. Sus crías lo heredaron (así pensaba Lamarck).'},
+ top:{e:'🐀',t:'El topo',s:'Vive bajo tierra, sin luz',g:'linear-gradient(150deg,#a16207,#3f1d0b)',bg:'#3f2a14',
+  intro:'Imagina un animal que se fue a vivir <b>bajo la tierra</b>, donde todo está oscuro. Allí <b>no usa los ojos</b>, pero <b>excava todo el día con sus garras</b>. Según Lamarck, lo que no se usa se achica y lo que se usa crece. ¡Toca rápido <b>Excavar</b> para llegar a los gusanos!',
+  act:'⛏️ ¡Excavar!',goal:g=>`Excava hasta los gusanos (generación ${g})`,
+  learnUse:'Usó mucho las <b>garras</b> → crecieron. No usó los <b>ojos</b> en la oscuridad → se hicieron chiquitos.'},
+ ser:{e:'🐍',t:'La serpiente',s:'¿Dónde quedaron sus patas?',g:'linear-gradient(150deg,#16a34a,#14532d)',bg:'#bbf7d0',
+  intro:'Los antepasados de las serpientes eran <b>parecidos a lagartijas, con 4 patitas</b>. Vivían entre la hierba alta y huecos estrechos, así que <b>se arrastraban</b> en vez de caminar. Para Lamarck, las patas que <b>no usaban</b> se fueron achicando… ¡Toca rápido <b>Arrastrarse</b> para cruzar la hierba!',
+  act:'🐍 ¡Arrastrarse!',goal:g=>`Cruza la hierba alta (generación ${g})`,
+  learnUse:'Se <b>arrastró</b> todo el tiempo y <b>no usó las patas</b> → se fueron achicando hasta desaparecer, y el cuerpo se alargó.'}
+};
+const ORD=['jir','top','ser'];
+function prog(){const d=load();document.getElementById('prog').textContent=`⭐ ${ORD.filter(k=>d[k]).length}/3`}
+function menu(){const d=load();A.innerHTML=`<div class="wrapc"><h1 class="t">La máquina de la evolución de Lamarck</h1><p class="s">En 1809, el francés <b>Jean-Baptiste Lamarck</b> propuso que los animales cambian según <b>usen o no usen</b> partes de su cuerpo, y que <b>sus crías heredan esos cambios</b>.</p>${nar('idea','¡Hola! Soy Molí. Elige un animal y hazlo evolucionar durante <b>4 generaciones</b>. ¡Tú decides cuánto usa su cuerpo!')}<div class="menu">${ORD.map(k=>`<button class="ch" style="--g:${AN[k].g}" data-a="${k}">${d[k]?'<span class="ok">✅ Lista</span>':''}<span class="e">${AN[k].e}</span><b>${AN[k].t}</b><small>${AN[k].s}</small></button>`).join('')}</div></div>`;A.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>play(b.dataset.a))}
+
+/* dibujos */
+function draw(k,S,gen){if(k==='jir'){const N=S.v,leaf=280-(110+gen*30),hy=195-N;return`<svg viewBox="0 0 400 300"><rect width="400" height="300" fill="#bae6fd"/><circle cx="350" cy="40" r="22" fill="#fde047"/><rect y="270" width="400" height="30" fill="#84cc16"/>
+<rect x="300" y="${leaf}" width="16" height="${280-leaf}" fill="#92400e" class="trait"/><circle cx="308" cy="${leaf}" r="40" fill="#16a34a" class="trait"/><circle cx="285" cy="${leaf+12}" r="20" fill="#22c55e" class="trait"/><text x="300" y="${leaf+8}" font-size="22">🍃</text>
+<g class="trait"><rect x="95" y="230" width="10" height="45" fill="#d97706"/><rect x="115" y="232" width="10" height="43" fill="#b45309"/><rect x="150" y="230" width="10" height="45" fill="#d97706"/><rect x="168" y="232" width="10" height="43" fill="#b45309"/>
+<ellipse cx="138" cy="218" rx="52" ry="24" fill="#f59e0b"/><circle cx="120" cy="212" r="6" fill="#92400e"/><circle cx="148" cy="222" r="7" fill="#92400e"/><circle cx="165" cy="208" r="5" fill="#92400e"/>
+<polygon points="160,210 176,206 ${192},${hy+6} ${178},${hy+10}" fill="#f59e0b"/><circle cx="178" cy="${(205+hy)/2}" r="5" fill="#92400e"/>
+<ellipse cx="196" cy="${hy}" rx="20" ry="11" fill="#f59e0b"/><circle cx="202" cy="${hy-3}" r="3" fill="#1e293b"/><rect x="186" y="${hy-20}" width="4" height="10" fill="#92400e"/><rect x="194" y="${hy-21}" width="4" height="10" fill="#92400e"/></g></svg>`}
+if(k==='top'){const E=S.e,C=S.v,dep=S.dig;return`<svg viewBox="0 0 400 300"><rect width="400" height="300" fill="#3f2a14"/><rect width="400" height="40" fill="#65a30d"/><rect y="40" width="400" height="14" fill="#713f12"/>
+${[...Array(14)].map((_,i)=>`<circle cx="${(i*53)%400}" cy="${70+(i*37)%220}" r="${3+(i%3)}" fill="#57391c"/>`).join('')}
+<path d="M40 150 Q${100+dep*1.5} 140 ${110+dep*2.2} 160" stroke="#1c1208" stroke-width="44" fill="none" stroke-linecap="round"/><text x="330" y="175" font-size="30">🪱</text><text x="350" y="215" font-size="24">🪱</text>
+<g class="trait" transform="translate(${60+dep*2.2},150)"><ellipse cx="0" cy="0" rx="42" ry="26" fill="#4b5563"/><ellipse cx="34" cy="2" rx="14" ry="10" fill="#6b7280"/><circle cx="46" cy="2" r="5" fill="#f9a8d4"/>
+<circle cx="28" cy="-8" r="${E}" fill="#111827"/><circle cx="${28+E*.3}" cy="${-8-E*.3}" r="${E*.3}" fill="#fff"/>
+<g fill="#f5f5f4"><path d="M18 18 l${C} ${C*.8} l-${C*.4} 2z"/><path d="M26 16 l${C} ${C*.6} l-${C*.4} 3z"/><path d="M-20 20 l-${C*.6} ${C*.7} l3 1z"/></g></g></svg>`}
+const L=S.v,B=S.b;return`<svg viewBox="0 0 400 300"><rect width="400" height="300" fill="#bbf7d0"/><rect y="250" width="400" height="50" fill="#a16207"/>
+${[...Array(22)].map((_,i)=>`<path d="M${i*19} 260 q4 -${60+(i*13)%40} 9 -${80+(i*7)%40}" stroke="#15803d" stroke-width="5" fill="none"/>`).join('')}
+<g class="trait" transform="translate(${70+S.dig*2},215)"><path d="M0 0 C ${B*.3} -18 ${B*.5} 18 ${B} 0" stroke="#65a30d" stroke-width="18" fill="none" stroke-linecap="round"/><circle cx="${B+8}" cy="-2" r="13" fill="#4d7c0f"/><circle cx="${B+12}" cy="-6" r="3" fill="#111"/><path d="M${B+20} 0 l10 -2 m-10 2 l10 3" stroke="#dc2626" stroke-width="2"/>
+${L>1?`<g stroke="#4d7c0f" stroke-width="6" stroke-linecap="round"><path d="M${B*.25} 8 l-4 ${L}"/><path d="M${B*.3} 8 l5 ${L}"/><path d="M${B*.75} 6 l-4 ${L}"/><path d="M${B*.8} 6 l5 ${L}"/></g>`:''}</g></svg>`}
+
+function play(k){const a=AN[k];let gen=1,taps=0,timer=null,t0=0;const S=k==='jir'?{v:20}:k==='top'?{v:6,e:9,dig:0}:{v:22,b:80,dig:0};let base=JSON.parse(JSON.stringify(S));const NEED=10,DUR=6000;
+A.innerHTML=`<div class="wrapc"><h1 class="t">${a.e} ${a.t}</h1>${nar('curiosa',a.intro)}<div class="gens" id="gens">${[1,2,3,4].map(g=>`<i>Generación ${g}</i>`).join('')}</div>
+<div class="stage" id="st" style="background:${a.bg}"></div><div class="hud" id="hud"></div><div class="bar"><i id="bar"></i></div><p class="s" id="msg"></p>
+<div class="row"><button class="btn big y" id="act" disabled>${a.act}</button><button class="btn" id="start">▶ Empezar generación 1</button></div><div id="out"></div></div>`;
+const st=document.getElementById('st'),msg=document.getElementById('msg'),act=document.getElementById('act'),start=document.getElementById('start'),bar=document.getElementById('bar');
+const render=()=>{st.innerHTML=draw(k,S,gen);document.querySelectorAll('#gens i').forEach((g,i)=>{g.className=i+1<gen?'ok':i+1===gen?'on':''})};render();msg.textContent=a.goal(gen);
+start.onclick=()=>{taps=0;base=JSON.parse(JSON.stringify(S));start.disabled=1;act.disabled=0;act.classList.add('go');t0=Date.now();msg.textContent=`¡Toca rápido "${a.act.replace(/^\S+\s/,'')}"! Tienes 6 segundos.`;
+timer=setInterval(()=>{const p=(Date.now()-t0)/DUR;bar.style.width=Math.min(100,p*100)+'%';if(p>=1)end()},60)};
+act.onclick=()=>{taps++;snd(300+taps*25,.06);if(k==='jir')S.v=Math.min(base.v+48,base.v+taps*4.8);else if(k==='top'){S.v=Math.min(base.v+6,base.v+taps*.6);S.dig=Math.min(100,taps*10)}else{S.dig=Math.min(100,taps*10);S.b=Math.min(base.b+30,base.b+taps*3)}render();
+const leaf=280-(110+gen*30);if(k==='jir'&&195-S.v<=leaf+18||k!=='jir'&&taps>=NEED)end(true)};
+function end(win){clearInterval(timer);act.disabled=1;act.classList.remove('go');bar.style.width='0%';
+if(!win){Object.assign(S,base);render();msg.innerHTML='😮 ¡No alcanzó! Tocaste muy poquito. Inténtalo otra vez.';start.textContent=`↻ Repetir generación ${gen}`;start.disabled=0;snd(180,.25);return}
+snd(880,.25);if(k==='top')S.e=Math.max(1,S.e-2.2);if(k==='ser')S.v=Math.max(0,S.v-6);
+const ch=k==='jir'?'Su cuello se estiró de tanto usarlo.':k==='top'?'Sus garras crecieron de tanto excavar y sus ojos se achicaron por no usarlos en la oscuridad.':'Sus patas casi no se usaron y se achicaron; su cuerpo se alargó.';
+if(gen<4){msg.innerHTML=`🎉 ¡Lo logró! ${ch} <b>Tiene crías… y según Lamarck, nacen con esos cambios.</b>`;gen++;setTimeout(()=>{if(k!=='jir')S.dig=0;render();msg.innerHTML+=`<br>👶 Generación ${gen}: ${a.goal(gen)}`;start.textContent=`▶ Empezar generación ${gen}`;start.disabled=0},1600);return}
+gen=5;if(k==='top')S.e=1;if(k==='ser')S.v=0;render();msg.innerHTML=`🏆 ¡4 generaciones! ${ch}`;start.hidden=1;act.hidden=1;finish(k)}}
+
+function finish(k){const a=AN[k];document.getElementById('out').innerHTML=`<div class="learn"><h3>🧠 Lo que pensaba Lamarck</h3>1) <b>Ley del uso y desuso:</b> la parte del cuerpo que se usa mucho crece y se fortalece; la que no se usa se achica o desaparece.<br>2) <b>Herencia de los caracteres adquiridos:</b> los cambios que un animal logra en su vida pasan a sus crías.<br>🦒 ${a.learnUse}<br><br>🔬 <b>Hoy sabemos que el punto 2 no es así:</b> lo que cambias en tu cuerpo durante tu vida <b>no se hereda</b> (si alguien hace pesas, sus hijos no nacen musculosos). Después, <b>Charles Darwin</b> explicó la evolución con la <b>selección natural</b>: los que nacen con rasgos más útiles sobreviven y tienen más crías. Aun así, Lamarck fue de los primeros en decir que <b>las especies cambian con el tiempo</b>. 👏</div>
+<div class="q" id="chk"><h3>🤖 Molí pregunta: según Lamarck, ¿por qué la parte de un animal se hace más grande?</h3><button class="opt" data-i="0">Porque la usa mucho, y sus crías heredan ese cambio</button><button class="opt" data-i="1">Porque nace así por casualidad</button><button class="opt" data-i="2">Porque come mucho</button></div><div class="row" id="fin"></div>`;
+const Q=document.getElementById('chk');Q.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(Q.dataset.d)return;if(b.dataset.i==='0'){b.classList.add('ok');Q.dataset.d=1;const d=load();d[k]=true;save(d);prog();snd(990,.3);const n=ORD[ORD.indexOf(k)+1];document.getElementById('fin').innerHTML=`${n?`<button class="btn y" id="nx">Siguiente: ${AN[n].e} ${AN[n].t} ›</button>`:''}<button class="btn g" id="mn">Elegir otro animal</button>`;n&&(document.getElementById('nx').onclick=()=>play(n));document.getElementById('mn').onclick=menu}else{b.classList.add('no');snd(180,.25)}});setTimeout(()=>document.querySelector('.learn')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
+prog();menu();
+</script>
+</body>
+</html>

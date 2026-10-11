@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Evolución con Darwin · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+main{flex:1;min-height:0;width:min(100%,980px);margin:0 auto;padding:0 14px 120px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+.pick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.st{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:190px;padding:12px;border-radius:20px;border:0;color:#fff;text-align:left;font:inherit;cursor:pointer;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.35);background:var(--g)}
+.st svg{position:absolute;inset:6px 6px 58px;width:calc(100% - 12px);height:calc(100% - 64px)}
+.st b{position:relative;font-size:17px;line-height:1.1}.st small{position:relative;font-weight:800;opacity:.9}
+.st .ok{position:absolute;top:8px;right:8px;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,.3);font-size:12px;font-weight:900}
+.st:active{transform:scale(.97)}
+.rnd{align-self:center;padding:12px 22px;border-radius:16px;border:0;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font:inherit;font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 10px 22px rgba(0,0,0,.35)}
+.intro{margin:0;text-align:center;font-weight:800;color:var(--ink2);font-size:14px}
+.scene{position:relative;border-radius:22px;overflow:hidden;box-shadow:0 16px 34px rgba(0,0,0,.4);aspect-ratio:16/7;min-height:170px}
+.scene svg{display:block;width:100%;height:100%}
+.gen{position:absolute;top:10px;left:10px;padding:5px 12px;border-radius:99px;background:rgba(0,0,0,.45);font-weight:900;font-size:13px}
+.pop{position:absolute;top:10px;right:10px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:1px;max-width:52%;padding:4px 8px;border-radius:14px;background:rgba(0,0,0,.4);font-size:16px}
+.pop span{animation:pp .4s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes pp{from{transform:scale(0)}}
+.story{padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-size:15px;line-height:1.5;font-weight:700}
+.story h2{margin:0 0 4px;font-size:18px}
+.opts{display:grid;gap:10px}
+.op{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:linear-gradient(160deg,#1e3a8a,#172554);color:#fff;font:inherit;font-weight:800;font-size:14.5px;text-align:left;cursor:pointer;line-height:1.35}
+.op i{flex:none;font-style:normal;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.15);font-weight:900}
+.op:hover{border-color:#fde047}
+.op:disabled{cursor:default;opacity:.55}
+.op.good{border-color:#4ade80;background:linear-gradient(160deg,#166534,#14532d);opacity:1}
+.op.bad{border-color:#f87171;background:linear-gradient(160deg,#7f1d1d,#450a0a);opacity:1}
+.op.mid{border-color:#fbbf24;background:linear-gradient(160deg,#78350f,#451a03);opacity:1}
+.res{padding:14px 16px;border-radius:18px;font-weight:700;font-size:14.5px;line-height:1.5;animation:pp .4s both}
+.res.good{background:rgba(34,197,94,.18);border:1px solid rgba(34,197,94,.5)}
+.res.bad{background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.5)}
+.res.mid{background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.5)}
+.next{align-self:center;padding:14px 24px;border-radius:16px;border:0;background:linear-gradient(135deg,#22c55e,#0d9488);color:#fff;font:inherit;font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 10px 22px rgba(0,0,0,.35);animation:glo 1.6s ease-in-out infinite}
+@keyframes glo{50%{box-shadow:0 0 0 8px rgba(74,222,128,.25),0 10px 22px rgba(0,0,0,.35)}}
+.end{text-align:center;padding:18px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.end h2{margin:4px 0;font-size:24px}.end p{font-size:15px;line-height:1.5;font-weight:700;color:#dbe4ff}
+.end .big{font-size:64px;line-height:1}
+.babies{animation:born 1.2s ease-out both}
+@keyframes born{from{opacity:0;transform:translateY(20px) scale(.5)}}
+@media (max-width:760px){.pick{grid-template-columns:1fr 1fr}.st{min-height:150px}.scene{aspect-ratio:16/10}.story{font-size:14px}.op{font-size:13.5px;padding:10px 12px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🧬 Evolución con Darwin</b></header>
+<main id="m"></main>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':evo',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let MI=load(KEY,{});const m=document.getElementById('m'),say=document.getElementById('say');
+// ---------- dibujos ----------
+const sky=(a,b)=>`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="800" height="350" fill="url(#sk)"/>`;
+const giraffe=(x,n,s)=>{s=s||1;const nh=60+n*45;return`<g transform="translate(${x} 300) scale(${s})"><rect x="-38" y="-${70}" width="76" height="44" rx="20" fill="#f6c453"/><g fill="#a16207">${[[-20,-60],[4,-56],[20,-64],[-6,-44],[22,-40]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="6"/>`).join('')}</g>${[-28,-12,14,28].map(a=>`<rect x="${a-4}" y="-30" width="8" height="30" rx="3" fill="#eab308"/>`).join('')}<path d="M24 -64 L${36} -${64+nh}" stroke="#f6c453" stroke-width="16" stroke-linecap="round"/><g fill="#a16207">${Array.from({length:Math.ceil(nh/22)},(_,i)=>`<circle cx="${26+i*(12/Math.ceil(nh/22))}" cy="-${76+i*22}" r="4"/>`).join('')}</g><ellipse cx="44" cy="-${70+nh}" rx="18" ry="11" fill="#f6c453"/><circle cx="46" cy="-${74+nh}" r="2.5" fill="#000"/><path d="M34 -${80+nh} v-10 M42 -${82+nh} v-10" stroke="#a16207" stroke-width="3"/><path d="M-36 -60 q-14 10 -10 26" stroke="#a16207" stroke-width="3" fill="none"/></g>`};
+const acacia=(x,h)=>`<g transform="translate(${x} 300)"><path d="M0 0 V-${h} M0 -${h*.7} L-20 -${h*.9} M0 -${h*.75} L22 -${h*.92}" stroke="#7c4a1e" stroke-width="9" stroke-linecap="round"/><ellipse cx="0" cy="-${h+6}" rx="70" ry="20" fill="#4d7c0f"/><ellipse cx="-30" cy="-${h-4}" rx="34" ry="12" fill="#65a30d"/></g>`;
+const moth=(x,y,c,s)=>`<g transform="translate(${x} ${y}) scale(${s||1})"><path d="M0 0 C-30 -26 -52 -6 -40 14 C-30 26 -10 16 0 6Z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/><path d="M0 0 C30 -26 52 -6 40 14 C30 26 10 16 0 6Z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/>${c==='#e7e5e4'?'<g fill="#57534e"><circle cx="-24" cy="0" r="2"/><circle cx="24" cy="2" r="2"/><circle cx="-14" cy="10" r="1.6"/><circle cx="16" cy="-8" r="1.6"/></g>':''}<ellipse rx="5" ry="16" cy="4" fill="#44403c"/><path d="M-2 -10 q-8 -14 -14 -14 M2 -10 q8 -14 14 -14" stroke="#44403c" stroke-width="2" fill="none"/></g>`;
+const trunk=(x,c,lich)=>`<g><rect x="${x}" y="0" width="140" height="350" fill="${c}"/>${lich?[[30,60],[90,140],[50,230],[100,300],[20,180]].map(([a,b])=>`<ellipse cx="${x+a}" cy="${b}" rx="24" ry="12" fill="#d9f99d" opacity=".6"/>`).join(''):[[30,60],[90,140],[50,230]].map(([a,b])=>`<ellipse cx="${x+a}" cy="${b}" rx="30" ry="10" fill="#0a0a0a" opacity=".5"/>`).join('')}</g>`;
+const rabbit=(x,c,ear,s)=>`<g transform="translate(${x} 300) scale(${s||1})"><ellipse cx="0" cy="-26" rx="34" ry="26" fill="${c}" stroke="rgba(0,0,0,.2)" stroke-width="2"/><circle cx="28" cy="-50" r="18" fill="${c}" stroke="rgba(0,0,0,.2)" stroke-width="2"/><ellipse cx="22" cy="-${68+ear/2}" rx="6" ry="${ear/2+4}" fill="${c}" stroke="rgba(0,0,0,.2)" stroke-width="2"/><ellipse cx="34" cy="-${66+ear/2}" rx="6" ry="${ear/2+4}" fill="${c}" stroke="rgba(0,0,0,.2)" stroke-width="2"/><circle cx="34" cy="-54" r="2.6" fill="#111"/><circle cx="45" cy="-48" r="2.5" fill="#f9a8d4"/><circle cx="-34" cy="-28" r="8" fill="${c}"/></g>`;
+const finch=(x,y,b,s)=>{const beak=b==='g'?'<path d="M22 -16 L48 -8 L22 2 Z" fill="#78716c"/>':b==='e'?'<path d="M22 -12 L42 -10 L22 -4 Z" fill="#a8a29e"/><path d="M40 -10 L74 -24" stroke="#854d0e" stroke-width="3"/>':'<path d="M22 -12 L46 -9 L22 -5 Z" fill="#a8a29e"/>';return`<g transform="translate(${x} ${y}) scale(${s||1})"><ellipse cx="0" cy="0" rx="26" ry="18" fill="#57534e"/><circle cx="16" cy="-12" r="13" fill="#44403c"/>${beak}<circle cx="20" cy="-15" r="2.5" fill="#fff"/><path d="M-20 4 L-46 14 L-24 -6Z" fill="#292524"/><path d="M-4 16 v12 M6 16 v12" stroke="#a16207" stroke-width="3"/></g>`};
+// ---------- historias ----------
+const ST={
+ jir:{t:'La jirafa',e:'🦒',g:'linear-gradient(160deg,#f59e0b,#a16207)',thumb:()=>sky('#fde68a','#f59e0b')+'<rect y="300" width="800" height="50" fill="#a3a335"/>'+acacia(560,210)+giraffe(300,2,1.1),
+  scene:(g)=>sky('#fef3c7','#fbbf24')+'<rect y="300" width="800" height="50" fill="#a3a335"/>'+acacia(620,150+g*40)+acacia(110,120+g*30)+giraffe(330,g,1)+giraffe(470,Math.max(0,g-1),.8),
+  gen:[
+   {n:'Eres una jirafa antigua en la sabana africana. Tu manada tiene cuellos de distinto largo: unos más cortos y otros un poco más largos. Llega una <b>sequía</b>: la hierba se seca y solo quedan hojas en lo alto de las acacias.',o:[
+    ['g','Las jirafas que nacieron con el cuello un poco más largo alcanzan las hojas altas y comen más.','En toda población hay <b>diferencias</b>. Las de cuello más largo comieron, sobrevivieron y tuvieron crías con cuello largo. ¡Eso es la <b>selección natural</b>!'],
+    ['m','Esperar a que vuelva a crecer la hierba.','Esperar no cambia nada: varias jirafas se debilitaron de hambre. Sobrevivieron menos.'],
+    ['b','Pelear con las cebras por la poca hierba que queda.','Pelear gasta energía y causa heridas. Muchas jirafas no sobrevivieron.']]},
+   {n:'Tus crías <b>heredaron</b> cuellos más largos. Ahora unos <b>leones</b> esperan cerca del río donde beben.',o:[
+    ['g','Vigilar desde arriba: con el cuello largo ven a los leones desde lejos.','¡Excelente! El cuello largo también sirve para <b>vigilar</b>. Más jirafas sobrevivieron y tuvieron crías.'],
+    ['b','Beber todas juntas sin vigilar.','Los leones atacaron por sorpresa. Tu manada perdió varias jirafas.'],
+    ['b','Dejar de beber agua para no acercarse al río.','Sin agua ningún animal sobrevive mucho tiempo. Tu manada se debilitó.']]},
+   {n:'Pasan muchas generaciones. Las acacias crecieron más alto y tienen <b>espinas</b>.',o:[
+    ['g','Las jirafas con lengua larga y dura (¡de hasta 50 cm!) comen entre las espinas.','¡Muy bien! La lengua larga y dura es otra <b>adaptación</b>: así comen sin lastimarse.'],
+    ['m','Comer solo frutas caídas en el suelo.','Hay muy pocas frutas en el suelo: algunas jirafas pasaron hambre.'],
+    ['b','Irse al desierto buscando otra comida.','En el desierto no hay árboles: tu manada sufrió mucho.']]}],
+  fin:'Hoy las jirafas tienen el cuello de hasta <b>2 metros</b>. No lo estiraron a propósito: en cada generación sobrevivieron más las que <b>nacieron</b> con el cuello más largo y lo heredaron a sus crías.'},
+ pol:{t:'La polilla del abedul',e:'🦋',g:'linear-gradient(160deg,#a8a29e,#292524)',thumb:()=>sky('#e7e5e4','#a8a29e')+trunk(330,'#d6d3d1',1)+moth(400,150,'#e7e5e4',1.1)+moth(560,220,'#1c1917',.9),
+  scene:(g)=>{const dark=g>=1,c=g===0?'#e7e5e4':'#1c1917';return sky(dark?'#78716c':'#e0f2fe',dark?'#44403c':'#bae6fd')+(dark?'<rect x="600" y="120" width="60" height="230" fill="#292524"/><rect x="680" y="160" width="50" height="190" fill="#3f3f46"/><circle cx="630" cy="90" r="30" fill="#52525b" opacity=".8"/><circle cx="660" cy="60" r="38" fill="#3f3f46" opacity=".7"/>':'')+trunk(200,dark?'#3f3f46':'#e7e5e4',!dark)+trunk(420,dark?'#27272a':'#d6d3d1',!dark)+moth(270,120,c)+moth(480,220,g===0?'#e7e5e4':g===1?'#e7e5e4':'#1c1917',.9)+moth(250,270,g===2?'#1c1917':'#e7e5e4',.8)+'<path d="M120 60 q20 -14 40 0 q20 -14 40 0" stroke="#111" stroke-width="5" fill="none"/>'},
+  gen:[
+   {n:'Eres una <b>polilla clara</b> con puntitos en Inglaterra, hace 200 años. Descansas de día sobre <b>troncos claros</b> cubiertos de líquenes. Los <b>pájaros</b> cazan polillas.',o:[
+    ['g','Quedarse quieta sobre los troncos claros: su color la camufla.','¡Bien! Tu color claro se confunde con el tronco: los pájaros no te ven. Esto se llama <b>camuflaje</b>.'],
+    ['b','Posarse sobre ladrillos rojos para tomar sol.','Sobre el rojo se nota muchísimo: los pájaros se comieron a varias.'],
+    ['b','Volar de día, cuando los pájaros cazan.','Volar de día te expone: perdiste muchas polillas.']]},
+   {n:'¡Llega la <b>Revolución Industrial</b>! Las fábricas lanzan <b>hollín negro</b> y los troncos se vuelven oscuros. Ahora las polillas claras se ven mucho. En tu población nacen unas pocas polillas <b>oscuras</b>.',o:[
+    ['g','Las polillas oscuras se esconden mejor en los troncos negros y sobreviven más.','¡Exacto! Las oscuras ahora tienen ventaja: sobreviven y tienen crías oscuras. El color de la población <b>empieza a cambiar</b>.'],
+    ['b','Todo sigue igual: las claras se posan en los troncos negros.','Las claras sobre troncos negros son fáciles de ver: los pájaros se comieron a muchas.'],
+    ['m','Esconderse bajo hojas verdes todo el día.','Las hojas ayudan un poco, pero no hay suficientes para todas.']]},
+   {n:'Pasan más generaciones. El humo sigue y hay más pájaros que nunca.',o:[
+    ['g','Las crías heredan el color oscuro: casi todas las polillas ya son negras.','¡Tu especie se adaptó! Tras muchas generaciones, casi el <b>98 %</b> de las polillas de Manchester eran negras.'],
+    ['m','Mezclarse claras y oscuras por igual.','Las claras siguen siendo cazadas: la población creció poco.'],
+    ['b','Volver a buscar troncos claros que ya no existen.','Ya no quedan troncos claros: muchas polillas fueron cazadas.']]}],
+  fin:'A esto se le llama <b>melanismo industrial</b>. Cuando el aire se limpió, los troncos volvieron a ser claros… ¡y las polillas claras volvieron a ser mayoría! El ambiente decide qué color sobrevive.'},
+ con:{t:'El conejo de la nieve',e:'🐇',g:'linear-gradient(160deg,#bae6fd,#0369a1)',thumb:()=>sky('#e0f2fe','#bae6fd')+'<rect y="290" width="800" height="60" fill="#fff"/>'+rabbit(380,'#fff',40,1.2),
+  scene:(g)=>{const spring=g===2;return sky(spring?'#bbf7d0':'#e0f2fe',spring?'#86efac':'#cbd5e1')+(spring?'<rect y="290" width="800" height="60" fill="#854d0e"/>':'<rect y="290" width="800" height="60" fill="#fff"/><g fill="#fff">'+Array.from({length:30},(_,i)=>`<circle cx="${(i*97)%800}" cy="${(i*53)%280}" r="3"/>`).join('')+'</g>')+'<path d="M560 290 L640 170 L720 290Z" fill="'+(spring?'#a16207':'#e2e8f0')+'"/>'+rabbit(300,spring?'#a16207':'#fff',g>=1?26:44,1)+rabbit(430,spring?'#fff':'#a8a29e',g>=1?26:50,.8)+'<g transform="translate(640 300)"><ellipse cx="0" cy="-22" rx="36" ry="18" fill="#ea580c"/><circle cx="36" cy="-34" r="14" fill="#ea580c"/><path d="M28 -46 l4 -12 6 10 M40 -46 l6 -12 4 12" fill="#ea580c"/><circle cx="42" cy="-36" r="2.4"/><path d="M-36 -22 q-30 -4 -34 -24" stroke="#ea580c" stroke-width="10" fill="none" stroke-linecap="round"/></g>'},
+  gen:[
+   {n:'Eres un conejo en una montaña muy fría. La <b>nieve</b> cubre todo el invierno y los <b>zorros</b> cazan conejos.',o:[
+    ['g','Los conejos que nacieron con pelaje blanco se confunden con la nieve.','¡Muy bien! El blanco sobre la nieve es un gran <b>camuflaje</b>: el zorro casi no los ve.'],
+    ['b','Salir a comer al campo nevado con pelaje marrón.','Un conejo marrón sobre la nieve se ve desde lejos: el zorro atrapó a varios.'],
+    ['m','Dormir sin salir a buscar comida.','Sin comer se debilitan: algunos conejos no resistieron.']]},
+   {n:'El invierno es terrible: <b>-20 °C</b>. El calor del cuerpo se escapa por las orejas.',o:[
+    ['g','Sobreviven más los que tienen pelaje grueso y orejas más cortas.','¡Exacto! Orejas cortas y pelaje grueso <b>pierden menos calor</b>. Sus crías heredaron esas características.'],
+    ['b','Sobreviven más los de orejas muy largas.','Las orejas largas pierden mucho calor: muchos conejos se congelaron.'],
+    ['b','Meterse al río para buscar comida.','El agua helada es peligrosísima: tu población bajó mucho.']]},
+   {n:'Llega la <b>primavera</b>: la nieve se derrite y el suelo queda <b>marrón</b>. ¡Ahora el blanco se nota!',o:[
+    ['g','Cambiar el pelaje a marrón en verano (la muda), como la liebre de las nieves.','¡Increíble adaptación! La liebre de las nieves <b>cambia de pelaje</b>: blanco en invierno y marrón en verano.'],
+    ['b','Quedarse blanco sobre la tierra marrón.','Un conejo blanco sobre tierra marrón es muy visible: el zorro atrapó a varios.'],
+    ['m','Esconderse en la madriguera todo el verano.','Esconderse protege, pero así casi no comen ni tienen crías.']]}],
+  fin:'Los animales de lugares fríos suelen tener <b>orejas cortas</b>, <b>pelaje grueso</b> y colores que los <b>camuflan</b>. Sobrevivieron los que nacieron con esas características y las heredaron.'},
+ pin:{t:'Los pinzones de Darwin',e:'🐦',g:'linear-gradient(160deg,#22d3ee,#0f766e)',thumb:()=>sky('#bae6fd','#38bdf8')+'<ellipse cx="400" cy="330" rx="360" ry="60" fill="#a16207"/>'+finch(400,250,'g',1.6),
+  scene:(g)=>sky('#e0f2fe','#7dd3fc')+'<rect y="250" width="800" height="100" fill="#0ea5e9"/><ellipse cx="260" cy="300" rx="200" ry="50" fill="#a16207"/><ellipse cx="640" cy="310" rx="140" ry="40" fill="#78350f"/><path d="M200 300 v-60 M200 250 l-30 -20 M200 260 l26 -24" stroke="#4d7c0f" stroke-width="6"/>'+finch(260,262,g===1?'e':'g',1.2)+finch(640,282,g===2?'f':'g',1)+(g===2?finch(380,258,'e',.9):'')+'<g transform="translate(120 290)"><circle r="7" fill="#78350f"/><circle cx="16" r="8" fill="#78350f"/></g>',
+  gen:[
+   {n:'Eres un <b>pinzón</b> que llegó volando a una isla de <b>Galápagos</b>. Aquí solo hay <b>semillas grandes y duras</b>. Los pinzones de tu grupo tienen picos distintos.',o:[
+    ['g','Los pinzones con pico grueso y fuerte rompen las semillas duras.','¡Bien! El <b>pico grueso</b> funciona como un cascanueces. Esos pinzones comieron y tuvieron crías con pico grueso.'],
+    ['b','Los de pico fino buscan semillas pequeñas que aquí no hay.','No hay semillas pequeñas en esta isla: los de pico fino pasaron hambre.'],
+    ['b','Volar mar adentro a buscar otra isla.','El mar es enorme: muchos pinzones no lograron llegar.']]},
+   {n:'Llega una <b>sequía</b>: casi no hay semillas, pero hay <b>insectos</b> escondidos dentro de la corteza de los árboles.',o:[
+    ['g','Algunos pinzones usan una espinita de cactus como herramienta para sacar insectos.','¡Asombroso! El <b>pinzón carpintero</b> usa espinas como herramienta. Así sobrevivió a la sequía.'],
+    ['m','Pelear entre ellos por las pocas semillas.','Pelear no crea más comida: solo algunos sobrevivieron.'],
+    ['b','Esperar sin comer a que termine la sequía.','Sin comida ningún pinzón resiste mucho: tu grupo se redujo.']]},
+   {n:'Tus pinzones viven ahora en <b>islas distintas</b>: cada isla tiene comida diferente (semillas, insectos, flores).',o:[
+    ['g','En cada isla sobreviven los picos que mejor sirven para su comida.','¡Así nacen <b>especies nuevas</b>! Con el tiempo cada isla tuvo su propio tipo de pinzón.'],
+    ['b','Todos con el mismo pico en todas las islas.','Un solo tipo de pico no sirve para todas las comidas: muchos no se adaptaron.'],
+    ['m','Volver todos a la primera isla.','La primera isla no tiene comida para todos: algunos no sobrevivieron.']]}],
+  fin:'Charles Darwin visitó Galápagos en 1835 y vio <b>pinzones con picos distintos</b> en cada isla. Así pensó su teoría de la <b>evolución por selección natural</b>.'}
+};
+// ---------- juego ----------
+let cur=null;
+const pop=n=>Array.from({length:Math.max(0,n)},(_,i)=>`<span style="animation-delay:${i*.04}s">${ST[cur.k].e}</span>`).join('');
+function home(){cur=null;const done=Object.keys(ST).filter(k=>MI[k]).length;
+ m.innerHTML=`<p class="intro">Elige un animal o deja que el azar decida. Toma buenas decisiones: si tu especie no se adapta, <b>se extingue</b>. Historias completadas: <b>${done}/4</b></p><div class="pick">${Object.entries(ST).map(([k,s])=>`<button type="button" class="st" data-k="${k}" style="--g:${s.g}"><svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid slice">${s.thumb()}</svg>${MI[k]?'<span class="ok">✅ Adaptada</span>':''}<b>${s.e} ${s.t}</b><small>3 generaciones</small></button>`).join('')}</div><button type="button" class="rnd" id="rnd">🎲 ¡Animal sorpresa!</button>`;
+ say.innerHTML='¡Hola! Soy Moli 🧬. En cada historia serás un animal. Elige bien para que tu especie <b>sobreviva</b> y pase sus características a la siguiente generación.';
+ document.getElementById('rnd').onclick=()=>start(Object.keys(ST)[Math.floor(Math.random()*4)]);
+ m.querySelectorAll('.st').forEach(b=>b.onclick=()=>start(b.dataset.k))}
+function start(k){cur={k,g:0,p:10,bad:0};chime([523,659]);round()}
+function shuffle(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
+function round(){const s=ST[cur.k],G=s.gen[cur.g],ops=shuffle(G.o.map((o,i)=>({o,i})));
+ m.innerHTML=`<div class="scene"><svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid slice">${s.scene(cur.g)}</svg><span class="gen">${s.e} ${s.t} · Generación ${cur.g+1} de 3</span><div class="pop" id="pop">${pop(cur.p)}</div></div>
+ <div class="story"><h2>Generación ${cur.g+1}</h2>${G.n}</div><div class="opts">${ops.map((x,i)=>`<button type="button" class="op" data-i="${x.i}"><i>${'ABC'[i]}</i>${x.o[1]}</button>`).join('')}</div><div id="out"></div>`;
+ say.innerHTML='¿Qué crees que ayudará a tu especie a <b>sobrevivir</b>? Elige una opción.';m.scrollTop=0;
+ m.querySelectorAll('.op').forEach(b=>b.onclick=()=>choose(+b.dataset.i))}
+function choose(i){const s=ST[cur.k],G=s.gen[cur.g],[t,,why]=G.o[i];
+ m.querySelectorAll('.op').forEach(b=>{b.disabled=true;const tt=G.o[+b.dataset.i][0];if(+b.dataset.i===i)b.classList.add(tt==='g'?'good':tt==='b'?'bad':'mid')});
+ const d=t==='g'?4:t==='m'?-3:-6;cur.p=Math.max(0,Math.min(20,cur.p+d));if(t!=='g')cur.bad++;
+ document.getElementById('pop').innerHTML=pop(cur.p);
+ const out=document.getElementById('out');
+ if(cur.p<=0){chime([392,330,262],'sawtooth');out.innerHTML=`<div class="res bad">${why}</div>`;setTimeout(()=>extinct(),1200);return}
+ chime(t==='g'?[659,784,1047]:t==='m'?[440,392]:[330,262],t==='g'?'triangle':'square');
+ out.innerHTML=`<div class="res ${t==='g'?'good':t==='b'?'bad':'mid'}">${t==='g'?'✅':t==='b'?'❌':'⚠️'} ${why}<br><b>Población: ${cur.p} ${s.e}</b> (${d>0?'+':''}${d})</div><div style="display:flex;justify-content:center;margin-top:12px"><button type="button" class="next" id="nx">${cur.g<2?'Pasar a la siguiente generación ➜':'Ver cómo terminó tu especie ➜'}</button></div>`;
+ say.innerHTML=t==='g'?'¡Buena decisión! Las que sobreviven <b>heredan</b> sus características a sus crías.':t==='m'?'Mmm… no ayudó mucho. Tu población bajó.':'¡Uy! Esa elección no ayuda a <b>adaptarse</b>. Cuidado: si tu población llega a 0, tu especie se extingue.';
+ document.getElementById('nx').onclick=()=>{if(cur.g<2){cur.g++;born();}else win()};out.scrollIntoView({behavior:'smooth',block:'end'})}
+function born(){const s=ST[cur.k];cur.p=Math.min(20,cur.p+2);m.innerHTML=`<div class="scene babies"><svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid slice">${s.scene(cur.g)}</svg><span class="gen">Nace la generación ${cur.g+1}</span><div class="pop">${pop(cur.p)}</div></div><div class="story" style="text-align:center">🐣 ¡Nacieron las crías! Heredaron las características de los que sobrevivieron.</div>`;chime([523,659,784]);setTimeout(round,2200)}
+function extinct(){const s=ST[cur.k];m.innerHTML=`<div class="end"><div class="big">🦴</div><h2>Tu especie se extinguió</h2><p>Tomaste ${cur.bad} ${cur.bad===1?'decisión':'decisiones'} que no ayudaron a <b>adaptarse</b> al ambiente. En la naturaleza, si los individuos no tienen características que les ayuden a sobrevivir, no llegan a tener crías y la especie puede <b>desaparecer</b>. Así se extinguieron muchas especies, como los dinosaurios.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button type="button" class="next" id="re">🔄 Intentar otra vez</button><button type="button" class="rnd" id="hm">🏠 Otras historias</button></div></div>`;say.innerHTML='No te preocupes: ¡prueba otra vez y elige lo que ayude a <b>sobrevivir</b>! 💪';
+ document.getElementById('re').onclick=()=>start(cur.k);document.getElementById('hm').onclick=home}
+function win(){const s=ST[cur.k];const first=!MI[cur.k];MI[cur.k]=1;save(KEY,MI);m.innerHTML=`<div class="scene babies"><svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid slice">${s.scene(2)}</svg><span class="gen">🏆 ¡Especie adaptada!</span><div class="pop">${pop(cur.p)}</div></div><div class="end"><h2>${s.e} ¡Tu especie sobrevivió!</h2><p>${s.fin}</p><button type="button" class="next" id="hm">🏠 Otra historia</button></div>`;
+ say.innerHTML=`¡Felicitaciones! ${Object.keys(ST).filter(k=>MI[k]).length}/4 historias completadas. 🧬`;party();document.getElementById('hm').onclick=home}
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function chime(fs,ty){const a=actx();if(!a)return;fs.forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+i*.12;o.type=ty||'triangle';o.frequency.value=f;g.gain.setValueAtTime(ty==='sawtooth'||ty==='square'?.04:.09,t);g.gain.exponentialRampToValueAtTime(.0001,t+.35);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.35)})}
+function party(){const b=document.createElement('canvas');b.className='boom';b.width=innerWidth;b.height=innerHeight;document.body.appendChild(b);const x=b.getContext('2d'),P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,c:`hsl(${Math.random()*360},90%,60%)`,s:4+Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,b.width,b.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<90)requestAnimationFrame(f);else b.remove()})();chime([523,659,784,1047])}
+home();
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

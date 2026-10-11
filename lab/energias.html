@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Energías · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.cards{position:relative;z-index:3;display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;padding:0 14px 8px}
+.cards::-webkit-scrollbar{display:none}
+.grp{flex:none;display:flex;flex-direction:column;gap:3px}.grp>small{font-size:10.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding-left:4px}.grp>div{display:flex;flex-wrap:wrap;gap:6px}
+.grp.r>small{color:#86efac}.grp.n>small{color:#fca5a5}.grp.n{margin-left:6px}
+.ec{flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;width:80px;overflow-wrap:anywhere;padding:6px 4px;border-radius:14px;border:0;color:#fff;font:inherit;font-size:11.5px;font-weight:900;line-height:1.1;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 14px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3)}
+.ec span{font-size:24px;line-height:1.1}
+.ec small{font-size:10px;opacity:.85}
+.ec.r{background:linear-gradient(160deg,#22c55e,#0f766e)}
+.ec.n{background:linear-gradient(160deg,#6b7280,#7f1d1d)}
+.eg{position:fixed;z-index:40;pointer-events:none;transform:translate(-50%,-50%) scale(1.15) rotate(-5deg)}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 270px;gap:12px;padding:0 14px 90px}
+.map{position:relative;min-height:0;border-radius:22px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+#mp{display:block;width:100%;height:100%;touch-action:none;user-select:none;background:#0e5aa7}
+.side{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto}
+.met{display:flex;flex-direction:column;gap:7px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+.mt{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:6px;font-size:12.5px;font-weight:900}
+.mt .bar{height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.mt .bar i{display:block;height:100%;width:0;border-radius:99px;transition:width .4s,background .4s}
+.mt b{font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
+.clock{display:flex;justify-content:space-between;font-weight:900;font-size:13px;color:var(--ink2)}
+.alarm{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;width:min(94%,420px);padding:10px 14px 12px;border-radius:16px;background:#fff;color:#14224a;box-shadow:0 14px 34px rgba(0,0,0,.45);animation:al .5s cubic-bezier(.2,1.4,.4,1)}
+.alarm[hidden]{display:none}
+.alarm>b{display:flex;align-items:center;gap:8px;font-size:15px}
+.alarm>b i{font-style:normal;font-size:22px;animation:ring .5s ease-in-out 6}
+.alarm{cursor:pointer}.alarm p{margin:4px 0 6px;font-size:13px;font-weight:700;line-height:1.35;color:#334155}
+.alarm .tm{height:6px;border-radius:99px;background:#e2e8f0;overflow:hidden}
+.alarm .tm i{display:block;height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b)}
+.alarm.min{width:auto;padding:6px 12px;cursor:pointer}.alarm.min p{display:none}.alarm.min>b{font-size:13px}.alarm.min .tm{width:120px}
+.alarm.ok{background:#dcfce7}.alarm.bad{background:#fee2e2}
+@keyframes al{from{transform:translate(-50%,-30px);opacity:0}}
+@keyframes ring{25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
+.start{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:rgba(6,14,40,.62);backdrop-filter:blur(2px)}
+.start[hidden]{display:none}
+.start div{width:min(90%,420px);padding:18px;border-radius:20px;background:#fff;color:#14224a;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.start h2{margin:0 0 6px;font-size:20px}
+.start p{margin:0 0 12px;font-size:14px;font-weight:700;line-height:1.4;color:#334155}
+.start button,.tool button{padding:10px 18px;border-radius:12px;border:0;background:linear-gradient(135deg,#22c55e,#0d9488);color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
+.tool{display:flex;gap:8px}.tool button{flex:1;font-size:13px;padding:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}
+#mp .slot{cursor:pointer}
+#mp .slot .rg{fill:rgba(255,255,255,.18);stroke:#fff;stroke-width:3;stroke-dasharray:7 6;animation:spin 8s linear infinite;transform-box:fill-box;transform-origin:center}
+#mp.dragging .slot.ok .rg{fill:rgba(74,222,128,.45);stroke:#4ade80;stroke-width:4}
+#mp.dragging .slot.no .rg{opacity:.25}
+#mp .blade{transform-box:view-box;animation:spin calc(2.4s / var(--w,.5)) linear infinite}
+#mp .off .blade{animation-play-state:paused}
+#mp .smoke circle{animation:smk 3s ease-out infinite}
+#mp .smoke circle:nth-child(2){animation-delay:1s}#mp .smoke circle:nth-child(3){animation-delay:2s}
+#mp .off .smoke{display:none}
+#mp .flow{stroke-dasharray:12 10;animation:fl 1.2s linear infinite}
+#mp .person{transition:fill .5s}
+#mp .walker{animation:walk var(--d,14s) linear infinite alternate}
+#mp .win{transition:fill .4s}
+#mp .empty{opacity:.45;filter:grayscale(1)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes smk{from{transform:translateY(0) scale(.5);opacity:.85}to{transform:translateY(-46px) scale(1.6);opacity:0}}
+@keyframes fl{to{stroke-dashoffset:-22}}
+@keyframes walk{from{transform:translateX(0)}to{transform:translateX(var(--x,120px))}}
+@keyframes wave{50%{transform:translateX(14px)}}
+#mp .bird{animation:fly var(--d,8s) ease-in-out infinite alternate;transition:opacity 2.5s}
+#mp .bird.gone{opacity:0;animation:flee 2.5s ease-in forwards}
+@keyframes fly{from{transform:translate(0,0)}50%{transform:translate(calc(var(--dx) / 2),-18px)}to{transform:translate(var(--dx),6px)}}
+@keyframes flee{to{transform:translate(0,-260px) scale(.4)}}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;grid-template-rows:auto auto;overflow:auto;padding:0 8px 80px}.map{aspect-ratio:1000/640}.alarm{top:6px;padding:8px 10px}.alarm>b{font-size:13.5px}.alarm p{font-size:12px}.side{overflow:visible}.moli-say img{width:48px}.moli-say p{font-size:12.5px}.cards{padding:0 8px 6px;gap:4px}.grp{flex:1 1 100%}.grp.n{margin-left:0}.ec{width:calc((100vw - 16px - 24px)/5);font-size:10px;padding:4px 2px}.ec small{font-size:8.5px}.ec span{font-size:18px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🏝️ Energías</b></header>
+<div class="cards" id="cards"></div>
+<div class="wrap">
+  <div class="map"><svg id="mp" viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="alarm" id="alarm" hidden></div>
+    <div class="start" id="start"><div><h2>🏝️ Isla Moli necesita energía</h2><p><b>Toca</b> una tarjeta de energía (o arrástrala) y se construye en su lugar de la isla. Tienes <b>120 💰</b>: cada energía cuesta. La ciudad paga impuestos cuando tiene luz. Cada minuto sonará una <b>alarma</b>. Cuida tu isla <b>4 días</b>: que tenga luz, aire limpio y que no se vayan las aves 🦩🦜🕊️.</p><button type="button" id="go">▶ Empezar</button></div></div></div>
+  <aside class="side">
+    <div class="met">
+      <div class="clock"><span id="coins" style="color:#fde047">💰 120</span><span id="day">Día 1</span><span id="tod">☀️ Día</span><span id="wind">💨 Viento</span></div>
+      <div class="mt"><span>⚡</span><div class="bar"><i id="bE"></i></div><b id="vE">0/25 MW</b></div>
+      <div class="mt"><span>🌿</span><div class="bar"><i id="bA"></i></div><b id="vA">100%</b></div>
+      <div class="mt"><span>😊</span><div class="bar"><i id="bH"></i></div><b id="vH">70%</b></div>
+    </div>
+    <div class="mis" id="mis"></div>
+    <div class="tool"><button type="button" id="pause">⏸ Pausa</button><button type="button" id="reset">🔄 Reiniciar</button></div>
+  </aside>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say">Toca una tarjeta de energía para construirla en la isla. ⚡</p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':ener',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let MI=load(KEY,{});
+const $=id=>document.getElementById(id),mp=$('mp'),say=$('say');
+// ---------- energías ----------
+const E={
+ solar:{c:30,n:'Solar',e:'☀️',r:1,mw:9,pol:0,info:'<b>Solar</b>: renovable ☀️. Los paneles usan la luz del sol. No contamina, pero <b>de noche no produce</b>.'},
+ eolica:{c:40,n:'Eólica',e:'🌬️',r:1,mw:10,pol:0,info:'<b>Eólica</b>: renovable 🌬️. El viento mueve las aspas. Funciona de día y de noche, <b>si hay viento</b>.'},
+ hidro:{c:60,n:'Hidroeléctrica',e:'💧',r:1,mw:16,pol:0,info:'<b>Hidroeléctrica</b>: renovable 💧. El agua del río mueve turbinas. Con <b>sequía</b> produce menos.'},
+ geo:{c:70,n:'Geotérmica',e:'🌋',r:1,mw:12,pol:0,info:'<b>Geotérmica</b>: renovable 🌋. Usa el calor de dentro de la Tierra, cerca de volcanes. <b>Funciona siempre</b>.'},
+ bio:{c:25,n:'Biomasa',e:'🌿',r:1,mw:7,pol:.12,info:'<b>Biomasa</b>: renovable 🌿. Usa restos de plantas y basura orgánica. Contamina <b>muy poquito</b>.'},
+ carbon:{c:20,n:'Carbón',e:'⚫',r:0,mw:24,pol:1,info:'<b>Carbón</b>: no renovable ⚫. Da mucha energía, pero <b>contamina mucho</b> y <b>se acaba</b>.'},
+ petroleo:{c:25,n:'Petróleo',e:'🛢️',r:0,mw:20,pol:.8,info:'<b>Petróleo</b>: no renovable 🛢️. Tardó millones de años en formarse: <b>se acaba</b> y contamina.'},
+ gas:{c:30,n:'Gas natural',e:'🔥',r:0,mw:17,pol:.5,info:'<b>Gas natural</b>: no renovable 🔥. Contamina menos que el carbón, pero <b>también se acaba</b>. En Perú se saca en Camisea (Cusco).'}
+};
+const card=([k,v])=>`<button type="button" class="ec ${v.r?'r':'n'}" data-k="${k}"><span>${v.e}</span>${k==='hidro'?'Hidro&shy;eléctrica':v.n}<small>${v.mw} MW · ${v.c}💰</small></button>`,ent=Object.entries(E);
+$('cards').innerHTML=`<div class="grp r"><small>♻️ Renovables</small><div>${ent.filter(e=>e[1].r).map(card).join('')}</div></div><div class="grp n"><small>⛽ No renovables</small><div>${ent.filter(e=>!e[1].r).map(card).join('')}</div></div>`;
+// ---------- lugares de la isla ----------
+const SL=[
+ {id:'t1',x:470,y:236,ok:['solar'],lbl:'Techo'},{id:'t2',x:600,y:236,ok:['solar'],lbl:'Techo'},{id:'p1',x:300,y:500,ok:['solar','bio'],lbl:'Campo soleado'},
+ {id:'h1',x:205,y:190,ok:['eolica'],lbl:'Cerro con viento'},{id:'h2',x:300,y:150,ok:['eolica'],lbl:'Cerro con viento'},{id:'c1',x:860,y:470,ok:['eolica'],lbl:'Costa'},
+ {id:'r1',x:700,y:250,ok:['hidro'],lbl:'Río'},{id:'v1',x:820,y:250,ok:['geo'],lbl:'Volcán'},{id:'f1',x:520,y:540,ok:['bio','solar'],lbl:'Granja'},
+ {id:'i1',x:190,y:380,ok:['carbon','petroleo','gas'],lbl:'Zona industrial'},{id:'i2',x:290,y:400,ok:['carbon','petroleo','gas'],lbl:'Zona industrial'}
+];
+// ---------- estado ----------
+const fresh=()=>({coins:150,dark:0,on:0,b:{},fuel:{},t:0,day:1,dem:20,hap:70,pol:0,wind:.6,dry:0,solved:0,ev:null,nextEv:45,dayOk:1,sp:[1,1,1],polT:0,end:0});
+let G=fresh(),run=false,paused=false;
+// ---------- dibujo base ----------
+const houses=[[430,280],[480,280],[530,280],[580,280],[630,280],[455,330],[505,330],[555,330],[605,330],[480,380],[530,380],[580,380]];
+function base(){
+ let h=`<defs><radialGradient id="sea" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#075985"/></radialGradient><linearGradient id="isl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86efac"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs>
+ <rect width="1000" height="640" fill="url(#sea)"/>
+ ${[0,1,2,3,4,5].map(i=>`<path d="M${40+i*170} ${70+(i%2)*480} q20 -10 40 0 t40 0" stroke="rgba(255,255,255,.5)" stroke-width="4" fill="none" style="animation:wave ${3+i%3}s ease-in-out infinite"/>`).join('')}
+ <path d="M120 300 C110 170 250 70 420 90 C560 60 760 70 870 160 C960 240 950 420 880 520 C800 610 620 620 470 600 C300 610 150 540 120 420 Z" fill="#fde68a"/>
+ <path d="M140 300 C135 185 260 92 420 110 C560 84 750 92 850 175 C930 245 925 410 860 505 C790 590 620 598 470 580 C310 590 170 525 145 415 Z" fill="url(#isl)"/>
+ <path d="M150 230 C190 120 330 100 360 160 C330 210 230 250 150 230Z" fill="#65a30d"/>
+ <path d="M760 250 L820 140 L880 250Z" fill="#78350f"/><path d="M805 165 L820 140 L835 165Z" fill="#ef4444"/><circle cx="820" cy="130" r="9" fill="#9ca3af" opacity=".7"/>
+ <path class="flow" d="M640 110 C660 170 690 220 700 280 C710 360 760 420 780 470 C800 520 840 560 880 600" stroke="#38bdf8" stroke-width="20" fill="none" stroke-linecap="round"/>
+ <path d="M640 110 C660 170 690 220 700 280 C710 360 760 420 780 470 C800 520 840 560 880 600" stroke="#7dd3fc" stroke-width="8" fill="none" class="flow" stroke-linecap="round"/>
+ <rect x="150" y="345" width="190" height="95" rx="14" fill="#a8a29e" opacity=".8"/><text x="245" y="458" font-size="15" font-weight="900" fill="#44403c" text-anchor="middle">Zona industrial</text>
+ <rect x="440" y="500" width="170" height="80" rx="14" fill="#a16207" opacity=".55"/>${[0,1,2,3].map(i=>`<path d="M${450+i*40} 512 v56" stroke="#4d7c0f" stroke-width="10" stroke-dasharray="6 6"/>`).join('')}<text x="525" y="596" font-size="14" font-weight="900" fill="#3f6212" text-anchor="middle">Granja</text>
+ <rect x="410" y="262" width="250" height="160" rx="20" fill="#cbd5e1" opacity=".7"/><text x="535" y="440" font-size="15" font-weight="900" fill="#1e3a8a" text-anchor="middle">Ciudad Moli</text>
+ <path d="M420 362 H650" stroke="#64748b" stroke-width="12"/><path d="M420 362 H650" stroke="#fff" stroke-width="2" stroke-dasharray="10 10"/>
+ ${houses.map(([x,y],i)=>`<g><rect x="${x-18}" y="${y-16}" width="36" height="30" rx="3" fill="${['#f87171','#60a5fa','#fbbf24','#a78bfa'][i%4]}"/><path d="M${x-22} ${y-14} L${x} ${y-32} L${x+22} ${y-14}Z" fill="#7c2d12"/><rect class="win" x="${x-11}" y="${y-8}" width="9" height="9" fill="#1f2937"/><rect class="win" x="${x+2}" y="${y-8}" width="9" height="9" fill="#1f2937"/></g>`).join('')}
+ <g id="hosp"><rect x="660" y="300" width="56" height="50" rx="4" fill="#fff"/><path d="M688 310 v26 M675 323 h26" stroke="#ef4444" stroke-width="7"/><rect class="win" x="666" y="338" width="10" height="8" fill="#1f2937"/><rect class="win" x="700" y="338" width="10" height="8" fill="#1f2937"/></g>
+ ${[0,1,2,3,4,5,6].map(i=>`<g class="walker" style="--d:${9+i*2}s;--x:${(i%2?-1:1)*(60+i*14)}px"><g transform="translate(${470+i*24} ${352+(i%2)*16})"><circle class="person" r="7" cy="-12" fill="#fcd34d"/><rect x="-5" y="-6" width="10" height="13" rx="4" fill="${['#ef4444','#3b82f6','#22c55e','#a855f7'][i%4]}"/><path class="mouth" d="M-3 -10 q3 3 6 0" stroke="#000" stroke-width="1.5" fill="none"/></g></g>`).join('')}
+ <g id="plants"></g>
+ <g id="birds">${BIRDS.map((b,i)=>`<g class="bird" id="bd${i}" style="--dx:${b.dx};--d:${7+i*2}s"><text x="${b.x}" y="${b.y}" font-size="34">${b.e}</text><text x="${b.x+40}" y="${b.y+18}" font-size="26">${b.e}</text></g>`).join('')}</g>
+ <rect id="smog" width="1000" height="640" fill="#4b5563" opacity="0" pointer-events="none"/>
+ <rect id="night" width="1000" height="640" fill="#0b1240" opacity="0" pointer-events="none"/>
+ <g id="slots"></g>`;
+ mp.innerHTML=h;
+}
+const PL={
+ solar:(x,y)=>`<g transform="translate(${x} ${y})">${[-1,1].map(d=>`<rect x="${d*24-20}" y="-14" width="40" height="28" rx="3" fill="#1e40af" stroke="#93c5fd" stroke-width="2" transform="skewX(-12)"/><path d="M${d*24-14} -14 v28 M${d*24} -14 v28 M${d*24+12} -14 v28 M${d*24-20} 0 h40" stroke="#93c5fd" stroke-width="1.2" transform="skewX(-12)"/>`).join('')}</g>`,
+ eolica:(x,y)=>`<g transform="translate(${x} ${y})"><path d="M-3 0 L-6 60 H6 L3 0Z" fill="#f1f5f9"/><g class="blade" style="transform-origin:${x}px ${y}px">${[0,120,240].map(a=>`<path d="M0 0 L-5 -46 Q0 -54 5 -46Z" fill="#fff" stroke="#cbd5e1" transform="rotate(${a})"/>`).join('')}</g><circle r="6" fill="#94a3b8"/></g>`,
+ hidro:(x,y)=>`<g transform="translate(${x} ${y})"><rect x="-38" y="-18" width="76" height="36" rx="6" fill="#64748b"/><rect x="-32" y="-12" width="64" height="10" fill="#94a3b8"/><path class="flow" d="M-30 26 H30" stroke="#e0f2fe" stroke-width="6"/><text y="10" font-size="14" text-anchor="middle" fill="#fff" font-weight="900">💧</text></g>`,
+ geo:(x,y)=>`<g transform="translate(${x} ${y})"><rect x="-26" y="-14" width="52" height="30" rx="4" fill="#e5e7eb"/><rect x="-18" y="-34" width="10" height="22" fill="#9ca3af"/><g class="smoke" transform="translate(-13 -38)"><circle r="7" fill="#fff"/><circle r="7" fill="#fff"/><circle r="7" fill="#fff"/></g><text y="8" font-size="13" text-anchor="middle">🌋</text></g>`,
+ bio:(x,y)=>`<g transform="translate(${x} ${y})"><rect x="-28" y="-14" width="56" height="30" rx="5" fill="#65a30d"/><rect x="10" y="-34" width="10" height="22" fill="#4d7c0f"/><g class="smoke" transform="translate(15 -38)"><circle r="6" fill="#d6d3d1"/><circle r="6" fill="#d6d3d1"/><circle r="6" fill="#d6d3d1"/></g><text x="-6" y="7" font-size="16" text-anchor="middle">🌿</text></g>`,
+ carbon:(x,y)=>`<g transform="translate(${x} ${y})"><rect x="-30" y="-14" width="60" height="32" rx="4" fill="#57534e"/><rect x="6" y="-48" width="14" height="36" fill="#44403c"/><g class="smoke" transform="translate(13 -52)"><circle r="9" fill="#1c1917"/><circle r="9" fill="#1c1917"/><circle r="9" fill="#1c1917"/></g><text x="-12" y="8" font-size="15" text-anchor="middle">⚫</text></g>`,
+ petroleo:(x,y)=>`<g transform="translate(${x} ${y})"><path d="M-20 18 L0 -40 L20 18" stroke="#1f2937" stroke-width="5" fill="none"/><path d="M-10 -10 H10 M-14 4 H14" stroke="#1f2937" stroke-width="3"/><rect x="-26" y="14" width="52" height="10" fill="#7f1d1d"/><g class="smoke" transform="translate(0 -44)"><circle r="7" fill="#44403c"/><circle r="7" fill="#44403c"/><circle r="7" fill="#44403c"/></g></g>`,
+ gas:(x,y)=>`<g transform="translate(${x} ${y})"><ellipse rx="26" ry="18" fill="#e5e7eb" stroke="#9ca3af" stroke-width="3"/><rect x="18" y="-40" width="8" height="34" fill="#9ca3af"/><path d="M22 -42 q-8 -12 0 -22 q8 10 0 22Z" fill="#f97316"/><g class="smoke" transform="translate(22 -60)"><circle r="6" fill="#9ca3af"/><circle r="6" fill="#9ca3af"/><circle r="6" fill="#9ca3af"/></g><text y="6" font-size="14" text-anchor="middle">🔥</text></g>`
+};
+function drawPlants(){
+ $('plants').innerHTML=SL.filter(s=>G.b[s.id]).map(s=>{const k=G.b[s.id],emp=!E[k].r&&G.fuel[s.id]<=0;return `<g class="pl ${emp?'empty off':''}" data-s="${s.id}">${PL[k](s.x,s.y)}${!E[k].r?`<g transform="translate(${s.x-26} ${s.y+30})"><rect width="52" height="8" rx="4" fill="rgba(0,0,0,.4)"/><rect class="fuel" data-s="${s.id}" width="${Math.max(0,52*G.fuel[s.id]/100)}" height="8" rx="4" fill="#f59e0b"/></g>`:''}</g>`}).join('');
+ $('slots').innerHTML=SL.filter(s=>!G.b[s.id]).map(s=>`<g class="slot" data-s="${s.id}"><circle class="rg" cx="${s.x}" cy="${s.y}" r="30"/><text x="${s.x}" y="${s.y+7}" font-size="20" text-anchor="middle">${s.ok.map(k=>E[k].e).slice(0,2).join('')}</text><circle cx="${s.x}" cy="${s.y}" r="40" fill="transparent"/></g>`).join('');
+}
+// ---------- simulación ----------
+const isDay=()=>G.t%60<40,DAYS=4;
+// Aves de la isla: si el aire sigue sucio, una especie se va para siempre.
+const BIRDS=[{e:'🦩',n:'los flamencos',x:250,y:150,dx:'160px'},{e:'🦜',n:'los loros',x:700,y:120,dx:'-180px'},{e:'🕊️',n:'las gaviotas',x:400,y:560,dx:'220px'}];
+function supply(){let s=0;for(const[id,k]of Object.entries(G.b)){const e=E[k];if(!e.r&&G.fuel[id]<=0)continue;let v=e.mw;if(k==='solar')v=isDay()?v:0;if(k==='eolica')v*=G.wind;if(k==='hidro')v*=G.dry?.4:1;s+=v}return Math.round(s)}
+function tick(){
+ if(!run||paused||!G.on)return;G.t++;const day=isDay();
+ if(G.t%60===0){G.day++;if(G.dayOk&&100-G.pol>70&&!MI.m3){MI.m3=1;save(KEY,MI);party('¡Misión cumplida: un día completo con luz y aire limpio! 🌿')}G.dayOk=1}
+ if(G.t%15===0)G.wind=Math.max(.15,Math.min(1,G.wind+(Math.random()-.5)*.5));
+ const sp=supply(),ok=sp>=G.dem;if(!ok)G.dayOk=0;G.dark=ok?0:G.dark+1;G.coins+=ok?2:0;
+ let p=0;for(const[id,k]of Object.entries(G.b)){const e=E[k];if(!e.r&&G.fuel[id]>0){G.fuel[id]-=1.1;G.coins=Math.max(0,G.coins-.6);p+=e.pol;if(G.fuel[id]<=0){G.fuel[id]=0;drawPlants();say.innerHTML=`⛽ ¡Se acabó el combustible de la planta de <b>${e.n}</b>! Las energías <b>no renovables se agotan</b>. Quítala y pon una renovable.`;beep(330,.4)}}else if(e.pol)p+=e.pol}
+ G.pol=Math.max(0,Math.min(100,G.pol+p*1.6-.5));if(G.pol>70)G.dayOk=0;
+ G.hap=Math.max(0,Math.min(100,G.hap+(ok?.8:-.7)+(G.pol>75?-1.6:G.pol>45?-.7:0)));
+ G.polT=G.pol>60?G.polT+1:Math.max(0,G.polT-1);
+ if(G.polT===8&&G.sp.some(Boolean))say.innerHTML='🐦 ¡Las aves tosen y se están yendo! Hay demasiado humo. Quita una planta que contamine.';
+ if(G.polT>=25){const i=G.sp.indexOf(1);G.polT=0;if(i>=0){G.sp[i]=0;mp.querySelector('#bd'+i).classList.add('gone');beep(300,.5,'sawtooth',.05);say.innerHTML=`💔 ¡Se perdió una especie! <b>${BIRDS[i].n[0].toUpperCase()+BIRDS[i].n.slice(1)}</b> ${BIRDS[i].e} se fueron de la isla por la contaminación y ya no volverán.`}}
+ if(G.day>DAYS)return finish();
+ if(G.ev){G.ev.left--;$('alarmT').style.width=(G.ev.left/G.ev.dur*100)+'%';if(G.ev.left<=0)endEvent(ok)}
+ else if(G.t>=G.nextEv)startEvent();
+ if(G.dark===12)say.innerHTML='⚠️ ¡La ciudad lleva mucho tiempo <b>sin luz</b>! Si sigue así, la isla se perderá.';
+ if(G.dark>=45&&G.coins<20)G.hap=0;
+ if(!G.sp.some(Boolean)&&G.pol>60)return finish(1);
+ if(G.hap<=0){run=false;$('start').hidden=false;$('start').querySelector('h2').textContent='😢 La ciudad se quedó triste';$('start').querySelector('p').innerHTML=`Sobreviviste <b>${G.day} ${G.day===1?'día':'días'}</b>. ${G.dark>5?'La ciudad se quedó <b>sin luz</b>'+(G.coins<20?' y sin monedas':'')+'. ':''}${G.pol>45?'El <b>humo</b> enfermó a la gente y asustó a las aves. ':''}Gasta bien tus monedas: las energías renovables cuestan más al inicio, pero no gastan combustible ni se acaban. ¡Inténtalo otra vez!`;$('go').textContent='🔄 Volver a jugar'}
+ ui(sp)}
+function finish(dead){run=false;G.end=1;const lost=BIRDS.filter((b,i)=>!G.sp[i]),air=Math.round(100-G.pol),clean=air>=60&&!lost.length,st=$('start');st.hidden=false;
+ const birds=lost.length?`Se ${lost.length===1?'perdió una especie':'perdieron '+lost.length+' especies'} de aves: <b>${lost.map(b=>b.n+' '+b.e).join(', ')}</b>.`:'';
+ if(dead){st.querySelector('h2').textContent='☠️ La isla quedó contaminada';st.querySelector('p').innerHTML=`Tu ciudad tenía luz, pero el humo cubrió toda la isla. ${birds} La gente se enfermó y el aire quedó en <b>${air}%</b>. El carbón, el petróleo y el gas dan mucha energía rápido, pero <b>contaminan y se acaban</b>. ¡Inténtalo con energías renovables!`}
+ else if(clean){st.querySelector('h2').textContent='🏆 ¡Salvaste tu isla!';st.querySelector('p').innerHTML=`Tu ciudad tuvo energía <b>${DAYS} días</b>, el aire quedó en <b>${air}%</b> y <b>todas las aves</b> siguen en la isla 🦩🦜🕊️. ¡Eso es usar bien las energías renovables!`;party('¡Isla salvada! 🌿')}
+ else{st.querySelector('h2').textContent='😟 Ganaste… pero';st.querySelector('p').innerHTML=`Tu ciudad tuvo energía <b>${DAYS} días</b>, pero <b>contaminaste la isla</b>: el aire quedó en <b>${air}%</b>. ${birds||'Las aves sufrieron mucho por el humo.'} Una buena ciudad no solo tiene luz: también cuida el aire, los animales y la naturaleza. ¡Inténtalo con más energías renovables!`}
+ $('go').textContent='🔄 Volver a jugar';ui()}
+function ui(sp){sp=sp??supply();const ok=sp>=G.dem,day=isDay();$('coins').textContent='💰 '+Math.floor(G.coins);
+ $('vE').textContent=`${sp}/${G.dem} MW`;$('bE').style.width=Math.min(100,sp/G.dem*100)+'%';$('bE').style.background=ok?'#22c55e':'#ef4444';
+ $('vA').textContent=Math.round(100-G.pol)+'%';$('bA').style.width=(100-G.pol)+'%';$('bA').style.background=G.pol>60?'#ef4444':G.pol>30?'#f59e0b':'#4ade80';
+ $('vH').textContent=Math.round(G.hap)+'%';$('bH').style.width=G.hap+'%';$('bH').style.background=G.hap<35?'#ef4444':G.hap<60?'#f59e0b':'#facc15';
+ $('day').textContent=`Día ${Math.min(G.day,DAYS)}/${DAYS}`;$('tod').textContent=day?'☀️ Día':'🌙 Noche';$('wind').textContent=G.wind>.66?'💨 Mucho viento':G.wind>.35?'🍃 Poco viento':'😶 Sin viento';
+ $('night').setAttribute('opacity',day?0:.42);$('smog').setAttribute('opacity',(G.pol/100*.55).toFixed(2));
+ mp.querySelectorAll('.win').forEach(w=>w.setAttribute('fill',ok?(day?'#bae6fd':'#fde047'):'#1f2937'));
+ mp.querySelectorAll('.person').forEach(p=>p.setAttribute('fill',G.hap<35?'#93c5fd':'#fcd34d'));
+ mp.querySelectorAll('.mouth').forEach(m=>m.setAttribute('d',G.hap<45?'M-3 -8 q3 -3 6 0':'M-3 -10 q3 3 6 0'));
+ mp.querySelectorAll('.pl').forEach(g=>{const k=G.b[g.dataset.s];g.style.setProperty('--w',k==='eolica'?G.wind:.6);g.classList.toggle('off',(k==='solar'&&!day)||(!E[k].r&&G.fuel[g.dataset.s]<=0))});
+ mp.querySelectorAll('.fuel').forEach(f=>f.setAttribute('width',Math.max(0,52*G.fuel[f.dataset.s]/100)));
+ mis()}
+// ---------- alarmas (una por minuto) ----------
+const EV=[
+ {e:'🏭',t:'¡Llegó una fábrica nueva!',p:'La ciudad necesita <b>+12 MW</b> más. Construye más energía, ¡mejor si es renovable!',f:()=>{G.dem+=12}},
+ {e:'🌙',t:'Viene una noche larga',p:'Los paneles solares no producen de noche. Usa energía que funcione <b>siempre</b>: eólica, hidroeléctrica o geotérmica.',f:()=>{G.t=Math.max(G.t,Math.floor(G.t/60)*60+36)}},
+ {e:'🌵',t:'¡Sequía en la isla!',p:'El río baja: la <b>hidroeléctrica produce menos</b>. Busca otra energía para cubrir lo que falta.',f:()=>{G.dry=1;setTimeout(()=>G.dry=0,60000)}},
+ {e:'😶',t:'Día sin viento',p:'Los molinos casi no giran. ¿Qué otra energía puede ayudar?',f:()=>{G.wind=.15}},
+ {e:'🏥',t:'El hospital necesita más energía',p:'Llegaron muchos pacientes: <b>+8 MW</b> para que las máquinas funcionen.',f:()=>{G.dem+=8}},
+ {e:'🏫',t:'¡Se abre una escuela nueva!',p:'Necesita luz y computadoras: <b>+6 MW</b>.',f:()=>{G.dem+=6}},
+ {e:'😷',t:'Humo en la ciudad',p:'La gente tose por la contaminación. Quita una planta que contamine y pon una <b>renovable</b>.',c:()=>G.pol>40,f:()=>{G.hap-=6}}
+];
+let evi=0;
+function startEvent(){let e=EV.find(x=>x.c&&x.c())||EV[evi++%(EV.length-1)];e.f();G.ev={e,left:40,dur:40};const a=$('alarm');a.className='alarm';a.hidden=false;a.innerHTML=`<b><i>🚨</i>${e.e} ${e.t}</b><p>${e.p}</p><div class="tm"><i id="alarmT" style="width:100%"></i></div>`;clearTimeout(a._m);a._m=setTimeout(()=>G.ev&&a.classList.add('min'),7000);a.onclick=()=>a.classList.toggle('min');say.innerHTML='🚨 ¡Alarma! Lee la necesidad de la ciudad y toma una decisión.';siren()}
+function endEvent(ok){const a=$('alarm');G.ev=null;G.nextEv=G.t+40;if(ok){G.solved++;a.className='alarm ok';a.innerHTML=`<b><i>✅</i>¡Salvaste a la ciudad!</b><p>Tu isla tiene suficiente energía. Alarmas resueltas: <b>${G.solved}</b>.</p>`;ding();if(G.solved>=3&&!MI.m2){MI.m2=1;save(KEY,MI);party('¡Misión cumplida: resolviste 3 alarmas! 🚨')}}else{a.className='alarm bad';G.hap-=8;a.innerHTML=`<b><i>⚠️</i>La ciudad se quedó sin energía</b><p>Construye más energía para la próxima alarma.</p>`;beep(200,.5)}setTimeout(()=>{if(!G.ev)a.hidden=true},5000)}
+// ---------- construir ----------
+function freeFor(k){return SL.find(s=>!G.b[s.id]&&s.ok.includes(k))}
+function build(sid,k){let s=sid&&SL.find(s=>s.id===sid),moved='';if(!s||G.b[s.id]||!s.ok.includes(k)){const f=freeFor(k);if(!f){say.innerHTML=`Ya no hay lugar libre para <b>${E[k].n}</b>. Quita otra planta tocándola.`;beep(220,.2);return}if(s)moved=`La puse en <b>${f.lbl}</b>, que es su lugar. `;s=f;sid=f.id}
+ if(G.coins<E[k].c){say.innerHTML=`💰 No te alcanzan las monedas: ${E[k].n} cuesta <b>${E[k].c}</b> y tienes <b>${Math.floor(G.coins)}</b>. La ciudad paga impuestos cuando tiene luz.`;beep(220,.2);return}
+ G.coins-=E[k].c;G.b[sid]=k;if(!E[k].r)G.fuel[sid]=100;if(!G.on){G.on=1}drawPlants();ui();ding(1);say.innerHTML=moved+E[k].info+(E[k].r?' ✅':' ⚠️');
+ const rs=new Set(Object.values(G.b).filter(x=>E[x].r));if(rs.size>=3&&!MI.m1){MI.m1=1;save(KEY,MI);party('¡Misión cumplida: usas 3 energías renovables! ♻️')}}
+let dr=null;
+$('cards').addEventListener('pointerdown',e=>{const b=e.target.closest('.ec');if(!b)return;e.preventDefault();actx();const g=b.cloneNode(true);g.classList.add('eg');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);dr={k:b.dataset.k,g,x:e.clientX,y:e.clientY};mp.classList.add('dragging');mp.querySelectorAll('.slot').forEach(s=>{const ok=SL.find(x=>x.id===s.dataset.s).ok.includes(dr.k);s.classList.toggle('ok',ok);s.classList.toggle('no',!ok)})});
+addEventListener('pointermove',e=>{if(!dr)return;dr.g.style.left=e.clientX+'px';dr.g.style.top=e.clientY+'px'});
+addEventListener('pointerup',e=>{if(!dr)return;const d=dr;dr=null;d.g.remove();mp.classList.remove('dragging');
+ if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8){if(!run){say.innerHTML=E[d.k].info;return}build(null,d.k);return}
+ const m=mp.getScreenCTM().inverse(),pt=mp.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(m);let best=null,bd=60;SL.forEach(s=>{const dd=Math.hypot(s.x-q.x,s.y-q.y);if(dd<bd&&!G.b[s.id]){bd=dd;best=s}});
+ build(best?best.id:null,d.k)});
+mp.addEventListener('click',e=>{const p=e.target.closest('.pl');if(p){const sid=p.dataset.s,k=G.b[sid];showRemove(sid,k);return}const s=e.target.closest('.slot');if(s){const sl=SL.find(x=>x.id===s.dataset.s);say.innerHTML=`<b>${sl.lbl}</b>: aquí puedes poner ${sl.ok.map(x=>E[x].e+' '+E[x].n).join(' o ')}.`}});
+function showRemove(sid,k){say.innerHTML=`${E[k].info} <button type="button" id="rm" style="margin-left:6px;padding:4px 10px;border-radius:10px;border:0;background:#ef4444;color:#fff;font:inherit;font-weight:900;cursor:pointer">🗑 Quitar</button>`;$('rm').onclick=()=>{G.coins+=Math.floor(E[k].c/2);delete G.b[sid];delete G.fuel[sid];drawPlants();ui();say.innerHTML=`Quitaste la planta de ${E[k].n}. Te devolvieron ${Math.floor(E[k].c/2)} 💰.`}}
+// ---------- misiones, sonido, inicio ----------
+function mis(){$('mis').innerHTML=`<h3>🎯 Misiones</h3><div class="mi ${MI.m1?'ok':''}">Usa 3 energías renovables<em>${MI.m1?'Completado ✅':'Falta'}</em></div><div class="mi ${MI.m2?'ok':''}">Resuelve 3 alarmas<em>${MI.m2?'Completado ✅':`${Math.min(3,G.solved)}/3`}</em></div><div class="mi ${MI.m3?'ok':''}">Un día con luz y aire limpio<em>${MI.m3?'Completado ✅':'Falta'}</em></div>`}
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function beep(f,d,ty,v,t0){const a=actx();if(!a)return;const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+(t0||0);o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v||.1,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function ding(s){(s?[660,990]:[523,659,784,1047]).forEach((f,i)=>beep(f,.25,'triangle',.09,i*.1))}
+function siren(){for(let i=0;i<6;i++)beep(i%2?660:880,.28,'square',.04,i*.3)}
+function party(t){const b=document.createElement('canvas');b.className='boom';b.width=innerWidth;b.height=innerHeight;document.body.appendChild(b);const x=b.getContext('2d'),P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,c:`hsl(${Math.random()*360},90%,60%)`,s:4+Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,b.width,b.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<90)requestAnimationFrame(f);else b.remove()})();ding();setTimeout(()=>{say.innerHTML='<b>'+t+'</b>'},60);mis()}
+$('go').onclick=()=>{actx();if(G.hap<=0||G.end)G=fresh(),base(),drawPlants();$('start').hidden=true;run=true;paused=false;$('pause').textContent='⏸ Pausa';say.innerHTML='La ciudad necesita <b>20 MW</b>. <b>Toca</b> una tarjeta de energía para construirla. ⚡';ui()};
+$('pause').onclick=()=>{if(!run)return;paused=!paused;$('pause').textContent=paused?'▶ Seguir':'⏸ Pausa'};
+$('reset').onclick=()=>{G=fresh();$('alarm').hidden=true;base();drawPlants();ui();say.innerHTML='Isla nueva. ¡A construir! 🏝️'};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&run)paused=true,$('pause').textContent='▶ Seguir'});
+base();drawPlants();ui();setInterval(tick,1000);
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

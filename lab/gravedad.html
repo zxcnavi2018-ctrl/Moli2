@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gravedad y atracción · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#312e81,#0b0a24 70%)}
+.main{flex:1;min-height:0;overflow:auto;width:min(100%,1000px);margin:0 auto;padding:0 10px 14px;display:flex;flex-direction:column;gap:8px}
+.main>*{flex:none}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tabs button{padding:9px 4px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-weight:900;font-size:13.5px;line-height:1.15;cursor:pointer}
+.tabs button.on{background:linear-gradient(135deg,#8b5cf6,#4338ca);border-color:#c4b5fd;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.stage{position:relative;border-radius:22px;overflow:hidden;box-shadow:0 16px 34px rgba(0,0,0,.45)}
+.stage svg{display:block;width:100%;height:auto;max-height:min(56dvh,520px);margin:0 auto}
+.hud{position:absolute;left:10px;top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.hud span{padding:4px 10px;border-radius:99px;background:rgba(0,0,0,.5);font-weight:900;font-size:13px}
+.hud:empty{display:none}
+.ctl{display:flex;gap:6px;flex-wrap:wrap}
+.ctl button,.ctl label{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font:inherit;font-weight:900;font-size:13.5px;cursor:pointer}
+.ctl button.on{background:linear-gradient(135deg,#0ea5e9,#2563eb);border-color:#bae6fd}
+.ctl button.go{background:linear-gradient(135deg,#22c55e,#15803d);border-color:#86efac}
+.ctl input[type=range]{flex:1;accent-color:#f97316;min-width:120px}
+.objs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.objs button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px;border-radius:14px;border:0;background:linear-gradient(160deg,#fff,#e0e7ff);color:#14224a;font:inherit;font-weight:900;font-size:11.5px;cursor:pointer;box-shadow:0 6px 12px rgba(0,0,0,.3)}
+.objs button i{font-style:normal;font-size:26px}
+.objs button.a{outline:3px solid #f97316;outline-offset:2px}.objs button.b{outline:3px solid #22d3ee;outline-offset:2px}
+.exp{padding:12px 14px;border-radius:18px;background:#fff;color:#14224a;font-weight:700;font-size:14px;line-height:1.45;box-shadow:0 12px 26px rgba(0,0,0,.4)}
+.exp h3{margin:0 0 3px;font-size:16px}
+.exp.flash{animation:fl .6s}
+@keyframes fl{30%{transform:scale(1.02);box-shadow:0 0 0 4px #fde047}}
+.mini{display:flex;gap:6px;flex-wrap:wrap}
+.mini .mi{flex:1 1 150px;font-size:12px;padding:6px 10px}
+.moli-say{left:auto;right:8px;top:8px;bottom:auto;flex-direction:row-reverse;align-items:flex-start;max-width:min(420px,calc(100% - 16px))}
+.moli-say img{width:46px}
+.moli-say p{margin:40px 0 0;border-radius:16px 4px 16px 16px;font-size:13.5px}
+.moli-say::after{left:auto;right:34px;bottom:auto;top:30px}
+.lab-top{padding-right:62px}
+@media (max-width:600px){.tabs button{font-size:12px}.ctl button,.ctl label{font-size:12.5px;padding:9px 6px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🍎 Gravedad y atracción</b></header>
+<div class="main">
+  <div class="tabs" id="tabs"></div>
+  <div class="stage"><svg id="sv" viewBox="0 0 600 380"></svg><div class="hud" id="hud"></div></div>
+  <div id="ctl"></div>
+  <div class="exp" id="exp"></div>
+  <div class="mini" id="mis"></div>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':grav',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const $=id=>document.getElementById(id),say=$('say'),sv=$('sv');let MI=load(KEY,{});
+const exp=(t,x,fl)=>{const e=$('exp');e.innerHTML=`<h3>${t}</h3>${x}`;if(fl){e.classList.remove('flash');void e.offsetWidth;e.classList.add('flash')}};
+const win=(k,t)=>{if(MI[k])return;MI[k]=1;save(KEY,MI);mis();tabs();fanfare();say.innerHTML='🎉 <b>¡Misión cumplida!</b> '+t};
+// ================= 1. CAÍDA LIBRE =================
+const OB={pie:{e:'🪨',n:'Piedra',vt:60,h:1},bal:{e:'⚽',n:'Pelota',vt:22,h:1},pap:{e:'📄',n:'Hoja de papel',vt:2.6,h:0},plu:{e:'🪶',n:'Pluma',vt:1.4,h:0},man:{e:'🍎',n:'Manzana',vt:35,h:1}};
+const S1={n:'🪶 Caída libre',
+ init(){this.a='pie';this.b='plu';this.air=1;this.st=null;this.ctl();this.hud();exp('🍎 ¿Qué cae primero?','La <b>gravedad</b> es la fuerza con la que la Tierra <b>atrae</b> a todos los objetos hacia su centro. Elige dos objetos (🟠 y 🔵), decide si hay aire o no, y suéltalos desde 10 metros. ¿Caerán a la vez?');say.innerHTML='Toca un objeto para el tubo <b>🟠</b> y luego otro para el tubo <b>🔵</b>. Después toca <b>▶ Soltar</b>.'},
+ ctl(){$('ctl').innerHTML=`<div class="objs" id="objs">${Object.entries(OB).map(([k,o])=>`<button type="button" data-k="${k}" class="${k===this.a?'a':''} ${k===this.b?'b':''}"><i>${o.e}</i>${o.n}</button>`).join('')}</div><div class="ctl" style="margin-top:6px"><button type="button" id="air" class="${this.air?'on':''}">${this.air?'🌬️ Con aire':'🚫 Sin aire (vacío)'}</button><button type="button" class="go" id="go">▶ Soltar</button></div>`;
+  $('objs').onclick=e=>{const b=e.target.closest('button');if(!b||this.st&&this.st.run)return;const k=b.dataset.k;if(this.pick!=='b'){this.a=k;this.pick='b'}else{this.b=k;this.pick='a'}this.st=null;click();this.ctl();this.hud()};
+  $('air').onclick=()=>{if(this.st&&this.st.run)return;this.air=!this.air;this.st=null;click();this.ctl();say.innerHTML=this.air?'🌬️ Hay <b>aire</b> en el tubo: el aire roza a los objetos y los frena.':'🚫 Sacamos todo el aire: ahora el tubo está <b>al vacío</b>, como en la Luna.'};
+  $('go').onclick=()=>this.drop()},
+ hud(){$('hud').innerHTML=this.st?`<span>🟠 ${this.st.A.t.toFixed(2)} s</span><span>🔵 ${this.st.B.t.toFixed(2)} s</span>`:''},
+ drop(){if(this.st&&this.st.run)return;actx();whoosh();const mk=k=>({k,y:0,v:0,t:0,done:0,x:0});this.st={run:1,A:mk(this.a),B:mk(this.b)}},
+ step(dt){const s=this.st;if(!s||!s.run)return;[s.A,s.B].forEach(o=>{if(o.done)return;const vt=OB[o.k].vt,a=this.air?9.8*(1-(o.v/vt)**2):9.8;o.v+=a*dt;o.y+=o.v*dt;o.t+=dt;if(this.air&&!OB[o.k].h)o.x=Math.sin(o.t*4)*10;if(o.y>=10){o.y=10;o.done=1;thud(OB[o.k].h)}});
+  this.hud();if(s.A.done&&s.B.done){s.run=0;this.result()}},
+ result(){const s=this.st,A=OB[s.A.k],B=OB[s.B.k],d=Math.abs(s.A.t-s.B.t),diff=A.h!==B.h;
+  if(!this.air){say.innerHTML=d<.05?`🤯 ¡Cayeron <b>al mismo tiempo</b>! Sin aire, la ${A.n.toLowerCase()} y la ${B.n.toLowerCase()} caen igual.`:'Prueba otra vez.';
+   exp('🚫 En el vacío todo cae igual','Sin aire, nada frena a los objetos: la gravedad los acelera <b>a todos por igual</b>, sin importar si son pesados o livianos. ¡Los astronautas lo probaron en la Luna con un martillo y una pluma!',1);if(diff)win('vac','En el vacío, una pluma y una piedra caen juntas.')}
+  else{say.innerHTML=d<.05?'Cayeron casi juntos: los dos son pesados y el aire casi no los frena.':`🌬️ La ${(s.A.t<s.B.t?A:B).n.toLowerCase()} llegó primero. ¡El aire frenó más a la ${(s.A.t<s.B.t?B:A).n.toLowerCase()}!`;
+   exp('🌬️ El aire frena','La gravedad jala a todos, pero el <b>aire</b> roza a los objetos. A las cosas livianas y anchas (pluma, papel) el aire las frena mucho; a las pesadas y compactas casi nada.'+(diff?' Ahora prueba lo mismo <b>sin aire</b>. 🤔':''),1);if(diff)win('aire','Viste cómo el aire frena a la pluma más que a la piedra.')}},
+ draw(){const s=this.st,Y=y=>40+y*30;let h=`<defs><linearGradient id="sk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e1b4b"/><stop offset="1" stop-color="#4338ca"/></linearGradient></defs><rect width="600" height="380" fill="url(#sk1)"/><rect y="350" width="600" height="30" fill="#334155"/>`;
+  [[200,'#f97316',s?s.A:{k:this.a,y:0,x:0}],[400,'#22d3ee',s?s.B:{k:this.b,y:0,x:0}]].forEach(([cx,col,o])=>{h+=`<rect x="${cx-60}" y="20" width="120" height="332" rx="16" fill="${this.air?'rgba(186,230,253,.12)':'rgba(0,0,0,.25)'}" stroke="${col}" stroke-width="4"/>`;
+   if(this.air)for(let i=0;i<10;i++)h+=`<circle cx="${cx-45+(i*37)%90}" cy="${50+(i*71)%290}" r="2" fill="#bae6fd" opacity=".5"/>`;
+   h+=`<text x="${cx+o.x}" y="${Y(o.y)+10}" font-size="40" text-anchor="middle">${OB[o.k].e}</text>`});
+  for(let i=0;i<=10;i+=2)h+=`<text x="300" y="${Y(i)+4}" font-size="12" font-weight="900" fill="#c7d2fe" text-anchor="middle">${10-i} m</text>`;
+  h+=`<text x="300" y="372" font-size="13" font-weight="900" fill="#fff" text-anchor="middle">${this.air?'🌬️ con aire':'🚫 al vacío'}</text>`;sv.innerHTML=h}};
+// ================= 2. PLANETAS =================
+const PLN=[{k:'lun',n:'Luna',e:'🌕',g:1.6,sky:'#0b0b1a',gr:'#9ca3af'},{k:'mar',n:'Marte',e:'🔴',g:3.7,sky:'#7c2d12',gr:'#c2410c'},{k:'tie',n:'Tierra',e:'🌍',g:9.8,sky:'#38bdf8',gr:'#65a30d'},{k:'jup',n:'Júpiter',e:'🟠',g:24.8,sky:'#92400e',gr:'#d6a77a'}];
+const S2={n:'🪐 Planetas',
+ init(){this.p=2;this.y=0;this.v=0;this.jumping=0;this.seen=this.seen||new Set();this.max=0;this.ctl();exp('🪐 La gravedad cambia en cada planeta','Los planetas más grandes y con más masa <b>atraen más fuerte</b>. Elige un planeta y toca <b>🦘 Saltar</b>: ¿dónde saltas más alto? Mira también la <b>báscula</b>.');say.innerHTML='Elige un planeta y toca <b>🦘 Saltar</b>.';this.hud()},
+ ctl(){$('ctl').innerHTML=`<div class="ctl">${PLN.map((p,i)=>`<button type="button" data-i="${i}" class="${i===this.p?'on':''}">${p.e} ${p.n}</button>`).join('')}</div><div class="ctl" style="margin-top:6px"><button type="button" class="go" id="jump">🦘 Saltar</button></div>`;
+  $('ctl').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{if(this.jumping)return;this.p=+b.dataset.i;click();this.ctl();this.hud();const P=PLN[this.p];say.innerHTML=`${P.e} En ${P.n} la gravedad es <b>${P.g} m/s²</b>${P.k==='tie'?' (la de la Tierra)':P.g<9.8?': ¡más débil que en la Tierra!':': ¡más fuerte que en la Tierra!'}`});
+  $('jump').onclick=()=>{if(this.jumping)return;actx();this.jumping=1;this.v=3.2;this.max=0;boing(1)}},
+ hud(){const P=PLN[this.p],kg=(35*P.g/9.8).toFixed(1);$('hud').innerHTML=`<span>⚖️ Báscula: ${kg} kg</span><span>🦘 Salto: ${(this.max).toFixed(2)} m</span>`},
+ step(dt){if(!this.jumping)return;const P=PLN[this.p];this.v-=P.g*dt;this.y+=this.v*dt;this.max=Math.max(this.max,this.y);if(this.y<=0){this.y=0;this.jumping=0;thud(1);this.seen.add(P.k);
+   say.innerHTML=`${P.e} En ${P.n} saltaste <b>${this.max.toFixed(2)} m</b>. ${P.g<9.8?'¡Como la gravedad es débil, subes más y caes lento!':P.g>9.8?'¡La gravedad es tan fuerte que casi no despegas!':'Así saltas en la Tierra.'}`;
+   exp('⚖️ Masa y peso no son lo mismo',`Tu <b>masa</b> (la cantidad de materia de tu cuerpo) es siempre la misma: 35 kg. Pero tu <b>peso</b> depende de la gravedad: en ${P.n} la báscula marcaría <b>${(35*P.g/9.8).toFixed(1)} kg</b>. Por eso en la Luna los astronautas dan saltos gigantes.`,1);
+   if(this.seen.size>=3)win('plan','Saltaste en 3 planetas distintos y comparaste la gravedad.')}this.hud()},
+ draw(){const P=PLN[this.p],gy=320,s=Math.min(110,60+this.y*0),py=gy-this.y*(P.g<2?40:90);let h=`<rect width="600" height="380" fill="${P.sky}"/>`;
+  if(P.sky!=='#38bdf8')for(let i=0;i<30;i++)h+=`<circle cx="${(i*97)%600}" cy="${(i*53)%200}" r="1.3" fill="#fff" opacity=".7"/>`;else h+='<circle cx="520" cy="60" r="30" fill="#fde047"/>';
+  h+=`<path d="M0 ${gy} Q150 ${gy-14} 300 ${gy} T600 ${gy} V380 H0Z" fill="${P.gr}"/><text x="60" y="70" font-size="46">${P.e}</text><text x="60" y="100" font-size="15" font-weight="900" fill="#fff">${P.n} · g = ${P.g}</text>`;
+  for(let i=0;i<=3;i++){const yy=gy-i*(P.g<2?40:90);h+=`<path d="M470 ${yy}h20" stroke="#fff" stroke-width="2" opacity=".6"/><text x="496" y="${yy+4}" font-size="11" font-weight="900" fill="#fff">${i} m</text>`}
+  h+=`<ellipse cx="300" cy="${gy+4}" rx="${26-Math.min(18,this.y*6)}" ry="5" fill="rgba(0,0,0,.35)"/><text x="300" y="${py}" font-size="56" text-anchor="middle">${P.k==='tie'?'🧒':'🧑‍🚀'}</text>`;
+  h+=`<g transform="translate(150 ${gy-6})"><rect x="-34" y="-12" width="68" height="16" rx="4" fill="#e2e8f0"/><rect x="-22" y="-30" width="44" height="18" rx="4" fill="#1e293b"/><text x="0" y="-16" font-size="12" font-weight="900" fill="#4ade80" text-anchor="middle">${(35*P.g/9.8).toFixed(1)}</text></g>`;
+  sv.innerHTML=h}};
+// ================= 3. CAÑÓN DE NEWTON =================
+const R=95,CXo=300,CYo=200,GM=1;const r0=R+18,vc=Math.sqrt(GM/r0);
+const S3={n:'🚀 Órbita',
+ init(){this.sp=5;this.shots=this.shots||[];this.b=null;this.ctl();exp('🚀 El cañón de Newton','La gravedad de la Tierra <b>atrae</b> todo hacia su centro. Si lanzas una bala más y más rápido, cae cada vez más lejos… ¡y si va muy rápido, cae <b>alrededor</b> de la Tierra sin tocarla! Eso es una <b>órbita</b>, como la de la Luna.');say.innerHTML='Mueve la <b>rapidez</b> y toca <b>🚀 Lanzar</b>. ¿Puedes ponerla en órbita?';$('hud').innerHTML=''},
+ ctl(){$('ctl').innerHTML=`<div class="ctl"><label>🐢 <input type="range" id="sp" min="1" max="10" step="0.5" value="${this.sp}"> 🚀</label><button type="button" class="go" id="fire">🚀 Lanzar</button><button type="button" id="clr">🧽 Borrar</button></div>`;
+  $('sp').oninput=e=>{this.sp=+e.target.value;$('hud').innerHTML=`<span>Rapidez: ${this.sp}</span>`};$('fire').onclick=()=>this.fire();$('clr').onclick=()=>{this.shots=[];this.b=null;click()}},
+ fire(){if(this.b&&this.b.run)return;actx();boom();const v=this.sp/7.07*vc*1.0;this.b={x:0,y:-r0,vx:v,vy:0,run:1,pts:[],ang:0,last:-Math.PI/2,turn:0};this.shots.push(this.b.pts);if(this.shots.length>6)this.shots.shift()},
+ step(dt){const b=this.b;if(!b||!b.run)return;const n=60,d=dt*1.9e3/n;for(let i=0;i<n;i++){const r=Math.hypot(b.x,b.y),a=GM/(r*r*r);b.vx-=a*b.x*d;b.vy-=a*b.y*d;b.x+=b.vx*d;b.y+=b.vy*d;
+   const an=Math.atan2(b.y,b.x);let da=an-b.last;if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;b.turn+=da;b.last=an;
+   if(r<R){b.run=0;thud(1);say.innerHTML=this.sp<4?'💥 Cayó cerca: la gravedad la jaló rápido al suelo.':'💥 Llegó más lejos, pero la gravedad igual la hizo caer. ¡Más rápido!';break}
+   if(r>330){b.run=0;say.innerHTML='🌌 ¡Escapó al espacio! Fue tan rápida que la gravedad no pudo atraparla.';exp('🌌 Velocidad de escape','Si algo va <b>demasiado rápido</b>, la gravedad no alcanza a curvar su camino y se va al espacio. Las naves que viajan a otros planetas necesitan esa rapidez.',1);break}
+   if(Math.abs(b.turn)>2*Math.PI){b.run=0;say.innerHTML='🛰️ ¡Dio una vuelta completa! Está en <b>órbita</b>: cae y cae, pero nunca toca el suelo.';exp('🛰️ ¡En órbita!','La bala va tan rápido que, mientras la gravedad la jala hacia abajo, el suelo de la Tierra "se curva" y nunca lo alcanza. Así la <b>Luna</b> gira alrededor de la Tierra y la Tierra alrededor del Sol: ¡por la <b>atracción de la gravedad</b>!',1);win('orb','Pusiste una bala en órbita alrededor de la Tierra.');break}}
+  b.pts.push([CXo+b.x,CYo+b.y]);if(b.pts.length>900)b.pts.shift()},
+ draw(){let h=`<rect width="600" height="380" fill="#0b0a24"/>`;for(let i=0;i<50;i++)h+=`<circle cx="${(i*131)%600}" cy="${(i*73)%380}" r="1.2" fill="#fff" opacity=".6"/>`;
+  h+=`<circle cx="${CXo}" cy="${CYo}" r="${R+10}" fill="#60a5fa" opacity=".18"/><circle cx="${CXo}" cy="${CYo}" r="${R}" fill="#2563eb"/><path d="M${CXo-50} ${CYo-40} q30 -30 60 -6 q12 26 -18 36 q-30 4 -42 -30z M${CXo+20} ${CYo+20} q30 -6 40 18 q-12 28 -38 14z" fill="#4ade80"/>`;
+  h+=`<path d="M${CXo-14} ${CYo-R+2} L${CXo} ${CYo-r0+2} L${CXo+14} ${CYo-R+2}Z" fill="#78716c"/><rect x="${CXo-2}" y="${CYo-r0-4}" width="18" height="7" rx="3" fill="#1f2937"/>`;
+  this.shots.forEach((pts,j)=>{if(pts.length>1)h+=`<path d="M${pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')}" fill="none" stroke="${['#f97316','#fde047','#4ade80','#22d3ee','#f472b6','#a78bfa'][j%6]}" stroke-width="2.5" stroke-dasharray="${j===this.shots.length-1?'0':'5 4'}"/>`});
+  if(this.b){const p=this.b.pts[this.b.pts.length-1];if(p)h+=`<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="#fde047" stroke="#fff" stroke-width="2"/>`}
+  h+=`<text x="${CXo+34}" y="${CYo-r0-8}" font-size="12" font-weight="900" fill="#e0e7ff">cañón en la montaña</text>`;sv.innerHTML=h}};
+// ================= control =================
+const ST={caida:S1,plan:S2,orb:S3};let cur='caida',S=S1;
+function tabs(){const done={caida:MI.aire&&MI.vac,plan:MI.plan,orb:MI.orb};$('tabs').innerHTML=Object.entries(ST).map(([k,s])=>`<button type="button" data-k="${k}" class="${k===cur?'on':''}">${s.n}${done[k]?' ✅':''}</button>`).join('')}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;cur=b.dataset.k;S=ST[cur];S.init();tabs();click()};
+function mis(){$('mis').innerHTML=[['aire','Con aire: la pluma cae lento'],['vac','Sin aire: todo cae igual'],['plan','Salta en 3 planetas'],['orb','Pon una bala en órbita']].map(([k,t])=>`<span class="mi ${MI[k]?'ok':''}">${t}<em>${MI[k]?'✅':'Falta'}</em></span>`).join('')}
+let t0=performance.now();function loop(now){const dt=Math.min(.033,(now-t0)/1000);t0=now;S.step(dt);S.draw();requestAnimationFrame(loop)}
+// ---------- sonidos ----------
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,ty,v=.06,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function noise(d,f,v,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,n=a.createBufferSource(),b=a.createBuffer(1,a.sampleRate*d,a.sampleRate),c=b.getChannelData(0);for(let i=0;i<c.length;i++)c[i]=(Math.random()*2-1)*(1-i/c.length);n.buffer=b;const fl=a.createBiquadFilter();fl.type='lowpass';fl.frequency.value=f;const g=a.createGain();g.gain.value=v;n.connect(fl).connect(g).connect(a.destination);n.start(t)}
+function thud(heavy){heavy?(tone(110,.25,'sine',.16),noise(.15,600,.2)):tone(900,.08,'sine',.03)}
+function whoosh(){noise(.4,1500,.08)}
+function boom(){noise(.5,500,.35);tone(70,.4,'sine',.15)}
+function boing(up){const a=actx();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(up?200:320,t);o.frequency.exponentialRampToValueAtTime(up?600:110,t+.3);g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.0001,t+.35);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.35)}
+function click(){tone(700,.05,'square',.03)}
+function fanfare(){[523,659,784,1047].forEach((f,i)=>tone(f,.28,'triangle',.08,i*.11))}
+mis();tabs();S.init();requestAnimationFrame(loop);
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cadena trófica · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#14432a,#06140c 70%)}
+.main{flex:1;min-height:0;overflow:auto;width:min(100%,1040px);margin:0 auto;padding:0 10px 12px;display:flex;flex-direction:column;gap:8px}
+.main>*{flex:none}
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;padding:9px 6px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
+.tabs button.on{background:linear-gradient(135deg,#65a30d,#15803d);border-color:#bef264;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.eco{position:relative;border-radius:22px;overflow:hidden;min-height:250px;box-shadow:0 16px 34px rgba(0,0,0,.45);display:flex;flex-direction:column;justify-content:center;padding:14px 10px}
+.eco>svg{position:absolute;inset:0;width:100%;height:100%}
+.chain{position:relative;display:flex;align-items:center;justify-content:center;gap:4px}
+.sun{flex:none;display:flex;flex-direction:column;align-items:center;font-size:30px;line-height:1;filter:drop-shadow(0 0 10px #fde047);animation:sunp 2.4s ease-in-out infinite}
+.sun small{font-size:10px;font-weight:900;color:#fff;text-shadow:0 1px 3px #000}
+@keyframes sunp{50%{transform:scale(1.12)}}
+.ar{flex:none;width:22px;height:4px;border-radius:2px;background:rgba(255,255,255,.75);position:relative}
+.ar::after{content:"";position:absolute;right:-4px;top:-5px;border:7px solid transparent;border-right:0;border-left-color:rgba(255,255,255,.85)}
+.ar.go{background:#fde047;box-shadow:0 0 10px #fde047}
+.ar.go::after{border-left-color:#fde047}
+.slot{position:relative;flex:1;max-width:130px;max-height:150px;min-width:0;aspect-ratio:3/4;border-radius:16px;border:3px dashed rgba(255,255,255,.7);background:rgba(255,255,255,.22);backdrop-filter:blur(2px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px;text-align:center;transition:.2s}
+.slot .rl{position:absolute;top:4px;left:4px;right:4px;font-size:9.5px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);line-height:1.05}
+.slot.hot{border-color:#fde047;background:rgba(253,224,71,.35);transform:scale(1.05)}
+.slot.ok{border:3px solid #4ade80;background:rgba(255,255,255,.9);color:#14224a}
+.slot.ok .rl{color:#15803d;text-shadow:none}
+.slot.bad{animation:no .45s}
+.slot .em{font-size:clamp(26px,4.6vw,44px);line-height:1}
+.slot.ok .em{animation:chomp .5s cubic-bezier(.2,1.6,.4,1)}
+.slot b{font-size:clamp(10px,1.4vw,13px);line-height:1.05}
+.slot.eat .em{animation:eat .6s ease-in-out 2}
+@keyframes chomp{from{transform:scale(.3) rotate(-20deg)}}
+@keyframes eat{50%{transform:scale(1.25) rotate(8deg)}}
+@keyframes no{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.dec{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.dec .slot{flex:none;width:clamp(86px,13vw,120px);aspect-ratio:auto;height:clamp(78px,10vw,100px)}
+.dec span{font-weight:900;font-size:12px;color:#fff;text-shadow:0 1px 3px #000;max-width:200px}
+.tray{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.org{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:16px;border:0;background:linear-gradient(160deg,#fff,#e2e8f0);color:#14224a;font:inherit;font-weight:900;font-size:12px;line-height:1.1;cursor:grab;touch-action:none;user-select:none;box-shadow:0 8px 16px rgba(0,0,0,.35);transition:transform .15s}
+.org .em{font-size:32px;line-height:1.1}
+.org:hover{transform:translateY(-3px)}
+.org.sel{outline:3px solid #fde047;outline-offset:2px}
+.org.used{visibility:hidden}
+.ghost{position:fixed;z-index:50;pointer-events:none;width:84px;transform:translate(-50%,-50%) rotate(-6deg) scale(1.1)}
+.box{padding:12px 14px;border-radius:18px;background:#fff;color:#14224a;font-weight:700;font-size:14.5px;line-height:1.45;box-shadow:0 12px 26px rgba(0,0,0,.4);animation:up .4s cubic-bezier(.2,1.3,.4,1)}
+.box h3{margin:0 0 4px;font-size:17px}
+.box button{margin:8px 6px 0 0;padding:10px 16px;border-radius:12px;border:0;background:linear-gradient(135deg,#65a30d,#15803d);color:#fff;font:inherit;font-weight:900;font-size:14.5px;cursor:pointer}
+.box button.alt{background:linear-gradient(135deg,#f59e0b,#dc2626)}
+.box .ops{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.box .ops button{margin:0;background:#e2e8f0;color:#14224a}
+.box .ops button.ok{background:#16a34a;color:#fff}.box .ops button.no{background:#dc2626;color:#fff}
+.pop{display:flex;flex-direction:column;gap:5px;margin:8px 0}
+.pop div{display:flex;align-items:center;gap:8px;font-size:13px}
+.pop div>span{width:120px;flex:none}
+.pop i{display:block;height:12px;border-radius:99px;background:linear-gradient(90deg,#4ade80,#16a34a);transition:width 1.2s cubic-bezier(.3,1.4,.5,1)}
+.pop i.dn{background:linear-gradient(90deg,#f87171,#dc2626)}.pop i.up{background:linear-gradient(90deg,#60a5fa,#2563eb)}
+@keyframes up{from{transform:translateY(16px);opacity:0}}
+.mini{display:flex;gap:6px;flex-wrap:wrap}
+.mini .mi{flex:1 1 140px;font-size:12px;padding:6px 10px}
+.moli-say{left:auto;right:8px;top:8px;bottom:auto;flex-direction:row-reverse;align-items:flex-start;max-width:min(420px,calc(100% - 16px))}
+.moli-say img{width:46px}
+.moli-say p{margin:40px 0 0;border-radius:16px 4px 16px 16px;font-size:13.5px}
+.moli-say::after{left:auto;right:34px;bottom:auto;top:30px}
+.lab-top{padding-right:62px}
+@media (max-width:600px){
+ .chain{flex-direction:column;align-items:stretch;gap:0}
+ .chain .sun{flex-direction:row;justify-content:center;gap:6px;font-size:24px!important}.chain .sun small{font-size:12px}
+ .chain .ar{width:4px!important;height:14px;margin:0 auto;border-radius:2px}
+ .chain .ar::after{right:auto!important;left:-6px!important;top:auto!important;bottom:-7px;border:8px solid transparent!important;border-bottom:0!important;border-top-color:rgba(255,255,255,.85)!important}
+ .chain .ar.go::after{border-top-color:#fde047!important}
+ .chain .slot,.dec .slot{max-width:none;max-height:none;width:100%!important;height:auto!important;aspect-ratio:auto;flex-direction:row;justify-content:flex-start;gap:10px;padding:6px 12px;min-height:54px;border-radius:14px!important}
+ .chain .slot .rl,.dec .slot .rl{position:static;width:96px;flex:none;font-size:11px!important;text-align:left;line-height:1.15}
+ .chain .slot .em,.dec .slot .em{font-size:30px}
+ .chain .slot b,.dec .slot b{font-size:14px}
+ .dec{flex-direction:column;gap:4px}.dec span{text-align:center;max-width:none}
+}
+@media (max-width:600px){.eco{min-height:0;padding:12px 10px}.ar{width:10px}.ar::after{border-width:5px;right:-3px;top:-3px}.chain{gap:2px}.sun{font-size:22px}.slot{border-radius:12px;border-width:2px}.slot .rl{font-size:7.5px;top:3px}.tabs button{font-size:12.5px;padding:8px 4px}.tray{grid-template-columns:repeat(4,1fr);gap:6px}.org .em{font-size:28px}.org{font-size:11px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🦊 Cadena trófica</b></header>
+<div class="main">
+  <div class="tabs" id="tabs"></div>
+  <div class="eco" id="eco"><svg id="bg" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid slice"></svg><div class="chain" id="chain"></div><div class="dec" id="dec"></div></div>
+  <div id="msg"></div>
+  <div class="tray" id="tray"></div>
+  <div class="mini" id="mis"></div>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':cad',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const $=id=>document.getElementById(id),say=$('say');let MI=load(KEY,{});
+const RL=['Productor','Consumidor primario','Consumidor secundario','Consumidor terciario','Consumidor cuaternario'];
+// ---------- ecosistemas del Perú ----------
+const EC={
+ sie:{n:'🏔️ Sierra',
+  bg:'<defs><linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#dbeafe"/></linearGradient></defs><rect width="1000" height="320" fill="url(#s1)"/><path d="M0 220 L160 70 L260 150 L400 40 L560 170 L700 60 L860 160 L1000 90 V320 H0Z" fill="#64748b"/><path d="M400 40 L440 76 L420 72 L400 86 L380 70 L362 76Z M700 60 L736 92 L716 90 L700 102 L684 88 L666 92Z M160 70 L190 98 L172 94 L160 104 L148 96 L134 98Z" fill="#fff"/><path d="M0 250 Q250 200 500 240 T1000 230 V320 H0Z" fill="#84cc16"/><path d="M0 290 Q300 250 600 285 T1000 280 V320 H0Z" fill="#65a30d"/>'+Array.from({length:18},(_, i)=>`<path d="M${30+i*55} ${300-(i%3)*8} l6 -22 l4 18 l5 -26 l4 26 l6 -20 l2 24z" fill="#facc15" opacity=".85"/>`).join(''),
+  o:[{k:'ichu',e:'🌾',n:'Ichu',r:0,w:'El <b>ichu</b> es una planta: hace su alimento con la luz del Sol (fotosíntesis). Es el <b>productor</b>.'},{k:'vic',e:'🦙',n:'Vicuña',r:1,w:'La <b>vicuña</b> come ichu: es <b>herbívora</b>, consumidor primario.'},{k:'puma',e:'🐆',n:'Puma',r:2,w:'El <b>puma</b> caza vicuñas: es <b>carnívoro</b>, consumidor secundario.'}],
+  d:{k:'hon',e:'🍄',n:'Hongos',w:'Los <b>hongos</b> descomponen los restos de plantas y animales y devuelven nutrientes al suelo.'},
+  q:[{q:'Unos cazadores eliminan a casi todos los <b>pumas</b>. ¿Qué pasa con las <b>vicuñas</b>?',o:['Aumentan','Disminuyen','Siguen igual'],a:0,e:'Sin su depredador, las vicuñas <b>aumentan</b> mucho.',pop:{ichu:60,vic:100,puma:8}},
+     {q:'Ahora hay demasiadas vicuñas. ¿Qué pasa con el <b>ichu</b>?',o:['Aumenta','Disminuye','Siguen igual'],a:1,e:'Tantas vicuñas comen todo el ichu: el pasto <b>disminuye</b> y luego faltará comida para ellas. ¡Cada ser vivo es importante!',pop:{ichu:15,vic:90,puma:8}}]},
+ mar:{n:'🌊 Mar peruano',
+  bg:'<defs><linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset=".32" stop-color="#bae6fd"/><stop offset=".33" stop-color="#0ea5e9"/><stop offset="1" stop-color="#0c4a6e"/></linearGradient></defs><rect width="1000" height="320" fill="url(#m1)"/><path d="M760 108 Q820 40 900 70 Q960 60 1000 104Z" fill="#a8a29e"/><path d="M790 80 Q840 56 880 72" stroke="#fff" stroke-width="8" fill="none" opacity=".8"/>'+Array.from({length:8},(_, i)=>`<path d="M${i*130} 140 q30 -10 60 0 t60 0" stroke="rgba(255,255,255,.35)" stroke-width="4" fill="none"/>`).join('')+Array.from({length:40},(_, i)=>`<circle cx="${(i*97)%1000}" cy="${150+(i*53)%160}" r="${2+(i%3)}" fill="#86efac" opacity=".45"/>`).join(''),
+  o:[{k:'fito',e:'🌿',n:'Fitoplancton',r:0,w:'El <b>fitoplancton</b> son algas diminutas que hacen fotosíntesis: el <b>productor</b> del mar.'},{k:'zoo',e:'🦐',n:'Zooplancton',r:1,w:'El <b>zooplancton</b> (animalitos diminutos) come fitoplancton: consumidor primario.'},{k:'anch',e:'🐟',n:'Anchoveta',r:2,w:'La <b>anchoveta</b> come zooplancton: consumidor secundario. ¡Es muy importante en el mar peruano!'},{k:'ping',e:'🐧',n:'Pingüino de Humboldt',r:3,w:'El <b>pingüino de Humboldt</b> come anchovetas: consumidor terciario.'}],
+  d:{k:'bac',e:'🦠',n:'Bacterias',w:'Las <b>bacterias</b> del fondo del mar descomponen los restos y devuelven nutrientes al agua.'},
+  q:[{q:'Llega el <b>Fenómeno El Niño</b>: el mar se calienta y hay mucho menos <b>fitoplancton</b>. ¿Qué pasa con las <b>anchovetas</b>?',o:['Aumentan','Disminuyen','Siguen igual'],a:1,e:'Con menos fitoplancton hay menos zooplancton, y las anchovetas <b>disminuyen</b> o se van a aguas más frías.',pop:{fito:20,zoo:30,anch:30,ping:70}},
+     {q:'Si hay pocas anchovetas, ¿qué pasa con los <b>pingüinos</b>?',o:['Aumentan','Disminuyen','Siguen igual'],a:1,e:'Los pingüinos tienen menos comida y su población <b>disminuye</b>. Lo que pasa en un eslabón afecta a toda la cadena.',pop:{fito:20,zoo:30,anch:25,ping:25}}]},
+ sel:{n:'🌳 Selva',
+  bg:'<rect width="1000" height="320" fill="#14532d"/><path d="M0 120 Q60 40 130 110 Q200 30 270 110 Q350 20 420 100 Q500 30 580 110 Q660 20 740 100 Q820 30 900 110 Q960 50 1000 100 V320 H0Z" fill="#166534"/><path d="M0 200 Q80 130 160 190 Q240 120 330 190 Q420 130 500 190 Q590 120 680 190 Q770 130 850 190 Q930 140 1000 180 V320 H0Z" fill="#15803d"/><path d="M0 290 Q200 260 420 285 T1000 270 V320 H0Z" fill="#0e7490"/>'+Array.from({length:10},(_, i)=>`<rect x="${40+i*100}" y="150" width="10" height="130" fill="#713f12" opacity=".7"/>`).join(''),
+  o:[{k:'hoja',e:'🍃',n:'Hojas',r:0,w:'Las <b>hojas</b> de los árboles hacen fotosíntesis: son el <b>productor</b>.'},{k:'oru',e:'🐛',n:'Oruga',r:1,w:'La <b>oruga</b> come hojas: consumidor primario.'},{k:'rana',e:'🐸',n:'Rana',r:2,w:'La <b>rana</b> atrapa orugas con su lengua: consumidor secundario.'},{k:'serp',e:'🐍',n:'Serpiente',r:3,w:'La <b>serpiente</b> come ranas: consumidor terciario.'},{k:'agui',e:'🦅',n:'Águila harpía',r:4,w:'El <b>águila harpía</b> caza serpientes: consumidor cuaternario, ¡el gran depredador de la selva!'}],
+  d:{k:'lomb',e:'🪱',n:'Lombrices y hongos',w:'Las <b>lombrices</b> y los hongos descomponen hojas y restos: abonan el suelo de la selva.'},
+  q:[{q:'Talan muchos árboles de la selva y hay muy pocas <b>hojas</b>. ¿Qué pasa con las <b>orugas</b>?',o:['Aumentan','Disminuyen','Siguen igual'],a:1,e:'Sin hojas no hay comida para las orugas: <b>disminuyen</b>.',pop:{hoja:15,oru:30,rana:70,serp:70,agui:70}},
+     {q:'Si la tala continúa, ¿qué le pasará al <b>águila harpía</b>?',o:['Nada, vuela lejos','También disminuye','Aumenta'],a:1,e:'Al final <b>todos disminuyen</b>, hasta el águila harpía. Por eso cuidar los bosques protege a toda la cadena.',pop:{hoja:10,oru:20,rana:25,serp:25,agui:20}}]}
+};
+let cur='sie',placed={},decOk=0,sel=null,qi=0;
+const shuffle=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+function tabs(){$('tabs').innerHTML=Object.entries(EC).map(([k,e])=>`<button type="button" data-k="${k}" class="${k===cur?'on':''}">${e.n}${MI[k]?' ✅':''}</button>`).join('')}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;cur=b.dataset.k;start();tone(600,.08,'triangle')};
+function start(){const E=EC[cur];placed={};decOk=0;sel=null;qi=0;tabs();$('bg').innerHTML=E.bg;$('msg').innerHTML='';
+ $('chain').innerHTML='<div class="sun">☀️<small>Sol</small></div>'+E.o.map((o,i)=>`<div class="ar" data-a="${i}"></div><div class="slot" data-r="${i}"><span class="rl">${RL[i]}</span><span class="em">❔</span></div>`).join('');
+ $('dec').innerHTML=`<div class="slot" data-r="d"><span class="rl">Descomponedor</span><span class="em">❔</span></div><span>♻️ Descompone los restos de todos y devuelve nutrientes al suelo</span>`;
+ $('tray').innerHTML=shuffle([...E.o,E.d]).map(o=>`<button type="button" class="org" data-k="${o.k}"><span class="em">${o.e}</span>${o.n}</button>`).join('');
+ say.innerHTML=`Arma la cadena alimenticia de la <b>${E.n.slice(3)}</b>. Empieza por el <b>productor</b> y sigue la flecha ➜ («es comido por»). Toca una tarjeta para leerla o <b>arrástrala</b> a su lugar.`;mis()}
+const org=k=>{const E=EC[cur];return E.o.find(o=>o.k===k)||(E.d.k===k?{...E.d,r:'d'}:null)};
+function drop(k,slot){const o=org(k),r=slot.dataset.r,want=r==='d'?'d':+r;if(!o||slot.classList.contains('ok'))return;
+ if(o.r===want){slot.classList.add('ok');slot.innerHTML=`<span class="rl">${r==='d'?'Descomponedor':RL[r]}</span><span class="em">${o.e}</span><b>${o.n}</b>`;tray(k).classList.add('used');chomp();if(r==='d')decOk=1;else placed[r]=k;say.innerHTML='✅ '+o.w;check()}
+ else{slot.classList.remove('bad');void slot.offsetWidth;slot.classList.add('bad');boing();
+  say.innerHTML=o.r==='d'?`🍄 <b>${o.n}</b> no se come a nadie de la cadena: descompone los restos. Ponlo abajo, en <b>Descomponedor</b>.`:want==='d'?`<b>${o.n}</b> no es descomponedor. Los descomponedores son hongos, bacterias o lombrices.`:o.r===0?`<b>${o.n}</b> hace fotosíntesis: es el <b>productor</b>, va primero, junto al Sol.`:want===0?`<b>${o.n}</b> no puede hacer su propio alimento: no es productor. El productor es una planta o alga.`:`Ahí no. Piensa: ¿qué come <b>${o.n}</b>? Y ¿quién se lo come?`}}
+const tray=k=>$('tray').querySelector(`[data-k="${k}"]`);
+function check(){const E=EC[cur];if(Object.keys(placed).length<E.o.length||!decOk)return;
+ // la energía viaja por las flechas
+ E.o.forEach((o,i)=>setTimeout(()=>{$('chain').querySelector(`[data-a="${i}"]`).classList.add('go');$('chain').querySelector(`[data-r="${i}"]`).classList.add('eat');tone(500+i*120,.15,'triangle',.06)},i*420));
+ setTimeout(()=>{const first=!MI[cur];MI[cur]=1;save(KEY,MI);tabs();mis();fanfare();
+  $('msg').innerHTML=`<div class="box"><h3>🎉 ¡Cadena completa!</h3>Cada eslabón es un <b>nivel trófico</b>. La <b>energía del Sol</b> pasa al productor y luego de un ser vivo a otro. Las flechas ➜ muestran hacia dónde va la energía («es comido por»). Los <b>descomponedores</b> cierran el ciclo devolviendo nutrientes al suelo.<br><button type="button" class="alt" id="qq">⚠️ ¿Qué pasa si…?</button><button type="button" id="rs">🔄 Armar otra vez</button></div>`;
+  $('qq').onclick=()=>{qi=0;quest()};$('rs').onclick=start;say.innerHTML=first?'¡Excelente! Ahora toca <b>«¿Qué pasa si…?»</b> para ver qué pasa cuando la cadena se rompe.':'¡Muy bien!'},E.o.length*420+300)}
+function quest(){const E=EC[cur],q=E.q[qi];
+ $('msg').innerHTML=`<div class="box"><h3>⚠️ ¿Qué pasa si…? (${qi+1}/2)</h3>${q.q}<div class="ops">${q.o.map((o,i)=>`<button type="button" data-i="${i}">${o}</button>`).join('')}</div><div id="qr"></div></div>`;
+ $('msg').querySelectorAll('.ops button').forEach(b=>b.onclick=()=>{if($('msg').querySelector('.ops .ok'))return;const i=+b.dataset.i,ok=i===q.a;$('msg').querySelectorAll('.ops button')[q.a].classList.add('ok');if(!ok)b.classList.add('no');ok?fanfare(1):boing();if(ok)quest.right=(quest.right||0)+1;
+  $('qr').innerHTML=`<p style="margin:8px 0 0">${ok?'✅ ':'❌ '}${q.e}</p><div class="pop">${E.o.map(o=>`<div><span>${o.e} ${o.n}</span><i style="width:60%"></i></div>`).join('')}</div><button type="button" id="qn">${qi<1?'Siguiente ➜':'Terminar'}</button>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$('qr').querySelectorAll('.pop i').forEach((el,j)=>{const v=q.pop[E.o[j].k];el.style.width=v+'%';el.className=v>70?'up':v<40?'dn':''})));
+  $('qn').onclick=()=>{if(qi<1){qi++;quest()}else{const all=quest.right>=2;quest.right=0;if(all&&!MI.deq){MI.deq=1;save(KEY,MI);mis();fanfare()}$('msg').innerHTML=`<div class="box"><h3>${all?'🏆 ¡Entiendes el equilibrio!':'💪 ¡Casi!'}</h3>${all?'Si un eslabón cambia, <b>toda la cadena cambia</b>. Por eso es importante cuidar a cada ser vivo.':'Vuelve a intentarlo: piensa quién se come a quién.'}<br><button type="button" id="rs">🔄 Armar otra vez</button>${all?'':'<button type="button" class="alt" id="qq">⚠️ Intentar de nuevo</button>'}</div>`;$('rs').onclick=start;const qq=$('qq');qq&&(qq.onclick=()=>{qi=0;quest()})}}})}
+quest.right=0;
+function mis(){$('mis').innerHTML=Object.entries(EC).map(([k,e])=>`<span class="mi ${MI[k]?'ok':''}">Cadena ${e.n.slice(3)}<em>${MI[k]?'✅':'Falta'}</em></span>`).join('')+`<span class="mi ${MI.deq?'ok':''}">¿Qué pasa si…?<em>${MI.deq?'✅':'Falta'}</em></span>`}
+// ---------- arrastrar o tocar ----------
+let dr=null;const slotAt=(x,y)=>{const el=document.elementFromPoint(x,y);return el&&el.closest('.slot')};
+$('tray').addEventListener('pointerdown',e=>{const b=e.target.closest('.org');if(!b)return;e.preventDefault();actx();const g=b.cloneNode(true);g.classList.add('ghost');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);dr={k:b.dataset.k,b,g,x:e.clientX,y:e.clientY}});
+addEventListener('pointermove',e=>{if(!dr)return;dr.g.style.left=e.clientX+'px';dr.g.style.top=e.clientY+'px';document.querySelectorAll('.slot.hot').forEach(s=>s.classList.remove('hot'));dr.g.style.display='none';const s=slotAt(e.clientX,e.clientY);dr.g.style.display='';s&&!s.classList.contains('ok')&&s.classList.add('hot')});
+addEventListener('pointerup',e=>{if(!dr)return;const d=dr;dr=null;d.g.remove();document.querySelectorAll('.slot.hot').forEach(s=>s.classList.remove('hot'));
+ if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8){document.querySelectorAll('.org.sel').forEach(x=>x.classList.remove('sel'));sel=d.k;d.b.classList.add('sel');const o=org(d.k);say.innerHTML=`<b>${o.e} ${o.n}</b>. ¿Dónde va en la cadena? Toca su lugar o arrástrala.`;tone(700,.06,'sine');return}
+ const s=slotAt(e.clientX,e.clientY);if(s)drop(d.k,s)});
+addEventListener('pointercancel',()=>{if(dr){dr.g.remove();dr=null}});
+$('eco').addEventListener('click',e=>{const s=e.target.closest('.slot');if(s&&sel){const k=sel;sel=null;document.querySelectorAll('.org.sel').forEach(x=>x.classList.remove('sel'));drop(k,s)}});
+// ---------- sonidos ----------
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,ty,v=.06,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function chomp(){const a=actx();if(!a)return;[0,.12].forEach(t0=>{const t=a.currentTime+t0,n=a.createBufferSource(),b=a.createBuffer(1,a.sampleRate*.08,a.sampleRate),c=b.getChannelData(0);for(let i=0;i<c.length;i++)c[i]=(Math.random()*2-1)*(1-i/c.length);n.buffer=b;const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=900;const g=a.createGain();g.gain.value=.25;n.connect(f).connect(g).connect(a.destination);n.start(t)});tone(880,.12,'triangle',.05,.25)}
+function boing(){const a=actx();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(320,t);o.frequency.exponentialRampToValueAtTime(110,t+.35);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0001,t+.4);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.4)}
+function fanfare(s){(s?[660,990]:[523,659,784,1047]).forEach((f,i)=>tone(f,.28,'triangle',.08,i*.11))}
+start();
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

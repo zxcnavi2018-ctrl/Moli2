@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Placas tectónicas · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.ribbon{position:relative;z-index:3;display:flex;flex-wrap:wrap;gap:8px;padding:0 14px 8px}
+.ribbon::-webkit-scrollbar{display:none}
+.rc{flex:none;display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:14px;border:0;color:#fff;font:inherit;font-weight:900;font-size:14px;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.3)}
+.rc.conv,.rc.subd{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+.rc.div{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.rc.tra{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+.rc.done::after{content:"✓";margin-left:2px;padding:0 6px;border-radius:99px;background:rgba(255,255,255,.3)}
+.rc:active{cursor:grabbing}
+.rghost{position:fixed;z-index:40;pointer-events:none;transform:translate(-50%,-50%) rotate(-4deg) scale(1.08)}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 300px;gap:14px;padding:0 14px 90px}
+.globe{position:relative;min-height:0;display:grid;place-items:center}
+#gl{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#gl.drop{filter:drop-shadow(0 0 22px rgba(253,224,71,.8))}
+.pinfo{position:absolute;left:50%;top:6px;transform:translateX(-50%);padding:7px 14px;border-radius:99px;background:#fff;color:#14224a;font-weight:900;font-size:14px;box-shadow:0 8px 20px rgba(0,0,0,.35);white-space:nowrap;pointer-events:none}
+.pinfo:empty{display:none}
+.pinfo i{font-style:normal;padding:2px 8px;border-radius:99px;margin-left:6px;font-size:12px;color:#fff}
+.pinfo i.c{background:#b45309}.pinfo i.o{background:#1d4ed8}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.txt{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);font-size:13.5px;line-height:1.45;font-weight:700;color:var(--ink2)}
+.txt h2{margin:0 0 6px;font-size:16px;color:var(--ink)}
+.txt b{color:var(--ink)}
+.txt .k{display:flex;gap:8px;margin-top:8px}
+.txt .k span{flex:1;padding:8px;border-radius:12px;font-size:12.5px;line-height:1.3}
+.txt .k .c{background:rgba(180,83,9,.25)}.txt .k .o{background:rgba(29,78,216,.3)}
+.txt .big{display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px 10px;border-radius:12px;background:rgba(255,211,77,.14)}
+.txt .big strong{font-size:28px;color:var(--sun);line-height:1}
+.anim{position:relative;width:100%;padding:12px 14px 14px;border-radius:20px;background:rgba(10,20,50,.92);border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 40px rgba(0,0,0,.5);backdrop-filter:blur(6px)}
+.anim[hidden]{display:none}
+.anim h3{margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px}
+.anim h3 i{font-style:normal;width:12px;height:12px;border-radius:50%}
+.anim p{margin:8px 0 0;font-size:13.5px;line-height:1.4;font-weight:700;color:#dbe4ff}
+.anim svg{width:100%;height:auto;display:block;border-radius:12px;background:linear-gradient(#bfe3ff,#e0f2fe 46%,#7c4a1e 46%)}
+.anim .x{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font:900 16px var(--font);cursor:pointer}
+.alert{position:absolute;top:44px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:14px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;font-weight:900;font-size:15px;box-shadow:0 0 0 4px rgba(254,202,202,.35),0 12px 26px rgba(0,0,0,.5);white-space:nowrap;animation:alin .4s cubic-bezier(.2,1.5,.4,1),alfl 1s ease-in-out infinite .4s}
+.alert.div{background:linear-gradient(135deg,#ea580c,#9a3412)}.alert.tra{background:linear-gradient(135deg,#7c3aed,#4c1d95)}
+@keyframes alin{from{transform:translate(-50%,-30px) scale(.6);opacity:0}}
+@keyframes alfl{50%{box-shadow:0 0 0 10px rgba(254,202,202,0),0 12px 26px rgba(0,0,0,.5)}}
+.globe.quake{animation:quake .09s linear 18}
+@keyframes quake{25%{transform:translate(4px,-3px) rotate(.4deg)}75%{transform:translate(-4px,3px) rotate(-.4deg)}}
+.hint{font-size:12px;color:var(--ink2);font-weight:800;text-align:center}
+@keyframes inL{from{transform:translateX(-26px)}to{transform:translateX(0)}}
+@keyframes inR{from{transform:translateX(26px)}to{transform:translateX(0)}}
+@keyframes outL{from{transform:translateX(0)}to{transform:translateX(-26px)}}
+@keyframes outR{from{transform:translateX(0)}to{transform:translateX(26px)}}
+@keyframes up{from{transform:scaleY(.15)}to{transform:scaleY(1)}}
+@keyframes sink{from{transform:translate(-40px,-6px) rotate(0)}to{transform:translate(10px,18px) rotate(14deg)}}
+@keyframes rise{from{transform:scaleY(.1)}to{transform:scaleY(1)}}
+@keyframes erupt{0%,100%{opacity:.2;transform:translateY(4px) scale(.6)}50%{opacity:1;transform:translateY(-6px) scale(1.1)}}
+@keyframes slideL{from{transform:translateX(30px)}to{transform:translateX(-30px)}}
+@keyframes slideR{from{transform:translateX(-30px)}to{transform:translateX(30px)}}
+.anim svg *{transform-box:fill-box}
+@media (max-width:760px){.alert{font-size:12.5px;top:40px;white-space:normal;width:max-content;max-width:94%}.wrap{grid-template-columns:1fr;grid-template-rows:minmax(300px,1fr) auto;overflow:auto;padding-bottom:96px}.side{overflow:visible}.ribbon{display:grid;grid-template-columns:1fr 1fr;padding:0 8px 6px;gap:6px}.rc{justify-content:center;padding:8px 6px;font-size:12.5px}.moli-say img{width:48px}.moli-say p{font-size:12.5px}.anim{position:fixed;left:10px;right:10px;bottom:10px;width:auto;z-index:25;max-height:52vh;overflow:auto}body.an .moli-say{display:none}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🌍 Placas tectónicas</b></header>
+<div class="ribbon" id="rib">
+  <button type="button" class="rc conv" data-m="conv">➡️⬅️ Convergente</button>
+  <button type="button" class="rc subd" data-m="subd">⤵️ Subducción</button>
+  <button type="button" class="rc div" data-m="div">⬅️➡️ Divergente</button>
+  <button type="button" class="rc tra" data-m="tra">⇅ Transformante</button>
+</div>
+<div class="wrap">
+  <div class="globe" id="gw"><canvas id="gl" aria-label="Planeta Tierra con sus placas tectónicas. Arrástralo para girarlo."></canvas><div class="pinfo" id="pinfo"></div><div class="alert" id="alert" hidden></div></div>
+  <aside class="side">
+    <div class="anim" id="anim" hidden><button class="x" type="button" id="ax" aria-label="Cerrar">✕</button><h3 id="ah"></h3><div id="as"></div><p id="ap"></p></div>
+    <div class="mis" id="mis"></div>
+    <div class="txt"><h2>¿Qué son las placas tectónicas?</h2>La capa de roca que cubre la Tierra está partida en <b>piezas gigantes</b>, como un rompecabezas. Se llaman <b>placas tectónicas</b> y se mueven muy lento: unos centímetros por año, ¡como crecen tus uñas!
+      <div class="k"><span class="c"><b>🟫 Continentales</b><br>Gruesas y livianas. Forman los continentes.</span><span class="o"><b>🟦 Oceánicas</b><br>Delgadas y pesadas. Forman el fondo del mar.</span></div>
+      <div class="big"><strong>52</strong><span>placas en este planeta: <b>7 grandes</b> y muchas pequeñas. Perú está sobre la placa <b>Sudamericana</b>.</span></div></div>
+    <p class="hint">Arrastra el planeta para girarlo · toca una placa · arrastra una tarjeta de arriba hasta el planeta</p>
+  </aside>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say">¡Gira el planeta con tu dedo y toca una placa para conocerla! 🌎</p></div>
+<script src="vendor/d3-array.min.js"></script>
+<script src="vendor/d3-geo.min.js"></script>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':plac',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let M=load(KEY,{});
+const cv=document.getElementById('gl'),ctx=cv.getContext('2d'),say=document.getElementById('say'),pinfo=document.getElementById('pinfo');
+let plates=[],land=null,bounds=[],ready=false;
+const proj=d3.geoOrthographic().clipAngle(90).precision(.6),path=d3.geoPath(proj,ctx),grat=d3.geoGraticule10();
+let rot=[75,-12],scale=1,zoom=1,sel=null,hl=null,arrows=null,idle=0,auto=true,dpr=Math.min(2,devicePixelRatio||1);
+const colorOf=i=>`hsla(${(i*137.5)%360},90%,60%,.24)`;
+function size(){const r=cv.parentElement.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;cv.style.width=r.width+'px';cv.style.height=r.height+'px';scale=Math.min(r.width,r.height)*.43;draw()}
+addEventListener('resize',size);
+function draw(){if(!ready)return;const w=cv.width/dpr,h=cv.height/dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ proj.translate([w/2,h/2]).scale(scale*zoom).rotate(rot);const R=scale*zoom;
+ const at=ctx.createRadialGradient(w/2,h/2,R*.9,w/2,h/2,R*1.15);at.addColorStop(0,'rgba(120,190,255,.45)');at.addColorStop(1,'rgba(120,190,255,0)');ctx.fillStyle=at;ctx.beginPath();ctx.arc(w/2,h/2,R*1.15,0,7);ctx.fill();
+ const oc=ctx.createRadialGradient(w/2-R*.35,h/2-R*.35,R*.1,w/2,h/2,R);oc.addColorStop(0,'#4fa3ff');oc.addColorStop(1,'#0b3d91');ctx.fillStyle=oc;ctx.beginPath();path({type:'Sphere'});ctx.fill();
+ ctx.beginPath();path(grat);ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
+ ctx.beginPath();path(land);ctx.fillStyle='#43b05c';ctx.fill();ctx.strokeStyle='rgba(20,80,40,.6)';ctx.lineWidth=.8;ctx.stroke();
+ plates.forEach((p,i)=>{ctx.beginPath();path(p.f);ctx.fillStyle=p===sel?'rgba(255,255,255,.45)':colorOf(i);ctx.fill()});
+ bounds.forEach(b=>{ctx.beginPath();path(b.f);ctx.strokeStyle=b.s?'#ff3b3b':'#ffd34d';ctx.lineWidth=b.s?2.4:1.8;ctx.stroke()});
+ if(sel){ctx.beginPath();path(sel.f);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke()}
+ if(hl){ctx.save();ctx.shadowColor='#fff';ctx.shadowBlur=14;hl.forEach(b=>{ctx.beginPath();path(b.f);ctx.strokeStyle='#ffffff';ctx.lineWidth=6;ctx.stroke()});ctx.restore()}
+ if(arrows)drawArrows(w,h);
+ const sh=ctx.createRadialGradient(w/2+R*.5,h/2+R*.5,R*.2,w/2,h/2,R*1.02);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(0,0,30,.45)');ctx.fillStyle=sh;ctx.beginPath();ctx.arc(w/2,h/2,R,0,7);ctx.fill();
+}
+function arrow(x,y,ang,len,col){ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=col;ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(-len/2,-7);ctx.lineTo(len/2-14,-7);ctx.lineTo(len/2-14,-15);ctx.lineTo(len/2,0);ctx.lineTo(len/2-14,15);ctx.lineTo(len/2-14,7);ctx.lineTo(-len/2,7);ctx.closePath();ctx.stroke();ctx.fill();ctx.restore()}
+function fx(a,c,t){const m=a.m;ctx.save();
+ if(m==='tra'||m==='subd'){for(let i=0;i<4;i++){const k=((t*.9+i/4)%1);ctx.beginPath();ctx.arc(c[0],c[1],10+k*110,0,7);ctx.strokeStyle=`rgba(${m==='tra'?'196,181,253':'125,211,252'},${(1-k)*.85})`;ctx.lineWidth=4;ctx.stroke()}}
+ if(m==='subd'){const vx=c[0]+a.n[0]*-58,vy=c[1]+a.n[1]*-58;ctx.fillStyle='#78716c';ctx.beginPath();ctx.moveTo(vx-18,vy+12);ctx.lineTo(vx,vy-14);ctx.lineTo(vx+18,vy+12);ctx.fill();for(let i=0;i<6;i++){const k=(t*1.4+i/6)%1;ctx.fillStyle=`rgba(${k<.5?'253,224,71':'249,115,22'},${1-k})`;ctx.beginPath();ctx.arc(vx+Math.sin(i*2.1)*k*16,vy-14-k*40,4+k*5,0,7);ctx.fill()}}
+ if(m==='conv'){const g=Math.min(1,t/2.2);for(let i=-2;i<=2;i++){const bx=c[0]+a.dir[0]*i*26,by=c[1]+a.dir[1]*i*26,h=(26+(2-Math.abs(i))*12)*g;ctx.fillStyle='#a8a29e';ctx.strokeStyle='#44403c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx-15,by+6);ctx.lineTo(bx,by+6-h);ctx.lineTo(bx+15,by+6);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(bx-5,by+6-h*.68);ctx.lineTo(bx,by+6-h);ctx.lineTo(bx+5,by+6-h*.68);ctx.fill()}}
+ if(m==='div'){const pl=.6+.4*Math.sin(t*5);ctx.strokeStyle=`rgba(249,115,22,${pl})`;ctx.lineWidth=10;ctx.shadowColor='#fb923c';ctx.shadowBlur=18;ctx.beginPath();ctx.moveTo(c[0]-a.dir[0]*80,c[1]-a.dir[1]*80);ctx.lineTo(c[0]+a.dir[0]*80,c[1]+a.dir[1]*80);ctx.stroke();ctx.shadowBlur=0;for(let i=0;i<10;i++){const k=(t*.8+i/10)%1,o=(i-5)*14;ctx.fillStyle=`rgba(253,186,116,${1-k})`;ctx.beginPath();ctx.arc(c[0]+a.dir[0]*o+a.n[0]*Math.sin(i)*6,c[1]+a.dir[1]*o-k*34,3+k*3,0,7);ctx.fill()}if(t>2.5){const g=Math.min(1,(t-2.5)/1.5);ctx.fillStyle='#16a34a';ctx.beginPath();ctx.ellipse(c[0]+a.n[0]*-20,c[1]+a.n[1]*-20,14*g,9*g,0,0,7);ctx.fill()}}
+ ctx.restore()}
+function drawArrows(w,h){const a=arrows,t=(performance.now()-a.t0)/1000,c=proj(a.at);if(!c)return;fx(a,c,t);const[dx,dy]=a.dir,nx=-dy,ny=dx,off=46,ph=Math.sin(t*3)*10,L=64;
+ const P=[[c[0]+nx*off,c[1]+ny*off],[c[0]-nx*off,c[1]-ny*off]],ang=Math.atan2(ny,nx);
+ if(a.m==='conv'||a.m==='subd'){arrow(P[0][0]-nx*ph,P[0][1]-ny*ph,ang+Math.PI,L,a.col);arrow(P[1][0]+nx*ph,P[1][1]+ny*ph,ang,L,a.col)}
+ else if(a.m==='div'){arrow(P[0][0]+nx*ph,P[0][1]+ny*ph,ang,L,a.col);arrow(P[1][0]-nx*ph,P[1][1]-ny*ph,ang+Math.PI,L,a.col)}
+ else{const da=Math.atan2(dy,dx);arrow(P[0][0]+dx*ph,P[0][1]+dy*ph,da,L,a.col);arrow(P[1][0]-dx*ph,P[1][1]-dy*ph,da+Math.PI,L,a.col)}
+ ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,.6)';ctx.lineWidth=4;ctx.font='900 14px Nunito,sans-serif';ctx.textAlign='center';ctx.strokeText(a.place,c[0],c[1]-70);ctx.fillText(a.place,c[0],c[1]-70);ctx.restore()}
+// ---------- carga ----------
+fetch('data/earth.json').then(r=>r.json()).then(d=>{
+ plates=d.plates.map(p=>({...p,f:{type:'Feature',geometry:{type:'MultiPolygon',coordinates:p.g}}}));
+ land={type:'MultiPolygon',coordinates:d.land};
+ bounds=d.bounds.map(b=>({n:b.n,s:b.s,f:{type:'MultiLineString',coordinates:b.g}}));
+ ready=true;size();loop();
+}).catch(()=>{say.textContent='📶 No se pudo cargar el planeta. Revisa tu internet y vuelve a entrar.'});
+// ---------- animación general ----------
+let tw=null;
+function loop(){const now=performance.now();
+ if(tw){const k=Math.min(1,(now-tw.t0)/tw.d),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;rot=[tw.r0[0]+(tw.r1[0]-tw.r0[0])*e,tw.r0[1]+(tw.r1[1]-tw.r0[1])*e];zoom=tw.z0+(tw.z1-tw.z0)*e;if(k>=1){tw.done&&tw.done();tw=null}}
+ else if(auto&&!down&&now-idle>2500&&!arrows)rot[0]+=.12;
+ draw();requestAnimationFrame(loop)}
+function goTo(lon,lat,z,done){let r0=rot.slice(),tgt=-lon;while(tgt-r0[0]>180)tgt-=360;while(tgt-r0[0]<-180)tgt+=360;tw={t0:performance.now(),d:1300,r0,r1:[tgt,-lat],z0:zoom,z1:z,done}}
+// ---------- arrastrar y tocar ----------
+let down=null;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);down={x:e.clientX,y:e.clientY,r:rot.slice(),m:0};tw=null;auto=false;cv.style.cursor='grabbing'});
+cv.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.hypot(dx,dy)>5)down.m=1;const k=70/(scale*zoom);rot=[down.r[0]+dx*k,Math.max(-80,Math.min(80,down.r[1]-dy*k))]});
+cv.addEventListener('pointerup',e=>{const d=down;down=null;idle=performance.now();cv.style.cursor='grab';setTimeout(()=>auto=true,4000);if(d&&!d.m)tap(e)});
+function tap(e){const r=cv.getBoundingClientRect(),ll=proj.invert([e.clientX-r.left,e.clientY-r.top]);if(!ll||isNaN(ll[0])||d3.geoDistance(ll,[-rot[0],-rot[1]])>Math.PI/2){sel=null;pinfo.textContent='';return}
+ const p=plates.find(p=>d3.geoContains(p.f,ll));if(!p)return;sel=p;const t=p.t==='c';
+ pinfo.innerHTML=`Placa ${p.n}<i class="${p.t}">${t?'Continental':'Oceánica'}</i>`;
+ say.innerHTML=t?`Tocaste la placa <b>${p.n}</b>: es una placa <b>continental</b>, gruesa y liviana. Sobre ella hay tierra firme. 🟫`:`Tocaste la placa <b>${p.n}</b>: es una placa <b>oceánica</b>, delgada y pesada. Está bajo el mar. 🟦`;
+ const k=t?'cont':'oce';if(!M[k]){M[k]=1;save(KEY,M);ding();setTimeout(()=>say.innerHTML+=' <b>¡Misión cumplida! 🎉</b>',10)}else ding(1);mis()}
+// ---------- tarjetas de movimiento ----------
+const MV={
+ conv:{al:'⛰️ Alerta: posible formación de montañas',t:'Convergente',col:'#ef4444',at:[84,28.5],pair:['IN','EU'],z:1.7,place:'Himalaya',p:'Dos placas <b>chocan de frente</b>. Cuando chocan dos placas continentales, la roca se arruga y sube: así nació el <b>Himalaya</b>, con las montañas más altas del mundo. 🏔️'},
+ subd:{al:'🌊 Alerta: posible sismo y tsunami',t:'Subducción',col:'#ef4444',at:[-77,-12.5],pair:['NZ','SA'],z:1.7,place:'Perú 🇵🇪',p:'Es un borde convergente donde la placa <b>oceánica</b>, más pesada, <b>se hunde</b> debajo de la continental. Frente a <b>Perú</b>, la placa de Nazca se mete bajo la Sudamericana: así se formaron los <b>Andes</b>, los volcanes y los sismos. 🌋'},
+ div:{al:'🌋 Alerta: posible ruptura de la corteza y nueva isla',t:'Divergente',col:'#f59e0b',at:[-13.5,-4],pair:['AF','SA'],z:1.5,place:'Océano Atlántico',p:'Dos placas <b>se separan</b>. Por la grieta sube <b>magma</b> que se enfría y forma suelo nuevo. Así crece el fondo del <b>océano Atlántico</b>, unos 2,5 cm por año. 🌊'},
+ tra:{al:'📳 Alerta: posible sismo de magnitud alta',t:'Transformante',col:'#8b5cf6',at:[-121,36.5],pair:['PA','NA'],z:1.9,place:'Falla de San Andrés',p:'Dos placas <b>se deslizan de lado</b>, una junto a la otra. No se crea ni se destruye suelo, pero se traban y producen <b>sismos</b>, como en la falla de San Andrés (EE. UU.). ↔️'}
+};
+const SVGS={
+ conv:`<svg viewBox="0 0 300 140"><g style="animation:inL 2.4s ease-in-out infinite alternate"><rect x="0" y="64" width="150" height="40" fill="#a16207"/><rect x="0" y="104" width="150" height="36" fill="#78350f"/></g><g style="animation:inR 2.4s ease-in-out infinite alternate"><rect x="150" y="64" width="150" height="40" fill="#b45309"/><rect x="150" y="104" width="150" height="36" fill="#7c2d12"/></g><g style="transform-origin:150px 66px;animation:up 2.4s ease-in-out infinite alternate"><path d="M100 66 L130 22 L150 40 L172 10 L205 66Z" fill="#9ca3af"/><path d="M162 22 L172 10 L182 24 Z" fill="#fff"/><path d="M124 30 L130 22 L136 31Z" fill="#fff"/></g><text x="20" y="92" font-size="13" font-weight="900" fill="#fff">India →</text><text x="205" y="92" font-size="13" font-weight="900" fill="#fff">← Eurasia</text></svg>`,
+ subd:`<svg viewBox="0 0 300 140"><rect x="0" y="64" width="300" height="76" fill="#7f1d1d" opacity=".55"/><g style="transform-origin:150px 80px;animation:sink 2.6s ease-in-out infinite alternate"><rect x="-20" y="70" width="190" height="16" rx="3" fill="#1d4ed8"/></g><path d="M150 64 H300 V104 H170 Z" fill="#a16207"/><path d="M210 64 L235 30 L260 64Z" fill="#78716c"/><circle cx="235" cy="24" r="9" fill="#f97316" style="animation:erupt 1.2s ease-in-out infinite"/><circle cx="235" cy="12" r="6" fill="#fde047" style="animation:erupt 1.2s .3s ease-in-out infinite"/><rect x="0" y="58" width="150" height="8" fill="#38bdf8" opacity=".6"/><text x="12" y="56" font-size="12" font-weight="900" fill="#1e3a8a">Nazca (oceánica) →</text><text x="172" y="100" font-size="12" font-weight="900" fill="#fff">Sudamericana</text></svg>`,
+ div:`<svg viewBox="0 0 300 140"><path d="M138 64 Q150 40 162 64 V140 H138Z" fill="#f97316" style="transform-origin:150px 140px;animation:rise 2.4s ease-in-out infinite alternate"/><g style="animation:outL 2.4s ease-in-out infinite alternate"><rect x="0" y="64" width="140" height="76" fill="#1d4ed8"/></g><g style="animation:outR 2.4s ease-in-out infinite alternate"><rect x="160" y="64" width="140" height="76" fill="#1e40af"/></g><rect x="0" y="40" width="300" height="24" fill="#38bdf8" opacity=".55"/><text x="18" y="100" font-size="13" font-weight="900" fill="#fff">← Sudamericana</text><text x="186" y="100" font-size="13" font-weight="900" fill="#fff">Africana →</text><text x="150" y="132" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">magma</text></svg>`,
+ tra:`<svg viewBox="0 0 300 140" style="background:linear-gradient(#a3a3a3,#d6d3d1)"><g style="animation:slideL 2.4s ease-in-out infinite alternate"><rect x="-40" y="10" width="380" height="58" fill="#65a30d"/><rect x="40" y="10" width="10" height="58" fill="#78350f"/><rect x="140" y="10" width="10" height="58" fill="#78350f"/><rect x="240" y="10" width="10" height="58" fill="#78350f"/><text x="20" y="44" font-size="13" font-weight="900" fill="#fff">← Pacífico</text></g><g style="animation:slideR 2.4s ease-in-out infinite alternate"><rect x="-40" y="72" width="380" height="58" fill="#4d7c0f"/><rect x="40" y="72" width="10" height="58" fill="#78350f"/><rect x="140" y="72" width="10" height="58" fill="#78350f"/><rect x="240" y="72" width="10" height="58" fill="#78350f"/><text x="170" y="106" font-size="13" font-weight="900" fill="#fff">Norteamérica →</text></g><path d="M0 70 H300" stroke="#fff" stroke-width="3" stroke-dasharray="8 6"/></svg>`
+};
+const anim=document.getElementById('anim');
+function play(m){const v=MV[m];anim.hidden=true;document.getElementById('alert').hidden=true;whoosh();sel=null;pinfo.textContent='';document.body.classList.remove('an');arrows=null;hl=bounds.filter(b=>{const c=b.n.split(/[-\/\\]/);return c.length===2&&c.includes(v.pair[0])&&c.includes(v.pair[1])});
+ say.innerHTML=`Mira el planeta: viajamos a <b>${v.place}</b>…`;auto=false;
+ goTo(v.at[0],v.at[1],v.z,()=>{let best=null,bd=1e9;hl.forEach(b=>b.f.coordinates.forEach(l=>l.forEach((p,i)=>{const d=d3.geoDistance(p,v.at);if(d<bd&&l[i+1]){bd=d;best=[p,l[i+1]]}})));let dir=[1,0];if(best){const a=proj(best[0]),b=proj(best[1]);if(a&&b){const L=Math.hypot(b[0]-a[0],b[1]-a[1])||1;dir=[(b[0]-a[0])/L,(b[1]-a[1])/L]}}
+  arrows={m,at:v.at,dir,n:[-dir[1],dir[0]],col:v.col,t0:performance.now(),place:v.place};const al=document.getElementById('alert');al.className='alert '+m;al.textContent=v.al;al.hidden=false;siren(m);if(m==='tra'||m==='subd'){const gw=document.getElementById('gw');gw.classList.remove('quake');void gw.offsetWidth;gw.classList.add('quake');rumble(m==='tra'?2.4:1.8)}else rumble(m==='conv'?1.6:1.2,m==='div'?380:150);
+  document.getElementById('ah').innerHTML=`<i style="background:${v.col}"></i>Borde ${v.t.toLowerCase()}`;document.getElementById('as').innerHTML=SVGS[m];document.getElementById('ap').innerHTML=v.p;anim.hidden=false;document.body.classList.add('an');say.innerHTML=`¡Mira las flechas! Así se mueven las placas en <b>${v.place}</b>.`;
+  document.querySelector(`.rc[data-m="${m}"]`).classList.add('done');M['m_'+m]=1;save(KEY,M);ding(1)})}
+document.getElementById('ax').onclick=()=>{anim.hidden=true;document.getElementById('alert').hidden=true;document.body.classList.remove('an');arrows=null;hl=null;goTo(-rot[0],-rot[1],1,()=>{auto=true});say.innerHTML='¡Prueba otra tarjeta o toca una placa! 🌎'};
+Object.keys(MV).forEach(m=>M['m_'+m]&&document.querySelector(`.rc[data-m="${m}"]`).classList.add('done'));
+// arrastrar tarjetas al planeta (o tocarlas)
+let rd=null;
+document.getElementById('rib').addEventListener('pointerdown',e=>{const b=e.target.closest('.rc');if(!b)return;e.preventDefault();actx();const g=b.cloneNode(true);g.classList.add('rghost');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);rd={m:b.dataset.m,g,x:e.clientX,y:e.clientY}});
+addEventListener('pointermove',e=>{if(!rd)return;rd.g.style.left=e.clientX+'px';rd.g.style.top=e.clientY+'px';const r=cv.getBoundingClientRect();cv.classList.toggle('drop',e.clientX>r.left&&e.clientX<r.right&&e.clientY>r.top&&e.clientY<r.bottom)});
+addEventListener('pointerup',e=>{if(!rd)return;const d=rd;rd=null;d.g.remove();cv.classList.remove('drop');const r=cv.getBoundingClientRect(),inG=e.clientX>r.left&&e.clientX<r.right&&e.clientY>r.top&&e.clientY<r.bottom,tapd=Math.hypot(e.clientX-d.x,e.clientY-d.y)<8;
+ if(inG||tapd)play(d.m)});
+// ---------- misiones y sonido ----------
+function mis(){document.getElementById('mis').innerHTML=`<h3>🎯 Misiones</h3><div class="mi ${M.cont?'ok':''}">Toca una placa continental<em>${M.cont?'Completado ✅':'Falta'}</em></div><div class="mi ${M.oce?'ok':''}">Toca una placa oceánica<em>${M.oce?'Completado ✅':'Falta'}</em></div>`}
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function ding(s){const a=actx();if(!a)return;(s?[784,1047]:[523,659,784,1047]).forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.value=f;const t=a.currentTime+i*.1;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.3)})}
+function noise(d){const a=actx();if(!a)return null;const b=a.createBuffer(1,a.sampleRate*d,a.sampleRate),x=b.getChannelData(0);for(let i=0;i<x.length;i++)x[i]=Math.random()*2-1;const s=a.createBufferSource();s.buffer=b;return s}
+function rumble(d,f){const a=actx(),s=noise(d);if(!s)return;const lp=a.createBiquadFilter(),g=a.createGain(),t=a.currentTime;lp.type='lowpass';lp.frequency.value=f||140;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.55,t+.25);g.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(lp).connect(g).connect(a.destination);s.start()}
+function whoosh(){const a=actx(),s=noise(1.2);if(!s)return;const bp=a.createBiquadFilter(),g=a.createGain(),t=a.currentTime;bp.type='bandpass';bp.Q.value=.8;bp.frequency.setValueAtTime(300,t);bp.frequency.exponentialRampToValueAtTime(2400,t+1.1);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.12,t+.5);g.gain.exponentialRampToValueAtTime(.0001,t+1.2);s.connect(bp).connect(g).connect(a.destination);s.start()}
+function siren(m){const a=actx();if(!a)return;for(let i=0;i<4;i++){const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+i*.32;o.type='triangle';o.frequency.setValueAtTime(m==='div'?520:660,t);o.frequency.linearRampToValueAtTime(m==='div'?700:900,t+.28);g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.3)}}
+mis();
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ecosistemas · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#0f3d3a,#04120f 70%)}
+.main{flex:1;min-height:0;overflow:auto;width:min(100%,980px);margin:0 auto;padding:0 12px 16px;display:flex;flex-direction:column;gap:10px}
+.main>*{flex:none}
+/* pasaporte */
+.pass{padding:14px;border-radius:24px;background:linear-gradient(160deg,#134e4a,#0b2e2b);border:2px solid rgba(153,246,228,.35);box-shadow:0 18px 36px rgba(0,0,0,.45)}
+.pass h2{margin:0 0 2px;font-size:20px}
+.pass p{margin:0 0 12px;font-weight:800;font-size:13.5px;color:#99f6e4}
+.places{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pl{position:relative;display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:4/3.3;padding:10px;border-radius:20px;border:0;overflow:hidden;color:#fff;font:inherit;text-align:left;cursor:pointer;background:var(--g);box-shadow:0 12px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .2s;animation:in .45s calc(var(--i)*.06s) cubic-bezier(.2,1.3,.4,1) both}
+.pl:hover{transform:translateY(-4px)}.pl:active{transform:scale(.96)}
+.pl .em{position:absolute;top:8px;left:50%;translate:-50% 0;font-size:clamp(38px,7vw,58px);filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
+.pl b{position:relative;font-size:clamp(13px,1.8vw,16px);line-height:1.1;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+.pl small{position:relative;font-weight:800;font-size:11px;opacity:.9}
+.pl .stamp{position:absolute;right:8px;top:8px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:rgba(255,255,255,.92);color:#15803d;border:3px dashed #16a34a;transform:rotate(-14deg);box-shadow:0 4px 10px rgba(0,0,0,.3)}
+@keyframes in{from{opacity:0;transform:translateY(16px) scale(.92)}}
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.legend div{padding:8px 10px;border-radius:14px;font-weight:800;font-size:12px;line-height:1.3;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.legend b{display:block;font-size:14px}
+/* lugar */
+.top{display:flex;align-items:center;gap:8px}
+.top button{padding:7px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font:inherit;font-weight:900;font-size:13px;cursor:pointer}
+.top h2{margin:0;font-size:18px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.steps span{padding:7px 4px;border-radius:12px;text-align:center;font-weight:900;font-size:12px;background:rgba(255,255,255,.08);color:#94a3b8;border:1px solid rgba(255,255,255,.1)}
+.steps span.on{background:linear-gradient(135deg,#14b8a6,#0f766e);color:#fff;border-color:#99f6e4}
+.steps span.ok{background:rgba(34,197,94,.25);color:#bbf7d0;border-color:#4ade80}
+.scene{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:16/8;box-shadow:0 16px 34px rgba(0,0,0,.45)}
+.scene>svg{position:absolute;inset:0;width:100%;height:100%}
+.it{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;font-size:clamp(30px,6vw,54px);line-height:1;transition:transform .3s,opacity .3s,filter .3s;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
+.it small{margin-top:2px;padding:2px 7px;border-radius:99px;background:rgba(0,0,0,.45);color:#fff;font-size:clamp(9px,1.3vw,12px);font-weight:900;white-space:nowrap}
+.scene.ask .it{opacity:.35;filter:grayscale(.6)}
+.scene.ask .it.cur{opacity:1;filter:drop-shadow(0 0 16px #fde047);transform:translate(-50%,-50%) scale(1.35);z-index:2}
+.it.cur::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:4px solid #fde047;animation:ring 1.1s ease-in-out infinite}
+@keyframes ring{50%{transform:scale(1.15);opacity:.5}}
+.scene .it.b{opacity:1!important;filter:none!important}
+.scene .it.a{opacity:1!important;filter:none!important}
+.it.b small{background:#16a34a}.it.a small{background:#92400e}
+.card{padding:14px;border-radius:20px;background:#fff;color:#14224a;box-shadow:0 12px 26px rgba(0,0,0,.4);animation:up .35s cubic-bezier(.2,1.3,.4,1)}
+@keyframes up{from{transform:translateY(12px);opacity:0}}
+.card h3{margin:0 0 8px;font-size:clamp(17px,2.4vw,21px);line-height:1.25}
+.card .q2{display:flex;gap:10px}
+.card .q2 button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px;border-radius:18px;border:0;font:inherit;font-weight:900;font-size:clamp(15px,2.2vw,18px);color:#fff;cursor:pointer;box-shadow:0 8px 16px rgba(0,0,0,.25);transition:transform .15s}
+.card .q2 button:active{transform:scale(.95)}
+.card .q2 button i{font-style:normal;font-size:clamp(30px,5vw,40px)}
+.card .q2 button small{font-size:12px;font-weight:800;opacity:.92}
+.yb{background:linear-gradient(160deg,#22c55e,#15803d)}.ya{background:linear-gradient(160deg,#d97706,#78350f)}
+.tT{background:linear-gradient(160deg,#65a30d,#365314)}.tA{background:linear-gradient(160deg,#0ea5e9,#1e3a8a)}.tM{background:linear-gradient(160deg,#14b8a6,#713f12)}
+.cnt{display:flex;gap:8px;margin-top:10px}
+.cnt span{flex:1;padding:6px 10px;border-radius:12px;font-weight:900;font-size:13px;text-align:center}
+.cnt .cb{background:#dcfce7;color:#166534}.cnt .ca{background:#fef3c7;color:#92400e}
+.clues{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.clues div{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:#f1f5f9;font-weight:800;font-size:14.5px;animation:up .4s both;animation-delay:calc(var(--i)*.25s)}
+.clues div i{font-style:normal;font-size:24px}
+.ops{display:flex;flex-direction:column;gap:8px}
+.ops button{padding:12px 14px;border-radius:14px;border:2px solid #e2e8f0;background:#f8fafc;color:#14224a;font:inherit;font-weight:900;font-size:15px;text-align:left;cursor:pointer}
+.ops button.ok,.q2 button.ok{outline:4px solid #4ade80}
+.ops button.ok{background:#dcfce7;border-color:#16a34a}
+.ops button.no{background:#fee2e2;border-color:#dc2626}
+.q2 button.no{opacity:.45}
+.fb{margin-top:10px;padding:10px 12px;border-radius:14px;font-weight:700;font-size:14px;line-height:1.4}
+.fb.g{background:#dcfce7;color:#14532d}.fb.r{background:#fee2e2;color:#7f1d1d}
+.next{margin-top:10px;width:100%;padding:13px;border-radius:14px;border:0;background:linear-gradient(135deg,#14b8a6,#0f766e);color:#fff;font:inherit;font-weight:900;font-size:16px;cursor:pointer}
+.big-stamp{display:grid;place-items:center;margin:4px auto 8px;width:120px;height:120px;border-radius:50%;border:6px dashed #16a34a;color:#15803d;font-size:54px;transform:rotate(-12deg);animation:stamp .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes stamp{from{transform:scale(2.4) rotate(-30deg);opacity:0}}
+.mini{display:flex;gap:6px;flex-wrap:wrap}
+.mini .mi{flex:1 1 150px;font-size:12px;padding:6px 10px}
+.moli-say{left:auto;right:8px;top:8px;bottom:auto;flex-direction:row-reverse;align-items:flex-start;max-width:min(420px,calc(100% - 16px))}
+.moli-say img{width:46px}
+.moli-say p{margin:40px 0 0;border-radius:16px 4px 16px 16px;font-size:13.5px}
+.moli-say::after{left:auto;right:34px;bottom:auto;top:30px}
+.lab-top{padding-right:62px}
+@media (max-width:640px){.places{grid-template-columns:repeat(2,1fr)}.legend{grid-template-columns:1fr}.scene{aspect-ratio:4/3}.card .q2{gap:8px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🌎 Ecosistemas</b></header>
+<div class="main" id="main"></div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':eco2',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const $=id=>document.getElementById(id),say=$('say'),main=$('main');
+let MI=load(KEY,{}),DONE=load(KEY+'-pas',[]);
+const TY={T:{n:'Terrestre',e:'🌳',d:'Los seres vivos viven sobre la tierra'},A:{n:'Acuático',e:'🌊',d:'Los seres vivos viven en el agua'},M:{n:'Mixto',e:'🦀',d:'Se juntan la tierra y el agua'}};
+// ---------- lugares del Perú: b = tiene vida (biótico), a = no tiene vida (abiótico) ----------
+const PL=[
+ {k:'sel',n:'Selva amazónica',e:'🌳',t:'T',g:'linear-gradient(160deg,#22c55e,#14532d)',
+  bg:'<rect width="1000" height="500" fill="#14532d"/><path d="M0 170 Q70 60 150 150 Q230 50 310 150 Q400 40 480 140 Q560 50 650 150 Q740 40 820 140 Q900 60 1000 140 V500 H0Z" fill="#166534"/><path d="M0 300 Q100 220 200 290 Q300 210 400 290 Q500 220 600 290 Q700 210 800 290 Q900 220 1000 280 V500 H0Z" fill="#15803d"/><path d="M0 430 Q250 390 520 420 T1000 410 V500 H0Z" fill="#78350f"/>',
+  it:[['🐒','Mono','b'],['🌳','Árbol','b'],['🐸','Rana','b'],['🌧️','Lluvia','a'],['☀️','Luz del Sol','a'],['🪨','Rocas','a']],
+  cl:[['🌳','Hay suelo firme lleno de árboles'],['🌧️','Llueve mucho y hace calor'],['🐒','Los animales viven en el suelo y en los árboles']],
+  th:{q:'Si deja de llover por muchos meses, ¿qué les pasa a las plantas y los animales?',ok:'Les falta agua: muchos se enferman o se van',no:['Nada, siguen igual','Crecen más rápido'],e:'El <b>agua</b> es un factor abiótico que todos los seres vivos necesitan. Si cambia lo abiótico, cambian los seres vivos.'}},
+ {k:'des',n:'Desierto de Sechura',e:'🌵',t:'T',g:'linear-gradient(160deg,#fbbf24,#b45309)',
+  bg:'<rect width="1000" height="500" fill="#7dd3fc"/><circle cx="860" cy="90" r="50" fill="#fde047"/><path d="M0 300 Q200 240 420 290 T1000 270 V500 H0Z" fill="#fcd34d"/><path d="M0 380 Q300 330 600 370 T1000 360 V500 H0Z" fill="#f59e0b"/>',
+  it:[['🦎','Lagartija','b'],['🌵','Cactus','b'],['🦂','Alacrán','b'],['☀️','Sol muy fuerte','a'],['🏜️','Arena','a'],['🌬️','Viento','a']],
+  cl:[['🏜️','Hay arena y muy poca agua'],['☀️','El sol quema durante el día'],['🦎','Los animales viven sobre la arena']],
+  th:{q:'¿Por qué el cactus guarda agua dentro de su tallo?',ok:'Porque casi no llueve y debe aguantar sin agua',no:['Porque hace mucho frío','Porque así flota'],e:'Los seres vivos se <b>adaptan</b> a los factores abióticos: en el desierto hay muy poca agua.'}},
+ {k:'pun',n:'Puna altoandina',e:'🏔️',t:'T',g:'linear-gradient(160deg,#94a3b8,#334155)',
+  bg:'<rect width="1000" height="500" fill="#93c5fd"/><path d="M0 260 L170 90 L300 200 L460 60 L640 210 L800 80 L1000 220 V500 H0Z" fill="#64748b"/><path d="M460 60 L500 96 L480 94 L460 110 L440 96 L420 98Z M800 80 L834 112 L816 110 L800 122 L784 110 L766 112Z" fill="#fff"/><path d="M0 330 Q250 290 500 320 T1000 310 V500 H0Z" fill="#a3a33a"/><path d="M0 410 Q300 370 600 400 T1000 395 V500 H0Z" fill="#84cc16"/>',
+  it:[['🦙','Vicuña','b'],['🌾','Ichu (pasto)','b'],['🦅','Cóndor','b'],['❄️','Helada','a'],['🪨','Rocas','a'],['🌬️','Viento frío','a']],
+  cl:[['🏔️','Está muy alto, en los Andes'],['❄️','De noche hace mucho frío'],['🦙','Los animales caminan sobre pastos']],
+  th:{q:'¿Por qué la vicuña tiene una lana muy fina y abrigadora?',ok:'Para protegerse del frío de la puna',no:['Para nadar en el lago','Para esconderse en la arena'],e:'El <b>frío</b> (abiótico) hace que los animales de la puna tengan lana o plumas que abrigan.'}},
+ {k:'mar',n:'Mar peruano',e:'🌊',t:'A',g:'linear-gradient(160deg,#0ea5e9,#1e3a8a)',
+  bg:'<defs><linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset=".2" stop-color="#bae6fd"/><stop offset=".21" stop-color="#0ea5e9"/><stop offset="1" stop-color="#0c4a6e"/></linearGradient></defs><rect width="1000" height="500" fill="url(#m1)"/><path d="M0 470 Q300 430 600 460 T1000 450 V500 H0Z" fill="#a8a29e"/>',
+  it:[['🐟','Anchoveta','b'],['🦭','Lobo marino','b'],['🐬','Delfín','b'],['🌊','Agua salada','a'],['☀️','Luz del Sol','a'],['🪨','Rocas del fondo','a']],
+  cl:[['🌊','Todo está cubierto de agua salada'],['🐟','Los seres vivos nadan bajo el agua'],['🧂','El agua tiene mucha sal']],
+  th:{q:'Si el mar se calienta mucho (Fenómeno El Niño), ¿qué pasa con las anchovetas?',ok:'Se van a buscar agua fría o disminuyen',no:['Se multiplican mucho','No pasa nada'],e:'La <b>temperatura del agua</b> es un factor abiótico: si cambia, los peces se van y los que los comen también sufren.'}},
+ {k:'tit',n:'Lago Titicaca',e:'🏞️',t:'A',g:'linear-gradient(160deg,#3b82f6,#172554)',
+  bg:'<defs><linearGradient id="t1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset=".3" stop-color="#bfdbfe"/><stop offset=".31" stop-color="#1d4ed8"/><stop offset="1" stop-color="#172554"/></linearGradient></defs><rect width="1000" height="500" fill="url(#t1)"/><path d="M0 155 L140 70 L260 150 L420 50 L600 150 L760 60 L1000 150Z" fill="#94a3b8"/>',
+  it:[['🐸','Rana gigante','b'],['🌾','Totora','b'],['🐟','Carachi (pez)','b'],['💧','Agua dulce','a'],['❄️','Frío','a'],['🪨','Piedras','a']],
+  cl:[['💧','Es un lago enorme de agua dulce'],['🌾','Las totoras crecen dentro del agua'],['🐸','Muchos animales viven en el agua']],
+  th:{q:'Si botan basura y detergente al lago, ¿qué les pasa a las ranas gigantes?',ok:'Se enferman: el agua sucia las daña',no:['Se ponen más fuertes','Nada, el lago es grande'],e:'Si ensuciamos el <b>agua</b> (abiótico), los seres vivos del lago se enferman. ¡Cuidar el agua es cuidar la vida!'}},
+ {k:'man',n:'Manglar de Tumbes',e:'🦀',t:'M',g:'linear-gradient(160deg,#14b8a6,#713f12)',
+  bg:'<rect width="1000" height="500" fill="#7dd3fc"/><path d="M0 250 Q250 210 500 240 T1000 230 V500 H0Z" fill="#0e7490"/><path d="M0 340 Q200 310 420 350 T1000 330 V500 H0Z" fill="#78716c"/>'+Array.from({length:6},(_,i)=>`<g transform="translate(${90+i*165} 240)"><circle r="46" cy="-40" fill="#15803d"/><path d="M0 -10 V70 M0 30 l-26 40 M0 30 l26 40" stroke="#57534e" stroke-width="5" fill="none"/></g>`).join(''),
+  it:[['🦀','Cangrejo','b'],['🌳','Mangle','b'],['🐊','Cocodrilo','b'],['🌊','Agua salada','a'],['🟫','Lodo','a'],['☀️','Calor','a']],
+  cl:[['🌊','El agua del mar entra y sale con la marea'],['🟫','Hay lodo y tierra entre las raíces'],['🦀','Los animales viven en el agua y en la tierra']],
+  th:{q:'¿Por qué el manglar es un ecosistema mixto?',ok:'Porque tiene tierra y agua juntas',no:['Porque es muy grande','Porque hace calor'],e:'Un ecosistema <b>mixto</b> une la tierra con el agua. Allí viven seres que necesitan las dos.'}}
+];
+const POS=[[16,30],[50,24],[84,32],[20,74],[50,80],[82,72]];
+const shuffle=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+// ---------- pasaporte ----------
+function home(){main.innerHTML=`<div class="pass"><h2>📘 Pasaporte del explorador</h2><p>Viaja a cada lugar del Perú, descubre sus seres vivos y no vivos, y gana su <b>sello</b>.</p>
+ <div class="places">${PL.map((p,i)=>`<button type="button" class="pl" data-k="${p.k}" style="--g:${p.g};--i:${i}"><span class="em">${p.e}</span>${DONE.includes(p.k)?'<span class="stamp">✔</span>':''}<b>${p.n}</b><small>${DONE.includes(p.k)?TY[p.t].e+' '+TY[p.t].n:'¿Qué tipo será?'}</small></button>`).join('')}</div></div>
+ <div class="legend"><div><b>🌱 Biótico</b>Tiene vida: nace, se alimenta, crece y se reproduce.</div><div><b>🪨 Abiótico</b>No tiene vida, pero los seres vivos lo necesitan: agua, sol, aire, suelo…</div><div><b>🌎 Ecosistema</b>Lugar donde los seres vivos se relacionan entre sí y con lo abiótico.</div></div><div class="mini" id="mis"></div>`;
+ main.querySelectorAll('.pl').forEach(b=>b.onclick=()=>{tone(620,.08,'triangle');visit(PL.find(p=>p.k===b.dataset.k))});mis();
+ say.innerHTML=`Tienes <b>${DONE.length} de 6</b> sellos. Elige un lugar para explorar. 🧭`}
+// ---------- visita: 3 pasos ----------
+let P,ord,ix,step;
+function frame(){main.innerHTML=`<div class="top"><button type="button" id="hm">‹ Pasaporte</button><h2>${P.e} ${P.n}</h2></div>
+ <div class="steps"><span id="s1">1 · ¿Tiene vida?</span><span id="s2">2 · ¿Qué tipo es?</span><span id="s3">3 · ¡Piensa!</span></div>
+ <div class="scene" id="sc"><svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice">${P.bg}</svg>${ord.map((it,i)=>`<div class="it" data-i="${i}" style="left:${POS[i][0]}%;top:${POS[i][1]}%">${it[0]}<small>${it[1]}</small></div>`).join('')}</div><div id="pan"></div>`;
+ $('hm').onclick=home;marks()}
+function marks(){[1,2,3].forEach(n=>{const s=$('s'+n);s.className=n<step?'ok':n===step?'on':''})}
+function visit(p){P=p;ord=shuffle(p.it);ix=0;step=1;frame();ask();say.innerHTML=`Bienvenido al <b>${p.n}</b>. Mira lo que brilla y decide: ¿<b>tiene vida</b> o <b>no tiene vida</b>?`}
+function ask(){const sc=$('sc');sc.classList.add('ask');sc.querySelectorAll('.it').forEach((el,i)=>el.classList.toggle('cur',i===ix));const it=ord[ix],nb=ord.slice(0,ix).filter(x=>x[2]==='b').length;
+ $('pan').innerHTML=`<div class="card"><h3>${it[0]} ¿${it[1]} tiene vida?</h3><div class="q2"><button type="button" class="yb" data-v="b"><i>🌱</i>Sí, tiene vida<small>biótico</small></button><button type="button" class="ya" data-v="a"><i>🪨</i>No tiene vida<small>abiótico</small></button></div><div id="fb"></div><div class="cnt"><span class="cb">🌱 Bióticos: ${nb}</span><span class="ca">🪨 Abióticos: ${ix-nb}</span></div></div>`;
+ $('pan').querySelectorAll('.q2 button').forEach(b=>b.onclick=()=>{const ok=b.dataset.v===it[2];
+  if(!ok){b.classList.add('no');boing();$('fb').innerHTML=`<div class="fb r">❌ Piensa: ${it[2]==='b'?`<b>${it[1]}</b> nace, se alimenta, crece y se reproduce.`:`<b>${it[1]}</b> no nace, no come ni crece como un ser vivo.`} ¡Prueba otra vez!</div>`;return}
+  const el=sc.querySelector(`.it[data-i="${ix}"]`);el.classList.remove('cur');el.classList.add(it[2]);it[2]==='b'?chirp():thunk();
+  say.innerHTML=it[2]==='b'?`✅ <b>${it[1]}</b> es <b>biótico</b>: tiene vida.`:`✅ <b>${it[1]}</b> es <b>abiótico</b>: no tiene vida, pero los seres vivos lo necesitan.`;
+  ix++;if(ix<ord.length)setTimeout(ask,450);else setTimeout(()=>{sc.classList.remove('ask');step=2;marks();types()},600)})}
+function types(){const ok=P.t;
+ $('pan').innerHTML=`<div class="card"><h3>🔎 Lee las pistas: ¿qué tipo de ecosistema es?</h3><div class="clues">${P.cl.map((c,i)=>`<div style="--i:${i}"><i>${c[0]}</i>${c[1]}</div>`).join('')}</div><div class="q2">${Object.entries(TY).map(([k,t])=>`<button type="button" class="t${k}" data-t="${k}"><i>${t.e}</i>${t.n}<small>${t.d}</small></button>`).join('')}</div><div id="fb"></div></div>`;
+ say.innerHTML='¡Muy bien! Ahora lee las <b>pistas</b> como un detective. 🔎';
+ $('pan').querySelectorAll('.q2 button').forEach(b=>b.onclick=()=>{if($('pan').querySelector('.q2 .ok'))return;
+  if(b.dataset.t!==ok){b.classList.add('no');boing();$('fb').innerHTML=`<div class="fb r">❌ Vuelve a leer las pistas: ¿dónde viven sus seres vivos?</div>`;return}
+  b.classList.add('ok');fanfare(1);$('fb').innerHTML=`<div class="fb g">✅ ¡Sí! <b>${P.n}</b> es un ecosistema <b>${TY[ok].n.toLowerCase()}</b>: ${TY[ok].d.toLowerCase()}.</div><button type="button" class="next" id="nx">Siguiente ➜</button>`;$('nx').onclick=()=>{step=3;marks();think()}})}
+function think(){const T=P.th,ops=shuffle([T.ok,...T.no]);
+ $('pan').innerHTML=`<div class="card"><h3>🤔 ${T.q}</h3><div class="ops">${ops.map(o=>`<button type="button">${o}</button>`).join('')}</div><div id="fb"></div></div>`;
+ say.innerHTML='Esta es para <b>pensar</b>: ¿cómo se relacionan lo vivo y lo no vivo? 🧠';
+ $('pan').querySelectorAll('.ops button').forEach(b=>b.onclick=()=>{if($('pan').querySelector('.ops .ok'))return;const ok=b.textContent===T.ok;
+  if(!ok){b.classList.add('no');boing();$('fb').innerHTML='<div class="fb r">❌ Mmm… piensa otra vez. ¿Qué necesitan los seres vivos?</div>';return}
+  b.classList.add('ok');$('fb').innerHTML=`<div class="fb g">✅ ${T.e}</div><button type="button" class="next" id="nx">📘 Ganar mi sello</button>`;fanfare(1);$('nx').onclick=stamp})}
+function stamp(){const first=!DONE.includes(P.k);if(first){DONE.push(P.k);save(KEY+'-pas',DONE)}
+ MI.p1=1;const types=new Set(PL.filter(p=>DONE.includes(p.k)).map(p=>p.t));if(types.size===3)MI.tipos=1;if(DONE.length>=6)MI.todo=1;save(KEY,MI);
+ step=4;marks();thud();fanfare();
+ $('pan').innerHTML=`<div class="card" style="text-align:center"><div class="big-stamp">${P.e}</div><h3>¡Sello conseguido: ${P.n}!</h3><p style="margin:0;font-weight:700">Encontraste <b>3 seres bióticos</b> y <b>3 factores abióticos</b>, y descubriste que es un ecosistema <b>${TY[P.t].n.toLowerCase()}</b>.</p><button type="button" class="next" id="nx">${DONE.length<6?'🧭 Elegir otro lugar':'🏆 Ver mi pasaporte completo'}</button></div>`;
+ $('nx').onclick=home;say.innerHTML=DONE.length>=6?'🏆 ¡Completaste tu pasaporte! Eres un gran explorador de ecosistemas.':`📘 ¡Sello ganado! Llevas <b>${DONE.length} de 6</b>.`}
+function mis(){const m=$('mis');if(!m)return;m.innerHTML=`<span class="mi ${MI.p1?'ok':''}">Tu primer sello<em>${MI.p1?'✅':'Falta'}</em></span><span class="mi ${MI.tipos?'ok':''}">Los 3 tipos: terrestre, acuático y mixto<em>${MI.tipos?'✅':'Falta'}</em></span><span class="mi ${MI.todo?'ok':''}">Pasaporte completo<em>${MI.todo?'✅':DONE.length+'/6'}</em></span>`}
+// ---------- sonidos ----------
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,ty,v=.06,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function chirp(){const a=actx();if(!a)return;[0,.09].forEach(t0=>{const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(1800,t);o.frequency.exponentialRampToValueAtTime(2600,t+.07);g.gain.setValueAtTime(.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+.08);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.09)})}
+function thunk(){tone(180,.18,'triangle',.1);tone(120,.2,'sine',.08,.03)}
+function thud(){tone(90,.3,'sine',.18);tone(60,.35,'triangle',.1,.02)}
+function boing(){const a=actx();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(320,t);o.frequency.exponentialRampToValueAtTime(110,t+.35);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0001,t+.4);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.4)}
+function fanfare(s){(s?[660,990]:[523,659,784,1047]).forEach((f,i)=>tone(f,.28,'triangle',.08,i*.11))}
+home();
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

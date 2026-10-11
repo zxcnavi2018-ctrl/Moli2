@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tierra y Luna · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:radial-gradient(120% 90% at 30% 20%,#0d1640,#02030c 70%)}
+body::before{display:none}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:10px;padding:0 10px 10px;overflow:auto}
+.view{position:relative;min-height:0;display:grid;place-items:center;border-radius:22px;background:linear-gradient(90deg,rgba(253,224,71,.35),rgba(253,224,71,0) 22%),radial-gradient(circle at 50% 50%,#0b1236,#02030a 75%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);overflow:hidden}
+.view svg{width:100%;height:100%;max-height:calc(100dvh - 80px)}
+.tag{position:absolute;left:10px;bottom:8px;padding:3px 10px;border-radius:99px;background:rgba(0,0,0,.45);font-size:12px;font-weight:900;color:#cbd5e1}
+.side{display:flex;flex-direction:column;gap:8px;min-height:0}
+.side>*{flex:none}
+.box{position:relative;border-radius:18px;overflow:hidden;background:rgba(18,26,70,.92);border:1px solid rgba(255,255,255,.12)}
+.box>small{position:absolute;left:8px;top:6px;z-index:1;padding:2px 9px;border-radius:99px;background:rgba(0,0,0,.45);font-size:11px;font-weight:900;color:#e2e8f0}
+.box svg{display:block;width:100%;height:auto}
+.row{display:grid;grid-template-columns:1fr 130px;gap:8px}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:30px 6px 8px;text-align:center}
+.ph>small{white-space:nowrap;left:50%!important;translate:-50% 0;font-size:10px!important}
+.ph svg{width:84px}
+.ph b{font-size:13px;line-height:1.15}
+.ph span{font-size:10.5px;font-weight:800;color:var(--ink2)}
+.tbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tbar span{font-weight:900;color:#cbd5e1;font-size:14px}
+.tbar b{padding:5px 12px;border-radius:99px;background:#0ea5e9;font-size:14px;transition:background .4s}
+.tbar b.low{background:#d97706}
+.tctl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tctl button,.qbtn{padding:9px 4px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(15,23,60,.9);color:#fff;font:inherit;font-weight:900;font-size:12.5px;cursor:pointer}
+.tctl button.on{background:#2563eb;border-color:#93c5fd}
+.qbtn{padding:11px;font-size:15px;background:linear-gradient(135deg,#7c3aed,#2563eb);border-color:#c4b5fd}
+.inf{padding:10px 12px}
+.inf h3{margin:0 0 6px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.inf ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.inf li{display:flex;gap:8px;align-items:flex-start;font-weight:700;font-size:13px;line-height:1.35}
+.inf li i{font-style:normal;font-size:18px;flex:none}
+.mis .mi{font-size:12.5px;padding:8px 10px}
+.ov{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(2,4,16,.75);padding:10px}
+.card{position:relative;width:min(100%,640px);max-height:100%;overflow:auto;padding:14px;border-radius:22px;background:#0f1a46;border:1px solid rgba(255,255,255,.16);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.card h2{margin:0 40px 8px 0;font-size:19px}
+.card .tx{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:#14224a;font:900 15px/1 var(--font);cursor:pointer}
+.texp{margin:8px 0 0;font-weight:700;font-size:13.5px;line-height:1.45;color:#dbe4ff}
+.qz .q{margin:6px 0 10px;font-size:17px;font-weight:900;line-height:1.3}
+.qz .ops{display:flex;flex-direction:column;gap:8px}
+.qz button.op{text-align:left;padding:11px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(15,23,60,.85);color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
+.qz button.op.ok{background:#15803d;border-color:#86efac}
+.qz button.op.no{background:#b91c1c;border-color:#fca5a5}
+.qz .fb{margin-top:10px;padding:10px 12px;border-radius:14px;background:#fff;color:#14224a;font-weight:700;font-size:14px;line-height:1.4}
+.qz .nx{margin-top:10px;width:100%;padding:12px;border-radius:14px;border:0;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;font:inherit;font-weight:900;font-size:16px;cursor:pointer}
+.qz .pr{font-weight:900;color:#93c5fd;font-size:13px}
+.moli-say{left:auto;right:8px;top:8px;bottom:auto;flex-direction:row-reverse;align-items:flex-start;max-width:min(420px,calc(100% - 16px))}
+.moli-say img{width:46px}
+.moli-say p{margin:40px 0 0;border-radius:16px 4px 16px 16px;font-size:13.5px}
+.moli-say::after{left:auto;right:34px;bottom:auto;top:30px}
+.lab-top{padding-right:62px}
+@media (max-width:820px){
+ .wrap{grid-template-columns:1fr;padding:0 8px 10px}
+ .view{aspect-ratio:1;max-height:56dvh;width:100%;margin:0 auto}
+ .row{grid-template-columns:1fr 110px}
+ .ph svg{width:66px}
+ .tctl button{font-size:11.5px;padding:8px 2px}
+}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🌍 Tierra y Luna 🌙</b></header>
+<div class="wrap">
+  <div class="view">
+    <span class="tag">Vista desde arriba (no está a escala)</span>
+    <svg id="top" viewBox="-160 -160 320 320" aria-label="La Tierra y la Luna vistas desde arriba">
+      <defs><radialGradient id="eg" cx=".35" cy=".4"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#1e3a8a"/></radialGradient>
+      <linearGradient id="sunl" x1="0" x2="1"><stop offset="0" stop-color="#fde047" stop-opacity=".55"/><stop offset="1" stop-color="#fde047" stop-opacity="0"/></linearGradient></defs>
+      <g id="stars"></g>
+            <text x="-156" y="-118" font-size="22">☀️</text><text x="-128" y="-122" font-size="11" font-weight="900" fill="#fde047">Sol (muy lejos)</text>
+      <g stroke="#fde047" stroke-width="1.5" opacity=".5" stroke-dasharray="6 6"><path d="M-130 -60h40M-130 0h40M-130 60h40"/></g>
+      <circle r="125" fill="none" stroke="rgba(255,255,255,.2)" stroke-dasharray="4 6"/>
+      <g id="tW"><ellipse rx="72" ry="54" fill="#38bdf8" opacity=".85"/></g>
+      <g id="tE"><circle r="50" fill="url(#eg)"/><path d="M-30 -20 q10 -18 26 -10 q8 12 -6 18 q-14 4 -20 -8z M8 14 q16 -8 24 6 q-4 16 -20 12 q-10 -6 -4 -18z M-18 22 q6 -4 10 2 q-2 8 -10 4z" fill="#4ade80"/><circle cx="50" cy="0" r="6" fill="#ef4444" stroke="#fff" stroke-width="2"/></g>
+      <path d="M0 -50A50 50 0 0 1 0 50z" fill="rgba(0,0,12,.45)"/>
+      <circle r="50" fill="none" stroke="rgba(255,255,255,.25)"/>
+      <line id="gl" x1="0" y1="0" x2="0" y2="0" stroke="#fde68a" stroke-width="2" stroke-dasharray="3 5"/>
+      <g id="tM"><circle r="13" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1.5"/><path d="M0 -13A13 13 0 0 1 0 13z" fill="rgba(0,0,12,.55)"/><circle cx="-4" cy="-3" r="2.6" fill="#9ca3af"/><circle cx="3" cy="5" r="2" fill="#9ca3af"/><text y="-19" font-size="11" font-weight="900" fill="#fde68a" text-anchor="middle">Luna</text></g>
+      <text id="pl" font-size="10" font-weight="900" fill="#fff" text-anchor="middle">Tu playa</text>
+    </svg>
+  </div>
+  <aside class="side">
+    <div class="row">
+      <div class="box"><small>🏖️ En tu playa</small><svg id="beach" viewBox="0 0 300 190">
+        <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#bae6fd"/></linearGradient></defs>
+        <rect id="bSky" width="300" height="190" fill="url(#sky)"/>
+        <text id="bCel" x="40" y="44" font-size="24">☀️</text>
+        <path d="M300 190 L300 88 Q210 94 130 140 L0 168 L0 190Z" fill="#fde68a"/><path d="M300 88 Q210 94 130 140 L0 168" stroke="#eab308" stroke-width="2" fill="none"/>
+        <text x="236" y="88" font-size="32">🌴</text><text x="188" y="108" font-size="21">⛱️</text><text x="150" y="134" font-size="14">🦀</text>
+        <g><rect x="96" y="90" width="6" height="90" fill="#78350f"/><path d="M102 100h8M102 116h8M102 132h8M102 148h8M102 164h8" stroke="#fff" stroke-width="2"/></g>
+        <g id="sea"><rect x="-40" y="0" width="400" height="220" fill="#0ea5e9" opacity=".88"/><path d="M-40 0 q15 -6 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0" stroke="#e0f2fe" stroke-width="3" fill="none"/><text id="boat" x="34" y="-4" font-size="22">⛵</text></g>
+      </svg></div>
+      <div class="box ph"><small>🔭 Desde el Perú</small><svg viewBox="-50 -50 100 100"><circle r="40" fill="#1f2937"/><path id="phH" fill="#f1f5f9"/><ellipse id="phE" rx="40" ry="40"/><circle r="40" fill="none" stroke="rgba(255,255,255,.25)"/></svg><b id="phN">Luna nueva</b><span id="phP">0 % iluminada</span></div>
+    </div>
+    <div class="tbar"><span id="clk">Día 1 · 06:00</span><b id="st">🌊 Marea alta</b></div>
+    <div class="tctl"><button type="button" data-sp="0">⏸ Pausa</button><button type="button" data-sp="1" class="on">▶ Normal</button><button type="button" data-sp="6">⏩ Apresurar</button><button type="button" data-sp="48">🚀 Muy rápido</button></div>
+    <div class="box inf"><h3>🌙 ¿Qué hace la Luna por la Tierra?</h3><ul>
+      <li><i>🌊</i><span><b>Mueve las mareas:</b> su gravedad jala el agua del mar y forma la marea alta y la marea baja.</span></li>
+      <li><i>🌕</i><span><b>Ilumina la noche:</b> no tiene luz propia, <b>refleja la luz del Sol</b>.</span></li>
+      <li><i>🌗</i><span><b>Tiene fases:</b> según dónde está, vemos más o menos de su lado iluminado (un ciclo dura casi un mes).</span></li>
+      <li><i>🌍</i><span><b>Da equilibrio:</b> ayuda a que la Tierra no se tambalee al girar y su clima sea más estable.</span></li>
+      <li><i>🐢</i><span><b>Guía a los animales:</b> tortugas, cangrejos y corales siguen la Luna y las mareas. Los pescadores también las miran antes de salir al mar.</span></li>
+    </ul></div>
+    <button type="button" class="qbtn" id="bQuiz">❓ Preguntitas: Luna, Tierra y mar</button>
+    <div class="mis" id="mis"></div>
+  </aside>
+</div>
+<div class="ov qz" id="quiz" hidden><div class="card" id="qcard"></div></div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':luna',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const $=id=>document.getElementById(id),say=$('say');let MI=load(KEY,{});
+$('stars').innerHTML=Array.from({length:60},()=>`<circle cx="${(Math.random()*320-160).toFixed(0)}" cy="${(Math.random()*320-160).toFixed(0)}" r="${(Math.random()*1.1+.3).toFixed(1)}" fill="#fff" opacity="${(Math.random()*.5+.3).toFixed(2)}"/>`).join('');
+// ---------- simulación: horas que pasan ----------
+// La Tierra gira una vez cada 24 h; la Luna da una vuelta cada 27,3 días (655 h). El Sol está a la izquierda.
+let tH=6,sp=1,hi=0,lo=0,full=0,nw=0,t0=performance.now();const D=Math.PI/180,MO=655.2;
+function step(now){const dt=Math.min(.05,(now-t0)/1000);t0=now;tH+=dt*sp;draw();requestAnimationFrame(step)}
+function draw(){
+ const spin=-tH/24*360,mA=180-tH/MO*360,pA=spin;
+ $('tE').setAttribute('transform',`rotate(${spin})`);$('tW').setAttribute('transform',`rotate(${mA})`);
+ const mx=125*Math.cos(mA*D),my=125*Math.sin(mA*D);$('tM').setAttribute('transform',`translate(${mx.toFixed(1)} ${my.toFixed(1)})`);
+ $('gl').setAttribute('x1',(56*Math.cos(mA*D)).toFixed(1));$('gl').setAttribute('y1',(56*Math.sin(mA*D)).toFixed(1));$('gl').setAttribute('x2',(mx*.88).toFixed(1));$('gl').setAttribute('y2',(my*.88).toFixed(1));
+ $('pl').setAttribute('x',(68*Math.cos(pA*D)).toFixed(1));$('pl').setAttribute('y',(68*Math.sin(pA*D)+3).toFixed(1));
+ // marea en la playa: alta cuando la playa mira a la Luna o al lado contrario
+ const h=Math.cos(2*(pA-mA)*D),hn=Math.cos(2*(pA-mA-.5)*D);
+ $('sea').setAttribute('transform',`translate(${((tH*40)%30-30).toFixed(1)} ${(130-h*30).toFixed(1)})`);$('boat').setAttribute('y',(-4+Math.sin(tH*3)*2).toFixed(1));
+ const hr=((tH%24)+24)%24,hh=Math.floor(hr),mm=Math.floor((hr-hh)*60),night=hr<6||hr>=18;
+ $('clk').textContent=`Día ${Math.floor(tH/24)+1} · ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+ $('bSky').setAttribute('fill',night?'#0b1240':'url(#sky)');$('bCel').textContent=night?'🌙':'☀️';
+ const st=$('st');st.textContent=h>.7?'🌊 Marea alta':h<-.7?'🏖️ Marea baja':(h>hn?'⬇️ El mar baja':'⬆️ El mar sube');st.classList.toggle('low',h<-.2);
+ // fases (vista desde el hemisferio sur: la Luna creciente se ilumina por la izquierda)
+ const a=((mA%360)+360)%360,k=(1+Math.cos(a*D))/2,wax=a>0&&a<180,L=wax?-1:1,r=40;
+ $('phH').setAttribute('d',`M0 -${r}A${r} ${r} 0 0 ${L<0?0:1} 0 ${r}Z`);const pe=$('phE');pe.setAttribute('rx',(r*Math.abs(2*k-1)).toFixed(1));pe.setAttribute('fill',k>.5?'#f1f5f9':'#1f2937');
+ $('phN').textContent=k>.97?'🌕 Luna llena':k<.03?'🌑 Luna nueva':k>.4&&k<.6?(wax?'Cuarto creciente':'Cuarto menguante'):k<=.4?(wax?'Luna creciente':'Luna menguante'):(wax?'Gibosa creciente':'Gibosa menguante');
+ $('phP').textContent=Math.round(k*100)+' % iluminada';
+ if(h>.97)hi=1;if(h<-.97)lo=1;if(k>.985)full=1;if(k<.015)nw=1;
+ if(hi&&lo&&!MI.ti){MI.ti=1;save(KEY,MI);party('¡Misión cumplida: viste una marea alta y una baja! 🌊')}
+ if(full&&nw&&!MI.fa){MI.fa=1;save(KEY,MI);party('¡Misión cumplida: viste la Luna llena y la Luna nueva! 🌕🌑')}}
+requestAnimationFrame(step);
+document.querySelectorAll('.tctl button').forEach(b=>b.onclick=()=>{actx();sp=+b.dataset.sp;document.querySelectorAll('.tctl button').forEach(x=>x.classList.toggle('on',x===b));tone(sp?660:330,.1,'triangle',.05);
+ say.innerHTML=sp>=48?'🚀 ¡Muy rápido! Mira cómo la Luna da la vuelta y cambian sus <b>fases</b>.':sp>=6?'⏩ Mira el agua de tu playa: sube y baja <b>2 veces al día</b>.':sp?'▶ Velocidad normal: 1 hora pasa en 1 segundo.':'⏸ Pausa. Observa dónde está la Luna y cómo está el mar.'});
+// ---------- preguntitas ----------
+const QS=[
+ {q:'¿Qué jala el agua del mar y produce las mareas?',o:['El viento','La gravedad de la Luna','Los peces'],a:1,e:'La <b>gravedad de la Luna</b> jala el agua de los océanos y la abulta: así se forman las mareas.'},
+ {q:'¿Cuántas mareas altas hay, más o menos, en un día?',o:['1','2','10'],a:1,e:'Hay <b>2 mareas altas</b> y 2 bajas al día: una cuando la playa mira a la Luna y otra cuando está del lado contrario.'},
+ {q:'En la playa el mar está lejos de la orilla y se ven las rocas. ¿Qué marea es?',o:['Marea baja','Marea alta','No hay mareas'],a:0,e:'Cuando el agua se retira y la playa se ve más grande, es <b>marea baja</b>.'},
+ {q:'¿Cuánto tarda la Luna en dar una vuelta a la Tierra?',o:['1 día','Unos 27 días','365 días'],a:1,e:'La Luna tarda <b>unos 27 días</b> (casi un mes) en dar una vuelta completa a la Tierra.'},
+ {q:'¿Qué es la Luna?',o:['Una estrella','Un planeta','El satélite natural de la Tierra'],a:2,e:'La Luna es el <b>satélite natural</b> de la Tierra: un cuerpo que gira a su alrededor.'},
+ {q:'¿Por qué brilla la Luna?',o:['Tiene fuego dentro','Refleja la luz del Sol','Tiene luz propia como el Sol'],a:1,e:'La Luna <b>no tiene luz propia</b>: lo que vemos es la <b>luz del Sol reflejada</b>.'},
+ {q:'¿Cómo se llama la fase cuando vemos la Luna toda iluminada?',o:['Luna nueva','Cuarto menguante','Luna llena'],a:2,e:'Es la <b>Luna llena</b>: la Luna está del lado contrario al Sol y vemos toda su cara iluminada.'},
+ {q:'¿Por qué siempre vemos la misma cara de la Luna?',o:['Porque no gira','Porque gira sobre sí misma en el mismo tiempo que da la vuelta a la Tierra','Porque la otra cara es invisible'],a:1,e:'La Luna <b>sí gira</b>, pero tarda lo mismo en girar sobre sí misma que en dar la vuelta a la Tierra.'}
+];
+let qi=0,qok=0;
+function openQuiz(){actx();qi=0;qok=0;$('quiz').hidden=false;showQ()}
+function showQ(){const c=$('qcard'),q=QS[qi];
+ c.innerHTML=`<button type="button" class="tx" id="qx" aria-label="Cerrar">✕</button><h2>❓ Preguntitas: Luna, Tierra y mar</h2><div class="pr">Pregunta ${qi+1} de ${QS.length} · ✅ ${qok}</div><div class="q">${q.q}</div><div class="ops">${q.o.map((o,i)=>`<button type="button" class="op" data-i="${i}">${o}</button>`).join('')}</div><div id="qfb"></div>`;
+ $('qx').onclick=()=>$('quiz').hidden=true;
+ c.querySelectorAll('.op').forEach(b=>b.onclick=()=>{if(c.querySelector('.op.ok'))return;const i=+b.dataset.i,ok=i===q.a;if(ok)qok++;c.querySelectorAll('.op')[q.a].classList.add('ok');if(!ok)b.classList.add('no');ok?(tone(880,.2,'triangle',.07),tone(1320,.2,'triangle',.05,.1)):tone(200,.25,'square',.04);
+  $('qfb').innerHTML=`<div class="fb">${ok?'✅ ¡Correcto! ':'❌ Casi. '}${q.e}</div><button type="button" class="nx" id="qn">${qi<QS.length-1?'Siguiente pregunta ➜':'Ver resultado'}</button>`;
+  $('qn').onclick=()=>{qi++;qi<QS.length?showQ():endQ()}})}
+function endQ(){const c=$('qcard'),win=qok>=6;if(win&&!MI.qz){MI.qz=1;save(KEY,MI);party('¡Misión cumplida: preguntitas de la Luna! 🌙')}
+ c.innerHTML=`<button type="button" class="tx" id="qx" aria-label="Cerrar">✕</button><h2>${win?'🏆 ¡Muy bien!':'💪 ¡Casi!'}</h2><p class="texp" style="font-size:16px">Acertaste <b>${qok} de ${QS.length}</b>. ${win?'Ya sabes cómo la Luna y la Tierra se relacionan con el mar.':'Necesitas 6 aciertos. Mira otra vez la Luna y las mareas y vuelve a intentarlo.'}</p><button type="button" class="nx" id="qr">${win?'Cerrar':'🔄 Intentar otra vez'}</button>`;
+ $('qx').onclick=()=>$('quiz').hidden=true;$('qr').onclick=()=>win?$('quiz').hidden=true:openQuiz()}
+$('bQuiz').onclick=openQuiz;
+function mis(){$('mis').innerHTML=`<h3>🎯 Misiones</h3><div class="mi ${MI.ti?'ok':''}">Mira una marea alta y una baja<em>${MI.ti?'Completado ✅':'Falta'}</em></div><div class="mi ${MI.fa?'ok':''}">Mira la Luna llena y la Luna nueva<em>${MI.fa?'Completado ✅':'Falta'}</em></div><div class="mi ${MI.qz?'ok':''}">Preguntitas: Luna, Tierra y mar<em>${MI.qz?'Completado ✅':'Falta'}</em></div>`}
+// ---------- sonidos ----------
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,ty,v=.06,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function party(t){mis();const b=document.createElement('canvas');b.className='boom';b.width=innerWidth;b.height=innerHeight;document.body.appendChild(b);const x=b.getContext('2d'),Q=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,c:`hsl(${Math.random()*360},90%,60%)`,s:4+Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,b.width,b.height);Q.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<90)requestAnimationFrame(f);else b.remove()})();[523,659,784,1047].forEach((f,i)=>tone(f,.3,'triangle',.08,i*.12));setTimeout(()=>{say.innerHTML='<b>'+t+'</b>'},60)}
+mis();
+say.innerHTML='¡Hola! Mira la <b>Tierra</b> y la <b>Luna</b> desde arriba 🌍🌙. El punto rojo es <b>tu playa</b>. Usa <b>⏩ Apresurar</b> para ver cómo sube y baja el mar.';
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sistema solar · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:#03040f}
+body::before{display:none}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 320px;gap:10px;padding:0 10px 10px}
+.space{position:relative;min-height:0;border-radius:20px;overflow:hidden;background:radial-gradient(circle at 50% 50%,#0b1030,#02030a 75%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#cv:active{cursor:grabbing}
+.ctl{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:2}
+.ctl button,.pan button,.pan a.big,.qz button.op{padding:7px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(15,23,60,.85);color:#fff;font:inherit;font-weight:900;font-size:13px;cursor:pointer}
+.ctl button.on{background:#2563eb;border-color:#93c5fd}
+.chips{position:absolute;left:8px;right:8px;bottom:8px;z-index:2;display:grid;grid-template-columns:repeat(9,1fr);gap:5px}
+.chips button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;padding:5px 2px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(15,23,60,.85);color:#fff;font:inherit;font-weight:900;font-size:10.5px;line-height:1.1;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chips button i{font-style:normal;font-size:18px}
+.chips button.f{border-color:#4ade80}
+.chips button.cur{background:#2563eb;border-color:#bfdbfe}
+.hint{position:absolute;left:50%;top:10px;z-index:2;transform:translateX(-50%);padding:5px 12px;border-radius:99px;background:rgba(0,0,0,.5);font-size:12px;font-weight:800;color:#cbd5e1;pointer-events:none;white-space:nowrap}
+.pan{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto;padding:12px;border-radius:20px;background:rgba(18,26,70,.9);border:1px solid rgba(255,255,255,.12)}
+.pan h2{display:flex;align-items:center;gap:8px;margin:0;font-size:21px}
+.pan h2 small{margin-left:auto;padding:2px 9px;border-radius:99px;background:rgba(255,255,255,.14);font-size:11px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.facts div{padding:7px 9px;border-radius:12px;background:rgba(255,255,255,.07)}
+.facts b{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.facts span{font-weight:900;font-size:14px}
+.dato{margin:0;padding:9px 11px;border-radius:12px;background:linear-gradient(135deg,rgba(255,211,77,.18),rgba(56,198,238,.14));font-weight:800;font-size:13.5px;line-height:1.4}
+.pan .acts{display:flex;flex-wrap:wrap;gap:6px}
+.pan .acts>*{flex:1 1 45%}
+.pan a.big{text-decoration:none;text-align:center}
+.pan .acts .big{background:linear-gradient(135deg,#0ea5e9,#2563eb);border-color:#93c5fd}
+.pan .x{display:none}
+.mis .mi{font-size:12.5px;padding:8px 10px}
+.ov{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(2,4,16,.75);padding:10px}
+.card{position:relative;width:min(100%,640px);max-height:100%;overflow:auto;padding:14px;border-radius:22px;background:#0f1a46;border:1px solid rgba(255,255,255,.16);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.card h2{margin:0 40px 8px 0;font-size:19px}
+.card .tx{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:#14224a;font:900 15px/1 var(--font);cursor:pointer}
+.texp{margin:8px 0 0;font-weight:700;font-size:13.5px;line-height:1.45;color:#dbe4ff}
+/* preguntitas */
+.qz .q{margin:6px 0 10px;font-size:17px;font-weight:900;line-height:1.3}
+.qz .ops{display:flex;flex-direction:column;gap:8px}
+.qz button.op{text-align:left;padding:11px 14px;font-size:15px}
+.qz button.op.ok{background:#15803d;border-color:#86efac}
+.qz button.op.no{background:#b91c1c;border-color:#fca5a5}
+.qz .fb{margin-top:10px;padding:10px 12px;border-radius:14px;background:#fff;color:#14224a;font-weight:700;font-size:14px;line-height:1.4}
+.qz .nx{margin-top:10px;width:100%;padding:12px;border-radius:14px;border:0;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;font:inherit;font-weight:900;font-size:16px;cursor:pointer}
+.qz .pr{font-weight:900;color:#93c5fd;font-size:13px}
+.moli-say{left:auto;right:8px;top:8px;bottom:auto;flex-direction:row-reverse;align-items:flex-start;max-width:min(420px,calc(100% - 16px))}
+.moli-say img{width:46px}
+.moli-say p{margin:40px 0 0;border-radius:16px 4px 16px 16px;font-size:13.5px}
+.moli-say::after{left:auto;right:34px;bottom:auto;top:30px}
+.lab-top{padding-right:62px}
+@media (max-width:760px){
+ .wrap{grid-template-columns:1fr;grid-template-rows:1fr auto;padding:0 6px 6px;gap:6px}
+ .pan{max-height:42dvh;padding:10px;gap:6px}
+ .pan h2{font-size:17px}.facts span{font-size:12.5px}.dato{font-size:12.5px}
+ .chips{grid-template-columns:repeat(9,1fr);gap:3px;left:5px;right:5px;bottom:5px}
+ .chips button{font-size:0;padding:4px 0}.chips button i{font-size:17px}
+ .ctl button{padding:6px 9px;font-size:12px}
+ .hint{display:none}
+}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🪐 Sistema solar</b><span class="chip" id="cnt">🔭 0/8</span></header>
+<div class="wrap">
+  <div class="space">
+    <canvas id="cv"></canvas>
+    <div class="ctl"><button type="button" id="all">☀️ Ver todo</button><button type="button" id="spd" class="on">▶ Girar</button></div>
+    <div class="hint">Arrastra para moverte · pellizca o usa la rueda para acercar · toca un planeta</div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <aside class="pan" id="pan"></aside>
+</div>
+<div class="ov qz" id="quiz" hidden><div class="card" id="qcard"></div></div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':sol',VIS='lab:'+U+':sol-vis',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const $=id=>document.getElementById(id),say=$('say');
+let MI=load(KEY,{}),FOUND=load(VIS,[]);
+// ---------- datos (distancias no están a escala) ----------
+const P=[
+ {k:'mer',n:'Mercurio',e:'🪨',ti:'Planeta rocoso',o:70,r:5,per:.24,c:['#d6d3d1','#57534e'],dist:'58 millones de km',dia:'59 días',ano:'88 días',lu:'0',d:'Es el planeta <b>más cercano al Sol</b> y el más pequeño. De día quema (430 °C) y de noche se congela (−180 °C) porque casi no tiene aire.',h:'el planeta número 1, el más cercano al Sol'},
+ {k:'ven',n:'Venus',e:'🌕',ti:'Planeta rocoso',o:100,r:8,per:.62,c:['#fde68a','#b45309'],dist:'108 millones de km',dia:'243 días',ano:'225 días',lu:'0',d:'Es el planeta <b>más caliente</b> (460 °C): sus nubes gruesas atrapan el calor. ¡Y gira al revés que los demás!',h:'el planeta número 2, amarillo y muy brillante'},
+ {k:'tie',n:'Tierra',e:'🌍',ti:'Planeta rocoso',o:135,r:9,per:1,c:['#60a5fa','#1e3a8a'],dist:'150 millones de km',dia:'24 horas',ano:'365 días',lu:'1 (la Luna)',d:'Es el <b>único planeta con vida</b> que conocemos: tiene agua líquida y aire para respirar. Su Luna mueve el agua del mar: las <b>mareas</b>.',h:'el planeta número 3, azul y con una luna'},
+ {k:'mar',n:'Marte',e:'🔴',ti:'Planeta rocoso',o:175,r:7,per:1.88,c:['#f87171','#7f1d1d'],dist:'228 millones de km',dia:'24 h 37 min',ano:'687 días',lu:'2',d:'Es el <b>planeta rojo</b>: su suelo tiene óxido de hierro, como un clavo oxidado. Tiene el volcán más alto del sistema solar, el Monte Olimpo.',h:'el planeta número 4, de color rojo'},
+ {k:'jup',n:'Júpiter',e:'🟠',ti:'Gigante gaseoso',o:260,r:24,per:11.86,c:['#fcd9a8','#9a3412'],dist:'778 millones de km',dia:'10 horas',ano:'12 años',lu:'más de 90',d:'Es el <b>planeta más grande</b>: ¡caben más de 1 000 Tierras dentro! Su Gran Mancha Roja es una tormenta más grande que la Tierra.',h:'el planeta número 5, el más grande de todos'},
+ {k:'sat',n:'Saturno',e:'🪐',ti:'Gigante gaseoso',o:340,r:20,per:29.46,c:['#fef3c7','#a16207'],dist:'1 430 millones de km',dia:'10 h 30 min',ano:'29 años',lu:'más de 140',d:'Tiene los <b>anillos más bonitos</b>, hechos de hielo y roca. Es tan liviano que flotaría en una piscina gigante.',h:'el planeta número 6, el que tiene anillos'},
+ {k:'ura',n:'Urano',e:'🧊',ti:'Gigante helado',o:415,r:13,per:84,c:['#a5f3fc','#0e7490'],dist:'2 870 millones de km',dia:'17 horas',ano:'84 años',lu:'28',d:'Gira <b>acostado</b>, como una pelota rodando. Es muy frío y de color celeste por el gas metano.',h:'el planeta número 7, celeste y muy lejano'},
+ {k:'nep',n:'Neptuno',e:'🔵',ti:'Gigante helado',o:480,r:13,per:164.8,c:['#93c5fd','#1e3a8a'],dist:'4 500 millones de km',dia:'16 horas',ano:'165 años',lu:'16',d:'Es el planeta <b>más lejano</b> y tiene los <b>vientos más fuertes</b>: ¡más de 2 000 km/h!',h:'el planeta número 8, el último y más lejano'}
+];
+const SUN={k:'sol',n:'Sol',e:'☀️',ti:'Estrella',r:34,dist:'centro del sistema',dia:'unos 27 días',ano:'—',lu:'8 planetas',d:'El Sol es una <b>estrella</b>: una bola gigante de gas muy caliente. Su luz tarda <b>8 minutos</b> en llegar a la Tierra y nos da calor y vida.'};
+const MOON={k:'lun',n:'Luna',e:'🌙',ti:'Satélite natural',r:3,dist:'384 000 km de la Tierra',dia:'27 días',ano:'27 días (una vuelta a la Tierra)',lu:'—',d:'La Luna es el <b>satélite natural</b> de la Tierra. Siempre vemos la <b>misma cara</b> porque gira sobre sí misma en el mismo tiempo que da la vuelta a la Tierra. Su gravedad produce las <b>mareas</b>.'};
+// ---------- lienzo y cámara ----------
+const cv=$('cv'),cx=cv.getContext('2d');let DW=0,DH=0,dpr=1,stars=null;
+let cam={x:0,y:0,z:1,tz:1,fol:null},fitZ=1,t0=performance.now(),simT=0,run=1,cur=null;
+const ang=p=>p.a0+simT*2*Math.PI/(22*Math.sqrt(p.per));
+P.forEach((p,i)=>p.a0=i*1.9+.4);
+const pos=p=>{if(p===SUN)return{x:0,y:0};if(p===MOON){const e=pos(P[2]),a=simT*2*Math.PI/5;return{x:e.x+24*Math.cos(a),y:e.y+24*Math.sin(a)}}const a=ang(p);return{x:p.o*Math.cos(a),y:p.o*Math.sin(a)}};
+function size(){const r=cv.getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);DW=r.width;DH=r.height;cv.width=DW*dpr;cv.height=DH*dpr;fitZ=Math.min(DW,DH)/(2*510);if(!cam.fol&&!size.done){cam.z=cam.tz=fitZ;size.done=1}
+ stars=document.createElement('canvas');stars.width=cv.width;stars.height=cv.height;const s=stars.getContext('2d');for(let i=0;i<260;i++){s.fillStyle=`rgba(255,255,255,${Math.random()*.7+.15})`;const r=Math.random()*1.3*dpr;s.beginPath();s.arc(Math.random()*stars.width,Math.random()*stars.height,r,0,7);s.fill()}}
+new ResizeObserver(size).observe(cv);
+const w2s=(x,y)=>[(x-cam.x)*cam.z+DW/2,(y-cam.y)*cam.z+DH/2],s2w=(x,y)=>[(x-DW/2)/cam.z+cam.x,(y-DH/2)/cam.z+cam.y];
+function ball(x,y,r,c,sx,sy){const dx=sx-x,dy=sy-y,l=Math.hypot(dx,dy)||1,g=cx.createRadialGradient(x+dx/l*r*.45,y+dy/l*r*.45,r*.1,x,y,r*1.05);g.addColorStop(0,c[0]);g.addColorStop(1,c[1]);cx.fillStyle=g;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill()}
+function draw(){
+ cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);if(stars)cx.drawImage(stars,0,0);
+ cx.setTransform(dpr,0,0,dpr,0,0);
+ const [sx,sy]=w2s(0,0),z=cam.z;
+ // órbitas
+ cx.lineWidth=1;P.forEach(p=>{cx.strokeStyle=p===cur?'rgba(147,197,253,.55)':'rgba(255,255,255,.13)';cx.beginPath();cx.arc(sx,sy,p.o*z,0,7);cx.stroke()});
+ // Sol
+ const sr=Math.max(10,SUN.r*z),gl=cx.createRadialGradient(sx,sy,sr*.3,sx,sy,sr*2.6);gl.addColorStop(0,'rgba(253,224,71,.6)');gl.addColorStop(1,'rgba(253,224,71,0)');cx.fillStyle=gl;cx.beginPath();cx.arc(sx,sy,sr*2.6,0,7);cx.fill();
+ const sg=cx.createRadialGradient(sx-sr*.2,sy-sr*.2,sr*.1,sx,sy,sr);sg.addColorStop(0,'#fff7c2');sg.addColorStop(.5,'#fde047');sg.addColorStop(1,'#f97316');cx.fillStyle=sg;cx.beginPath();cx.arc(sx,sy,sr,0,7);cx.fill();
+ // planetas
+ P.forEach(p=>{const q=pos(p),[x,y]=w2s(q.x,q.y),r=Math.max(3,p.r*z*(z<1?1.6:1));
+  if(x<-r*4||y<-r*4||x>DW+r*4||y>DH+r*4)return;
+  if(p.k==='sat'){cx.strokeStyle='rgba(253,230,138,.75)';cx.lineWidth=Math.max(1.5,r*.28);cx.beginPath();cx.ellipse(x,y,r*2,r*.6,-.35,Math.PI,2*Math.PI);cx.stroke()}
+  ball(x,y,r,p.c,sx,sy);
+  if(p.k==='jup'&&r>8){cx.save();cx.beginPath();cx.arc(x,y,r,0,7);cx.clip();cx.fillStyle='rgba(154,52,18,.35)';[-.5,-.15,.25,.55].forEach(b=>cx.fillRect(x-r,y+b*r,2*r,r*.13));cx.fillStyle='rgba(185,28,28,.7)';cx.beginPath();cx.ellipse(x+r*.3,y+r*.35,r*.18,r*.1,0,0,7);cx.fill();cx.restore()}
+  if(p.k==='tie'&&r>6){cx.save();cx.beginPath();cx.arc(x,y,r,0,7);cx.clip();cx.fillStyle='rgba(74,222,128,.85)';[[-.3,-.2,.35],[.35,.25,.3],[-.1,.5,.2]].forEach(([a,b,c])=>{cx.beginPath();cx.arc(x+a*r,y+b*r,c*r,0,7);cx.fill()});cx.restore()}
+  if(p.k==='sat'){cx.strokeStyle='rgba(253,230,138,.85)';cx.lineWidth=Math.max(1.5,r*.28);cx.beginPath();cx.ellipse(x,y,r*2,r*.6,-.35,0,Math.PI);cx.stroke()}
+  // sombra del lado opuesto al Sol
+  const dx=x-sx,dy=y-sy,l=Math.hypot(dx,dy)||1;cx.fillStyle='rgba(0,0,10,.45)';cx.beginPath();cx.arc(x,y,r,Math.atan2(dy,dx)-Math.PI/2,Math.atan2(dy,dx)+Math.PI/2);cx.fill();
+  if(p===cur){cx.strokeStyle='#fde047';cx.lineWidth=2;cx.setLineDash([5,5]);cx.beginPath();cx.arc(x,y,r+7,0,7);cx.stroke();cx.setLineDash([])}
+  const f=FOUND.includes(p.k);cx.font=`900 ${Math.max(11,Math.min(15,12*z))}px Nunito,system-ui,sans-serif`;cx.textAlign='center';cx.fillStyle=f?'#e0e7ff':'rgba(224,231,255,.6)';cx.fillText(f?p.n:'?',x,y+r+16);
+  if(p.k==='tie'&&z>1.6){const m=pos(MOON),[mx,my]=w2s(m.x,m.y),[ex,ey]=w2s(q.x,q.y);cx.strokeStyle='rgba(255,255,255,.2)';cx.beginPath();cx.arc(ex,ey,24*z,0,7);cx.stroke();ball(mx,my,Math.max(3,MOON.r*z),['#f1f5f9','#6b7280'],sx,sy);cx.fillStyle='#e5e7eb';cx.fillText('Luna',mx,my-MOON.r*z-6)}
+ });
+}
+function loop(now){const dt=Math.min(.05,(now-t0)/1000);t0=now;if(run)simT+=dt*(run===2?6:1);
+ if(cam.fol){const q=pos(cam.fol);cam.x+=(q.x-cam.x)*.12;cam.y+=(q.y-cam.y)*.12}cam.z+=(cam.tz-cam.z)*.1;
+ draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+// ---------- tocar, mover, acercar ----------
+const ptrs=new Map();let mv=0,pinch=0;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});if(ptrs.size===1)mv=0;actx()});
+cv.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;
+ if(ptrs.size===1){const dx=e.clientX-p.x,dy=e.clientY-p.y;if(Math.hypot(e.clientX-p.x0,e.clientY-p.y0)>6)mv=1;if(mv){cam.fol=null;cam.x-=dx/cam.z;cam.y-=dy/cam.z}}
+ else if(ptrs.size===2){const [a,b]=[...ptrs.values()],d0=Math.hypot(a.x-b.x,a.y-b.y);p.x=e.clientX;p.y=e.clientY;const d1=Math.hypot(a.x-b.x,a.y-b.y);if(d0>0)zoomAt((a.x+b.x)/2,(a.y+b.y)/2,d1/d0);mv=1}
+ p.x=e.clientX;p.y=e.clientY});
+const up=e=>{const p=ptrs.get(e.pointerId);ptrs.delete(e.pointerId);if(p&&!mv&&!ptrs.size){const r=cv.getBoundingClientRect();tap(e.clientX-r.left,e.clientY-r.top)}};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>ptrs.delete(e.pointerId));
+cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*.0015),r)},{passive:false});
+function zoomAt(X,Y,f,r){r=r||cv.getBoundingClientRect();const x=X-r.left,y=Y-r.top,[wx,wy]=s2w(x,y),nz=Math.max(fitZ*.6,Math.min(14,cam.z*f));cam.z=cam.tz=nz;if(!cam.fol){cam.x=wx-(x-DW/2)/nz;cam.y=wy-(y-DH/2)/nz}}
+function tap(x,y){const [wx,wy]=s2w(x,y);let best=null,bd=1e9;
+ const cand=[...P,SUN];if(cam.z>1.6)cand.push(MOON);
+ cand.forEach(p=>{const q=pos(p),d=Math.hypot(q.x-wx,q.y-wy)*cam.z,rr=Math.max(p.r*cam.z*(cam.z<1?1.6:1),4)+16;if(d<rr&&d<bd){bd=d;best=p}});
+ if(best)go(best)}
+function go(p){cur=p;tone(660,.12,'triangle',.06);tone(990,.12,'triangle',.05,.08);
+ if(p===MOON){cam.fol=P[2];cam.tz=Math.max(cam.tz,4)}else{cam.fol=p===SUN?null:p;if(p===SUN){cam.x=cam.x;cam.fol=SUN;cam.tz=Math.max(fitZ*2.2,1.2)}else cam.tz=p.k==='tie'?4.2:Math.min(9,Math.max(1.4,46/p.r))}
+ if(P.includes(p)&&!FOUND.includes(p.k)){FOUND.push(p.k);save(VIS,FOUND);if(FOUND.length===8&&!MI.pl){MI.pl=1;save(KEY,MI);party('¡Misión cumplida: encontraste los 8 planetas! 🔭')}}
+ panel(p);chips();
+ say.innerHTML=p.k==='tie'||p===MOON?'Esta es la <b>Tierra</b> con su <b>Luna</b> 🌙. Para ver cómo la Luna mueve el mar, entra al juego <b>Tierra y Luna</b>.':`¡Llegaste a <b>${p.n}</b>! ${p.e} Lee sus datos en el panel.`}
+// ---------- panel ----------
+function panel(p){const pan=$('pan');
+ if(!p){pan.innerHTML=`<h2>🔭 Explora el espacio</h2><p class="dato">Toca el <b>Sol</b> o un <b>planeta</b> para viajar hasta allí. Busca los <b>8 planetas</b>: los que no conoces aparecen con <b>?</b>. Las distancias del dibujo no están a escala: ¡el espacio es mucho más grande!</p><div class="acts"><button type="button" class="big" id="bQuiz">❓ Preguntitas del sistema solar</button></div>${misHtml()}`;$('bQuiz').onclick=openQuiz;return}
+ const tl=p.k==='tie'||p===MOON,i=P.indexOf(p);
+ pan.innerHTML=`<h2>${p.e} ${p.n}<small>${p.ti}</small></h2><div class="facts"><div><b>Distancia al Sol</b><span>${p.dist}</span></div><div><b>Un día dura</b><span>${p.dia}</span></div><div><b>Un año dura</b><span>${p.ano}</span></div><div><b>Lunas</b><span>${p.lu}</span></div></div><p class="dato">💡 ${p.d}</p>
+ <div class="acts">${tl?`<a class="big" href="luna.html?u=${encodeURIComponent(U)}&t=${Date.now()}">🌙 Ir al juego Tierra y Luna</a>`:''}<button type="button" class="big" id="bQuiz">❓ Preguntitas</button>${i>=0&&i<7?`<button type="button" id="bNext">Siguiente: ${FOUND.includes(P[i+1].k)?P[i+1].n:'?'} ➜</button>`:''}${p===SUN?'<button type="button" id="bNext">Ir a Mercurio ➜</button>':''}</div>${misHtml()}`;
+ const q=$('bQuiz');q&&(q.onclick=openQuiz);const n=$('bNext');n&&(n.onclick=()=>go(p===SUN?P[0]:P[i+1]))}
+function misHtml(){return`<div class="mis"><h3>🎯 Misiones</h3><div class="mi ${MI.pl?'ok':''}">Busca los 8 planetas<em>${MI.pl?'Completado ✅':FOUND.length+'/8'}</em></div><div class="mi ${MI.qs?'ok':''}">Preguntitas del sistema solar<em>${MI.qs?'Completado ✅':'Falta'}</em></div></div>`}
+function chips(){$('cnt').textContent=`🔭 ${FOUND.length}/8`;
+ $('chips').innerHTML=[SUN,...P].map(p=>{const f=p===SUN||FOUND.includes(p.k);return`<button type="button" data-k="${p.k}" class="${f&&p!==SUN?'f':''} ${cur===p?'cur':''}" title="${f?p.n:'Planeta por descubrir'}"><i>${f?p.e:'❓'}</i>${f?p.n:'¿?'}</button>`}).join('')}
+$('chips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const p=b.dataset.k==='sol'?SUN:P.find(x=>x.k===b.dataset.k);
+ if(p===SUN||FOUND.includes(p.k))go(p);else{say.innerHTML=`🔭 ¡Ese planeta todavía no lo encuentras! Pista: es <b>${p.h}</b>. Muévete por el espacio y tócalo.`;tone(330,.15,'sine',.05)}});
+$('all').onclick=()=>{cur=null;cam.fol=null;cam.tz=fitZ;cam.x=0;cam.y=0;panel(null);chips()};
+$('spd').onclick=()=>{run=(run+1)%3;$('spd').textContent=['⏸ Quieto','▶ Girar','⏩ Rápido'][run];$('spd').classList.toggle('on',run>0)};
+// ---------- preguntitas ----------
+const QS=[
+ {q:'¿Qué es el Sol?',o:['Un planeta','Una estrella','Un satélite'],a:1,e:'El Sol es una <b>estrella</b>: una bola enorme de gas muy caliente que da luz y calor.'},
+ {q:'¿Cuál es el planeta más cercano al Sol?',o:['Venus','Marte','Mercurio'],a:2,e:'<b>Mercurio</b> es el primero y el más pequeño.'},
+ {q:'¿Cuál es el planeta más grande?',o:['Júpiter','Saturno','La Tierra'],a:0,e:'<b>Júpiter</b>: dentro de él cabrían más de 1 000 Tierras.'},
+ {q:'¿Cuántos planetas tiene el sistema solar?',o:['7','8','9'],a:1,e:'Son <b>8 planetas</b>. Plutón ahora es un <b>planeta enano</b>.'},
+ {q:'¿Cuál es el planeta más caliente?',o:['Mercurio','Venus','Júpiter'],a:1,e:'¡Sorpresa! Es <b>Venus</b>: sus nubes gruesas atrapan el calor, aunque Mercurio esté más cerca del Sol.'},
+ {q:'¿Por qué Marte es de color rojo?',o:['Porque está en llamas','Porque su suelo tiene óxido de hierro','Porque refleja a Júpiter'],a:1,e:'Su suelo tiene <b>óxido de hierro</b>, como un clavo oxidado.'},
+ {q:'¿Qué planeta tiene los anillos más famosos?',o:['Neptuno','Marte','Saturno'],a:2,e:'<b>Saturno</b>: sus anillos son de hielo y roca.'}
+];
+let qi=0,qok=0;
+function openQuiz(){qi=0;qok=0;$('quiz').hidden=false;showQ()}
+function showQ(){const c=$('qcard'),q=QS[qi];
+ c.innerHTML=`<button type="button" class="tx" id="qx" aria-label="Cerrar">✕</button><h2>❓ Preguntitas del sistema solar</h2><div class="pr">Pregunta ${qi+1} de ${QS.length} · ✅ ${qok}</div><div class="q">${q.q}</div><div class="ops">${q.o.map((o,i)=>`<button type="button" class="op" data-i="${i}">${o}</button>`).join('')}</div><div id="qfb"></div>`;
+ $('qx').onclick=()=>$('quiz').hidden=true;
+ c.querySelectorAll('.op').forEach(b=>b.onclick=()=>{if(c.querySelector('.op.ok'))return;const i=+b.dataset.i,ok=i===q.a;if(ok)qok++;c.querySelectorAll('.op')[q.a].classList.add('ok');if(!ok)b.classList.add('no');ok?tone(880,.2,'triangle',.07):tone(200,.25,'square',.04);
+  $('qfb').innerHTML=`<div class="fb">${ok?'✅ ¡Correcto! ':'❌ Casi. '}${q.e}</div><button type="button" class="nx" id="qn">${qi<QS.length-1?'Siguiente pregunta ➜':'Ver resultado'}</button>`;
+  $('qn').onclick=()=>{qi++;qi<QS.length?showQ():endQ()}})}
+function endQ(){const c=$('qcard'),win=qok>=6;if(win&&!MI.qs){MI.qs=1;save(KEY,MI);party('¡Misión cumplida: preguntitas del sistema solar! 🪐')}
+ c.innerHTML=`<button type="button" class="tx" id="qx" aria-label="Cerrar">✕</button><h2>${win?'🏆 ¡Muy bien!':'💪 ¡Casi!'}</h2><p class="texp" style="font-size:16px">Acertaste <b>${qok} de ${QS.length}</b>. ${win?'¡Ya conoces el sistema solar!':'Necesitas 6 aciertos. Visita los planetas, lee sus datos y vuelve a intentarlo.'}</p><button type="button" class="nx" id="qr">${win?'Cerrar':'🔄 Intentar otra vez'}</button>`;
+ $('qx').onclick=()=>$('quiz').hidden=true;$('qr').onclick=()=>win?$('quiz').hidden=true:openQuiz();cur&&panel(cur)}
+// ---------- sonidos ----------
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,ty,v=.06,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function party(t){const b=document.createElement('canvas');b.className='boom';b.width=innerWidth;b.height=innerHeight;document.body.appendChild(b);const x=b.getContext('2d'),Q=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,c:`hsl(${Math.random()*360},90%,60%)`,s:4+Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,b.width,b.height);Q.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<90)requestAnimationFrame(f);else b.remove()})();[523,659,784,1047].forEach((f,i)=>tone(f,.3,'triangle',.08,i*.12));setTimeout(()=>{say.innerHTML='<b>'+t+'</b>'},60)}
+// ---------- inicio ----------
+panel(null);chips();
+say.innerHTML='¡Bienvenido al <b>sistema solar</b>! 🚀 Arrastra para moverte y <b>toca un planeta</b> para viajar. Busca los 8 planetas y responde las preguntitas.';
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

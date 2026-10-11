@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Enfermedades · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#3b0d3f,#12061f 70%)}
+.board{flex:1;min-height:0;width:min(100%,1000px);margin:0 auto;padding:0 12px 84px;display:grid;grid-template-rows:auto 1fr auto;gap:8px}
+.side{display:flex;align-items:center;gap:12px}
+.who{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.who svg{width:clamp(70px,12vw,120px);height:auto;flex:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+.foe svg{animation:fbob 2.4s ease-in-out infinite}
+@keyframes fbob{50%{transform:translateY(-6px) rotate(-2deg)}}
+.foe.hit svg{animation:hit .5s}
+@keyframes hit{20%,60%{transform:translateX(-8px) rotate(-6deg);filter:brightness(2)}40%,80%{transform:translateX(8px) rotate(6deg)}}
+.nm{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.nm b{font-size:16px}
+.hp{height:14px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;max-width:300px}
+.hp i{display:block;height:100%;border-radius:99px;transition:width .5s}
+.nm small{font-weight:800;color:var(--ink2)}
+.backs{display:flex;gap:6px}
+.backs i{width:clamp(30px,5vw,46px);aspect-ratio:3/4;border-radius:8px;background:repeating-linear-gradient(45deg,#7f1d1d 0 6px,#991b1b 6px 12px);border:2px solid #fca5a5;box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.arena{position:relative;min-height:0;display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,60px);border-radius:24px;background:radial-gradient(circle at 50% 50%,rgba(244,114,182,.18),rgba(0,0,0,.25));border:2px dashed rgba(255,255,255,.18)}
+.arena.drop{border-color:#4ade80;background:radial-gradient(circle,rgba(74,222,128,.25),rgba(0,0,0,.25))}
+.arena .vs{font-size:clamp(22px,4vw,40px);font-weight:900;color:#fde047;text-shadow:0 0 18px rgba(253,224,71,.6)}
+.slot{width:clamp(110px,16vw,150px);aspect-ratio:3/4.2;border-radius:16px;border:3px dashed rgba(255,255,255,.3);display:grid;place-items:center;text-align:center;font-weight:900;color:var(--ink2);font-size:13px;padding:8px}
+.card{position:relative;width:clamp(84px,13vw,140px);aspect-ratio:3/4.2;border-radius:16px;padding:22px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;color:#fff;border:0;font:inherit;cursor:grab;touch-action:none;user-select:none;box-shadow:0 10px 22px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .2s}
+.card .ic{font-size:clamp(28px,5vw,44px);line-height:1.15;filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))}
+.card b{font-size:clamp(11px,1.6vw,14px);line-height:1.1}
+.card small{font-size:clamp(9.5px,1.25vw,11.5px);font-weight:700;line-height:1.2;opacity:.92}
+.card .tg{position:absolute;top:6px;left:6px;padding:1px 6px;border-radius:99px;background:rgba(0,0,0,.3);font-size:9.5px;font-weight:900}
+.card.atk{background:linear-gradient(160deg,#dc2626,#7c3aed);cursor:default}
+.card.def{background:linear-gradient(160deg,#0ea5e9,#16a34a)}
+.card.def.pv{background:linear-gradient(160deg,#f59e0b,#16a34a)}
+.card:hover{transform:translateY(-6px)}
+.card.flip{animation:flip .6s ease both}
+@keyframes flip{from{transform:rotateY(90deg) scale(.6)}}
+.hand{display:flex;justify-content:center;gap:clamp(6px,1.5vw,14px)}
+.hand .card{width:clamp(76px,11vw,122px)}
+.hand .card{animation:deal .4s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes deal{from{transform:translateY(60px) scale(.7);opacity:0}}
+.hand.wait .card{opacity:.55;pointer-events:none}
+.res{position:absolute;inset:auto 10px 10px 10px;z-index:4;margin:auto;max-width:560px;padding:12px 14px;border-radius:16px;background:#fff;color:#14224a;font-weight:700;font-size:14px;line-height:1.4;box-shadow:0 14px 30px rgba(0,0,0,.5);animation:deal .35s both}
+.res b.t{display:block;font-size:16px;margin-bottom:2px}
+.res.good{border-left:8px solid #22c55e}.res.mid{border-left:8px solid #f59e0b}.res.bad{border-left:8px solid #ef4444}
+.res button{margin-top:8px;padding:8px 16px;border-radius:12px;border:0;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font:inherit;font-weight:900;cursor:pointer}
+.dmg{position:absolute;font-size:28px;font-weight:900;pointer-events:none;animation:dmg 1.2s ease-out forwards;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+@keyframes dmg{to{transform:translateY(-60px);opacity:0}}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) rotate(-6deg) scale(1.05)}
+.over{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(10,4,20,.7)}
+.over[hidden]{display:none}
+.over div{width:min(92%,440px);padding:20px;border-radius:22px;background:#fff;color:#14224a;text-align:center}
+.over h2{margin:6px 0;font-size:22px}.over p{font-size:14.5px;font-weight:700;line-height:1.45;color:#334155}
+.over .big{font-size:60px}
+.over button{padding:12px 22px;border-radius:14px;border:0;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font:inherit;font-weight:900;font-size:16px;cursor:pointer}
+.mini{display:flex;gap:4px;flex-wrap:wrap}
+.mini .mi{font-size:11.5px;padding:5px 9px}
+@media (max-width:640px){.board{padding-bottom:10px}.side.me{flex-direction:column;align-items:stretch}.side.me .nm{max-width:none!important}.side .backs{display:none}.moli-say{display:none}.nm b{font-size:14px}.res{font-size:13px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🦠 Enfermedades</b></header>
+<div class="board">
+  <div class="side foe" id="foe"><div class="who"><svg viewBox="0 0 160 160" id="villain"><g><g fill="#65a30d">${''}</g></g></svg><div class="nm"><b>Bacterius 😈</b><div class="hp"><i id="fH" style="background:linear-gradient(90deg,#a3e635,#65a30d)"></i></div><small id="fT">Infección 12/12</small></div></div><div class="backs" id="backs"></div></div>
+  <div class="arena" id="arena"><div id="aSlot"></div><span class="vs">VS</span><div id="dSlot"><div class="slot">Arrastra aquí tu carta de defensa</div></div><div id="res"></div></div>
+  <div class="side me"><div class="nm" style="max-width:260px"><b>❤️ Tu cuerpo</b><div class="hp"><i id="pH" style="background:linear-gradient(90deg,#f87171,#ef4444)"></i></div><small id="pT">Salud 10/10</small><div class="mini" id="mis"></div></div><div class="hand wait" id="hand"></div></div>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<div class="over" id="over"><div><div class="big">🦠⚔️🛡️</div><h2>¡Defiende tu cuerpo!</h2><p><b>Bacterius</b> quiere enfermarte con microbios. Él tiene 4 cartas y tú también. Cuando él ataque, <b>arrastra</b> la carta de defensa correcta al centro. ¡Gana quien deje al otro sin energía!</p><button type="button" id="go">▶ Empezar el duelo</button></div></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':enf',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let MI=load(KEY,{});const $=id=>document.getElementById(id),say=$('say');
+$('villain').innerHTML=`<g><path d="M80 20 C120 20 140 50 140 85 C140 125 112 148 80 148 C48 148 20 125 20 85 C20 50 40 20 80 20Z" fill="#84cc16" stroke="#3f6212" stroke-width="5"/>${[[22,50],[138,50],[14,96],[146,96],[40,140],[120,140],[80,14]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="9" fill="#a3e635" stroke="#3f6212" stroke-width="4"/>`).join('')}${[[55,110,7],[100,120,5],[110,60,6],[48,62,4]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#4d7c0f" opacity=".6"/>`).join('')}<path d="M44 66 L70 76 M116 66 L90 76" stroke="#1a2e05" stroke-width="7" stroke-linecap="round"/><circle cx="62" cy="86" r="9" fill="#fff"/><circle cx="98" cy="86" r="9" fill="#fff"/><circle cx="64" cy="88" r="4.5" fill="#dc2626"/><circle cx="96" cy="88" r="4.5" fill="#dc2626"/><path d="M58 112 Q80 100 102 112 Q80 124 58 112Z" fill="#1a2e05"/><path d="M66 110 l4 6 4-6 M86 110 l4 6 4-6" fill="#fff"/><path d="M20 98 Q2 110 6 128 M140 98 Q158 110 154 128" stroke="#65a30d" stroke-width="9" fill="none" stroke-linecap="round"/></g>`;
+// ---------- cartas ----------
+const ATK={
+ bac:{n:'Bacterias',ic:'🦠',k:'bac',d:2,t:'Pequeños seres vivos que entran por heridas o la boca.',say:'¡Te lanzo un montón de bacterias! 😈'},
+ sal:{n:'Bacteria en la comida',ic:'🍗',k:'bac',d:3,t:'Salmonela en comida mal lavada o mal cocinada.',say:'¡Me escondí en tu comida y ya te la comiste! 🍗',ov:{piel:0,moco:0,aci:2,jab:1,vac:0},no:{piel:'La bacteria ya está <b>dentro de tu cuerpo</b>, en la comida que comiste. La <b>piel</b> protege por fuera, así que aquí no sirve. Mejor: el <b>ácido del estómago</b>, los <b>fagocitos</b> o un antibiótico que receta el médico.',moco:'El moco y las lágrimas protegen la nariz y los ojos, pero esta bacteria llegó con la <b>comida</b> al estómago.',jab:'Lavarse las manos y los alimentos sirve <b>antes</b> de comer. ¡Ahora la bacteria ya está adentro! Igual ayuda a que no vuelva a pasar.'}},
+ vir:{n:'Virus de la gripe',ic:'🤧',k:'vir',d:2,t:'Se mete en tus células y las usa para copiarse.',say:'¡Achú! Te mando el virus de la gripe 🤧',ov:{piel:0,aci:0},no:{piel:'El virus de la gripe entra por la <b>nariz y la boca</b>, no por la piel. Mejor: <b>células NK</b>, <b>linfocitos</b> o la <b>vacuna</b>.'}},
+ bat:{n:'Batallón de virus',ic:'👾',k:'bat',d:4,t:'¡Miles de virus atacando a la vez!',say:'¡Ataque masivo! ¡Un BATALLÓN de virus! 👾👾'},
+ hon:{n:'Hongos',ic:'🍄',k:'hon',d:2,t:'Crecen en la piel húmeda, como el pie de atleta.',say:'¡Hongos para tus pies sudados! 🍄',ov:{piel:1},no:{piel:'Los hongos crecen <b>sobre</b> la piel húmeda. La piel ayuda, pero hay que mantenerla <b>limpia y seca</b>; los <b>fagocitos</b> los eliminan mejor.'}},
+ par:{n:'Parásito',ic:'🪱',k:'par',d:3,t:'Lombrices que viven en el intestino.',say:'¡Un parásito para tu barriga! 🪱',ov:{piel:0},no:{piel:'Las lombrices entran por la <b>boca</b>, con comida o manos sucias, y viven en el intestino. Mejor: <b>eosinófilos</b> o <b>lavarse las manos</b>.'}}
+};
+const DEF={
+ piel:{n:'Piel',ic:'🧱',t:'Barrera natural',s:{bac:2,hon:2,vir:1,par:1},i:'La <b>piel</b> es tu <b>primera barrera natural</b>: una capa que no deja entrar a los microbios. Por eso hay que lavar y cubrir las heridas.'},
+ aci:{n:'Ácido del estómago',ic:'🧪',t:'Barrera natural',s:{bac:1,par:1},i:'El <b>ácido del estómago</b> es muy fuerte: destruye muchos microbios que llegan con la <b>comida</b> y el agua.'},
+ moco:{n:'Moco y lágrimas',ic:'💧',t:'Barrera natural',s:{vir:1,bac:1},i:'El <b>moco</b> y las <b>lágrimas</b> atrapan microbios en la nariz y los ojos y los sacan del cuerpo.'},
+ fago:{n:'Fagocito',ic:'😋',t:'Glóbulo blanco',s:{bac:2,hon:2,par:1,vir:1},i:'El <b>fagocito</b> es un glóbulo blanco que <b>se come</b> a los microbios. ¡Ñam!'},
+ nk:{n:'Células NK',ic:'⚔️',t:'Asesinas naturales',s:{vir:2,bat:1},i:'Las <b>células NK</b> (asesinas naturales) <b>destruyen las células infectadas por virus</b> para que el virus no se copie.'},
+ lt:{n:'Linfocitos T',ic:'🛡️',t:'Defensa especial',s:{bat:2,vir:2},i:'Los <b>linfocitos T</b> dirigen la defensa y <b>eliminan las células infectadas</b>. Se multiplican: ¡ideales contra un batallón de virus!'},
+ lb:{n:'Linfocitos B',ic:'🎯',t:'Anticuerpos',s:{bac:2,vir:2,bat:1,hon:1},i:'Los <b>linfocitos B</b> fabrican <b>anticuerpos</b>: marcas que se pegan a los microbios para que los demás glóbulos los encuentren.'},
+ eos:{n:'Eosinófilos',ic:'🔱',t:'Glóbulo blanco',s:{par:2},i:'Los <b>eosinófilos</b> son glóbulos blancos especialistas en atacar <b>parásitos</b>.'},
+ fie:{n:'Fiebre',ic:'🌡️',t:'Respuesta del cuerpo',s:{bac:1,vir:1,bat:1,hon:1,par:1},i:'La <b>fiebre</b> sube la temperatura para que los microbios se multipliquen más lento. Ayuda, pero no los elimina sola.'},
+ vac:{n:'Vacuna',ic:'💉',t:'Prevención',pv:1,s:{vir:2,bat:2,bac:2},i:'La <b>vacuna</b> entrena a tu cuerpo <b>antes</b> de enfermarte: tus defensas ya saben cómo vencer a ese microbio.'},
+ anti:{n:'Antibiótico',ic:'💊',t:'Medicina',pv:1,s:{bac:2},i:'El <b>antibiótico</b> mata <b>bacterias</b>. <b>¡No sirve contra virus!</b> Solo se toma con receta del médico.'},
+ jab:{n:'Lavarse las manos',ic:'🧼',t:'Prevención',pv:1,s:{bac:1,vir:1,par:2,hon:1},i:'<b>Lavarse las manos</b> con agua y jabón quita los microbios antes de que entren a tu cuerpo.'}
+};
+const WHY={bac:'bacterias',vir:'virus',bat:'un batallón de virus',hon:'hongos',par:'parásitos'};
+// ---------- estado ----------
+let G;const shuffle=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+function newGame(){G={fh:12,ph:10,fd:shuffle(['bac','sal','vir','bat','hon','par','vir','bac','bat','par','hon','sal']),fhand:[],pd:shuffle(Object.keys(DEF).flatMap(k=>[k,k])),phand:[],atk:null,busy:1};for(let i=0;i<4;i++){G.fhand.push(G.fd.pop());G.phand.push(G.pd.pop())}draw();setTimeout(foeTurn,900)}
+function card(k,cls,i){const c=cls==='atk'?ATK[k]:DEF[k];return`<button type="button" class="card ${cls} ${c.pv?'pv':''}" data-k="${k}" data-i="${i??''}"><span class="tg">${cls==='atk'?'ATAQUE':c.t}</span><span class="ic">${c.ic}</span><b>${c.n}</b><small>${cls==='atk'?c.t:''}</small></button>`}
+function draw(){$('fH').style.width=G.fh/12*100+'%';$('fT').textContent=`Infección ${Math.max(0,G.fh)}/12`;$('pH').style.width=Math.max(0,G.ph)/10*100+'%';$('pT').textContent=`Salud ${Math.max(0,G.ph)}/10`;
+ $('backs').innerHTML=G.fhand.map(()=>'<i></i>').join('');$('hand').innerHTML=G.phand.map((k,i)=>card(k,'def',i)).join('');$('hand').classList.toggle('wait',!!G.busy);mis()}
+function foeTurn(){if(G.fh<=0||G.ph<=0)return;const i=Math.floor(Math.random()*G.fhand.length),k=G.fhand.splice(i,1)[0];if(G.fd.length)G.fhand.push(G.fd.pop());G.atk=k;G.busy=0;
+ $('aSlot').innerHTML=card(k,'atk').replace('class="card atk','class="card atk flip');$('dSlot').innerHTML='<div class="slot">Arrastra aquí tu carta de defensa</div>';$('res').innerHTML='';
+ say.innerHTML=`<b>Bacterius:</b> «${ATK[k].say}» ¿Qué carta usas para defenderte?`;boom(220,.25,'sawtooth');draw()}
+function play(i){if(G.busy||G.atk==null)return;G.busy=1;const k=G.phand.splice(i,1)[0],a=ATK[G.atk],d=DEF[k],lv=a.ov&&k in a.ov?a.ov[k]:d.s[a.k]||0,di=a.no&&a.no[k]||d.i,wy=G.atk==='sal'?'bacterias de la comida':WHY[a.k];
+ if(G.pd.length)G.phand.push(G.pd.pop());else G.pd=shuffle(Object.keys(DEF)),G.phand.push(G.pd.pop());
+ $('dSlot').innerHTML=card(k,'def').replace('class="card def','class="card def flip');
+ let txt,cls,pd=0,fd=0;
+ if(lv===2){fd=3;cls='good';txt=`<b class="t">✅ ¡Defensa perfecta!</b>${di}`;if(k==='nk'&&a.k==='vir'&&!MI.nk){MI.nk=1;save(KEY,MI)}if(k==='lt'&&a.k==='bat'&&!MI.lt){MI.lt=1;save(KEY,MI)}}
+ else if(lv===1){fd=1;pd=Math.ceil(a.d/2);cls='mid';txt=`<b class="t">⚠️ Ayuda un poco</b>${di}${di===d.i?` Contra ${wy} hay una defensa mejor.`:''}`}
+ else{pd=a.d;cls='bad';txt=`<b class="t">❌ No funciona contra ${wy}</b>${di}`}
+ G.fh-=fd;G.ph-=pd;
+ if(fd){$('foe').classList.remove('hit');void $('foe').offsetWidth;$('foe').classList.add('hit');pop($('foe'),'-'+fd,'#a3e635');boom(660,.2,'triangle');setTimeout(()=>boom(990,.2,'triangle'),120)}
+ if(pd){pop($('pH'),'-'+pd+' ❤️','#f87171');boom(160,.35,'square')}
+ setTimeout(()=>{draw();$('res').innerHTML=`<div class="res ${cls}">${txt}<br><button type="button" id="nx">${G.fh<=0||G.ph<=0?'Ver resultado ➜':'Siguiente turno ➜'}</button></div>`;
+  say.innerHTML=cls==='good'?'¡Así se hace! 💪 Tu sistema inmune trabaja en equipo.':cls==='mid'?'Bien, pero busca una carta que sea <b>especialista</b> contra ese microbio.':'¡Ay! Esa carta no sirve contra ese microbio. Lee la explicación 👇';
+  $('nx').onclick=()=>{if(G.fh<=0)return end(1);if(G.ph<=0)return end(0);foeTurn()}},450)}
+function end(win){const o=$('over');o.hidden=false;if(win&&!MI.win){MI.win=1;save(KEY,MI)}
+ o.innerHTML=win?`<div><div class="big">🏆🛡️</div><h2>¡Tu sistema inmune venció!</h2><p>Venciste a <b>Bacterius</b>. Tu cuerpo tiene <b>barreras</b> (piel, moco), <b>glóbulos blancos</b> (fagocitos, linfocitos, NK) y te ayudan la <b>vacunas</b>, la higiene y las medicinas correctas.</p><button type="button" id="go">🔄 Jugar otra vez</button></div>`:`<div><div class="big">🤒</div><h2>Te enfermaste…</h2><p>Bacterius ganó esta vez. Recuerda: cada microbio tiene su defensa. Contra <b>virus</b>: NK, linfocitos T o vacunas. Contra <b>bacterias</b>: piel, fagocitos o antibióticos. Contra <b>parásitos</b>: eosinófilos y lavarse las manos.</p><button type="button" id="go">🔄 Intentar otra vez</button></div>`;
+ win?party():boom(130,.6,'sawtooth');$('go').onclick=()=>{o.hidden=true;newGame()};mis()}
+function mis(){$('mis').innerHTML=`<span class="mi ${MI.win?'ok':''}">Gana un duelo<em>${MI.win?'✅':'Falta'}</em></span><span class="mi ${MI.nk?'ok':''}">NK vs virus<em>${MI.nk?'✅':'Falta'}</em></span><span class="mi ${MI.lt?'ok':''}">Linfocitos T vs batallón<em>${MI.lt?'✅':'Falta'}</em></span>`}
+function pop(el,t,c){const r=el.getBoundingClientRect(),d=document.createElement('div');d.className='dmg';d.textContent=t;d.style.color=c;d.style.left=r.left+r.width/2-20+'px';d.style.top=r.top+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1300)}
+// ---------- arrastrar ----------
+let dr=null;const ar=$('arena');
+$('hand').addEventListener('pointerdown',e=>{const b=e.target.closest('.card');if(!b||G.busy)return;e.preventDefault();actx();const g=b.cloneNode(true);g.classList.add('ghost');g.style.width=b.offsetWidth+'px';g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);dr={i:+b.dataset.i,g,x:e.clientX,y:e.clientY}});
+addEventListener('pointermove',e=>{if(!dr)return;dr.g.style.left=e.clientX+'px';dr.g.style.top=e.clientY+'px';const r=ar.getBoundingClientRect();ar.classList.toggle('drop',e.clientY<r.bottom&&e.clientY>r.top)});
+addEventListener('pointerup',e=>{if(!dr)return;const d=dr;dr=null;d.g.remove();ar.classList.remove('drop');const r=ar.getBoundingClientRect(),tap=Math.hypot(e.clientX-d.x,e.clientY-d.y)<8;
+ if(tap){const k=G.phand[d.i];say.innerHTML=`<b>${DEF[k].ic} ${DEF[k].n}</b>: ${DEF[k].i} <br>Arrástrala al centro para usarla.`;return}
+ if(e.clientY<r.bottom&&e.clientY>r.top)play(d.i)});
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function boom(f,d,ty){const a=actx();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(.06,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+d)}
+function party(){const b=document.createElement('canvas');b.className='boom';b.width=innerWidth;b.height=innerHeight;document.body.appendChild(b);const x=b.getContext('2d'),P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,c:`hsl(${Math.random()*360},90%,60%)`,s:4+Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,b.width,b.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<90)requestAnimationFrame(f);else b.remove()})();[523,659,784,1047].forEach((f,i)=>setTimeout(()=>boom(f,.3,'triangle'),i*110))}
+$('go').onclick=()=>{$('over').hidden=true;actx();newGame()};
+G={fh:12,ph:10,fhand:[1,2,3,4],phand:[],busy:1};draw();say.innerHTML='¡Prepárate! Bacterius quiere enfermarte. Toca una carta para leerla y <b>arrástrala</b> al centro para defenderte.';
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

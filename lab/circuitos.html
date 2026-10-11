@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Circuitos · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.tray{position:relative;z-index:3;display:flex;flex-wrap:wrap;gap:10px;padding:2px 14px 10px}
+.tray::-webkit-scrollbar{display:none}
+.it{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;width:86px;padding:6px 4px 7px;border-radius:16px;background:linear-gradient(160deg,#20387c,#172a63);border:1px solid rgba(255,255,255,.16);color:var(--ink);font:inherit;font-size:12px;font-weight:900;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 14px rgba(0,0,0,.3)}
+.it svg{width:60px;height:38px}
+.it:active{cursor:grabbing;transform:scale(.95)}
+.it[disabled]{opacity:.4;cursor:not-allowed}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 250px;gap:12px;padding:0 14px 92px}
+.table{position:relative;min-height:0;border-radius:22px;padding:12px;background:linear-gradient(135deg,#8b5a2b,#6b4423 50%,#7a4e27);box-shadow:0 18px 40px rgba(0,0,0,.45),inset 0 0 0 3px rgba(255,255,255,.08)}
+.table::before{content:"";position:absolute;inset:0;border-radius:22px;background:repeating-linear-gradient(95deg,rgba(255,255,255,.04) 0 2px,transparent 2px 22px);pointer-events:none}
+#sv{position:relative;display:block;width:100%;height:100%;border-radius:14px;touch-action:none;user-select:none}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.tools button{flex:1;padding:9px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer}
+.legend{font-size:12.5px;font-weight:700;color:var(--ink2);line-height:1.45;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06)}
+.legend b{color:var(--ink)}
+.ghost{position:fixed;z-index:40;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
+.ghost svg{width:90px;height:56px}
+#sv .term{cursor:crosshair}
+#sv .term .hit{fill:transparent}
+#sv .term .ring{transition:r .15s}
+#sv .term.hot .ring{fill:#fde047;r:13px}
+#sv .comp{cursor:grab}
+#sv .wire{fill:none;stroke-linecap:round;cursor:pointer}
+#sv .wire.on{stroke-dasharray:10 9;animation:flow .7s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-19}}
+#sv .glow{opacity:0;transition:opacity .25s}
+#sv .on .glow{opacity:1;animation:glw 1.6s ease-in-out infinite}
+#sv .dim .glow{opacity:.45;animation:none}
+#sv .hot .glow{animation:glw .25s ease-in-out infinite;transform:scale(1.25)}
+#sv .burned{filter:grayscale(1) brightness(.6)}
+@keyframes glw{50%{opacity:.75}}
+#sv .bz.on .bzb{animation:shake .12s linear infinite}
+#sv .bz .wv{opacity:0}
+#sv .bz.on .wv{animation:wave 1s ease-out infinite}
+#sv .bz.on .wv.w2{animation-delay:.33s}
+#sv .bz.on .wv.w3{animation-delay:.66s}
+@keyframes shake{25%{transform:translate(1.5px,-1px)}75%{transform:translate(-1.5px,1px)}}
+@keyframes wave{from{opacity:.9;transform:scale(.6)}to{opacity:0;transform:scale(1.5)}}
+#sv .sel .selbox{stroke:#fde047;stroke-width:3;stroke-dasharray:8 6;fill:none}
+#sv .tb circle{fill:#fff;stroke:#14224a;stroke-width:2}
+#sv .tb text{font:900 20px Nunito,sans-serif;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.badge{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:2;padding:6px 14px;border-radius:99px;font-weight:900;font-size:14px;color:#14224a;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.35);pointer-events:none;white-space:nowrap}
+.badge:empty{display:none}
+.badge.bad{background:#fecaca;color:#7f1d1d}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;grid-template-rows:1fr auto;padding:0 8px 8px;gap:8px}.table{padding:6px;border-radius:16px}.side{overflow:visible;gap:6px}.legend{display:none}.mis{flex-direction:row;flex-wrap:wrap;gap:6px}.mis h3{display:none}.mi{flex:1 1 40%;font-size:11.5px;padding:6px 8px}.free{flex:1 1 100%;padding:5px}.tools{padding-left:62px}.tools button{padding:8px 6px;font-size:12px}.moli-say{bottom:6px;left:6px}.moli-say img{width:50px}.moli-say p{font-size:12.5px}.tray{padding:0 8px 6px;gap:6px}.it{width:calc((100% - 31px)/6);min-width:0;font-size:9.5px;padding:4px 1px 5px}.it svg{width:100%;max-width:44px;height:28px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>⚡ Circuitos</b><span class="chip" id="free" hidden>🔓 Juego libre</span></header>
+<div class="tray" id="tray"></div>
+<div class="wrap">
+  <div class="table"><div class="badge" id="badge"></div><svg id="sv" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <aside class="side">
+    <div class="mis" id="mis"></div>
+    <div class="tools"><button type="button" id="rot">⟳ Girar</button><button type="button" id="del">🗑 Quitar</button><button type="button" id="clr">🧹 Limpiar</button></div>
+    <div class="legend"><b>Cómo jugar:</b> arrastra las piezas a la mesa. Une los puntos dorados ● arrastrando desde uno hasta otro: así pones un cable. Toca una pieza para girarla o quitarla.<br><b>Simple:</b> 1 receptor. <b>Compuesto:</b> 2 o más receptores.<br><b>Ojo:</b> cada pila doble da 3 V. Si unes muchas pilas a un foquito, ¡se quema! 💥</div>
+  </aside>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':circ',ST='lab:'+U+':circ-mesa';
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const NS='http://www.w3.org/2000/svg',sv=document.getElementById('sv'),say=document.getElementById('say'),badge=document.getElementById('badge');
+// ---------- piezas ----------
+const T={
+ pila:{n:'Pila doble',t:[[-96,0,'−'],[96,0,'+']],w:180,h:70},
+ foco:{n:'Foco',t:[[-60,0],[60,0]],w:120,h:90,load:1},
+ led:{n:'LED',t:[[-46,0,'−'],[46,0,'+']],w:96,h:50,load:1},
+ buzzer:{n:'Zumbador',t:[[-56,0],[56,0]],w:110,h:80,load:1},
+ sw:{n:'Interruptor',t:[[-56,0],[56,0]],w:112,h:64}
+};
+// Interruptor: cerrado deja pasar la corriente; abierto la corta.
+const swArt=open=>`<rect x="-50" y="-24" width="100" height="40" rx="10" fill="#7c2d12" stroke="#431407" stroke-width="3"/><path d="M-56 0H-34M34 0H56" stroke="#9ca3af" stroke-width="6"/><circle cx="-30" cy="0" r="7" fill="#e5e7eb" stroke="#4b5563" stroke-width="2"/><circle cx="30" cy="0" r="7" fill="#e5e7eb" stroke="#4b5563" stroke-width="2"/><g transform="rotate(${open?-38:0} -30 0)"><path d="M-30 0H34" stroke="${open?'#f87171':'#4ade80'}" stroke-width="7" stroke-linecap="round"/><circle cx="30" cy="0" r="6" fill="#1f2937"/></g><text y="34" font-size="13" font-weight="900" fill="${open?'#fecaca':'#bbf7d0'}" text-anchor="middle" stroke="#000" stroke-width="3" paint-order="stroke">${open?'ABIERTO':'CERRADO'}</text>`;
+const art={
+ pila:`<rect x="-84" y="-32" width="168" height="64" rx="12" fill="#1f2937" stroke="#0b1220" stroke-width="3"/>
+  <g><rect x="-76" y="-24" width="72" height="22" rx="10" fill="url(#cell)"/><rect x="-76" y="2" width="72" height="22" rx="10" fill="url(#cell)"/><rect x="-6" y="-19" width="5" height="12" rx="2" fill="#d1d5db"/><rect x="-6" y="7" width="5" height="12" rx="2" fill="#d1d5db"/>
+  <rect x="4" y="-24" width="72" height="22" rx="10" fill="url(#cell)"/><rect x="4" y="2" width="72" height="22" rx="10" fill="url(#cell)"/></g>
+  <text x="-58" y="-9" font-size="11" font-weight="900" fill="#fff" stroke="#7c2d12" stroke-width="2.5" paint-order="stroke" text-anchor="middle">+</text><text x="58" y="-9" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">1,5V</text>
+  <text x="0" y="48" font-size="15" font-weight="900" fill="#fde047" text-anchor="middle">PILA DOBLE · 3 V</text>`,
+ foco:`<circle class="glow" r="92" fill="url(#bulbGlow)"/><rect x="-62" y="-6" width="124" height="12" rx="6" fill="#9ca3af"/><circle r="40" fill="#6b7280" stroke="#374151" stroke-width="3"/><circle r="31" fill="#d1d5db"/>
+  <circle class="bulb" r="25" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><circle class="glow" r="25" fill="#fde047"/><path d="M-12 4 l6-10 6 10 6-10 6 10" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="-9" cy="-10" r="5" fill="#fff" opacity=".8"/>`,
+ led:`<circle class="glow" r="58" fill="url(#ledGlow)"/><path d="M-46 0H-12M12 0H46" stroke="#cbd5e1" stroke-width="4"/><path d="M12 0h34" stroke="#e5e7eb" stroke-width="4"/><circle r="17" fill="#b91c1c" stroke="#7f1d1d" stroke-width="3"/><circle class="glow" r="17" fill="#ff4d4d"/><circle cx="-5" cy="-6" r="5" fill="#fff" opacity=".6"/><text x="-30" y="-10" font-size="13" font-weight="900" fill="#e5e7eb" text-anchor="middle">−</text><text x="30" y="-10" font-size="13" font-weight="900" fill="#e5e7eb" text-anchor="middle">+</text>`,
+ buzzer:`<g class="wv w1"><circle r="44" fill="none" stroke="#38c6ee" stroke-width="3"/></g><g class="wv w2"><circle r="44" fill="none" stroke="#38c6ee" stroke-width="3"/></g><g class="wv w3"><circle r="44" fill="none" stroke="#38c6ee" stroke-width="3"/></g>
+  <rect x="-58" y="-5" width="116" height="10" rx="5" fill="#9ca3af"/><g class="bzb"><circle r="34" fill="#111827" stroke="#000" stroke-width="3"/><circle r="26" fill="#1f2937"/><circle r="6" fill="#000"/><text x="0" y="22" font-size="11" font-weight="900" fill="#9ca3af" text-anchor="middle">BUZZ</text><text x="-18" y="-10" font-size="13" font-weight="900" fill="#e5e7eb">+</text></g>`
+};
+const icon={pila:'<svg viewBox="-100 -50 200 100"><g transform="scale(.95)">'+art.pila.replace(/<text[^>]*>PILA[^<]*<\/text>/,'')+'</g></svg>',foco:'<svg viewBox="-70 -50 140 100">'+art.foco+'</svg>',led:'<svg viewBox="-60 -40 120 80">'+art.led+'</svg>',buzzer:'<svg viewBox="-65 -48 130 96">'+art.buzzer+'</svg>',sw:'<svg viewBox="-62 -40 124 80">'+swArt(1).replace(/<text[^]*<\/text>/,'')+'</svg>',cable:'<svg viewBox="0 0 120 70"><path d="M14 52 C40 4 80 66 106 18" stroke="#ef4444" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="14" cy="52" r="8" fill="#d4a017"/><circle cx="106" cy="18" r="8" fill="#d4a017"/></svg>'};
+const DEFS=`<defs><linearGradient id="cell" x1="0" x2="1"><stop offset="0" stop-color="#b45309"/><stop offset=".55" stop-color="#f59e0b"/><stop offset=".56" stop-color="#111827"/><stop offset="1" stop-color="#374151"/></linearGradient>
+<radialGradient id="bulbGlow"><stop offset="0" stop-color="#fff7b0" stop-opacity=".95"/><stop offset=".35" stop-color="#fde047" stop-opacity=".55"/><stop offset="1" stop-color="#fde047" stop-opacity="0"/></radialGradient>
+<radialGradient id="ledGlow"><stop offset="0" stop-color="#ff6b6b" stop-opacity=".9"/><stop offset="1" stop-color="#ff0000" stop-opacity="0"/></radialGradient>
+<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2"/></pattern></defs>`;
+// ---------- estado ----------
+let S=load(ST,{c:[],w:[],n:1});S.c=S.c||[];S.w=S.w||[];S.n=S.n||1;
+let M=load(KEY,{});let sel=null,W=1000,H=620;sv.setAttribute('viewBox','0 0 1000 620');
+const tray=document.getElementById('tray');
+tray.innerHTML=['pila','cable','sw','foco','led','buzzer'].map(k=>`<button type="button" class="it" data-k="${k}" aria-label="Arrastra ${k==='cable'?'un cable':T[k].n}">${icon[k]}${k==='cable'?'Cable':T[k].n}</button>`).join('');
+const comp=id=>S.c.find(c=>c.id===id);
+function tp(tid){const[id,i]=tid.split(':'),c=comp(id);if(!c)return null;const[ox,oy]=T[c.type].t[+i],a=c.r*Math.PI/2;return{x:c.x+ox*Math.cos(a)-oy*Math.sin(a),y:c.y+ox*Math.sin(a)+oy*Math.cos(a)}}
+const ep=e=>e.t&&tp(e.t)||{x:e.x,y:e.y};
+// ---------- evaluación del circuito ----------
+function evaluate(){
+ const par={},f=x=>{while(par[x]&&par[x]!==x)x=par[x];return x},un=(a,b)=>{a=f(a);b=f(b);if(a!==b)par[a]=b};
+ S.c.forEach(c=>T[c.type].t.forEach((_,i)=>{par[c.id+':'+i]=c.id+':'+i}));
+ S.w.forEach(w=>{if(w.a.t&&w.b.t&&par[w.a.t]&&par[w.b.t])un(w.a.t,w.b.t)});
+ S.c.forEach(c=>{if(c.type==='sw'&&!c.open)un(c.id+':0',c.id+':1')});
+ const bats=S.c.filter(c=>c.type==='pila'),R={on:new Map(),nodes:new Set(),short:false,kind:'',openSw:S.c.some(c=>c.type==='sw'&&c.open),loads:S.c.filter(c=>T[c.type].load).length,bats:bats.length,f,paths:[]};
+ if(!bats.length)return R;
+ const E=S.c.filter(c=>c.type!=='sw'&&(!c.burned||c.type==='pila')).map(c=>({c,id:c.id,a:f(c.id+':0'),b:f(c.id+':1'),bat:c.type==='pila',load:!!T[c.type].load}));
+ for(const B of E.filter(e=>e.bat)){
+  if(B.a===B.b){R.short=true;continue}
+  const out=[];
+  (function dfs(n,vis,used,boost){if(out.length>300)return;if(n===B.a){out.push({loads:used.filter(e=>e.load),boost,used:used.slice()});return}
+   for(const e of E){if(e===B||used.includes(e)||e.a===e.b)continue;const o=e.a===n?e.b:e.b===n?e.a:null;if(o===null||vis.has(o))continue;
+    vis.add(o);used.push(e);dfs(o,vis,used,boost+(e.bat?(e.a===n?1:-1):0));used.pop();vis.delete(o)}})(B.b,new Set([B.b]),[],0);
+  for(const p of out){const V=3*(1+p.boost);if(V<=0)continue;if(!p.loads.length){R.short=true;continue}
+   const per=V/p.loads.length;p.loads.forEach(e=>{R.on.set(e.id,Math.max(R.on.get(e.id)||0,per));R.nodes.add(e.a);R.nodes.add(e.b)});p.used.forEach(e=>{R.nodes.add(e.a);R.nodes.add(e.b)});R.paths.push(p)}
+ }
+ if(R.short){R.on.clear();R.nodes.clear();return R}
+ if(R.on.size===1)R.kind='simple';
+ else if(R.on.size>1)R.kind=R.paths.some(p=>p.loads.length===R.on.size)?'serie':'paralelo';
+ return R;
+}
+const BURN={foco:9,led:6,buzzer:12},VOLT={foco:3,led:3,buzzer:3};
+// ---------- dibujo ----------
+const wd=w=>{const a=ep(w.a),b=ep(w.b),mx=(a.x+b.x)/2,my=(a.y+b.y)/2-Math.min(80,Math.hypot(b.x-a.x,b.y-a.y)*.18);return{a,b,d:`M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}`}};
+// Mientras se arrastra no se redibuja toda la mesa: solo la pieza y sus cables (más suave en el celular).
+function fastWire(w){const g=sv.querySelector(`[data-w="${w.id}"]`);if(!g)return;const{a,b,d}=wd(w);g.querySelectorAll('path').forEach(p=>p.setAttribute('d',d));g.querySelectorAll('[data-we]').forEach(c=>{const p=c.dataset.we.endsWith(':a')?a:b;c.setAttribute('cx',p.x);c.setAttribute('cy',p.y)})}
+function fastComp(c){const g=sv.querySelector(`[data-c="${c.id}"]`);if(!g)return;g.setAttribute('transform',`translate(${c.x} ${c.y}) rotate(${c.r*90})`);
+ T[c.type].t.forEach((_,i)=>{const t=sv.querySelector(`.term[data-t="${c.id}:${i}"]`),p=tp(c.id+':'+i);if(!t)return;t.querySelectorAll('circle').forEach(q=>{q.setAttribute('cx',p.x);q.setAttribute('cy',p.y)});const x=t.querySelector('text');if(x){x.setAttribute('x',p.x);x.setAttribute('y',p.y-18)}});
+ S.w.forEach(w=>{if((w.a.t||'').split(':')[0]===c.id||(w.b.t||'').split(':')[0]===c.id)fastWire(w)})}
+function render(){
+ const R=evaluate();
+ let h=DEFS+`<rect x="0" y="0" width="${W}" height="${H}" rx="14" fill="#14532d"/><rect x="0" y="0" width="${W}" height="${H}" rx="14" fill="url(#grid)"/>`;
+ const colors=['#ef4444','#111827','#2563eb','#16a34a','#f97316'];
+ S.w.forEach((w,i)=>{const{a,b,d}=wd(w),on=R.f&&w.a.t&&w.b.t&&R.nodes.has(R.f(w.a.t));
+  const col=w.col||colors[i%colors.length];
+  h+=`<g data-w="${w.id}" class="${sel===w.id?'sel':''}"><path class="wire" d="${d}" stroke="rgba(0,0,0,.35)" stroke-width="13" transform="translate(3 5)"/><path class="wire" d="${d}" stroke="${col}" stroke-width="10"/>${on?`<path class="wire on" d="${d}" stroke="#fef08a" stroke-width="4"/>`:''}${sel===w.id?`<path class="selbox" d="${d}"/>`:''}`+
+   [['a',a,w.a.t],['b',b,w.b.t]].map(([k,p,t])=>`<circle data-we="${w.id}:${k}" cx="${p.x}" cy="${p.y}" r="${t?7:11}" fill="${t?'#d4a017':'#9ca3af'}" stroke="#4b5563" stroke-width="2"/><circle data-we="${w.id}:${k}" cx="${p.x}" cy="${p.y}" r="24" fill="transparent"/>`).join('')+'</g>'});
+ S.c.forEach(c=>{const d=T[c.type],v=R.on.get(c.id)||0,on=v>0&&!c.burned,br=v>=5.5?' hot':v&&v<2.5?' dim':'';
+  h+=`<g class="comp ${c.type==='buzzer'?'bz':''} ${on?'on'+br:''} ${c.burned?'burned':''} ${sel===c.id?'sel':''}" data-c="${c.id}" transform="translate(${c.x} ${c.y}) rotate(${c.r*90})"><rect x="${-d.w/2-10}" y="${-d.h/2-14}" width="${d.w+20}" height="${d.h+28}" rx="18" fill="rgba(255,255,255,.001)"/>${c.type==='sw'?swArt(c.open):art[c.type]}${c.burned?`<g class="crack"><path d="M-14 -16 L-2 -2 L-10 6 L4 18 M6 -18 L2 -4 L14 4" stroke="#111" stroke-width="3" fill="none"/><circle r="22" fill="rgba(30,30,30,.55)"/><text y="${d.h/2+16}" font-size="14" font-weight="900" fill="#fecaca" text-anchor="middle" stroke="#000" stroke-width="3" paint-order="stroke">QUEMADO</text></g>`:''}${sel===c.id?`<rect class="selbox" x="${-d.w/2-10}" y="${-d.h/2-10}" width="${d.w+20}" height="${d.h+20}" rx="18"/>`:''}</g>`});
+ S.c.forEach(c=>T[c.type].t.forEach((tt,i)=>{const p=tp(c.id+':'+i);h+=`<g class="term" data-t="${c.id}:${i}"><circle class="hit" cx="${p.x}" cy="${p.y}" r="17"/><circle class="ring" cx="${p.x}" cy="${p.y}" r="10" fill="#d4a017" stroke="#7c5a00" stroke-width="3"/>${tt[2]?`<text x="${p.x}" y="${p.y-18}" font-size="18" font-weight="900" fill="#fff" text-anchor="middle" stroke="#000" stroke-width="3" paint-order="stroke">${tt[2]}</text>`:''}</g>`}));
+ sv.innerHTML=h;
+ status(R);
+ document.querySelector('.it[data-k="pila"]').disabled=S.c.filter(c=>c.type==='pila').length>=4;
+ save(ST,S);
+}
+const LN={foco:'foco',led:'LED',buzzer:'zumbador'};
+let lastKind='';
+function status(R){
+ const burn=S.c.find(c=>T[c.type].load&&!c.burned&&(R.on.get(c.id)||0)>=BURN[c.type]);
+ if(burn){burn.burned=1;pop();const v=Math.round(R.on.get(burn.id));setTimeout(()=>{render();say.innerHTML=`💥 ¡Se quemó ${burn.type==='led'?'el LED':burn.type==='foco'?'el foco':'el zumbador'}! Le llegaron <b>${v} V</b> y solo aguanta unos <b>${VOLT[burn.type]} V</b>. Demasiadas pilas lo calientan tanto que se rompe. Quítalo y pon uno nuevo con menos pilas.`;badge.textContent='💥 ¡Se quemó!';badge.className='badge bad'},30);return}
+ const pila=S.c.find(c=>c.type==='pila');
+ badge.className='badge';
+ let m;
+ if(!S.c.length)m='Arrastra la <b>pila doble</b>, un <b>foco</b> y <b>cables</b> a la mesa. Une los puntos dorados ● para cerrar el circuito.',badge.textContent='';
+ else if(!pila)m='Te falta la <b>pila doble</b>: es la que da la energía al circuito. 🔋',badge.textContent='Sin pila';
+ else if(!R.loads&&S.c.every(c=>c.type==='pila'||c.burned)&&S.c.some(c=>c.burned))m='Ese receptor está <b>quemado</b>: quítalo y pon uno nuevo.',badge.textContent='💥 Quemado';
+ else if(R.short)m='¡Cuidado! <b>Cortocircuito</b>: uniste el + y el − sin pasar por un receptor. La pila se calienta y se gasta. Quita ese cable. ⚠️',badge.textContent='⚠️ Cortocircuito',badge.className='badge bad';
+ else if(!R.loads)m='Ahora agrega un <b>receptor</b>: un foco, un LED o un zumbador.',badge.textContent='Sin receptor';
+ else if(!R.on.size&&R.openSw)m='El <b>interruptor está abierto</b>: corta el camino y la corriente no pasa. <b>Tócalo</b> para cerrarlo y encender. 🔌',badge.textContent='🔌 Interruptor abierto';
+ else if(!R.on.size)m='El circuito está <b>abierto</b>: la corriente necesita un camino completo que salga del <b>+</b> y vuelva al <b>−</b>.',badge.textContent='Circuito abierto';
+ else if(R.kind==='simple'){const id=[...R.on.keys()][0],c=comp(id),v=R.on.get(id);m=`¡Muy bien! Es un <b>circuito simple</b>: la corriente sale del +, pasa por el ${LN[c.type]} y vuelve al −. ✨`+(v>=5.5?` ⚠️ Le llegan <b>${Math.round(v)} V</b>: ¡brilla muchísimo! Con más pilas se puede quemar.`:'');badge.textContent='✅ Circuito simple'}
+ else if(R.kind==='serie'){m=`¡Genial! Es un <b>circuito compuesto en serie</b>: ${R.on.size} receptores en un solo camino. Si quitas uno, se apagan todos.`;badge.textContent='✅ Circuito compuesto (serie)'}
+ else {m=`¡Excelente! Es un <b>circuito compuesto en paralelo</b>: cada receptor tiene su propio camino. Si quitas uno, los demás siguen funcionando.`;badge.textContent='✅ Circuito compuesto (paralelo)'}
+ if(R.on.size&&S.c.some(c=>c.type==='sw'))m+=' 🔌 El <b>interruptor</b> está cerrado: tócalo para abrirlo y apagar.';
+ say.innerHTML=m;
+ const k=R.kind;
+ if(k==='simple'&&!M.s){M.s=1;save(KEY,M);party('¡Misión cumplida: circuito simple! 🎉')}
+ if((k==='serie'||k==='paralelo')&&!M.c){M.c=1;save(KEY,M);party('¡Misión cumplida: circuito compuesto! 🎉')}
+ const bz=S.c.some(c=>c.type==='buzzer'&&!c.burned&&R.on.has(c.id));buzz(bz);
+ if(k&&k!==lastKind)ding();lastKind=k;
+ misions();
+}
+function misions(){
+ document.getElementById('mis').innerHTML=`<h3>🎯 Misiones</h3><div class="mi ${M.s?'ok':''}">Arma un circuito simple<em>${M.s?'Completado ✅':'Falta'}</em></div><div class="mi ${M.c?'ok':''}">Arma un circuito compuesto<em>${M.c?'Completado ✅':'Falta'}</em></div>${M.s&&M.c?'<div class="free">🔓 ¡Juego libre! Arma los circuitos que quieras.</div>':''}`;
+ document.getElementById('free').hidden=!(M.s&&M.c);
+}
+// ---------- sonido ----------
+let ac=null,bzT=0;
+const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,type,v){const a=actx();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(v||.12,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+d)}
+function ding(){[660,880,1320].forEach((f,i)=>setTimeout(()=>tone(f,.25,'triangle',.09),i*90))}
+function buzz(on){if(!!bzT===on)return;clearInterval(bzT);bzT=0;if(on){tone(980,.12,'sine',.025);bzT=setInterval(()=>tone(980,.12,'sine',.025),700)}}
+function pop(){const a=actx();if(!a)return;const b=a.createBuffer(1,a.sampleRate*.25,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);const s=a.createBufferSource(),g=a.createGain();g.gain.value=.25;s.buffer=b;s.connect(g).connect(a.destination);s.start()}
+function party(t){const b=document.createElement('canvas');b.className='boom';b.width=innerWidth;b.height=innerHeight;document.body.appendChild(b);const x=b.getContext('2d'),P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,c:`hsl(${Math.random()*360},90%,60%)`,s:4+Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,b.width,b.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<90)requestAnimationFrame(f);else b.remove()})();[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.3,'triangle',.12),i*120));setTimeout(()=>{say.innerHTML='<b>'+t+'</b>'},50)}
+// ---------- tamaño de la mesa ----------
+function fit(){const r=sv.getBoundingClientRect();if(!r.width)return;const nw=r.width<600?470:r.width<900?760:1000,nh=Math.round(nw*r.height/r.width);if(nw!==W||nh!==H){W=nw;H=Math.max(320,nh);sv.setAttribute('viewBox',`0 0 ${W} ${H}`);S.c.forEach(c=>{c.x=Math.min(W-70,Math.max(70,c.x));c.y=Math.min(H-50,Math.max(50,c.y))});render()}}
+addEventListener('resize',fit);
+const pt=e=>{const m=sv.getScreenCTM();const p=sv.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(m.inverse())};
+const near=(p,skip)=>{let best=null,bd=W<600?50:42;S.c.forEach(c=>T[c.type].t.forEach((_,i)=>{const id=c.id+':'+i;if(id===skip)return;const q=tp(id),d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=id}}));return best};
+// ---------- arrastrar desde la bandeja ----------
+let drag=null;
+tray.addEventListener('pointerdown',e=>{const b=e.target.closest('.it');if(!b||b.disabled)return;e.preventDefault();actx();const g=document.createElement('div');g.className='ghost';g.innerHTML=icon[b.dataset.k];g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);drag={k:'new',type:b.dataset.k,g,x0:e.clientX,y0:e.clientY}});
+addEventListener('pointermove',e=>{if(!drag)return;if(drag.k==='new'){drag.g.style.left=e.clientX+'px';drag.g.style.top=e.clientY+'px';return}const p=pt(e);drag.moved=drag.moved||Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>6;
+ if(drag.k==='move'&&drag.moved){const c=comp(drag.id);c.x=Math.min(W-40,Math.max(40,p.x-drag.dx));c.y=Math.min(H-30,Math.max(30,p.y-drag.dy));fastComp(c)}
+ if(drag.k==='we'){const w=S.w.find(w=>w.id===drag.id),e2=w[drag.end];if(e2.t){e2.t=null;render()}e2.x=p.x;e2.y=p.y;fastWire(w);const n=near(p,w[drag.end==='a'?'b':'a'].t);sv.querySelectorAll('.term.hot').forEach(x=>x.classList.remove('hot'));if(n){const el=sv.querySelector(`.term[data-t="${n}"]`);el&&el.classList.add('hot')}}});
+addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;
+ if(d.k==='new'){d.g.remove();const r=sv.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<8)say.innerHTML='Mantén presionado y <b>arrastra</b> la pieza hasta la mesa. 👉';return}const p=pt(e);
+  if(d.type==='cable'){const id='w'+S.n++;S.w.push({id,a:{t:near({x:p.x-70,y:p.y},null),x:p.x-70,y:p.y},b:{t:null,x:p.x+70,y:p.y}});sel=id}
+  else{const id='c'+S.n++;S.c.push({id,type:d.type,x:Math.min(W-90,Math.max(90,p.x)),y:Math.min(H-50,Math.max(50,p.y)),r:0});sel=id}
+  tone(520,.08,'sine',.08);render();return}
+ if(d.k==='we'){const w=S.w.find(w=>w.id===d.id),o=w[d.end==='a'?'b':'a'],n=near(pt(e),o.t);if(n){w[d.end].t=n;tone(900,.06,'square',.05)}
+  if(!d.moved&&d.fresh){S.w=S.w.filter(x=>x!==w)}render();return}
+ if(d.k==='move'&&!d.moved){const c=comp(d.id);if(c&&c.type==='sw'){c.open=!c.open;sel=d.id;tone(c.open?300:600,.06,'square',.06);render();return}sel=sel===d.id?null:d.id;render()}
+ if(d.k==='move'||d.k==='we')render();
+ if(d.k==='wire'){sel=sel===d.id?null:d.id;render()}
+});
+sv.addEventListener('pointerdown',e=>{actx();const p=pt(e),t=e.target.closest('[data-t],[data-we],[data-c],[data-w]');if(!t){sel=null;render();return}e.preventDefault();
+ if(t.dataset.t){const id='w'+S.n++;S.w.push({id,a:{t:t.dataset.t},b:{t:null,x:p.x,y:p.y}});drag={k:'we',id,end:'b',x0:e.clientX,y0:e.clientY,fresh:1};sel=null;render();return}
+ if(t.dataset.we){const[id,end]=t.dataset.we.split(':');drag={k:'we',id,end,x0:e.clientX,y0:e.clientY};return}
+ if(t.dataset.c){const c=comp(t.dataset.c);drag={k:'move',id:c.id,dx:p.x-c.x,dy:p.y-c.y,x0:e.clientX,y0:e.clientY};return}
+ if(t.dataset.w){drag={k:'wire',id:t.dataset.w,x0:e.clientX,y0:e.clientY}}
+});
+document.getElementById('rot').onclick=()=>{const c=sel&&comp(sel);if(!c)return void(say.innerHTML='Primero <b>toca una pieza</b> de la mesa para girarla.');c.r=(c.r+1)%4;render()};
+document.getElementById('del').onclick=()=>{if(!sel)return void(say.innerHTML='Primero <b>toca una pieza o un cable</b> para quitarlo.');if(comp(sel)){const id=sel;S.c=S.c.filter(c=>c.id!==id);S.w.forEach(w=>{['a','b'].forEach(k=>{if(w[k].t&&w[k].t.split(':')[0]===id){const p=ep(w[k]);w[k]={t:null,x:p.x,y:p.y}}})})}else S.w=S.w.filter(w=>w.id!==sel);sel=null;render()};
+document.getElementById('clr').onclick=()=>{S={c:[],w:[],n:S.n};sel=null;render()};
+addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&sel)document.getElementById('del').click();if(e.key==='r'&&sel)document.getElementById('rot').click()});
+misions();requestAnimationFrame(()=>{fit();render()});
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

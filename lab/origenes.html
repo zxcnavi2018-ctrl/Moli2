@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Orígenes de la vida · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.app{position:relative;z-index:1;flex:1;min-height:0;overflow:auto;padding:6px 14px 28px}
+.wrapc{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1.t{margin:4px 0 0;font-size:clamp(24px,4vw,40px);font-weight:900;text-align:center}
+p.s{margin:0;text-align:center;color:var(--ink2);font-weight:800}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px}
+.ch{position:relative;display:flex;flex-direction:column;gap:6px;min-height:190px;padding:16px;border:0;border-radius:24px;color:#fff;text-align:left;font:inherit;cursor:pointer;background:var(--g);box-shadow:0 16px 30px -12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .2s}
+.ch:hover{transform:translateY(-4px)}
+.ch .e{font-size:54px;line-height:1}
+.ch b{font-size:20px;font-weight:900}.ch small{font-weight:800;opacity:.92;font-size:14px}
+.ch .ok{position:absolute;top:10px;right:12px;padding:3px 10px;border-radius:99px;background:rgba(0,0,0,.3);font-size:12px;font-weight:900}
+.nar{display:flex;align-items:flex-end;gap:10px}
+.nar img{width:clamp(80px,13vw,120px);flex:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));animation:mbob 3s ease-in-out infinite}
+.bub{position:relative;flex:1;padding:14px 18px;border-radius:20px 20px 20px 6px;background:#fff;color:#14224a;font-weight:800;font-size:clamp(15px,2.1vw,21px);line-height:1.35;box-shadow:0 12px 26px rgba(0,0,0,.35);animation:sayIn .35s cubic-bezier(.2,1.4,.4,1)}
+.bub b{color:#6d28d9}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{padding:12px 20px;border-radius:16px;border:0;font:inherit;font-weight:900;font-size:16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#8b5cf6,#6d28d9);box-shadow:0 10px 20px -8px rgba(0,0,0,.6)}
+.btn.y{background:linear-gradient(135deg,#fde047,#f59e0b);color:#3b0764}.btn.g{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25)}
+.btn:active{transform:scale(.96)}.btn:disabled{opacity:.45}
+.stage{position:relative;width:100%;aspect-ratio:16/10;max-height:64vh;border-radius:24px;overflow:hidden;box-shadow:0 18px 40px -16px rgba(0,0,0,.7);touch-action:none;user-select:none}
+.hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;z-index:5;pointer-events:none}
+.hud span{padding:6px 12px;border-radius:99px;background:rgba(0,0,0,.45);font-weight:900;font-size:14px}
+.pop{position:absolute;z-index:6;font-weight:900;font-size:15px;padding:4px 10px;border-radius:99px;background:#fff;color:#14224a;transform:translate(-50%,-100%);animation:popUp 1.4s ease forwards;pointer-events:none;white-space:nowrap}
+@keyframes popUp{to{transform:translate(-50%,-220%);opacity:0}}
+/* panspermia */
+.sky{background:radial-gradient(120% 90% at 50% 120%,#3b0764,#0b1026 60%)}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.8;animation:tw 2s ease-in-out infinite}
+@keyframes tw{50%{opacity:.2}}
+.ground{position:absolute;left:0;right:0;bottom:0;height:30%;display:flex}
+.seg{height:100%;position:relative}
+.seg.l{background:linear-gradient(#a16207,#713f12)}
+.seg.w{background:linear-gradient(#38bdf8,#1d4ed8);box-shadow:inset 0 8px 0 rgba(255,255,255,.25)}
+.seg.w.life{background:linear-gradient(#34d399,#0f766e)}
+.seg .lf{position:absolute;bottom:20%;font-size:clamp(18px,3vw,30px);animation:grow .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes grow{from{transform:scale(0)}}
+.ufo{position:absolute;top:12%;width:clamp(80px,13vw,130px);translate:-50% 0;z-index:3;transition:none;filter:drop-shadow(0 0 18px rgba(103,232,249,.6))}
+.ufo .beam{position:absolute;left:30%;right:30%;top:80%;height:40%;background:linear-gradient(rgba(103,232,249,.5),transparent);clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);opacity:0;transition:.2s}
+.ufo.drop .beam{opacity:1}
+.sp{position:absolute;z-index:2;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,#bef264,#16a34a);box-shadow:0 0 10px #a3e635;translate:-50% 0}
+.ctl{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+/* sopa */
+.lab2{background:radial-gradient(90% 70% at 50% 0%,#7c2d12,#1c1917 70%)}
+.volc{position:absolute;bottom:34%;font-size:clamp(40px,7vw,70px)}
+.pot{position:absolute;left:12%;right:12%;bottom:0;height:36%;border-radius:50% 50% 0 0/30% 30% 0 0;background:linear-gradient(#0ea5e9,#1e3a8a);overflow:hidden;box-shadow:inset 0 10px 0 rgba(255,255,255,.2)}
+.pot .m{position:absolute;font-size:clamp(16px,2.6vw,26px);animation:swim 3s ease-in-out infinite alternate}
+@keyframes swim{to{transform:translate(14px,-10px) rotate(20deg)}}
+.zap{position:absolute;top:0;font-size:clamp(40px,8vw,80px);animation:zap .5s steps(2) 4}
+@keyframes zap{50%{opacity:0}}
+.ings{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.ing{padding:10px;border-radius:14px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:var(--ink);font:inherit;font-weight:900;font-size:15px;cursor:pointer}
+.ing.on{border-color:#4ade80;background:rgba(34,197,94,.22)}
+.ing.bad{border-color:#f87171;background:rgba(239,68,68,.22);animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.steps{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.steps i{font-style:normal;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.1);font-weight:900;opacity:.35;transition:.4s}
+.steps i.on{opacity:1;background:linear-gradient(135deg,#22c55e,#0d9488)}
+/* redi */
+.kitchen{background:linear-gradient(#fef3c7,#fde68a 70%,#b45309 70%)}
+.jar{position:absolute;bottom:22%;width:26%;height:52%;border:4px solid rgba(15,23,42,.6);border-top:0;border-radius:0 0 26px 26px;background:rgba(255,255,255,.35)}
+.jar .meat{position:absolute;left:12%;right:12%;bottom:6%;height:24%;border-radius:40% 40% 20% 20%;background:linear-gradient(#f87171,#991b1b)}
+.jar .lid{position:absolute;left:-6%;right:-6%;top:-6px;height:14px;border-radius:6px;background:repeating-linear-gradient(90deg,#e5e7eb 0 4px,#9ca3af 4px 6px)}
+.jar .lab{position:absolute;top:-38px;left:0;right:0;text-align:center;font-weight:900;color:#1e293b;font-size:clamp(12px,1.8vw,17px)}
+.jar .wo{position:absolute;bottom:22%;font-size:clamp(14px,2.4vw,24px);animation:grow .5s}
+.fly{position:absolute;font-size:clamp(16px,2.6vw,26px);transition:left 1.2s ease,top 1.2s ease;z-index:3}
+.day{position:absolute;top:10px;right:12px;padding:6px 12px;border-radius:99px;background:#1e293b;color:#fde047;font-weight:900}
+/* creacion */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px}
+.card{padding:14px;border-radius:18px;border:3px solid transparent;background:rgba(255,255,255,.08);color:var(--ink);font:inherit;font-weight:800;font-size:15px;text-align:left;cursor:pointer;line-height:1.35}
+.card.sel{border-color:#fde047}.card.done{border-color:#4ade80;background:rgba(34,197,94,.18);cursor:default}
+.card b{display:block;font-size:13px;letter-spacing:.08em;color:var(--ink2);margin-bottom:4px}
+.q{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.q h3{margin:0;font-size:clamp(17px,2.4vw,22px)}
+.opt{padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-weight:800;font-size:15px;text-align:left;cursor:pointer}
+.opt.ok{border-color:#4ade80;background:rgba(34,197,94,.25)}.opt.no{border-color:#f87171;background:rgba(239,68,68,.2)}
+.learn{padding:16px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(14,165,233,.25));border:1px solid rgba(255,255,255,.2);font-weight:800;line-height:1.45;font-size:clamp(15px,2vw,19px)}
+.learn h3{margin:0 0 6px;font-size:clamp(18px,2.6vw,24px)}
+.cls{display:flex;flex-direction:column;gap:8px}
+.cl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.07);font-weight:800}
+.cl span{flex:1;min-width:200px}
+.cl button{padding:8px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.2);background:transparent;color:var(--ink);font:inherit;font-weight:900;cursor:pointer}
+.cl button.ok{border-color:#4ade80;background:rgba(34,197,94,.25)}.cl button.no{border-color:#f87171;background:rgba(239,68,68,.2)}
+@media (max-width:640px){.stage{aspect-ratio:4/5;max-height:58vh}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🌍 Orígenes de la vida</b><span class="chip" id="prog"></span></header>
+<main class="app" id="app"></main>
+<script>
+const U=new URLSearchParams(location.search).get('u')||'anon',KEY='lab:'+U+':orig';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}},save=v=>{try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}};{const o=load(),K=['pan','qui','gen','cre'],n={};K.forEach(k=>o[k]&&(n[k]=true));Object.keys(o).length!==Object.keys(n).length&&save(n)}
+const A=document.getElementById('app'),M=n=>`../img/moli/${n}.webp`;
+const nar=(img,html)=>`<div class="nar"><img src="${M(img)}" alt="Molí"><div class="bub">${html}</div></div>`;
+const CH=[
+ {k:'pan',e:'🛸',t:'Panspermia',s:'¡Y vinieron del espacio!',g:'linear-gradient(150deg,#6366f1,#312e81)'},
+ {k:'qui',e:'🌋',t:'Quimiosíntesis',s:'La sopa primitiva',g:'linear-gradient(150deg,#f97316,#7c2d12)'},
+ {k:'gen',e:'🪰',t:'Generación espontánea',s:'El experimento de Redi',g:'linear-gradient(150deg,#eab308,#854d0e)'},
+ {k:'cre',e:'📜',t:'Creacionismo',s:'Relatos de los pueblos',g:'linear-gradient(150deg,#ec4899,#831843)'}
+];
+function prog(){const d=load(),n=CH.filter(c=>d[c.k]).length;document.getElementById('prog').textContent=`⭐ ${n}/${CH.length}`}
+function done(k){const d=load();d[k]=true;save(d);prog()}
+function snd(f,t=.12){try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),v=a.createGain();o.type='triangle';o.frequency.value=f;v.gain.setValueAtTime(.06,a.currentTime);v.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t);o.connect(v).connect(a.destination);o.start();o.stop(a.currentTime+t)}catch(e){}}
+function pop(stage,x,y,txt){const p=document.createElement('div');p.className='pop';p.style.left=x+'px';p.style.top=y+'px';p.textContent=txt;stage.appendChild(p);setTimeout(()=>p.remove(),1400)}
+let cleanup=null;function go(f){cleanup&&cleanup();cleanup=null;A.scrollTop=0;f()}
+
+function menu(){const d=load();A.innerHTML=`<div class="wrapc"><h1 class="t">¿Cómo empezó la vida en la Tierra?</h1><p class="s">Hace mucho, mucho tiempo, la Tierra no tenía ningún ser vivo… Las personas pensaron distintas respuestas. ¡Vívelas una por una!</p>${nar('curiosa','¡Hola! Soy Molí 🤖. Elige una historia y <b>juégala</b>. Al final de cada una te haré una preguntita.')}<div class="menu">${CH.map(c=>`<button class="ch" style="--g:${c.g}" data-c="${c.k}">${d[c.k]?'<span class="ok">✅ Lista</span>':''}<span class="e">${c.e}</span><b>${c.t}</b><small>${c.s}</small></button>`).join('')}</div></div>`;
+A.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>go(()=>({pan,qui,gen,cre})[b.dataset.c]()))}
+
+/* final check shared */
+function check(k,learnH,q,opts,ok,next){const W=A.querySelector('.wrapc')||A;W.insertAdjacentHTML('beforeend',`<div class="learn" id="lrn">${learnH}</div><div class="q" id="chk"><h3>🤖 Molí pregunta: ${q}</h3>${opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><div class="row" id="fin"></div>`);
+const Q=document.getElementById('chk');Q.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(Q.dataset.d)return;const i=+b.dataset.i;if(i===ok){b.classList.add('ok');Q.dataset.d=1;done(k);snd(880,.3);document.getElementById('fin').innerHTML=`<button class="btn y" id="nx">${next?'Siguiente historia ›':'¡Terminé! Volver al inicio'}</button><button class="btn g" id="mn">Elegir otra</button>`;document.getElementById('nx').onclick=()=>go(next||menu);document.getElementById('mn').onclick=()=>go(menu);setTimeout(()=>document.getElementById('fin')?.scrollIntoView({behavior:'smooth',block:'center'}),100)}else{b.classList.add('no');snd(180,.25)}});setTimeout(()=>document.getElementById('lrn')?.scrollIntoView({behavior:'smooth',block:'start'}),150)}
+
+/* 1. PANSPERMIA */
+function pan(){A.innerHTML=`<div class="wrapc"><h1 class="t">🛸 ¡Y vinieron del espacio!</h1>${nar('sorpresa','Hace <b>4 mil millones de años</b> la Tierra estaba vacía: rocas, agua y nada de vida… De pronto, algo llegó del espacio trayendo <b>esporas</b>: semillitas de vida. ¡Tú manejas la nave! Muévela y suelta esporas. <b>Solo crecen si caen en el agua.</b>')}
+<div class="stage sky" id="st"><div class="hud"><span id="cnt">🌱 Vida: 0/5</span><span id="miss">💨 Perdidas: 0</span></div><div class="ufo" id="ufo"><div class="beam"></div><svg viewBox="0 0 120 60"><ellipse cx="60" cy="38" rx="56" ry="14" fill="#94a3b8"/><ellipse cx="60" cy="34" rx="56" ry="12" fill="#cbd5e1"/><path d="M32 30 Q60 -4 88 30Z" fill="#67e8f9" opacity=".85"/><circle cx="25" cy="38" r="4" fill="#fde047"/><circle cx="45" cy="42" r="4" fill="#4ade80"/><circle cx="75" cy="42" r="4" fill="#f472b6"/><circle cx="95" cy="38" r="4" fill="#fde047"/></svg></div><div class="ground" id="gr"></div></div>
+<div class="ctl"><button class="btn g" id="lf">◀</button><button class="btn y" id="dr">🌱 Soltar esporas</button><button class="btn g" id="rt">▶</button></div><p class="s">También puedes mover el dedo o el ratón sobre el cielo y tocar para soltar.</p></div>`;
+const st=document.getElementById('st'),ufo=document.getElementById('ufo'),gr=document.getElementById('gr');
+for(let i=0;i<40;i++){const s=document.createElement('i');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*65+'%';s.style.animationDelay=Math.random()*2+'s';st.appendChild(s)}
+const SEG=[['l',10],['w',16],['l',18],['w',14],['l',16],['w',14],['l',12]];let acc=0;const water=[];SEG.forEach(([t,w])=>{const d=document.createElement('div');d.className='seg '+t;d.style.width=w+'%';gr.appendChild(d);t==='w'&&water.push({a:acc,b:acc+w,el:d,n:0});acc+=w});
+let x=50,tx=50,life=0,miss=0,raf,dropping=0,fin=0;
+const loop=()=>{x+=(tx-x)*.12;ufo.style.left=x+'%';raf=requestAnimationFrame(loop)};loop();
+const keys=e=>{e.key==='ArrowLeft'&&(tx=Math.max(6,tx-8));e.key==='ArrowRight'&&(tx=Math.min(94,tx+8));(e.key===' '||e.key==='Enter')&&(e.preventDefault(),drop())};addEventListener('keydown',keys);
+st.addEventListener('pointermove',e=>{const r=st.getBoundingClientRect();tx=Math.max(6,Math.min(94,(e.clientX-r.left)/r.width*100))});
+st.addEventListener('pointerdown',e=>{const r=st.getBoundingClientRect();tx=Math.max(6,Math.min(94,(e.clientX-r.left)/r.width*100));setTimeout(drop,120)});
+document.getElementById('lf').onclick=()=>tx=Math.max(6,tx-10);document.getElementById('rt').onclick=()=>tx=Math.min(94,tx+10);document.getElementById('dr').onclick=drop;
+function drop(){if(dropping||fin)return;dropping=1;ufo.classList.add('drop');snd(520);const px=x,s=document.createElement('div');s.className='sp';s.style.left=px+'%';s.style.top='22%';st.appendChild(s);
+s.animate([{top:'22%'},{top:'72%'}],{duration:900,easing:'ease-in'}).onfinish=()=>{s.remove();ufo.classList.remove('drop');dropping=0;const w=water.find(w=>px>=w.a&&px<=w.b),r=st.getBoundingClientRect(),X=px/100*r.width,Y=r.height*.7;
+if(w){life++;w.n++;w.el.classList.add('life');const lf=document.createElement('span');lf.className='lf';lf.style.left=((px-w.a)/(w.b-w.a)*80+5)+'%';lf.textContent=['🦠','🧫','🌿','🪸','🦠'][life%5];w.el.appendChild(lf);pop(st,X,Y,'¡Nació vida! 🦠');snd(760,.2)}else{miss++;pop(st,X,Y,'Se secó en la roca 💨');snd(200,.2)}
+document.getElementById('cnt').textContent=`🌱 Vida: ${Math.min(life,5)}/5`;document.getElementById('miss').textContent=`💨 Perdidas: ${miss}`;
+if(life>=5&&!fin){fin=1;setTimeout(()=>check('pan',`<h3>🛸 Panspermia</h3>Esta teoría dice que <b>la vida (o sus "semillas", como esporas y bacterias) llegó a la Tierra desde el espacio</b>, viajando en <b>meteoritos y cometas</b>. Al caer en el agua de la Tierra, empezó a crecer.<br>👀 Ojo: los científicos hablan de meteoritos, no de ovnis de verdad. ¡El ovni fue solo para jugar! 😉`,'Según la panspermia, ¿de dónde vino la vida?',['Del espacio, en meteoritos o cometas','De la carne podrida','De una sopa de gases en el océano'],0,qui),400)}}}
+cleanup=()=>{cancelAnimationFrame(raf);removeEventListener('keydown',keys)}}
+
+/* 2. QUIMIOSINTESIS */
+function qui(){const I=[['agua','💧 Agua (H₂O)',1],['met','🟢 Metano (CH₄)',1],['amo','🔵 Amoníaco (NH₃)',1],['hid','⚪ Hidrógeno (H₂)',1],['oxi','🔴 Oxígeno (O₂)',0,'¡Ups! En la Tierra joven <b>casi no había oxígeno</b> en el aire.'],['piz','🍕 Pizza',0,'Jaja, ¡todavía no existían las pizzas! 🍕'],['ray','⚡ Rayos',2],['vol','🌋 Volcanes',2],['uv','☀️ Luz ultravioleta',2]];
+A.innerHTML=`<div class="wrapc"><h1 class="t">🌋 La sopa primitiva</h1>${nar('idea','Un científico ruso, <b>Alexander Oparin</b>, imaginó que la vida nació en el mar de la Tierra joven, como una <b>sopa caliente</b>. ¡Cocinémosla! Echa al océano los <b>4 gases</b> que había y al menos <b>1 fuente de energía</b>.')}
+<div class="stage lab2" id="st"><div class="hud"><span id="gc">🧪 Gases: 0/4</span><span id="ec">⚡ Energía: 0</span></div><span class="volc" style="left:6%">🌋</span><span class="volc" style="right:6%">🌋</span><div class="pot" id="pot"></div></div>
+<div class="ings">${I.map(i=>`<button class="ing" data-k="${i[0]}">${i[1]}</button>`).join('')}</div>
+<div class="row"><button class="btn y" id="mix" disabled>⏳ Mezclar y esperar millones de años</button></div><div class="steps" id="steps"><i>💧 Gases + energía</i><i>🧩 Moléculas simples</i><i>🔗 Aminoácidos</i><i>🫧 Coacervados</i><i>🦠 ¡Primera célula!</i></div><p class="s" id="msg"></p></div>`;
+const pot=document.getElementById('pot'),st=document.getElementById('st'),on=new Set();let g=0,e=0;
+A.querySelectorAll('.ing').forEach(b=>b.onclick=()=>{const it=I.find(i=>i[0]===b.dataset.k);if(on.has(it[0]))return;if(!it[2]){b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad');document.getElementById('msg').innerHTML=it[3];snd(180,.25);return}
+on.add(it[0]);b.classList.add('on');snd(600);if(it[2]===1){g++;const m=document.createElement('span');m.className='m';m.style.left=(10+Math.random()*75)+'%';m.style.top=(15+Math.random()*55)+'%';m.textContent=it[1].split(' ')[0];pot.appendChild(m)}else{e++;const z=document.createElement('span');z.className='zap';z.style.left=(30+Math.random()*40)+'%';z.textContent=it[1].split(' ')[0];st.appendChild(z);setTimeout(()=>z.remove(),2200)}
+document.getElementById('gc').textContent=`🧪 Gases: ${g}/4`;document.getElementById('ec').textContent=`⚡ Energía: ${e}`;document.getElementById('msg').textContent=g<4?'Sigue echando los gases que había en la Tierra joven…':e<1?'¡Falta energía para que reaccionen!':'¡Listo! Ahora mezcla.';document.getElementById('mix').disabled=!(g>=4&&e>=1)});
+document.getElementById('mix').onclick=function(){this.disabled=1;A.querySelectorAll('.ing').forEach(b=>b.disabled=1);const S=document.querySelectorAll('#steps i'),em=['🧩','🔗','🫧','🦠'];let k=0;const t=setInterval(()=>{S[k].classList.add('on');if(k>0){for(let j=0;j<4;j++){const m=document.createElement('span');m.className='m';m.style.left=(8+Math.random()*80)+'%';m.style.top=(10+Math.random()*60)+'%';m.textContent=em[k-1];pot.appendChild(m)}}snd(400+k*120);k++;if(k>=S.length){clearInterval(t);pop(st,st.clientWidth/2,st.clientHeight*.6,'🦠 ¡Nació la primera célula!');
+setTimeout(()=>check('qui',`<h3>🌋 Quimiosíntesis (teoría de Oparin)</h3>La vida se formó <b>poco a poco en los océanos de la Tierra joven</b>: gases como agua, metano, amoníaco e hidrógeno, con la <b>energía</b> de rayos, volcanes y luz del Sol, formaron moléculas cada vez más complejas, hasta llegar a la <b>primera célula</b>. En 1953, <b>Stanley Miller</b> lo probó en un laboratorio: ¡con gases y chispas eléctricas obtuvo aminoácidos!`,'¿Qué hizo falta, además de los gases, para formar las primeras moléculas de la vida?',['Energía de rayos, volcanes o el Sol','Oxígeno del aire','Carne en un frasco'],0,gen),600)}},900)};}
+
+/* 3. GENERACION ESPONTANEA */
+function gen(){A.innerHTML=`<div class="wrapc"><h1 class="t">🪰 ¿Los gusanos salen de la carne?</h1>${nar('pensativa','Hace mucho tiempo, la gente creía que la vida <b>salía sola de cosas sin vida</b>: ¡que los gusanos nacían de la carne podrida y los ratones de ropa sucia con trigo! A esto le llamaron <b>generación espontánea</b>. En 1668, el italiano <b>Francesco Redi</b> hizo un experimento para comprobarlo. ¡Hazlo tú!')}
+<div class="stage kitchen" id="st"><span class="day" id="day">Día 0</span><div class="jar" style="left:14%"><span class="lab">Frasco A · abierto</span><div class="meat"></div></div><div class="jar" style="right:14%"><div class="lid"></div><span class="lab">Frasco B · tapado con tela</span><div class="meat"></div></div></div>
+<div class="q" id="pred"><h3>🤔 Antes de empezar: ¿en qué frasco crees que aparecerán gusanos?</h3><button class="opt" data-p="a">En el frasco A (abierto)</button><button class="opt" data-p="b">En el frasco B (tapado)</button><button class="opt" data-p="ab">En los dos</button></div>
+<div class="row"><button class="btn y" id="dbtn" disabled>☀️ Pasar un día</button></div><p class="s" id="msg">Primero elige tu predicción.</p></div>`;
+const st=document.getElementById('st');let day=0,pred='';const J=[...st.querySelectorAll('.jar')];
+A.querySelectorAll('#pred .opt').forEach(b=>b.onclick=()=>{if(pred)return;pred=b.dataset.p;b.classList.add('ok');document.getElementById('dbtn').disabled=0;document.getElementById('msg').textContent='¡Anotado! Ahora pasa los días y observa.'});
+const fly=(x,y)=>{const f=document.createElement('span');f.className='fly';f.textContent='🪰';f.style.left=(Math.random()*90)+'%';f.style.top='5%';st.appendChild(f);setTimeout(()=>{f.style.left=x;f.style.top=y},50);return f};
+document.getElementById('dbtn').onclick=function(){day++;document.getElementById('day').textContent='Día '+day;snd(500+day*80);const m=document.getElementById('msg');
+if(day===1){fly('22%','52%');fly('70%','24%');fly('78%','22%');m.innerHTML='Las <b>moscas</b> huelen la carne y llegan a los dos frascos…'}
+if(day===2){fly('26%','60%');m.innerHTML='En el frasco A las moscas <b>se posan en la carne</b> y ponen huevitos. En el B se quedan <b>sobre la tela</b>: no pueden entrar.'}
+if(day===3){for(let i=0;i<5;i++){const w=document.createElement('span');w.className='wo';w.textContent='🐛';w.style.left=(14+i*14)+'%';J[0].appendChild(w)}const e=document.createElement('span');e.className='wo';e.textContent='🥚';e.style.cssText='top:-26px;bottom:auto;left:40%';J[1].appendChild(e);
+m.innerHTML='¡Mira! <b>Solo en el frasco A aparecieron gusanos</b> (larvas de mosca). En el B, la carne está sin gusanos; los huevos quedaron en la tela.';this.disabled=1;
+setTimeout(()=>{A.querySelector('.wrapc').insertAdjacentHTML('beforeend',nar(pred==='a'?'feliz':'guino',pred==='a'?'¡Acertaste tu predicción! 🎉':'Tu predicción no se cumplió, ¡y así se aprende en ciencia! 🔬'));check('gen',`<h3>🪰 Generación espontánea: ¡NO es así!</h3>Se creía que la vida salía sola de cosas sin vida. El experimento de <b>Redi</b> mostró que <b>los gusanos salen de los huevos de las moscas</b>, no de la carne. Después, en 1862, <b>Louis Pasteur</b> lo comprobó con microbios usando frascos de cuello de cisne. Hoy sabemos que <b>todo ser vivo viene de otro ser vivo</b>: a eso se le llama <b>biogénesis</b>.`,'¿Por qué no salieron gusanos en el frasco tapado?',['Porque las moscas no pudieron poner sus huevos en la carne','Porque la carne tapada no se pudre nunca','Porque los gusanos nacen solo de noche'],0,cre)},700)}}}
+
+/* 4. CREACIONISMO */
+function cre(){const S=[['bib','Un ser divino creó el cielo, la tierra, las plantas, los animales y al ser humano en seis días, y el séptimo descansó.','📖 La Biblia (judíos y cristianos)'],['inc','Del lago Titicaca salió Wiracocha, quien creó el Sol, la Luna, las estrellas y a los primeros seres humanos.','🏔️ Los incas'],['may','Los dioses intentaron crear al ser humano con barro y con madera, y al final lo hicieron con masa de maíz.','🌽 Los mayas (Popol Vuh)']],Ord=[...S].sort(()=>Math.random()-.5);
+A.innerHTML=`<div class="wrapc"><h1 class="t">📜 Relatos de los pueblos</h1>${nar('timida','Desde siempre, los pueblos del mundo contaron <b>relatos sobre cómo se creó la vida</b>. El <b>creacionismo</b> dice que la vida fue creada por un ser divino. Es una <b>creencia de fe</b> que muchas familias respetan. 🤝 Une cada relato con el pueblo que lo cuenta: toca un relato y luego su pueblo.')}
+<div class="cards">${S.map((s,i)=>`<button class="card" data-s="${s[0]}"><b>RELATO ${i+1}</b>${s[1]}</button>`).join('')}</div><div class="row">${Ord.map(s=>`<button class="btn g" data-p="${s[0]}">${s[2]}</button>`).join('')}</div><p class="s" id="msg">Toca un relato.</p><div id="part2"></div></div>`;
+let sel=null,ok=0;A.querySelectorAll('.card').forEach(c=>c.onclick=()=>{if(c.classList.contains('done'))return;A.querySelectorAll('.card').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');sel=c.dataset.s;document.getElementById('msg').textContent='Ahora toca el pueblo que lo cuenta.'});
+A.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{if(!sel)return document.getElementById('msg').textContent='Primero toca un relato.';const c=A.querySelector(`.card[data-s="${sel}"]`);if(b.dataset.p===sel){c.classList.remove('sel');c.classList.add('done');c.querySelector('b').textContent='✅ '+S.find(s=>s[0]===sel)[2];b.disabled=1;ok++;sel=null;snd(760);document.getElementById('msg').textContent=ok<3?'¡Muy bien! Sigue con otro relato.':'¡Uniste los 3 relatos! 🎉';ok===3&&part2()}else{snd(180,.25);document.getElementById('msg').textContent='Ese no es. ¡Intenta otro pueblo!'}});
+function part2(){const C=[['El mundo fue creado por un ser divino.','f'],['Redi mostró con frascos que los gusanos salen de huevos de mosca.','c'],['Wiracocha creó el Sol y la Luna.','f'],['Miller obtuvo aminoácidos con gases y chispas eléctricas.','c']];
+document.getElementById('part2').innerHTML=`${nar('decidida','En <b>ciencias</b> estudiamos lo que se puede <b>comprobar con experimentos y evidencias</b>. Las <b>creencias</b> se basan en la fe. ¿Cuál es cuál?')}<div class="cls">${C.map((c,i)=>`<div class="cl" data-a="${c[1]}"><span>${c[0]}</span><button data-v="f">🙏 Creencia</button><button data-v="c">🔬 Ciencia</button></div>`).join('')}</div>`;
+let r=0;document.querySelectorAll('.cl').forEach(l=>l.querySelectorAll('button').forEach(b=>b.onclick=()=>{if(l.dataset.d)return;if(b.dataset.v===l.dataset.a){b.classList.add('ok');l.dataset.d=1;r++;snd(760);r===C.length&&check('cre',`<h3>📜 Creacionismo</h3>Dice que <b>la vida fue creada por un ser divino</b>. Hay muchos relatos: el de la Biblia, el de los incas con Wiracocha, el de los mayas con el maíz… Son <b>creencias de fe</b> que merecen respeto. La diferencia con las teorías científicas es que <b>no se comprueban con experimentos</b>.`,'¿Qué diferencia al creacionismo de una teoría científica?',['Se basa en la fe y no se comprueba con experimentos','Usa frascos y microscopios','Dice que la vida vino en meteoritos'],0,null)}else{b.classList.add('no');snd(180,.25);setTimeout(()=>b.classList.remove('no'),600)}}))}}
+
+prog();menu();
+</script>
+</body>
+</html>

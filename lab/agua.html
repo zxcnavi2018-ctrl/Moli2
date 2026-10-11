@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Laboratorio del agua · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#0c3a5c,#03111f 70%)}
+.main{flex:1;min-height:0;overflow:auto;width:min(100%,1000px);margin:0 auto;padding:0 10px 12px;display:flex;flex-direction:column;gap:8px}
+.main>*{flex:none}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tabs button{padding:8px 4px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-weight:900;font-size:13px;line-height:1.15;cursor:pointer}
+.tabs button.on{background:linear-gradient(135deg,#0ea5e9,#4338ca);border-color:#bae6fd;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.bench{position:relative;border-radius:22px;overflow:hidden;box-shadow:0 16px 34px rgba(0,0,0,.45);background:#0b2540;touch-action:none}
+.bench svg{display:block;width:100%;height:auto;max-height:min(54dvh,520px);margin:0 auto}
+.bench.drop{box-shadow:0 0 0 3px #fde047,0 16px 34px rgba(0,0,0,.45)}
+.hud:empty{display:none}
+.hud{position:absolute;left:10px;top:8px;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,.45);font-weight:900;font-size:13px}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:16px;border:0;background:linear-gradient(160deg,#fff,#dbeafe);color:#14224a;font:inherit;font-weight:900;font-size:12px;line-height:1.1;cursor:grab;touch-action:none;user-select:none;box-shadow:0 8px 16px rgba(0,0,0,.35);transition:transform .15s}
+.tool .em{font-size:28px;line-height:1.1}
+.tool:hover{transform:translateY(-3px)}
+.tool.alt{background:linear-gradient(160deg,#fde68a,#fbbf24)}
+.ghost{position:fixed;z-index:50;pointer-events:none;width:92px;transform:translate(-50%,-50%) rotate(-6deg) scale(1.1)}
+.exp{padding:12px 14px;border-radius:18px;background:#fff;color:#14224a;font-weight:700;font-size:14px;line-height:1.45;box-shadow:0 12px 26px rgba(0,0,0,.4)}
+.exp h3{margin:0 0 3px;font-size:16px}
+.exp.flash{animation:fl .6s}
+@keyframes fl{30%{transform:scale(1.02);box-shadow:0 0 0 4px #fde047}}
+.mini{display:flex;gap:6px;flex-wrap:wrap}
+.mini .mi{flex:1 1 150px;font-size:12px;padding:6px 10px}
+.moli-say{left:auto;right:8px;top:8px;bottom:auto;flex-direction:row-reverse;align-items:flex-start;max-width:min(420px,calc(100% - 16px))}
+.moli-say img{width:46px}
+.moli-say p{margin:40px 0 0;border-radius:16px 4px 16px 16px;font-size:13.5px}
+.moli-say::after{left:auto;right:34px;bottom:auto;top:30px}
+.lab-top{padding-right:62px}
+@media (max-width:600px){.tabs{grid-template-columns:repeat(2,1fr)}.tabs button{font-size:12.5px}.tools{grid-template-columns:repeat(4,1fr);gap:6px}.tool{font-size:11px;padding:6px 2px}.tool .em{font-size:24px}.exp{font-size:13px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>💧 Laboratorio del agua</b></header>
+<div class="main">
+  <div class="tabs" id="tabs"></div>
+  <div class="bench" id="bench"><svg id="sv" viewBox="0 0 600 340"></svg><span class="hud" id="hud"></span></div>
+  <div class="tools" id="tools"></div>
+  <div class="exp" id="exp"></div>
+  <div class="mini" id="mis"></div>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':tens',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const $=id=>document.getElementById(id),say=$('say'),sv=$('sv');let MI=load(KEY,{});
+const win=(k,msg)=>{if(MI[k])return;MI[k]=1;save(KEY,MI);mis();tabs();fanfare();say.innerHTML='🎉 <b>¡Misión cumplida!</b> '+msg;const e=$('exp');e.classList.remove('flash');void e.offsetWidth;e.classList.add('flash')};
+const BG='<defs><linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16406a"/><stop offset="1" stop-color="#0b2540"/></linearGradient><linearGradient id="wat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc" stop-opacity=".85"/><stop offset="1" stop-color="#0284c7" stop-opacity=".9"/></linearGradient><linearGradient id="gl" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".2" stop-color="#fff" stop-opacity=".05"/><stop offset=".8" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient></defs><rect width="600" height="340" fill="url(#wall)"/><g opacity=".25" stroke="#7dd3fc"><path d="M0 60h600M0 120h600M0 180h600M100 0v320M200 0v320M300 0v320M400 0v320M500 0v320"/></g><rect y="312" width="600" height="28" fill="#8b5a2b"/><rect y="308" width="600" height="6" fill="#a16207"/>';
+const clipSvg=(x,y,r=0)=>`<g transform="translate(${x} ${y}) rotate(${r})"><path d="M-16 0 h28 a5 5 0 0 0 0 -8 h-26 a4 4 0 0 0 0 6 h22" fill="none" stroke="#cbd5e1" stroke-width="2.4" stroke-linecap="round"/></g>`;
+// ================= 1. TENSIÓN SUPERFICIAL =================
+const S1={n:'🫧 Tensión superficial',y0:170,
+ tools:[['clip','📎','Clip'],['bug','🦗','Insecto zapatero'],['coin','🪙','Moneda'],['pep','🧂','Pimienta'],['soap','🧴','Jabón líquido'],['new','🔄','Agua nueva',1]],
+ init(){this.soap=0;this.o=[];this.pep=[];this.rip=[];this.drop=null;this.fl=0;$('hud').textContent='';exp('🫧 Tensión superficial','La superficie del agua es como una <b>piel elástica</b>: sus moléculas se atraen muy fuerte entre sí. Por eso cosas livianas pueden <b>flotar sobre ella</b> aunque sean de metal. Prueba con el clip 📎 y luego echa jabón 🧴.')},
+ use(k,x){x=Math.max(130,Math.min(470,x??300));const y0=this.y0;
+  if(k==='new'){this.init();tone(500,.1,'sine');return}
+  if(k==='clip'||k==='bug'||k==='coin'){this.o.push({k,x,y:40,vy:0,st:'fall'});tone(700,.06,'sine');return}
+  if(k==='pep'){for(let i=0;i<46;i++)this.pep.push({x:110+Math.random()*380,tx:null});shake();say.innerHTML='🧂 La pimienta queda <b>sobre</b> el agua: la tensión superficial la sostiene. Ahora echa una gota de <b>jabón</b> 🧴 en el centro.';return}
+  if(k==='soap'){this.drop={x,y:40}}},
+ step(dt){const y0=this.y0;
+  if(this.drop){this.drop.y+=dt*260;if(this.drop.y>=y0){const sx=this.drop.x;this.drop=null;this.soap=1;this.rip.push({x:sx,r:0});plop();
+    this.pep.forEach(p=>p.tx=p.x<sx?95+Math.random()*24:481+Math.random()*24);let sank=0;this.o.forEach(o=>{if(o.st==='float'){o.st='sink';sank++}});
+    say.innerHTML=sank?'🧴 ¡El jabón <b>rompió la tensión superficial</b>! La "piel" del agua se debilitó y lo que flotaba <b>se hundió</b>.':this.pep.length?'🧴 ¡Mira la pimienta! El jabón debilita la tensión superficial en el centro y la "piel" del agua <b>jala la pimienta hacia los bordes</b>.':'🧴 Echaste jabón: ahora la tensión superficial es más débil. Prueba poner un clip.';
+    exp('🧴 El jabón rompe la tensión','El jabón se mete entre las moléculas del agua y <b>debilita su atracción</b>. La "piel" del agua ya no aguanta peso: por eso el clip se hunde. Los insectos zapateros no podrían caminar en agua con jabón.');
+    if(sank&&this.fl)win('ten','Hiciste flotar un objeto de metal y rompiste la tensión con jabón.');if(this.pep.length&&this.fl)win('ten','¡Tensión superficial comprobada!')}}
+  this.o.forEach(o=>{const light=o.k!=='coin';
+   if(o.st==='fall'){o.vy=Math.min(o.vy+dt*400,o.k==='coin'?260:70);o.y+=o.vy*dt;if(o.y>=y0-3){if(light&&!this.soap){o.y=y0-3;o.st='float';this.fl=1;plip();
+      say.innerHTML=o.k==='bug'?'🦗 El <b>insecto zapatero</b> camina sobre el agua sin hundirse: ¡usa la tensión superficial!':'📎 ¡El clip <b>flota</b>! Es de metal, pero la tensión superficial lo sostiene como una cama elástica. Ahora echa <b>jabón</b> 🧴.';
+      exp('📎 ¡Flota sobre la "piel" del agua!','Mira cómo el agua se <b>hunde un poquito</b> debajo del clip, como una cama elástica. Esa es la <b>tensión superficial</b>.')}
+     else{o.st='sink';plop();if(o.k==='coin')say.innerHTML='🪙 La moneda es <b>muy pesada</b>: rompe la "piel" del agua y se hunde. La tensión superficial solo sostiene cosas livianas.'}}}
+   else if(o.st==='sink'){o.y=Math.min(296,o.y+dt*(o.k==='coin'?160:60))}
+   else if(o.st==='float'&&o.k==='bug'){o.x+=Math.sin(performance.now()/500+o.y)*dt*20;o.x=Math.max(120,Math.min(480,o.x))}});
+  this.pep.forEach(p=>{if(p.tx!=null)p.x+=(p.tx-p.x)*Math.min(1,dt*3)});this.rip.forEach(r=>r.r+=dt*120);this.rip=this.rip.filter(r=>r.r<220)},
+ draw(){const y0=this.y0;let s=BG;
+  // superficie con hundimientos debajo de lo que flota
+  const fl=this.o.filter(o=>o.st==='float');let d=`M92 ${y0}`;for(let x=92;x<=508;x+=4){let y=y0;fl.forEach(o=>{const k=Math.max(0,1-Math.abs(x-o.x)/26);y+=k*k*7});d+=` L${x} ${y.toFixed(1)}`}
+  s+=`<path d="${d} L508 300 Q508 306 500 306 L100 306 Q92 306 92 300Z" fill="url(#wat)"/><path d="${d}" fill="none" stroke="#e0f2fe" stroke-width="2.5"/>`;
+  this.rip.forEach(r=>{s+=`<ellipse cx="${r.x}" cy="${y0}" rx="${r.r}" ry="${r.r*.12}" fill="none" stroke="#fff" stroke-opacity="${(1-r.r/220).toFixed(2)}" stroke-width="2"/>`});
+  this.pep.forEach(p=>{s+=`<circle cx="${p.x.toFixed(1)}" cy="${y0-1}" r="2.2" fill="#1c1917"/>`});
+  this.o.forEach(o=>{s+=o.k==='clip'?clipSvg(o.x,o.y,o.st==='sink'?25:0):o.k==='bug'?`<text x="${o.x}" y="${o.y+2}" font-size="30" text-anchor="middle">🦗</text>`:`<ellipse cx="${o.x}" cy="${o.y}" rx="13" ry="4" fill="#facc15" stroke="#a16207" stroke-width="2"/>`});
+  if(this.drop)s+=`<path d="M${this.drop.x} ${this.drop.y-10} q7 10 0 14 q-7 -4 0 -14z" fill="#f472b6"/>`;
+  s+=`<path d="M86 120 V300 Q86 312 100 312 H500 Q514 312 514 300 V120" fill="url(#gl)" stroke="#e0f2fe" stroke-width="4"/>`;
+  if(this.soap)s+=`<text x="500" y="110" font-size="13" font-weight="900" fill="#f9a8d4" text-anchor="end">con jabón 🧴</text>`;
+  sv.innerHTML=s}};
+// ================= 2. COHESIÓN =================
+const S2={n:'💧 Cohesión',
+ tools:[['drop','💧','Gotero'],['soap','🧴','Jabón'],['new','🔄','Secar moneda',1]],
+ init(){this.n=0;this.soap=0;this.dr=[];this.spill=0;this.pl=[{x:70,y:250,r:10},{x:140,y:270,r:9},{x:110,y:215,r:8},{x:190,y:240,r:11}];this.drag=null;this.hud();exp('💧 Cohesión','La <b>cohesión</b> es la atracción entre moléculas de la <b>misma sustancia</b>: agua con agua. ¿Cuántas gotas caben sobre una moneda? Toca el <b>gotero</b> 💧 muchas veces. En el plato de la izquierda, <b>arrastra una gota</b> hacia otra.')},
+ cap(){return this.soap?8:22},
+ hud(){$('hud').textContent=`💧 Gotas en la moneda: ${this.n}`},
+ use(k){if(k==='new'){this.init();tone(500,.1,'sine');return}
+  if(k==='soap'){this.soap=1;say.innerHTML='🧴 Le pusiste jabón al gotero: el jabón <b>debilita la cohesión</b>. ¿Cuántas gotas caben ahora?';this.n=0;this.spill=0;this.hud();return}
+  if(this.spill)return void(say.innerHTML='La moneda ya se rebalsó. Toca <b>🔄 Secar moneda</b> para intentar otra vez.');
+  this.dr.push({y:70})},
+ step(dt){this.dr.forEach(d=>d.y+=dt*300);const hit=this.dr.filter(d=>d.y>=this.top());this.dr=this.dr.filter(d=>d.y<this.top());
+  hit.forEach(()=>{this.n++;this.hud();plip();if(this.n>this.cap()){this.spill=1;this.sp=0;plop();
+   say.innerHTML=`💦 ¡Se rebalsó! Cupieron <b>${this.n-1} gotas</b>${this.soap?' con jabón':''}. ${this.soap?'Con jabón caben muchas menos: la cohesión es más débil.':'El agua formó una <b>cúpula</b> porque sus moléculas se jalan entre sí: eso es la <b>cohesión</b>.'}`;
+   exp('💧 ¡Una cúpula de agua!','Las gotas no se derramaron enseguida: las moléculas de agua se <b>atraen entre sí</b> (cohesión) y forman una cúpula sobre la moneda. Cuando el peso es demasiado, la cúpula se rompe y el agua se derrama.');
+   if(!this.soap)win('coh','Descubriste la cohesión con una cúpula de agua.')}
+   else if(this.n===10)say.innerHTML='Mira la moneda de lado: el agua forma una <b>cúpula</b> más alta que el borde y no se cae. Sigue echando gotas.'});
+  if(this.spill)this.sp=Math.min(1,(this.sp||0)+dt*1.5)},
+ top(){const h=this.spill?4:Math.min(this.n,this.cap())/22*46;return 248-h-2},
+ draw(){let s=BG;const cx=400,h=this.spill?4*(1-this.sp)+2:Math.min(this.n,this.cap())/22*46,w=Math.min(74,20+this.n*6);
+  // plato con gotas que se unen
+  s+=`<ellipse cx="130" cy="290" rx="115" ry="18" fill="#e2e8f0"/><ellipse cx="130" cy="286" rx="104" ry="13" fill="#f8fafc"/>`;
+  s+=`<rect x="22" y="300" width="216" height="8" fill="#cbd5e1" rx="4"/>`;
+  this.pl.forEach(p=>{s+=`<ellipse class="pd" cx="${p.x}" cy="${Math.min(282,p.y)}" rx="${p.r*1.25}" ry="${p.r*.85}" fill="#38bdf8" fill-opacity=".85" stroke="#e0f2fe" stroke-width="2"/><ellipse cx="${p.x-p.r*.35}" cy="${Math.min(282,p.y)-p.r*.3}" rx="${p.r*.3}" ry="${p.r*.18}" fill="#fff" opacity=".8"/>`});
+  s+=`<text x="130" y="330" font-size="12" font-weight="900" fill="#fff" text-anchor="middle">Arrastra una gota hacia otra</text>`;
+  // moneda vista de lado y cúpula de agua
+  s+=`<rect x="${cx-80}" y="248" width="160" height="14" rx="4" fill="#facc15" stroke="#a16207" stroke-width="2"/><rect x="${cx-60}" y="262" width="120" height="46" fill="#94a3b8"/>`;
+  if(this.n)s+=`<path d="M${cx-w} 248 Q${cx-w} ${248-h*1.3} ${cx} ${248-h*1.3} Q${cx+w} ${248-h*1.3} ${cx+w} 248Z" fill="url(#wat)" stroke="#e0f2fe" stroke-width="2"/>`;
+  if(this.spill)s+=`<path d="M${cx-80} 250 q-10 ${30*this.sp} -40 ${56*this.sp} h40z M${cx+80} 250 q10 ${30*this.sp} 40 ${56*this.sp} h-40z" fill="#38bdf8" opacity=".8"/>`;
+  // gotero
+  s+=`<g transform="translate(${cx} 20)"><rect x="-8" y="0" width="16" height="22" rx="7" fill="#f43f5e"/><path d="M-6 22 h12 l-3 34 h-6z" fill="#e0f2fe" stroke="#94a3b8"/></g>`;
+  this.dr.forEach(d=>{s+=`<path d="M${cx} ${d.y-8} q6 9 0 12 q-6 -3 0 -12z" fill="#38bdf8"/>`});
+  if(this.soap)s+=`<text x="${cx}" y="330" font-size="12" font-weight="900" fill="#f9a8d4" text-anchor="middle">gotero con jabón 🧴</text>`;
+  sv.innerHTML=s},
+ down(p){const d=this.pl.find(q=>Math.hypot(q.x-p.x,Math.min(282,q.y)-p.y)<q.r*1.6+8);if(d){this.drag=d;return true}},
+ move(p){if(!this.drag)return;this.drag.x=Math.max(30,Math.min(230,p.x));this.drag.y=Math.max(200,Math.min(282,p.y));
+  const o=this.pl.find(q=>q!==this.drag&&Math.hypot(q.x-this.drag.x,q.y-this.drag.y)<(q.r+this.drag.r)*1.1);
+  if(o){o.r=Math.sqrt(o.r*o.r+this.drag.r*this.drag.r);o.x=(o.x+this.drag.x)/2;this.pl=this.pl.filter(q=>q!==this.drag);this.drag=null;plip();
+   say.innerHTML=this.pl.length>1?'💧 ¡Las gotas se <b>unieron</b>! El agua se atrae a sí misma: eso es la <b>cohesión</b>.':'💧 ¡Todas las gotas se juntaron en una gota grande! <b>Cohesión</b> pura.'}},
+ up(){this.drag=null}};
+// ================= 3. ADHESIÓN =================
+const SF=[{k:'vid',n:'Vidrio',x:110,c:'#bae6fd'},{k:'hoj',n:'Hoja con cera',x:300,c:'#4ade80'},{k:'pap',n:'Papel',x:490,c:'#fef3c7'}];
+const S3={n:'🪟 Adhesión',
+ tools:[['drop','💧','Gota de agua'],['new','🔄','Limpiar',1]],
+ init(){this.st={};this.dr=null;$('hud').textContent='';exp('🪟 Adhesión','La <b>adhesión</b> es la atracción entre moléculas de <b>sustancias diferentes</b>: agua con vidrio, agua con papel… <b>Arrastra la gota</b> 💧 sobre cada superficie y mira qué pasa.')},
+ use(k,x){if(k==='new'){this.init();tone(500,.1,'sine');return}const f=SF.reduce((a,b)=>Math.abs(b.x-(x??SF.find(q=>!this.st[q.k])?.x??110))<Math.abs(a.x-(x??SF.find(q=>!this.st[q.k])?.x??110))?b:a);this.dr={x:f.x,y:40,f}},
+ step(dt){if(this.dr){this.dr.y+=dt*300;if(this.dr.y>=208){const f=this.dr.f;this.dr=null;this.st[f.k]={t:0};plip();
+   const M={vid:'🪟 En el <b>vidrio</b> la gota se <b>esparce</b> y se pega: la adhesión (agua-vidrio) es fuerte.',hoj:'🍃 En la <b>hoja con cera</b> la gota queda <b>redonda como una perla</b>: la cohesión (agua-agua) gana a la adhesión.',pap:'📄 El <b>papel</b> se <b>moja y absorbe</b> la gota: la adhesión con las fibras del papel es muy fuerte.'};
+   say.innerHTML=M[f.k];if(Object.keys(this.st).length===3){exp('🪟 Adhesión vs. cohesión','Cuando la <b>adhesión</b> es más fuerte, el agua se pega y se esparce (vidrio, papel). Cuando la <b>cohesión</b> es más fuerte, el agua se junta en gotas redondas (hoja con cera, plástico). Por eso el agua moja unas cosas más que otras.');win('adh','Comparaste la adhesión en 3 superficies.')}}}
+  Object.values(this.st).forEach(s=>s.t=Math.min(1,s.t+dt*1.2))},
+ draw(){let s=BG;SF.forEach(f=>{const st=this.st[f.k],t=st?st.t:0;
+  if(f.k==='hoj')s+=`<path d="M${f.x-80} 226 Q${f.x} 196 ${f.x+80} 226 Q${f.x} 252 ${f.x-80} 226Z" fill="${f.c}" stroke="#15803d" stroke-width="3"/><path d="M${f.x-70} 226 H${f.x+70}" stroke="#15803d" stroke-width="2"/>`;
+  else s+=`<rect x="${f.x-80}" y="222" width="160" height="12" rx="3" fill="${f.c}" stroke="${f.k==='vid'?'#e0f2fe':'#d6d3d1'}" stroke-width="2" ${f.k==='vid'?'fill-opacity=".6"':''}/>`;
+  if(st){if(f.k==='vid')s+=`<ellipse cx="${f.x}" cy="${221-4*(1-t)}" rx="${14+46*t}" ry="${12-8*t}" fill="#38bdf8" fill-opacity=".8" stroke="#e0f2fe"/>`;
+   else if(f.k==='hoj')s+=`<circle cx="${f.x+Math.sin(t*6)*6*(1-t)}" cy="${200}" r="14" fill="#38bdf8" fill-opacity=".85" stroke="#e0f2fe" stroke-width="2"/><ellipse cx="${f.x-5}" cy="195" rx="4" ry="2.5" fill="#fff"/>`;
+   else s+=`<ellipse cx="${f.x}" cy="228" rx="${14+50*t}" ry="${6+2*t}" fill="#0ea5e9" fill-opacity="${(.7-.45*t).toFixed(2)}"/><ellipse cx="${f.x}" cy="${221+6*t}" rx="${14*(1-t)}" ry="${12*(1-t)}" fill="#38bdf8" fill-opacity=".8"/>`}
+  s+=`<rect x="${f.x-52}" y="260" width="104" height="24" rx="12" fill="rgba(0,0,0,.4)"/><text x="${f.x}" y="277" font-size="13" font-weight="900" fill="#fff" text-anchor="middle">${f.n}${st?' ✅':''}</text>`});
+  if(this.dr)s+=`<path d="M${this.dr.x} ${this.dr.y-14} q10 14 0 20 q-10 -6 0 -20z" fill="#38bdf8" stroke="#e0f2fe"/>`;
+  sv.innerHTML=s}};
+// ================= 4. CAPILARIDAD =================
+const COL=[['#3b82f6','azul'],['#ef4444','rojo'],['#22c55e','verde'],['#a855f7','morado']];
+const S4={n:'🌼 Capilaridad',
+ tools:[['dye','🎨','Colorante'],['flor','🌼','Flor blanca'],['pap','🧻','Tira de papel'],['tub','🧪','Tubos delgado y grueso'],['wait','⏩','Esperar',1],['new','🔄','Empezar de nuevo',1]],
+ init(){this.c=null;this.o=null;this.p=0;this.fast=0;$('hud').textContent='';exp('🌼 Capilaridad','La <b>capilaridad</b> hace que el agua <b>suba por tubitos muy delgados</b>, ¡en contra de la gravedad! Pon <b>colorante</b> 🎨 al agua y luego mete una <b>flor blanca</b> 🌼.')},
+ use(k){if(k==='new'){this.init();tone(500,.1,'sine');return}
+  if(k==='dye'){const i=this.c?(COL.indexOf(this.c)+1)%COL.length:0;this.c=COL[i];this.p=0;plip();say.innerHTML=`🎨 Pintaste el agua de color <b>${this.c[1]}</b>. Ahora mete la flor, el papel o los tubos.`;return}
+  if(k==='wait'){this.fast=3;say.innerHTML='⏩ Pasan las horas…';return}
+  this.o=k;this.p=0;this.fast=0;plop();
+  if(!this.c)say.innerHTML='El agua no tiene color: así no podrás ver cómo sube. Pon <b>colorante</b> 🎨 primero.';
+  else say.innerHTML=k==='flor'?'🌼 Mira el tallo: el agua de color <b>sube por sus tubitos</b>. Toca <b>⏩ Esperar</b> para que pase el tiempo.':k==='pap'?'🧻 El agua <b>trepa por el papel</b> entre sus fibras.':'🧪 ¿En cuál tubo sube más el agua: en el <b>delgado</b> o en el <b>grueso</b>?'},
+ step(dt){if(this.o&&this.c&&this.p<1){this.p=Math.min(1,this.p+dt*(this.fast?.28:.07));if(this.p>=1){this.fast=0;
+   if(this.o==='flor'){say.innerHTML=`🌼 ¡La flor se pintó de <b>${this.c[1]}</b>! El agua subió por el tallo hasta los pétalos gracias a la <b>capilaridad</b>.`;exp('🌼 ¡Así toman agua las plantas!','El tallo tiene <b>tubitos muy delgados</b>. El agua se pega a sus paredes (<b>adhesión</b>) y se jala a sí misma (<b>cohesión</b>), así <b>sube</b> sin que nadie la empuje. Por eso las plantas llevan agua desde la raíz hasta las hojas.');win('cap','Pintaste una flor blanca con capilaridad.')}
+   else if(this.o==='tub'){say.innerHTML='🧪 ¡En el tubo <b>delgado</b> el agua sube mucho más! Mientras más delgado el tubo, más fuerte es la capilaridad.';exp('🧪 Tubo delgado vs. grueso','En un tubo delgado, casi toda el agua toca las paredes y la <b>adhesión</b> la jala hacia arriba. En un tubo grueso hay demasiada agua y sube poquito.')}
+   else{say.innerHTML='🧻 ¡El agua trepó por el papel! Sus fibras forman tubitos diminutos.';exp('🧻 El papel absorbe','Entre las fibras del papel hay espacios muy delgados: el agua sube por ellos por <b>capilaridad</b>. Así funciona una servilleta que seca el agua.')}}}},
+ draw(){let s=BG;const c=this.c?this.c[0]:'#7dd3fc',p=this.p;
+  s+=`<path d="M230 190 H370 V296 Q370 306 360 306 H240 Q230 306 230 296Z" fill="${c}" fill-opacity="${this.c?.85:.5}"/>`;
+  if(this.o==='flor'){const top=86,h=(300-top)*p,fc=p>.85&&this.c?c:'#fff',fo=p>.85?Math.min(1,(p-.85)/.15):0;
+   s+=`<path d="M300 300 V${top}" stroke="#86efac" stroke-width="7"/><path d="M300 300 V${300-h}" stroke="${this.c?c:'#86efac'}" stroke-width="4" opacity=".9"/><path d="M300 200 q-30 -10 -40 -34 q28 4 40 30" fill="#4ade80"/>`;
+   s+=`<g transform="translate(300 ${top})">${Array.from({length:8},(_, i)=>`<ellipse rx="13" ry="26" cy="-22" transform="rotate(${i*45})" fill="#fff" stroke="#e2e8f0"/><ellipse rx="10" ry="20" cy="-22" transform="rotate(${i*45})" fill="${c}" fill-opacity="${(fo*.8).toFixed(2)}"/>`).join('')}<circle r="10" fill="#facc15"/></g>`}
+  else if(this.o==='pap'){s+=`<rect x="285" y="70" width="30" height="236" fill="#fff" stroke="#e2e8f0"/><rect x="285" y="${300-(230*p)}" width="30" height="${230*p+6}" fill="${c}" fill-opacity=".6"/>`}
+  else if(this.o==='tub'){const a=190-140*p,b=190-40*p;s+=`<rect x="262" y="40" width="10" height="266" rx="4" fill="rgba(255,255,255,.18)" stroke="#e0f2fe" stroke-width="2"/><rect x="264" y="${a}" width="6" height="${306-a}" fill="${c}"/><rect x="316" y="40" width="34" height="266" rx="6" fill="rgba(255,255,255,.18)" stroke="#e0f2fe" stroke-width="2"/><rect x="318" y="${b}" width="30" height="${306-b}" fill="${c}"/><text x="267" y="34" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">delgado</text><text x="333" y="34" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">grueso</text>`}
+  s+=`<path d="M226 150 V298 Q226 312 240 312 H360 Q374 312 374 298 V150" fill="url(#gl)" stroke="#e0f2fe" stroke-width="4"/>`;
+  if(this.o&&this.c&&this.p<1)s+=`<text x="470" y="60" font-size="14" font-weight="900" fill="#fde047" text-anchor="middle">⏳ ${Math.round(this.p*100)} %</text>`;
+  sv.innerHTML=s}};
+// ================= control general =================
+const ST={ten:S1,coh:S2,adh:S3,cap:S4};let cur='ten',S=S1;
+function tabs(){$('tabs').innerHTML=Object.entries(ST).map(([k,s])=>`<button type="button" data-k="${k}" class="${k===cur?'on':''}">${s.n}${MI[k]?' ✅':''}</button>`).join('')}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;go(b.dataset.k);tone(600,.08,'triangle')};
+function go(k){cur=k;S=ST[k];S.init();tabs();$('tools').innerHTML=S.tools.map(([k,e,n,alt])=>`<button type="button" class="tool ${alt?'alt':''}" data-k="${k}"><span class="em">${e}</span>${n}</button>`).join('');
+ say.innerHTML={ten:'Pon un <b>clip</b> 📎 sobre el agua: <b>arrástralo</b> al vaso o tócalo.',coh:'Toca el <b>gotero</b> 💧 para echar gotas sobre la moneda. ¡Cuéntalas!',adh:'Arrastra la <b>gota</b> 💧 sobre el vidrio, la hoja y el papel.',cap:'Primero pon <b>colorante</b> 🎨 y luego mete la <b>flor blanca</b> 🌼.'}[k]}
+function exp(t,x){$('exp').innerHTML=`<h3>${t}</h3>${x}`}
+function mis(){$('mis').innerHTML=Object.entries(ST).map(([k,s])=>`<span class="mi ${MI[k]?'ok':''}">${{ten:'Clip que flota y jabón',coh:'Cúpula de gotas',adh:'Gota en 3 superficies',cap:'Flor de colores'}[k]}<em>${MI[k]?'✅':'Falta'}</em></span>`).join('')}
+const P=e=>{const m=sv.getScreenCTM().inverse(),q=sv.createSVGPoint();q.x=e.clientX;q.y=e.clientY;return q.matrixTransform(m)};
+let dr=null;const bench=$('bench'),inB=e=>{const r=bench.getBoundingClientRect();return e.clientX>r.left&&e.clientX<r.right&&e.clientY>r.top&&e.clientY<r.bottom};
+$('tools').addEventListener('pointerdown',e=>{const b=e.target.closest('.tool');if(!b)return;e.preventDefault();actx();const g=b.cloneNode(true);g.classList.add('ghost');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);dr={k:b.dataset.k,g,x:e.clientX,y:e.clientY}});
+sv.addEventListener('pointerdown',e=>{actx();if(S.down&&S.down(P(e))){e.preventDefault();sv.setPointerCapture(e.pointerId)}});
+sv.addEventListener('pointermove',e=>{S.move&&S.move(P(e))});sv.addEventListener('pointerup',()=>{S.up&&S.up()});
+addEventListener('pointermove',e=>{if(!dr)return;dr.g.style.left=e.clientX+'px';dr.g.style.top=e.clientY+'px';bench.classList.toggle('drop',inB(e))});
+addEventListener('pointerup',e=>{if(!dr)return;const d=dr;dr=null;d.g.remove();bench.classList.remove('drop');
+ if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8)return S.use(d.k);if(inB(e))S.use(d.k,P(e).x)});
+addEventListener('pointercancel',()=>{if(dr){dr.g.remove();dr=null;bench.classList.remove('drop')}});
+let t0=performance.now();function loop(now){const dt=Math.min(.05,(now-t0)/1000);t0=now;S.step(dt);S.draw();requestAnimationFrame(loop)}
+// ---------- sonidos de agua ----------
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,ty,v=.06,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function plip(){const a=actx();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(600,t);o.frequency.exponentialRampToValueAtTime(1500,t+.08);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.13)}
+function plop(){const a=actx();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(380,t);o.frequency.exponentialRampToValueAtTime(90,t+.25);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.3)}
+function shake(){for(let i=0;i<6;i++)tone(3000+Math.random()*2000,.03,'square',.015,i*.05)}
+function fanfare(){[523,659,784,1047].forEach((f,i)=>tone(f,.28,'triangle',.08,i*.11))}
+mis();go('ten');requestAnimationFrame(loop);
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>
