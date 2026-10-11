@@ -2027,11 +2027,11 @@ function crearMoli(THREE, opt = {}) {
     else if (kind === 'star') { g.beginPath(); for (let k = 0; k < 10; k++) { const r = k % 2 ? 22 : 50, a = -Math.PI / 2 + k * Math.PI / 5; g.lineTo(64 + Math.cos(a) * r, 98 + Math.sin(a) * r); } g.closePath(); g.fill();
       g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.ellipse(56, 84, 6, 8, -0.3, 0, 6.3); g.fill(); }
     else if (kind === 'sadL' || kind === 'sadR') { const d = kind === 'sadL' ? 1 : -1;               // ojitos tristes: el párpado de arriba cae hacia afuera
-      g.beginPath(); g.ellipse(64, 104, 29, 44, 0, 0, 6.3); g.fill(); g.globalCompositeOperation = 'destination-out';
-      g.beginPath(); g.moveTo(0, 40); g.lineTo(128, 40); g.lineTo(128, 86 - 22 * d); g.lineTo(0, 86 + 22 * d); g.closePath(); g.fill(); g.globalCompositeOperation = 'source-over';
+      g.save(); g.beginPath(); g.moveTo(0, 86 + 22 * d); g.lineTo(128, 86 - 22 * d); g.lineTo(128, 192); g.lineTo(0, 192); g.closePath(); g.clip();
+      g.beginPath(); g.ellipse(64, 104, 29, 44, 0, 0, 6.3); g.fill(); g.restore();
       g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.ellipse(58, 116, 7, 9, 0, 0, 6.3); g.fill(); }
     else if (kind === 'think') {                                                                  // pensando: medio cerrados, mirando arriba
-      g.beginPath(); g.ellipse(64, 92, 30, 48, 0, 0, 6.3); g.fill(); g.globalCompositeOperation = 'destination-out'; g.fillRect(0, 100, 128, 92); g.globalCompositeOperation = 'source-over';
+      g.save(); g.beginPath(); g.rect(0, 0, 128, 100); g.clip(); g.beginPath(); g.ellipse(64, 92, 30, 48, 0, 0, 6.3); g.fill(); g.restore();
       g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.ellipse(74, 62, 7, 10, 0.2, 0, 6.3); g.fill(); }
   });
   ['open', 'wow', 'happy', 'closed', 'wink', 'heart', 'star', 'sadL', 'sadR', 'think'].forEach(k => EYE[k] = eyeTex(k));
