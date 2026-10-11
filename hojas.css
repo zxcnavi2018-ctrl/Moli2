@@ -234,3 +234,53 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
 .labd-r { display: flex; align-items: center; gap: 8px; padding: 5px 4px; border-bottom: 1px dashed #cbd5e1; font-size: 13px; } .labd-r .rg-n { width: 9.5em; flex: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
 .labd-r .qb { max-width: 7em; } .labd-j { display: flex; flex-wrap: wrap; gap: 2px; } .labd-j i { font-style: normal; font-size: 13px; filter: grayscale(1); opacity: .35; } .labd-j i.mid { opacity: .75; filter: none; } .labd-j i.ok { opacity: 1; filter: none; text-shadow: 0 0 6px #facc15; }
 .labd-p { font-size: 12px; color: #64748b; }
+
+/* ===================== DIPLOMAS DE FELICITACIONES (pasaporte en modo proyección) ===================== */
+.pp { background: #0b1220; overflow: hidden; }
+.pp-stage { position: absolute; inset: 0 0 2.6em; overflow: hidden; }
+.pp-cuadro { position: absolute; inset: 0; }
+.pp-cuadro.pp-in { animation: ppIn .62s cubic-bezier(.2,.8,.3,1) both; }
+.pp-cuadro.pp-out { animation: ppOut .5s ease-in both; }
+.pp.pp-flash::after { content: ''; position: absolute; inset: 0 0 2.6em; pointer-events: none; z-index: 4; background: radial-gradient(60% 70% at 50% 45%, rgba(255,255,255,.85), rgba(190,230,255,.25) 60%, transparent);
+  animation: ppFlash .55s ease-out both; mix-blend-mode: screen; }
+@keyframes ppIn { 0% { opacity: 0; transform: scale(1.06); filter: blur(6px) brightness(1.8); clip-path: inset(0 0 0 100%); } 55% { filter: blur(1px) brightness(1.2); } 100% { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0); } }
+@keyframes ppOut { to { opacity: 0; transform: scale(.96); filter: blur(4px) brightness(.6); } }
+@keyframes ppFlash { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+.pp-sl { position: absolute; inset: 0; padding: 1.1em 1.8em 1.4em; display: flex; flex-direction: column; justify-content: center; overflow: hidden; color: #1e293b; }
+.pp-sl h2 { margin: 0 0 .4em; font-size: 1.6em; color: #1d3c8f; } .pp-sl h2 small { display: block; font-size: .55em; color: #64748b; font-weight: 700; }
+.pp-azul { background: radial-gradient(70% 80% at 50% 40%, #1e3a8a, #0b1736); color: #fff; align-items: center; text-align: center; } .pp-azul h2 { color: #f4d27a; } .pp-azul p { font-size: 1.15em; max-width: 26em; }
+.pp-mol { width: 5em; height: 5em; object-fit: contain; flex: none; }
+.pp-tapa { background: radial-gradient(70% 90% at 50% 35%, #1e3a8a, #0b1736 75%); align-items: center; }
+.pp-oro { width: min(22em, 80%); padding: 1.2em 1em; border: .25em double #f4d27a; border-radius: .9em; text-align: center; color: #f4d27a; box-shadow: inset 0 0 0 .5em rgba(244,210,122,.12); }
+.pp-oro small { letter-spacing: .25em; font-weight: 800; font-size: .7em; } .pp-em { font-size: 3em; margin: .2em 0; filter: sepia(1) saturate(3) hue-rotate(5deg); }
+.pp-oro h1 { margin: 0; font: 900 2.4em Georgia, serif; letter-spacing: .05em; } .pp-oro h1 span { display: block; font: italic 400 .45em Georgia, serif; letter-spacing: .3em; }
+.pp-un { margin: .6em 0 .2em; font-weight: 800; color: #fff; } .pp-nm { margin: 0 0 .6em; font: 1.6em "Moli Script", "Great Vibes", cursive; color: #fde68a; }
+.pp-papel { background: #fffdf6 repeating-linear-gradient(0deg, transparent 0 1.6em, rgba(29,60,143,.06) 1.6em calc(1.6em + 1px)); }
+.pp-papel::before { content: ''; position: absolute; inset: .5em; border: 2px solid rgba(29,60,143,.25); border-radius: .6em; pointer-events: none; }
+.pp-pie { position: absolute; left: 0; right: 0; bottom: .5em; text-align: center; font-size: .7em; color: #94a3b8; letter-spacing: .1em; }
+.pp-k { font-size: .8em; font-weight: 800; color: #64748b; letter-spacing: .08em; text-transform: uppercase; }
+.pp-id { display: flex; gap: 1.2em; align-items: center; } .pp-ph { width: 6.5em; height: 8em; flex: none; border: 3px solid #1d3c8f; border-radius: .5em; background: #dbeafe; display: grid; place-items: center; overflow: hidden; }
+.pp-ph img { width: 110%; } .pp-id dl { display: grid; grid-template-columns: auto 1fr; gap: .2em .8em; margin: 0; font-size: 1.05em; } .pp-id dt { color: #64748b; font-weight: 700; } .pp-id dd { margin: 0; font-weight: 800; }
+.pp-mrz { margin-top: .9em; padding: .4em .6em; background: #f1f5f9; border-radius: .4em; font: 700 .8em ui-monospace, monospace; letter-spacing: .12em; color: #334155; word-break: break-all; }
+.pp-mq { display: flex; gap: .8em; align-items: center; margin-bottom: .6em; } .pp-bub { position: relative; flex: 1; padding: .6em .9em; border: 3px solid #2b2547; border-radius: 1em; background: #fff; font-size: 1.02em; }
+.pp-ins { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .5em .9em; } .pp-ins li { display: flex; align-items: center; gap: .6em; font-weight: 700; font-size: .95em; }
+.pp-ins .pp-st { width: 4.2em; height: 4.2em; font-size: .7em; flex: none; }
+.pp-visa { display: flex; justify-content: center; gap: 1.2em; flex-wrap: wrap; margin: .4em 0 .6em; }
+.pp-st { width: 6.2em; height: 6.2em; border-radius: 50%; border: 3px dashed #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #94a3b8; filter: grayscale(1); opacity: .7; transform: rotate(var(--r, 0deg)); position: relative; }
+.pp-st i { font-style: normal; font-size: 2em; line-height: 1; } .pp-st b { font-size: .72em; line-height: 1.1; padding: 0 .3em; } .pp-st small { position: absolute; right: -.1em; top: -.1em; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font-weight: 900; }
+.pp-st.on { border: 4px double var(--c); color: var(--c); filter: none; opacity: 1; background: color-mix(in srgb, var(--c) 8%, #fff); animation: sello .5s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes sello { from { transform: scale(1.8) rotate(calc(var(--r) - 20deg)); opacity: 0; } to { transform: rotate(var(--r)); opacity: 1; } }
+.pp-msg { text-align: center; font-weight: 800; color: #1d3c8f; margin: .2em 0; }
+.pp-dip { align-self: center; padding: .35em 1em; border-radius: 999px; background: #e2e8f0; color: #64748b; font-weight: 900; } .pp-dip.on { background: linear-gradient(90deg, #f6d365, #fda085); color: #7c2d12; box-shadow: 0 0 1.2em rgba(246,211,101,.7); }
+.pp-fondo { background: radial-gradient(70% 80% at 50% 40%, #1e3a8a, #0b1736); align-items: center; padding: .7em 1em 1em; }
+.dp { width: min(36em, 94%); aspect-ratio: 1600 / 1130; max-height: 86%; background: radial-gradient(circle, #fffdf6, #f7ecd2); border: .55em solid #d4a72c; border-radius: .3em; box-shadow: 0 1em 2.5em rgba(0,0,0,.45); position: relative; }
+.dp-in { position: absolute; inset: .55em; border: 2px solid #1d3c8f; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: .3em 1.2em; color: #2f3d63; font-size: .8em; }
+.dp-c { position: absolute; width: 1.6em; height: 1.6em; border: 3px solid #d4a72c; } .dp-c.tl { top: .3em; left: .3em; border-right: 0; border-bottom: 0; } .dp-c.tr { top: .3em; right: .3em; border-left: 0; border-bottom: 0; } .dp-c.bl { bottom: .3em; left: .3em; border-right: 0; border-top: 0; } .dp-c.br { bottom: .3em; right: .3em; border-left: 0; border-top: 0; }
+.dp-medal { font-size: 1.6em; line-height: 1; } .dp-in > small { font-weight: 900; letter-spacing: .3em; color: #1d3c8f; font-size: .75em; }
+.dp-in h3 { margin: .1em 0; font: 700 1.9em Georgia, serif; color: #b8860b; } .dp-in p { margin: .1em 0; font-style: italic; }
+.dp-n { font: 2.6em "Moli Script", "Great Vibes", cursive; color: #12224a; border-bottom: 2px solid #d4a72c; padding: 0 .6em; line-height: 1.1; }
+.dp-why { font-style: normal !important; font-weight: 600; max-width: 34em; font-size: .85em; }
+.dp-f { display: flex; align-items: center; justify-content: space-between; width: 92%; margin-top: .3em; } .dp-f > div { display: flex; flex-direction: column; align-items: center; font-size: .8em; }
+.dp-f img { width: 3.2em; height: 3.2em; } .dp-f i { font: 1.5em "Moli Script", "Great Vibes", cursive; color: #12224a; font-style: normal; } .dp-f small { color: #5b6785; }
+.dp-seal { width: 2.4em; height: 2.4em; border-radius: 50%; background: radial-gradient(#ffe08a, #c8961e); color: #fff; display: grid; place-items: center; font-size: 1.3em; box-shadow: 0 0 0 .2em #f6d365; }
+.pp-dl { position: absolute; right: 1em; bottom: .7em; z-index: 3; border: 0; border-radius: 999px; padding: .5em 1em; background: linear-gradient(90deg, #f59e0b, #ef4444); color: #fff; font: 900 .95em system-ui; box-shadow: 0 .25em 0 #9a3412; cursor: pointer; }

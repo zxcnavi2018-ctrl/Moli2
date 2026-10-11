@@ -518,7 +518,7 @@ Devuelve JSON:
       const f = el.querySelector('form'); f.addEventListener('submit', e => { e.preventDefault(); if (f.querySelector('input').value.trim() === '123') { try { sessionStorage.setItem('moli2:cv', '1'); } catch (x) {} el = null; montar(); } else f.querySelector('.err').textContent = 'Contraseña incorrecta.'; });
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
-      MD.cargar().then(() => { let ok = false; try { ok = sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
+      MD.cargar().then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
     P.cerrar = () => { P.ro && P.ro.disconnect(); };
     return P;
   }
@@ -531,7 +531,7 @@ Devuelve JSON:
     abrir(kind, host) {
       Hojas.cerrar();
       host.classList.add('libro');
-      if (kind === 'pizarra') { actual = flujoPresentacion(host); actual.iniciar(); return; }
+      if (kind === 'pizarra') { actual = MD.esDocente() || !Hojas.diplomas ? flujoPresentacion(host) : Hojas.diplomas(host); actual.iniciar(); return; }   // estudiante: sus diplomas; docente: Mi presentación
       const D = MD.esDocente() && Hojas.docente ? Hojas.docente[kind] : null;     // la docente ve su versión: registro de 6° A-D, avances y editar
       const F = D ? D() : kind === 'cuaderno' ? flujoSesiones() : kind === 'folder' ? flujoTickets() : kind === 'docente' ? flujoNotas() : kind === 'mision' ? flujoMisiones() : null;
       if (!F) return;

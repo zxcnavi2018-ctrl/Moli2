@@ -147,7 +147,7 @@
 <link rel="stylesheet" href="hojas.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="datos.js"></script><script src="docente.js"></script>
-<script src="hojas.js"></script><script src="hojas-docente.js"></script><script src="fotocheck.js"></script>
+<script src="hojas.js"></script><script src="hojas-docente.js"></script><script src="diplomas.js"></script><script src="fotocheck.js"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -1864,7 +1864,7 @@ const STOPS = [
   { name: '📗 Mis misiones', title: 'Mis misiones de refuerzo', ...FOCUS.mision,
     async enter() { await openBook(this.obj); await expand('mision', this.obj); },
     async leave() { await shrink(this.obj); await closeBook(this.obj); } },
-  { name: '📽️ Mi presentación', title: 'Mi presentación', ...FOCUS.pizarra, pf: 1.2,
+  { get name() { return MD.esDocente() ? '📽️ Mi presentación' : '🏅 Mis diplomas'; }, get title() { return MD.esDocente() ? 'Mi presentación' : 'Diplomas de felicitaciones'; }, ...FOCUS.pizarra, pf: 1.2,
     async enter() {                                                 // el proyector se prende: el lente brilla, la luz parpadea, el ecran se ilumina y sale el polvito en el haz
       const bm = this.beam.material, gm = this.glow.material, sm = this.scr.material, dm = this.dust.material, lp = this.spill;
       sm.map = this.onTex; sm.color.setScalar(0.72); sm.needsUpdate = true;
@@ -2237,7 +2237,7 @@ const GUIA = [
   'Este es el <b>corcho de la unidad</b>: aquí ves qué unidad estamos trabajando y su propósito. 📌',
   'Esta es la <b>mesa del profesor</b>. En su folder azul están <b>tus notas</b>. 📂',
   'Y en la mesa del profesor también está este <b>cuaderno verde</b> con <b>tus misiones de refuerzo</b>: para practicar lo que más te cuesta. 💪',
-  'Y en la <b>pizarra</b> se proyecta <b>Mi presentación</b>: las diapositivas de cada sesión, ¡con mis preguntas! 📽️ Ya conoces tu salón. Si me necesitas, <b>tócame</b>. 🤖'
+  'Y en la <b>pizarra</b> se proyectan tus <b>Diplomas de felicitaciones</b> 🏅: en cada sesión ganas sellos en tu pasaporte (🎟️ Exit ticket AD, 🙋 +4 en participación, 🤝 buena conducta y 💪 tu refuerzo). ¡Si juntas todos, recibes tu diploma y lo puedes <b>descargar</b>! Ya conoces tu aula. Si me necesitas, <b>tócame</b>. 🤖'
 ];
 const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
 const MO = { pos: new THREE.Vector3(R6B.cx + 3.4, R6B.y0 + 2.3, R6B.cz + 3.6), vel: new THREE.Vector3(), target: new THREE.Vector3(), ground: R6B.y0,
@@ -2351,7 +2351,7 @@ const menuEl = document.createElement('div'); menuEl.id = 'moliMenu'; document.b
 function menuMoli() {                                                // la ventanita de Molí 2: a dónde vamos
   const me = MD.yo(), b = (k, ic, t) => `<button data-ir="${k}"><i>${ic}</i>${t}</button>`;
   menuEl.innerHTML = `<div class="mm-c"><div class="mm-h"><img src="img/moli/hola.webp" alt=""><div><b>¡Hola${me ? ', ' + String(me.name).split(' ')[0] : ''}! 👋</b><span>Soy Molí. ¿A dónde vamos?</span></div><button class="mm-x" data-ir="x" aria-label="Cerrar">✕</button></div>
-    <div class="mm-g">${b(1, '📗', 'Mis sesiones')}${b(2, '🎟️', 'Mis Exit tickets')}${b(3, '🧪', 'Laboratorio')}${b(5, '📂', 'Mis notas')}${b(6, '💪', 'Mis misiones')}${b(7, '📽️', 'Mi presentación')}</div>
+    <div class="mm-g">${b(1, '📗', 'Mis sesiones')}${b(2, '🎟️', 'Mis Exit tickets')}${b(3, '🧪', 'Laboratorio')}${b(5, '📂', 'Mis notas')}${b(6, '💪', 'Mis misiones')}${MD.esDocente() ? b(7, '📽️', 'Mi presentación') : b(7, '🏅', 'Mis diplomas')}</div>
     ${me ? `<p class="mm-me">👤 ${me.name} · 6° ${me.section} <button data-ir="salir">Salir</button></p>` : ''}</div>`;
   menuEl.classList.add('on');
 }
