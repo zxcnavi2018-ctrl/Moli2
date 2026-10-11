@@ -72,7 +72,8 @@
       const pass = await pbkdf(info.rid + '|' + info.s, 'ciencia-apin-' + pin, 200000, 256);
       try { await conCorreo(`${info.rid}-${info.s}@${FB.authDomain}`, pass); } catch (e) { throw new Error(/TOO_MANY/.test(e.message) ? 'MUCHOS' : /INVALID|PASSWORD|EMAIL_NOT_FOUND|USER_DISABLED/.test(e.message) ? 'CLAVE' : 'RED'); }
     }
-    const me = { key: await kid(info.dni), dni: info.dni, name: info.name, section: 'DOC', rid: info.rid, teacher: true, docente: true, tipo: info.tipo, area: info.area || '' };
+    const rcs = hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('moli2-rc|' + info.rid + '|' + pin))).slice(0, 32);   // canal del control remoto (celular y laptop con la misma cuenta)
+    const me = { key: await kid(info.dni), dni: info.dni, name: info.name, section: 'DOC', rid: info.rid, teacher: true, docente: true, tipo: info.tipo, area: info.area || '', rcs };
     LS.set(ME, me); return me;
   }
 

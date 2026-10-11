@@ -147,7 +147,7 @@
 <link rel="stylesheet" href="hojas.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="datos.js"></script><script src="docente.js"></script>
-<script src="hojas.js"></script><script src="hojas-docente.js"></script><script src="diplomas.js"></script><script src="fotocheck.js"></script><script src="herramientas.js"></script>
+<script src="hojas.js"></script><script src="hojas-docente.js"></script><script src="diplomas.js"></script><script src="fotocheck.js"></script><script src="herramientas.js"></script><script src="remoto.js"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -2032,11 +2032,14 @@ function crearMoli(THREE, opt = {}) {
       g.save(); g.beginPath(); g.moveTo(0, 86 + 22 * d); g.lineTo(128, 86 - 22 * d); g.lineTo(128, 192); g.lineTo(0, 192); g.closePath(); g.clip();
       g.beginPath(); g.ellipse(64, 104, 29, 44, 0, 0, 6.3); g.fill(); g.restore();
       g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.ellipse(58, 116, 7, 9, 0, 0, 6.3); g.fill(); }
+    else if (kind === 'angL' || kind === 'angR') { const d = kind === 'angL' ? -1 : 1;               // enojado: el párpado cae hacia adentro
+      g.save(); g.beginPath(); g.moveTo(0, 80 + 26 * d); g.lineTo(128, 80 - 26 * d); g.lineTo(128, 192); g.lineTo(0, 192); g.closePath(); g.clip();
+      g.beginPath(); g.ellipse(64, 104, 30, 46, 0, 0, 6.3); g.fill(); g.restore(); }
     else if (kind === 'think') {                                                                  // pensando: medio cerrados, mirando arriba
       g.save(); g.beginPath(); g.rect(0, 0, 128, 100); g.clip(); g.beginPath(); g.ellipse(64, 92, 30, 48, 0, 0, 6.3); g.fill(); g.restore();
       g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.ellipse(74, 62, 7, 10, 0.2, 0, 6.3); g.fill(); }
   });
-  ['open', 'wow', 'happy', 'closed', 'wink', 'heart', 'star', 'sadL', 'sadR', 'think'].forEach(k => EYE[k] = eyeTex(k));
+  ['open', 'wow', 'happy', 'closed', 'wink', 'heart', 'star', 'sadL', 'sadR', 'think', 'angL', 'angR'].forEach(k => EYE[k] = eyeTex(k));
   const MOUTH = {};
   const mouthTex = (kind) => canvasTex(128, 96, (g) => {
     halo(g, 64, 48, 46); g.fillStyle = g.strokeStyle = lightFill(g, 20, 80); g.lineCap = 'round';
@@ -2187,8 +2190,8 @@ function crearMoli(THREE, opt = {}) {
     let open = 1; if (S.blink > 0) { S.blink -= dt; const k = 1 - Math.abs(S.blink / 0.075 - 1); open = 1 - Math.max(0, k) * 0.94; }
     const ex = S.expr, happy = cheer || S.act === 'girar';
     // 8 expresiones: normal, feliz, sorpresa, amor, guiño, estrellas, triste y pensativo
-    const kind = happy ? 'happy' : ex === 'sorpresa' ? 'wow' : ex === 'amor' ? 'heart' : ex === 'estrellas' ? 'star' : ex === 'triste' ? 'sad' : ex === 'pensativo' ? 'think' : 'open';
-    eyes.forEach((e, i) => { const wink = ex === 'guiño' && i === 1, map = wink ? EYE.wink : kind === 'sad' ? EYE[i ? 'sadR' : 'sadL'] : EYE[kind];
+    const kind = happy ? 'happy' : ex === 'sorpresa' ? 'wow' : ex === 'amor' ? 'heart' : ex === 'estrellas' ? 'star' : ex === 'triste' ? 'sad' : ex === 'enojado' ? 'ang' : ex === 'pensativo' ? 'think' : 'open';
+    eyes.forEach((e, i) => { const wink = ex === 'guiño' && i === 1, map = wink ? EYE.wink : kind === 'sad' ? EYE[i ? 'sadR' : 'sadL'] : kind === 'ang' ? EYE[i ? 'angR' : 'angL'] : EYE[kind];
       if (e.material.map !== map) e.material.map = map;
       const sy = (happy || wink || kind === 'heart' || kind === 'star' ? 1 : open) * (S.talk ? 1 + Math.abs(Math.sin(t * 10)) * 0.05 : 1);
       e.scale.set(kind === 'wow' ? 1.06 : 1, sy, 1); e.material.opacity = 0.9 + Math.sin(t * 3 + i) * 0.1; });
@@ -2197,7 +2200,7 @@ function crearMoli(THREE, opt = {}) {
     if (S.talk) { S.moT -= dt; if (S.moT < 0) { S.moT = 0.07 + Math.random() * 0.1; S.mo = Math.random() < 0.18 ? 0 : 0.35 + Math.random() * 0.65; } mMap = MOUTH.open; mOp = 1; mSy = 0.25 + S.mo * 0.75; }
     else if (ex === 'sorpresa') { mMap = MOUTH.o; mOp = 1; }
     else if (ex === 'estrellas') { mMap = MOUTH.open; mOp = 1; mSy = 0.8; }
-    else if (ex === 'triste') { mMap = MOUTH.frown; mOp = 1; }
+    else if (ex === 'triste' || ex === 'enojado') { mMap = MOUTH.frown; mOp = 1; }
     else if (ex === 'pensativo') { mMap = MOUTH.flat; mOp = 1; }
     else if (happy || ex === 'feliz' || ex === 'guiño' || ex === 'amor') { mMap = MOUTH.smile; mOp = 1; }
     if (mouth.material.map !== mMap) mouth.material.map = mMap;
@@ -2375,6 +2378,7 @@ window.SPLASH.then(function arrancar() {                                        
   requestAnimationFrame(tick);
 });
 window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
+Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
 </body>
 </html>
