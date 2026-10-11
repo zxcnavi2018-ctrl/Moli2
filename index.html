@@ -2205,10 +2205,10 @@ function moliIr(st, ms, sp0) {                                        // vuela e
     MO.target.set(a * a * p0.x + 2 * a * k * mid.x + k * k * p1.x, a * a * p0.y + 2 * a * k * mid.y + k * k * p1.y, a * a * p0.z + 2 * a * k * mid.z + k * k * p1.z);
     MO.ground = g0 + (sp.ground - g0) * k; }, ease).then(() => { if (MO.trip === id) MO.flying = false; });
 }
-function spotCerca() {                                               // al empezar: Molí cerquita de la cámara (abajo a la derecha de la pantalla)
+function spotCerca() {                                               // al empezar: Molí cerquita de la cámara (abajo a la izquierda de la pantalla)
   const st = STOPS[0], from = fromOf(st), f = st.look.clone().sub(from).normalize(), r = new THREE.Vector3().crossVectors(f, camera.up).normalize();
-  const p = from.clone().addScaledVector(f, 1.15).addScaledVector(r, (portrait() ? 0.2 : 0.42)).add(new THREE.Vector3(0, -0.36 - 0.95 * MSC, 0));
-  return { pos: p, ground: R6B.y0 };
+  const p = from.clone().addScaledVector(f, 0.98).addScaledVector(r, (portrait() ? -0.16 : -0.4)).add(new THREE.Vector3(0, -0.33 - 0.95 * MSC, 0));
+  return { pos: p, ground: R6B.y0, entra: p.clone().addScaledVector(r, -1.7).addScaledVector(f, 0.4).add(new THREE.Vector3(0, 0.45, 0)) };   // (entra = desde dónde llega volando: fuera de la pantalla, por la izquierda)
 }
 addEventListener('resize', () => { if (!TOUR.busy) setTimeout(() => moliIr(MO.tut ? STOPS[TOUR.i] : STOPS[0], 700, MO.tut && TOUR.i === 0 ? spotCerca() : null), 50); });
 const talkEl = document.getElementById('moliTalk');
@@ -2234,7 +2234,7 @@ function callar() { if (MO.talking) MO.talking.fin(); talkEl.classList.remove('o
 async function guiar() {                                             // en el primer recorrido: espera el título, que Molí llegue, y explica el lugar
   await titleGate;
   const i = TOUR.i; if (!MO.tut || MO.said[i]) return; MO.said[i] = true;
-  for (let k = 0; k < 40 && MO.flying; k++) await wait(100);
+  for (let k = 0; k < 80 && MO.flying; k++) await wait(100);
   if (TOUR.i !== i) return;
   const lado = tv.copy(MO.pos).project(camera).x > 0 ? -1 : 1;         // señala hacia lo que se ve
   moli.accion(i === 0 ? 'saludar' : 'señalar', lado); moli.expr('feliz'); setTimeout(() => moli.expr('normal'), 1100);
@@ -2248,7 +2248,8 @@ new MutationObserver(() => { if (document.body.classList.contains('open')) calla
 const camF = new THREE.Vector3(), camR = new THREE.Vector3(), lookV = new THREE.Vector3(), headV = new THREE.Vector3(), dpos = new THREE.Vector3(), lv1 = new THREE.Vector3(), lv2 = new THREE.Vector3();
 animHooks.push((t, dt) => {
   if (dt <= 0) return;
-  MO.vel.addScaledVector(dpos.copy(MO.target).sub(MO.pos), 60 * dt).multiplyScalar(Math.exp(-11 * dt)); MO.pos.addScaledVector(MO.vel, dt);   // sigue su camino con un resorte
+  for (let n = Math.min(8, Math.ceil(dt / (1 / 60))), h = dt / n, q = 0; q < n; q++) {   // sigue su camino con un resorte (en pasitos: aunque el equipo vaya lento, no se balancea)
+    MO.vel.addScaledVector(dpos.copy(MO.target).sub(MO.pos), 60 * h).multiplyScalar(Math.exp(-11 * h)); MO.pos.addScaledVector(MO.vel, h); }
   moli.root.position.copy(MO.pos);
   camera.getWorldDirection(camF); camR.crossVectors(camF, camera.up).normalize();
   MO.mov += (clampN(MO.vel.dot(camR) * 2.2, -1.6, 1.6) - MO.mov) * Math.min(1, dt * 6);   // se inclina según cómo se mueve
@@ -2266,7 +2267,8 @@ animHooks.push((t, dt) => {
     moli.root.updateMatrixWorld(); camera.updateMatrixWorld();         // (con la posición de ESTE cuadro, no la del anterior)
     headV.set(0, 2.02, 0).applyMatrix4(moli.root.matrixWorld).project(camera);
     const x = (headV.x + 1) / 2 * innerWidth, y = (1 - headV.y) / 2 * innerHeight, w = talkEl.offsetWidth, h = talkEl.offsetHeight;
-    const left = Math.max(8, Math.min(innerWidth - w - 8, x - w + 56)), top = Math.max(8, Math.min(innerHeight - h - 70, y - h - 12));
+    const left = Math.max(8, Math.min(innerWidth - w - 8, x < innerWidth * 0.45 ? x - 46 : x - w + 56)),   // el globo se abre hacia el centro de la pantalla
+          top = Math.max(8, Math.min(innerHeight - h - 70, y - h - 12));
     const tail = Math.max(16, Math.min(w - 36, left + w - x - 10)), B = MO.bub || (MO.bub = { x: left, y: top, t: tail });
     const k = MO.bubSnap ? 1 : 1 - Math.exp(-14 * dt); MO.bubSnap = false;
     B.x += (left - B.x) * k; B.y += (top - B.y) * k; B.t += (tail - B.t) * k;
@@ -2295,10 +2297,10 @@ function tocarMoli(e) {                                              // ¿tocast
   setTimeout(menuMoli, 380); return true;
 }   // Molí dentro del aula (con la misma cámara)
 try { renderer.compile(scene, camera); renderer.compile(moliScene, camera); } catch (e) {}   // prepara todos los shaders al cargar: sin tirones cuando algo aparece por primera vez
-(function arrancar() {                                               // empieza con «Mi aula» cuando ya se mueve fluido; Molí entra volando desde la puerta
+(function arrancar() {                                               // empieza con «Mi aula» cuando ya se mueve fluido; Molí entra volando por la izquierda
   const t0 = performance.now(); let n = 0, last = t0;
   const tick = (now) => { n = now - last < 90 ? n + 1 : 0; last = now;
-    if (n >= 4 || now - t0 > 4000) setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) { moliIr(STOPS[0], 2200, spotCerca()); showTitle(STOPS[0].title, 0); guiar(); } }, 250);
+    if (n >= 4 || now - t0 > 4000) setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) { const sp = spotCerca(); MO.pos.copy(sp.entra); MO.target.copy(sp.entra); MO.vel.set(0, 0, 0); moliIr(STOPS[0], 1700, sp); showTitle(STOPS[0].title, 0); guiar(); } }, 250);
     else requestAnimationFrame(tick); };
   requestAnimationFrame(tick);
 })();
