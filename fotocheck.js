@@ -41,6 +41,7 @@
     ['editar', '✏️', 'Editar aula', 'Mueve mesas, sillas y más'],
     ['cuenta', '🤖', 'Crear cuenta con Molí', 'Cuentas de tus estudiantes'],
     ['trabajar', '✨', 'Trabajar con Molí', 'Crea la ficha de tu sesión'],
+    ['preparadas', '📦', 'Sesiones preparadas', 'Unidad 7 lista para publicar'],
     ['escanear', '📷', 'Escanear', 'Exit tickets en papel'],
     ['remoto', '📱', 'Control remoto', 'Maneja la pantalla desde tu celular'],
     ['equipo', '💻', 'Laptop o celular', 'Qué hace este equipo']

@@ -224,8 +224,47 @@ Devuelve "sections" en orden; cada una con "kind": "texto" (información: "headi
     });
   }
 
+  // =================================================================
+  //  📦 SESIONES PREPARADAS: una unidad ya armada (data/*.json) fiel a las fichas del colegio; la docente la revisa y la publica
+  // =================================================================
+  const OFF = { enabled: false, title: '', desc: '', file: '' };
+  async function preparadas() {
+    const b = abrir('📦 Sesiones preparadas', 'Tus sesiones con sus fichas del colegio, listas para publicar.', 'estrellas', '<p class="hp-tip">Cargando…</p>', true);
+    let P, hechos = {};
+    try { P = await (await fetch('data/unidad7.json?v=' + Date.now(), { cache: 'no-store' })).json(); await MD.cargar(); }
+    catch (e) { b.innerHTML = '<p>📶 No pude cargar las sesiones preparadas. Revisa tu internet.</p>'; return; }
+    try { (await Docente.ticketsUnidad(P.unit)).forEach(t => { const n = +t.session; if (n > 0 && n < 30) hechos[n] = (hechos[n] || 0) + 1; }); }
+    catch (e) { b.innerHTML = `<p>${errTxt(e)}</p>`; return; }
+    const u = MD.unidades().find(x => x.key === P.unit) || { sessions: [] };
+    b.innerHTML = `<p class="hp-tip">📘 <b>Unidad ${esc(P.num)} · ${esc(P.titulo)}</b>. Cada sesión trae su ficha (la del colegio, en su orden, con las pistas de Molí ✨), su meta, criterios y actividades. Se mantienen tus archivos y videos. Si una sesión ya tiene Exit tickets respondidos, sus preguntas no se cambian (a menos que lo marques).</p>
+      <div class="pq-ls">${P.sesiones.map(x => { const q = x.ticket && x.ticket.questions ? x.ticket.questions.length : -1, h = hechos[x.n] || 0, ya = u.sessions[x.n - 1];
+        return `<div class="pq-s"><input type="checkbox" data-n="${x.n}" id="pq${x.n}" checked><span><label for="pq${x.n}"><b>Sesión ${x.n} · ${esc(x.title)}</b><small>${ya ? '🔄 reemplaza la actual' : '🆕 sesión nueva'} · 📄 ficha · 🧪 ${x.activities.length} actividades · ${q > 0 ? `🎟️ ${q} preguntas (del colegio${x.ticket.questions.some(z => z.m) ? ' + Molí' : ''})` : q === 0 ? '🎟️ sin Exit ticket' : '🎟️ se mantiene el actual'}</small></label>
+          ${q > 0 && h ? `<small class="pq-av">⚠️ ${h} ya respondieron su Exit ticket: se mantienen sus preguntas. <label><input type="checkbox" data-r="${x.n}"> Reemplazar igual</label></small>` : ''}</span></div>`; }).join('')}</div>
+      <button class="hp-ok" data-h="pub">📤 Publicar las sesiones marcadas</button><p class="hp-msg"></p>`;
+    b.querySelector('[data-h="pub"]').addEventListener('click', async e => {
+      const bt = e.currentTarget, m = b.querySelector('.hp-msg'), sel = new Set([...b.querySelectorAll('[data-n]:checked')].map(i => +i.dataset.n)), rep = new Set([...b.querySelectorAll('[data-r]:checked')].map(i => +i.dataset.r));
+      if (!sel.size) { m.textContent = 'Marca al menos una sesión.'; return; }
+      bt.disabled = true; m.textContent = 'Publicando…';
+      try {
+        await MD.publicar(units => {
+          const U = units.find(x => x.key === P.unit); if (!U) throw new Error('NOUNIT');
+          P.sesiones.filter(x => sel.has(x.n)).forEach(x => {
+            const s0 = U.sessions[x.n - 1] || { title: '', meta: '', criteria: ['', '', ''], rubric: '', flipped: OFF, flipped2: OFF, activities: [], ticket: { questions: [] }, hidden: false }, A0 = s0.activities || [];
+            const s = { ...s0, title: x.title, flipped: { ...OFF, ...x.flipped, file: (s0.flipped || {}).file || '' }, flipped2: { ...OFF, ...x.flipped2, file: (s0.flipped2 || {}).file || '' }, fx: x.fx };
+            if (x.meta) s.meta = x.meta; if (x.criteria) s.criteria = x.criteria; if (x.rubric) s.rubric = x.rubric;
+            s.activities = x.activities.map((a, k) => ({ ficha: 'Ficha de la sesión', file: '', ...(A0[k] || (A0[0] && A0[0].file ? { file: A0[0].file } : {})), mode: a.mode, title: a.title, desc: a.desc }));   // se quedan sus archivos y videos
+            if (x.ticket && (!hechos[x.n] || rep.has(x.n))) s.ticket = x.ticket;
+            while (U.sessions.length < x.n - 1) U.sessions.push({ title: '', meta: '', criteria: ['', '', ''], rubric: '', flipped: OFF, flipped2: OFF, activities: [], ticket: { questions: [] } });
+            U.sessions[x.n - 1] = s;
+          });
+        });
+        m.innerHTML = `✅ ¡Listo! Publiqué ${sel.size} ${sel.size === 1 ? 'sesión' : 'sesiones'}. Ya están en el cuaderno de sesiones (y en Molí 1). Revisa cada una y, si quieres, toca «✏️ Editar sesión».`;
+      } catch (x) { bt.disabled = false; m.textContent = x.message === 'NOUNIT' ? 'No encontré la unidad en tus sesiones.' : x.message === 'GRANDE' ? 'El contenido quedó muy grande.' : errTxt(x); }
+    });
+  }
+
   // ---- qué abre cada botón del fotocheck ----
-  const H = { cuenta: crearCuenta, trabajar };
+  const H = { cuenta: crearCuenta, trabajar, preparadas };
   addEventListener('moli2:herramienta', e => { const f = H[e.detail] || (window.Herramientas && window.Herramientas.extra && window.Herramientas.extra[e.detail]); if (f) f(); });
   window.Herramientas = { abrir, cerrar, esc, extra: {}, set cerrarActual(f) { cerrarActual = f; } };
 })();

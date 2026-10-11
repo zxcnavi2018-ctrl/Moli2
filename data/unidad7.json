@@ -1,0 +1,2616 @@
+{
+"unit": "unit7",
+"num": "7",
+"titulo": "Microorganismos en acción",
+"v": "2026-10-11",
+"sesiones": [
+{
+"n": 1,
+"title": "Analizo y clasifico enfermedades",
+"meta": "Explicar qué es una enfermedad y diferenciar sus tipos a partir de una situación.",
+"criteria": [
+"Reconoce el concepto de enfermedad con ejemplos de su entorno.",
+"Describe los tipos de enfermedades.",
+"Diferencia entre enfermedades infecciosas y no infecciosas."
+],
+"rubric": "Explica hechos o fenómenos naturales utilizando conocimientos científicos.",
+"flipped": {
+"enabled": true,
+"title": "Tarea flipped: Microorganismos (Anexo 3)",
+"desc": "Investiga en fuentes confiables sobre la levadura, las bacterias del yogur, Salmonella y el moho del pan, y completa la matriz. Trae para la siguiente sesión: ½ cucharadita de levadura seca comercial, una cucharadita de azúcar, una regla graduada y lápices de dos colores.",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "individual",
+"title": "Analizo y clasifico enfermedades",
+"desc": "Leemos cuatro casos (Lucía, Mariana, Carlos y Pedro) e identificamos qué problema de salud presenta cada persona, qué lo causa, si interviene un agente infeccioso y qué dato del caso nos permite decidir (Anexo 1)."
+},
+{
+"mode": "group",
+"title": "Comité médico: clasificamos, comparamos y explicamos",
+"desc": "En equipo clasificamos 6 tarjetas de enfermedades, comparamos una enfermedad infecciosa con una no infecciosa, elaboramos nuestra explicación y revisamos la de otro equipo (Anexo 2)."
+}
+],
+"ticket": {
+"questions": [
+{
+"q": "Mariana tiene influenza causada por un virus. Su abuela tiene diabetes. ¿Cuál afirmación diferencia mejor ambas enfermedades?",
+"options": [
+"Las dos son enfermedades infecciosas porque ambas afectan la salud.",
+"La influenza es infecciosa porque está causada por un agente infeccioso; la diabetes es no infecciosa porque no está causada por uno.",
+"La diabetes es infecciosa porque puede durar mucho tiempo y la influenza es no infecciosa porque puede durar pocos días."
+],
+"answer": 1,
+"why": "Lo que diferencia a las enfermedades es su causa: la influenza la causa un virus; la diabetes no la causa ningún agente infeccioso."
+},
+{
+"q": "Pedro tiene anemia por falta de hierro. ¿Qué tipo de enfermedad es?",
+"options": [
+"Infecciosa, porque la causa un virus",
+"No infecciosa: no la causa un agente infeccioso",
+"Infecciosa, porque produce cansancio",
+"No es una enfermedad"
+],
+"answer": 1,
+"why": "La anemia por falta de hierro no la causa un virus, bacteria, hongo ni parásito.",
+"m": 1
+},
+{
+"q": "¿Qué causa el dengue?",
+"options": [
+"Un virus que transmite un mosquito",
+"La falta de hierro",
+"El exceso de glucosa",
+"Las bacterias del yogur"
+],
+"answer": 0,
+"why": "El dengue lo causa un virus que llega a las personas por la picadura de un mosquito infectado.",
+"m": 1
+}
+]
+},
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Analizo y clasifico enfermedades",
+"st": "No todas las enfermedades tienen la misma causa: ¡descubrámoslo como un comité médico! 🩺",
+"sb": "El dengue no se contagia de persona a persona: lo transmite la picadura del mosquito Aedes aegypti infectado.",
+"s": [
+{
+"k": "texto",
+"h": "Lee cada situación",
+"t": "Caso 1. Influenza: Lucía presenta fiebre, tos y dolor de garganta. El médico explica que tiene influenza, una enfermedad causada por un virus.\nCaso 2. Dengue: Mariana tiene fiebre alta y dolor muscular. El médico explica que presenta dengue, una enfermedad causada por un virus que puede llegar a las personas mediante la picadura de un mosquito infectado.\nCaso 3. Diabetes: Carlos debe controlar regularmente la cantidad de glucosa en su sangre porque tiene diabetes. Esta enfermedad no es causada por virus, bacterias, hongos ni parásitos.\nCaso 4. Anemia por falta de hierro: Pedro presenta cansancio frecuente. Los análisis muestran que tiene anemia relacionada con una cantidad insuficiente de hierro en su organismo.",
+"a": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "1. Completa.",
+"c": [
+"Caso",
+"¿Qué enfermedad presenta?",
+"¿Qué la causa?",
+"¿Interviene un agente infeccioso?",
+"Tipo de enfermedad",
+"¿Qué dato del caso te permitió decidir?"
+],
+"r": 3,
+"a": 1,
+"hp": "Fíjate en la causa, no solo en los síntomas: ¿aparece algún virus, bacteria, hongo o parásito?",
+"o": 0,
+"it": [
+"Lucía",
+"Mariana",
+"Carlos",
+"Pedro"
+]
+},
+{
+"k": "tabla",
+"t": "2. A partir de los casos, completa.",
+"c": [
+"Una enfermedad es…",
+"Una enfermedad infecciosa se caracteriza por…",
+"Una enfermedad no infecciosa se caracteriza por…"
+],
+"r": 1,
+"a": 1,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "3. Explica: ¿Qué diferencia principal encuentras entre una enfermedad infecciosa y una no infecciosa?",
+"a": 1,
+"hp": "Usa un ejemplo de cada tipo.",
+"f": "La diferencia principal es que…",
+"ln": 2,
+"o": 0
+},
+{
+"k": "texto",
+"h": "Anexo 2 · Comité médico",
+"t": "Reto: Un centro de salud necesita organizar diferentes casos para explicar a las familias que no todas las enfermedades tienen la misma causa. Su equipo deberá clasificarlas y elaborar una explicación clara.",
+"a": 2,
+"o": 0
+},
+{
+"k": "lista",
+"h": "1. Clasificamos — Lean las 6 tarjetas:",
+"t": "",
+"it": [
+"Influenza: Enfermedad causada por un virus. Puede propagarse entre personas mediante gotitas respiratorias.",
+"Tuberculosis: Enfermedad causada por una bacteria. Puede transmitirse a través del aire cuando una persona enferma tose o estornuda.",
+"Dengue: Enfermedad causada por un virus que puede transmitirse mediante la picadura de un mosquito infectado.",
+"Diabetes: Enfermedad relacionada con dificultades del organismo para regular la glucosa en la sangre. No es causada por un agente infeccioso.",
+"Asma: Enfermedad que afecta las vías respiratorias y puede dificultar la respiración. No es causada por un agente infeccioso.",
+"Anemia por deficiencia de hierro: Enfermedad relacionada con una cantidad insuficiente de hierro en el organismo. No es causada por un agente infeccioso."
+],
+"a": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Colóquenlas en la categoría correspondiente.",
+"c": [
+"Enfermedades infecciosas",
+"Enfermedades no infecciosas"
+],
+"r": 3,
+"a": 2,
+"hp": "Para cada caso completen oralmente: «La clasificamos como ____ porque ____».",
+"o": 0
+},
+{
+"k": "tabla",
+"t": "2. Comparamos: elijan una enfermedad infecciosa y una no infecciosa.",
+"c": [
+"Aspecto",
+"Enfermedad infecciosa",
+"Enfermedad no infecciosa"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Nombre",
+"Causa",
+"¿Interviene un agente infeccioso?",
+"¿Puede propagarse?",
+"Evidencia que permite clasificarla"
+]
+},
+{
+"k": "pregunta",
+"t": "3. Elaboramos nuestra explicación: ¿Cuál es la diferencia principal entre una enfermedad infecciosa y una no infecciosa?",
+"a": 2,
+"hp": "Pueden utilizar este apoyo.",
+"f": "Ambas son enfermedades porque ____. Sin embargo, se diferencian en que ____. Por ejemplo, ____ es infecciosa porque ____, mientras que ____ es no infecciosa porque ____.",
+"ln": 3,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "4. Revisamos otra explicación (retroalimentación): lean la producción de otro equipo.",
+"c": [
+"Una fortaleza",
+"Una pregunta para mejorar"
+],
+"r": 1,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Metacognición: completa dos de las siguientes frases.",
+"a": 0,
+"hp": "Antes pensaba que las enfermedades… · Ahora comprendo que… · Para diferenciar los tipos de enfermedades debo fijarme en… · El caso que más me ayudó a comprender fue…",
+"f": "",
+"ln": 2,
+"o": 0
+}
+]
+}
+},
+{
+"n": 2,
+"title": "Investigamos microorganismos",
+"meta": null,
+"criteria": null,
+"rubric": null,
+"flipped": {
+"enabled": true,
+"title": "Materiales para observar la levadura",
+"desc": "Trae para la siguiente sesión: ½ cucharadita de levadura seca comercial, una cucharadita de azúcar, una regla graduada y lápices de dos colores.",
+"file": ""
+},
+"flipped2": {
+"enabled": true,
+"title": "Microorganismos y fuentes confiables",
+"desc": "Trae la matriz del Anexo 3 con lo que investigaste sobre la levadura, las bacterias del yogur, Salmonella y el moho del pan.",
+"file": ""
+},
+"activities": [
+{
+"mode": "individual",
+"title": "Investigamos en fuentes confiables",
+"desc": "Investigamos sobre la levadura, las bacterias del yogur, Salmonella y el moho del pan; completamos la matriz y registramos las fuentes consultadas (Anexo 3)."
+},
+{
+"mode": "individual",
+"title": "Elaboramos una conclusión",
+"desc": "Completamos la conclusión comparando los microorganismos con la información y las evidencias obtenidas."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Microorganismos",
+"st": "Pequeñitos, distintos y muy importantes: ¡a investigar! 🔍",
+"sb": "Las bacterias del yogur (como Lactobacillus) transforman el azúcar de la leche en ácido láctico: por eso el yogur es espeso y un poco ácido.",
+"s": [
+{
+"k": "texto",
+"h": "",
+"t": "Investiga en fuentes confiables sobre los siguientes microorganismos: levadura, bacterias del yogur, Salmonella y moho del pan.",
+"a": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "1. Completa la matriz.",
+"c": [
+"Microorganismo",
+"¿Qué tipo de microorganismo es?",
+"Características",
+"¿Dónde se encuentra?",
+"¿Qué función cumple?",
+"¿Qué efecto produce?",
+"Evidencia encontrada"
+],
+"r": 3,
+"a": 1,
+"hp": "Una fuente confiable tiene autor o institución reconocida (Minsa, OMS, una universidad, un libro de texto).",
+"o": 0,
+"it": [
+"Levadura",
+"Bacterias del yogur",
+"Salmonella",
+"Moho del pan"
+]
+},
+{
+"k": "tabla",
+"t": "Registra las fuentes consultadas.",
+"c": [
+"Fuente consultada"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "2. Elabora una conclusión: completa la conclusión utilizando la información y evidencias obtenidas.",
+"a": 2,
+"hp": "",
+"f": "No todos los microorganismos son iguales porque ____. Aunque ____ y ____ se parecen en ____, se diferencian en ____. La evidencia que sustenta nuestra comparación es ____.",
+"ln": 4,
+"o": 0
+}
+]
+}
+},
+{
+"n": 3,
+"title": "Observamos la levadura en acción",
+"meta": "Explica el fenómeno de la actividad de la levadura para delimitar una relación investigable.",
+"criteria": [
+"Observa los cambios producidos durante la experiencia.",
+"Registra los cambios mediante medidas y descripciones.",
+"Describe los factores que podrían modificar el fenómeno."
+],
+"rubric": "Describe hechos y fenómenos.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": true,
+"title": "Trae hoy tus materiales",
+"desc": "½ cucharadita de levadura seca comercial, una cucharadita de azúcar, una regla graduada y lápices de dos colores.",
+"file": ""
+},
+"activities": [
+{
+"mode": "group",
+"title": "Observamos y registramos la actividad de la levadura",
+"desc": "En equipo preparamos la mezcla con 50 mL de agua tibia, 5 g de azúcar y 2 g de levadura, marcamos el nivel inicial e iniciamos el cronómetro. Cada uno registra la altura de la espuma a los 0, 5, 10, 15 y 20 minutos."
+},
+{
+"mode": "individual",
+"title": "De los datos a una explicación",
+"desc": "Analizamos lo observado, calculamos cuánto cambió la altura de la espuma, leemos información científica y explicamos el fenómeno."
+},
+{
+"mode": "group",
+"title": "Identificamos qué podríamos investigar",
+"desc": "En equipo completamos el factor que podría modificarse, el efecto que podría medirse y su instrumento, y anotamos la relación que continuaremos: temperatura del agua – altura de la espuma."
+}
+],
+"ticket": {
+"questions": [
+{
+"q": "Un equipo observó que la altura de la espuma aumentó de 0 cm a 2 cm en 15 minutos. ¿Qué relación podría investigarse experimentalmente?",
+"options": [
+"Cambiar la temperatura del agua y medir la altura de la espuma.",
+"Cambiar la altura de la espuma y medir la cantidad de levadura.",
+"Cambiar las burbujas y medir el tamaño del recipiente."
+],
+"answer": 0,
+"why": "Se cambia algo que podemos modificar (la temperatura del agua) y se mide su efecto (la altura de la espuma)."
+},
+{
+"q": "¿Qué gas libera la levadura durante la fermentación?",
+"options": [
+"Oxígeno",
+"Dióxido de carbono",
+"Vapor de agua",
+"Nitrógeno"
+],
+"answer": 1,
+"why": "Durante la fermentación la levadura libera dióxido de carbono; sus burbujas forman la espuma.",
+"m": 1
+},
+{
+"q": "La espuma pasó de 0 cm a 2,5 cm en 20 minutos. ¿Cuánto cambió?",
+"options": [
+"2 cm",
+"2,5 cm",
+"20 cm",
+"0,5 cm"
+],
+"answer": 1,
+"why": "2,5 cm − 0 cm = 2,5 cm.",
+"m": 1
+}
+]
+},
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Observamos la levadura en acción",
+"st": "Hoy somos científicos: observamos, medimos y explicamos. 🔬",
+"sb": "En un solo gramo de levadura de pan hay miles de millones de células vivas.",
+"s": [
+{
+"k": "texto",
+"h": "El pan que no siempre crece igual",
+"t": "En la cafetería de la escuela prepararon dos masas para elaborar pan. En una, la masa aumentó rápidamente de tamaño; en la otra, casi no se observaron cambios. En ambas se había utilizado levadura.",
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "Normas de seguridad",
+"t": "",
+"it": [
+"Utilizar únicamente levadura comercial.",
+"No ingerir la mezcla.",
+"No cerrar herméticamente el recipiente.",
+"Manipular el agua tibia bajo supervisión.",
+"Limpiar inmediatamente cualquier derrame.",
+"Lavarse las manos al concluir.",
+"Evitar acercar el rostro directamente al vaso."
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "1. Antes de comenzar: ¿Qué cambio crees que observarás en la mezcla?",
+"a": 1,
+"hp": "Todavía no hay respuestas correctas o incorrectas: escribe tu predicción.",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Qué cambio podrías medir con una regla?",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "2. Registramos los cambios: observa la mezcla en cada momento y completa la tabla.",
+"c": [
+"Tiempo",
+"Altura de la espuma (cm)",
+"Burbujas observadas",
+"Descripción del cambio"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"0 min",
+"5 min",
+"10 min",
+"15 min",
+"20 min"
+]
+},
+{
+"k": "lista",
+"h": "Recuerda",
+"t": "",
+"it": [
+"Medir implica utilizar un instrumento y registrar una cantidad con su unidad.",
+"Describir implica señalar lo que observas sin explicar todavía por qué ocurre."
+],
+"a": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "3. Analizamos lo observado. a. ¿Qué cambio principal observaste?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "b. Escribe dos datos de la tabla que demuestren ese cambio.",
+"a": 2,
+"hp": "Un dato lleva número y unidad: «a los 10 min, 1,2 cm».",
+"f": "1. … / 2. …",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "c. ¿Cuánto cambió la altura de la espuma entre el inicio y los 20 minutos?",
+"c": [
+"Dato",
+"Valor"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"d": [
+[
+"Altura a los 20 min",
+"____ cm"
+],
+[
+"Altura inicial",
+"____ cm"
+],
+[
+"Cálculo",
+""
+],
+[
+"Diferencia",
+"____ cm"
+]
+]
+},
+{
+"k": "texto",
+"h": "4. Leemos información científica",
+"t": "La levadura es un microorganismo formado por una sola célula. Cuando tiene agua, azúcar y una temperatura adecuada, puede realizar fermentación.\nDurante este proceso se produce un gas llamado dióxido de carbono. Las burbujas de este gas ayudan a formar la espuma que observamos.\nLa levadura utilizada para preparar pan (Saccharomyces cerevisiae) suele tener mayor actividad cerca de los 30 °C. Con temperaturas más bajas puede actuar más lentamente, mientras que temperaturas muy altas pueden reducir su actividad o dañarla.\nTambién podemos observar cómo cambia la mezcla con el paso del tiempo, por ejemplo, si aumenta la espuma o aparecen más burbujas.\nFuente: Adaptado de Khan Academy, Fermentación y respiración anaeróbica, y de Salvadó et al. (2011), estudio sobre la respuesta de Saccharomyces cerevisiae a la temperatura.",
+"a": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Después de leer: a. ¿Qué gas libera la levadura durante la fermentación?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "b. ¿Cómo se relaciona este gas con las burbujas y la espuma observada?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "5. Explicamos el fenómeno: completa la explicación utilizando tus datos y la información científica.",
+"a": 2,
+"hp": "",
+"f": "La altura de la espuma cambió de ___ cm a ___ cm. Este cambio ocurrió porque la levadura utilizó el azúcar y liberó ______. Las burbujas de este gas contribuyeron a ______.",
+"ln": 3,
+"o": 0
+},
+{
+"k": "lista",
+"h": "6. Identificamos una relación que podemos investigar — a. Piensa en la experiencia:",
+"t": "",
+"it": [
+"¿Qué aspecto podríamos cambiar intencionalmente en una nueva experiencia?",
+"¿Qué efecto podríamos observar o medir para saber qué ocurrió?",
+"¿Con qué instrumento podríamos medirlo?"
+],
+"a": 3,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "b. Completa.",
+"c": [
+"Factor que podría modificarse",
+"Efecto que podría medirse",
+"Instrumento para medirlo"
+],
+"r": 2,
+"a": 3,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "c. Escribe otros dos factores que podrían modificar la actividad de la levadura.",
+"a": 3,
+"hp": "",
+"f": "- … / - …",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "d. Relación que retomaremos en la siguiente sesión.",
+"a": 3,
+"hp": "",
+"f": "Posible relación entre la ______ del agua y la ______ de la espuma.",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Metacognición: completa solo dos.",
+"a": 0,
+"hp": "Una medida que me ayudó a comprender el fenómeno fue… · Ahora entiendo que observar científicamente también implica… · Un factor que podríamos modificar es… · Un efecto que podríamos medir es…",
+"f": "",
+"ln": 2,
+"o": 0
+}
+]
+}
+},
+{
+"n": 4,
+"title": "Formulamos nuestra pregunta",
+"meta": "Formula una pregunta que pueda responderse mediante una indagación experimental.",
+"criteria": [
+"Selecciona un factor que pueda modificarse.",
+"Selecciona un efecto que pueda medirse.",
+"Relaciona una causa y un efecto, definiendo qué cambiará y qué medirá."
+],
+"rubric": "Formula pregunta de indagación.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "individual",
+"title": "Formulamos individualmente una pregunta de indagación",
+"desc": "Leemos la situación, identificamos el factor que se modificará, los valores que se probarán, el efecto que se medirá, el instrumento y la unidad, y escribimos nuestra primera pregunta con el andamio (Anexo Sesión 4)."
+},
+{
+"mode": "group",
+"title": "Construimos la pregunta de indagación del equipo",
+"desc": "Comparamos nuestras preguntas, elaboramos la pregunta del equipo y la mejoramos con la retroalimentación «estrellas y escaleras»."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Formulamos nuestra pregunta",
+"st": "Una buena pregunta dice qué cambiaremos y qué mediremos. ❓",
+"sb": "Daniel Gabriel Fahrenheit inventó el termómetro de mercurio en 1714; hoy lo usamos para controlar la temperatura del agua.",
+"s": [
+{
+"k": "texto",
+"h": "1. Comprendemos la situación",
+"t": "Durante la sesión anterior observamos que una mezcla con levadura produjo burbujas y espuma. Ahora queremos investigar si la temperatura inicial del agua influye en la altura de la espuma.\nPara realizar la experiencia se utilizará: agua a 15 °C, 25 °C y 35 °C; un termómetro; una regla; un cronómetro; la misma cantidad de agua, azúcar y levadura en cada recipiente.",
+"a": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "2. Reconocemos qué cambiaremos y qué mediremos: completa la información.",
+"c": [
+"Elemento de la indagación",
+"Respuesta"
+],
+"r": 3,
+"a": 1,
+"hp": "15 °C, 25 °C y 35 °C no son tres variables diferentes: son tres valores de la temperatura inicial del agua.",
+"o": 0,
+"it": [
+"Factor que se modificará",
+"Valores que se probarán",
+"Efecto que se medirá",
+"Instrumento para medir el efecto",
+"Unidad de medida",
+"Tiempo en el que se compararán los resultados"
+]
+},
+{
+"k": "lista",
+"h": "Para recordar",
+"t": "",
+"it": [
+"El factor que se modificará es aquello que cambiaremos intencionalmente.",
+"El efecto que se medirá es el resultado que observaremos y registraremos con un instrumento."
+],
+"a": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "3. Formulamos una pregunta individual: completa el andamio.",
+"a": 1,
+"hp": "",
+"f": "¿Cómo influye ______ en ______ después de ______?",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Mi primera pregunta",
+"a": 1,
+"hp": "Revisa: ¿se nota qué cambiarás y qué medirás?",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Reviso mi pregunta",
+"c": [
+"Criterio",
+"Sí",
+"Debo mejorar"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Seleccioné un factor que puede modificarse",
+"Seleccioné un efecto que puede medirse",
+"Relacioné lo que se modificará con lo que se medirá"
+]
+},
+{
+"k": "pregunta",
+"t": "4. Construimos y mejoramos la pregunta del equipo. Pregunta inicial del equipo:",
+"a": 2,
+"hp": "La pregunta debe indicar que se modificará la temperatura inicial del agua, que se medirá la altura de la espuma y poder responderse mediante mediciones.",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Retroalimentación recibida",
+"c": [
+"Una estrella: algo que logramos",
+"Una escalera: algo que podemos mejorar"
+],
+"r": 1,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Pregunta mejorada del equipo",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+}
+]
+}
+},
+{
+"n": 5,
+"title": "Elaboramos nuestra hipótesis",
+"meta": "Elabora una hipótesis causal y fundamentada para la indagación.",
+"criteria": [
+"Selecciona información científica relacionada con la pregunta.",
+"Establece una relación de causa y efecto entre las variables.",
+"Predice en qué condición se producirá mayor altura de espuma, es decir, con cuál de las temperaturas probadas."
+],
+"rubric": "Elabora hipótesis.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "individual",
+"title": "Elaboramos individualmente una hipótesis",
+"desc": "Recuperamos la pregunta de indagación, leemos la información científica, seleccionamos dos ideas y escribimos nuestra hipótesis con el andamio «Si…, entonces…, porque…» (Anexo Sesión 5)."
+},
+{
+"mode": "group",
+"title": "Construimos la hipótesis del equipo",
+"desc": "Leemos nuestras hipótesis, las comparamos, elaboramos la hipótesis del equipo y la mejoramos con la retroalimentación «estrellas y escaleras»."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Elaboramos nuestra hipótesis",
+"st": "Una hipótesis es una posible respuesta… ¡con un porqué científico! 💡",
+"sb": "En el antiguo Egipto ya se usaba levadura para hacer pan y bebidas fermentadas hace miles de años.",
+"s": [
+{
+"k": "texto",
+"h": "Situación: «Cuatro respuestas para una misma pregunta»",
+"t": "El equipo «Levaduras en acción» formuló esta pregunta: ¿Cómo influye la cantidad de levadura en la altura de la espuma producida después de 20 minutos? Antes de realizar el experimento, sus integrantes propusieron cuatro posibles respuestas.\nDaniela: «Habrá mucha espuma porque la levadura produce espuma».\nLuis: «La mezcla que tenga mayor cantidad de levadura producirá mayor altura de espuma después de 20 minutos».\nAndrea: «La mezcla que tenga mayor cantidad de levadura podría producir mayor altura de espuma porque contendrá inicialmente más células de levadura capaces de utilizar el azúcar y liberar dióxido de carbono».\nMateo: «Si colocamos más levadura y también más azúcar, se producirá mayor altura de espuma».",
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "Preguntas para analizar el caso",
+"t": "",
+"it": [
+"¿Cuál de las respuestas constituye solamente una opinión?",
+"¿Cuál presenta una predicción, pero todavía no explica por qué?",
+"¿Cuál relaciona claramente una causa con un efecto?",
+"¿Cuál utiliza información científica?",
+"¿Cuál modifica dos factores al mismo tiempo?",
+"¿Cuál podría comprobarse mediante el experimento?",
+"¿La respuesta de Andrea es una conclusión o una posible respuesta?"
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "texto",
+"h": "Recuerda",
+"t": "Una hipótesis no es una adivinanza ni una conclusión. Es una posible respuesta que relaciona una causa con un efecto y explica por qué se espera ese resultado.",
+"a": 0,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "1. Recuperamos nuestra pregunta: copia la pregunta acordada en la sesión anterior.",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "texto",
+"h": "2. La levadura y la temperatura",
+"t": "La levadura es un microorganismo formado por una sola célula. Cuando dispone de agua y azúcar, puede realizar un proceso llamado fermentación.\nDurante la fermentación, la levadura utiliza el azúcar y libera dióxido de carbono. Las burbujas de este gas contribuyen a formar la espuma que observamos en la mezcla.\nLa temperatura puede modificar la actividad de la levadura. Dentro de un intervalo adecuado, una temperatura más cálida puede favorecer la fermentación y la producción de dióxido de carbono. Sin embargo, una temperatura demasiado alta puede dañar las células de la levadura.",
+"a": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Selecciona dos ideas que te ayuden a explicar tu predicción.",
+"a": 1,
+"hp": "Subraya en el texto las ideas que explican cómo la temperatura puede influir en la actividad de la levadura.",
+"f": "Idea 1: … / Idea 2: …",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Explica por qué seleccionaste esas ideas.",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "3. Elaboramos una hipótesis individual: completa la información.",
+"c": [
+"Componente",
+"Respuesta"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Factor que se modificará",
+"Efecto que se medirá",
+"Temperaturas que se probarán",
+"Temperatura con la que espero mayor altura de espuma",
+"Información científica que explica mi predicción"
+]
+},
+{
+"k": "pregunta",
+"t": "Organizo mi hipótesis.",
+"a": 1,
+"hp": "",
+"f": "Si la temperatura inicial del agua ______, entonces la mezcla preparada con agua a ___ °C producirá ______, porque ______.",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Mi hipótesis",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 3,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Reviso mi hipótesis",
+"c": [
+"Criterio",
+"Sí",
+"Debo mejorar"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Seleccioné información científica relacionada con la pregunta",
+"Relacioné la temperatura con la altura de la espuma",
+"Predije con cuál temperatura se producirá mayor altura",
+"Expliqué científicamente mi predicción"
+]
+},
+{
+"k": "pregunta",
+"t": "4. Construimos y mejoramos la hipótesis del equipo. Hipótesis inicial del equipo:",
+"a": 2,
+"hp": "Debe responder la pregunta, relacionar la temperatura inicial del agua con la altura de la espuma, predecir con cuál temperatura habrá mayor altura e incluir una explicación científica.",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Retroalimentación recibida",
+"c": [
+"Una estrella: algo que logramos",
+"Una escalera: algo que podemos mejorar"
+],
+"r": 1,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Hipótesis mejorada del equipo",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+}
+]
+}
+},
+{
+"n": 6,
+"title": "Determinamos las variables",
+"meta": "Determina las variables necesarias para comprobar la hipótesis.",
+"criteria": [
+"Identifica la variable que modificará y la que medirá.",
+"Define cómo medirá cada variable y qué unidades empleará.",
+"Establece las condiciones que mantendrá iguales."
+],
+"rubric": "Verificación de hipótesis a través de diseño de indagación propuesto.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "individual",
+"title": "Identificamos qué modificaremos y qué mediremos",
+"desc": "Copiamos la pregunta y la hipótesis, e identificamos la variable que se modificará, sus valores, la variable que se medirá, cómo se medirá, con qué instrumento y en qué unidad (Anexo Sesión 6)."
+},
+{
+"mode": "group",
+"title": "Establecemos los factores que mantendremos iguales",
+"desc": "En equipo revisamos una comparación, decidimos qué factores mantendremos iguales, organizamos nuestras variables y revisamos con el semáforo de criterios."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Determinamos las variables",
+"st": "Cambiamos una sola cosa, medimos un efecto y cuidamos que lo demás no cambie. ⚖️",
+"sb": "A una prueba en la que solo cambia una cosa a la vez los científicos la llaman «experimento controlado» o «prueba justa».",
+"s": [
+{
+"k": "datos",
+"h": "Conceptos centrales",
+"t": "",
+"c": [
+"Concepto",
+"Explicación",
+"Pregunta orientadora"
+],
+"d": [
+[
+"Variable independiente",
+"Factor que se modifica deliberadamente",
+"¿Qué cambiaremos?"
+],
+[
+"Variable dependiente",
+"Efecto que se observa o mide",
+"¿Qué mediremos para reconocer el efecto?"
+],
+[
+"Variable controlada",
+"Aspectos que se mantienen iguales",
+"¿Qué no debe cambiar?"
+]
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "texto",
+"h": "Principio de la sesión",
+"t": "Cambiamos una variable, medimos un efecto y mantenemos iguales las demás condiciones.",
+"a": 0,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "1. Recuperamos nuestra pregunta y nuestra hipótesis. Pregunta de indagación:",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Hipótesis:",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "2. Identificamos qué modificaremos y qué mediremos.",
+"c": [
+"Componente",
+"Decisión"
+],
+"r": 3,
+"a": 1,
+"hp": "Observa el termómetro y la regla: ¿qué medirás con cada uno y en qué unidad?",
+"o": 0,
+"it": [
+"Variable que se modificará",
+"Valores que se probarán",
+"¿Cómo se establecerá o medirá?",
+"Instrumento",
+"Unidad",
+"Variable que se medirá",
+"¿Cómo se medirá?",
+"Instrumento",
+"Unidad"
+]
+},
+{
+"k": "lista",
+"h": "Recuerda",
+"t": "",
+"it": [
+"La variable que modificaremos se llama variable independiente.",
+"La variable que mediremos se llama variable dependiente."
+],
+"a": 1,
+"o": 0
+},
+{
+"k": "datos",
+"h": "3. Revisamos una comparación",
+"t": "Un equipo preparó las siguientes mezclas:",
+"c": [
+"Mezcla",
+"Temperatura inicial",
+"Agua",
+"Azúcar",
+"Levadura"
+],
+"d": [
+[
+"A",
+"15 °C",
+"50 mL",
+"5 g",
+"2 g"
+],
+[
+"B",
+"35 °C",
+"60 mL",
+"10 g",
+"3 g"
+]
+],
+"a": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Qué factores cambió el equipo?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Podría saber si la diferencia en la espuma fue producida solamente por la temperatura? ¿Por qué?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "4. Establecemos los factores que mantendremos iguales.",
+"c": [
+"Factor",
+"Valor o forma que utilizaremos"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Cantidad de agua",
+"Cantidad de azúcar",
+"Cantidad de levadura",
+"Tipo y tamaño del recipiente",
+"Forma de mezclar",
+"Tiempo total de observación",
+"Momentos de medición",
+"Forma de medir la espuma"
+]
+},
+{
+"k": "tabla",
+"t": "Organizamos nuestras variables",
+"c": [
+"Cambiaremos",
+"Mediremos",
+"Mantendremos igual"
+],
+"r": 1,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "tabla",
+"t": "5. Revisamos mediante el semáforo de criterios: marca un color para cada criterio.",
+"c": [
+"Criterio",
+"🟢 Verde",
+"🟡 Amarillo",
+"🔴 Rojo"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Identifica la variable que se modificará y la que se medirá",
+"Indica los instrumentos y las unidades",
+"Establece los factores que se mantendrán iguales"
+]
+},
+{
+"k": "pregunta",
+"t": "Pregunta para ayudar a mejorar",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Mejora realizada",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+}
+]
+}
+},
+{
+"n": 7,
+"title": "Diseñamos y validamos la indagación",
+"meta": "Diseña una estrategia experimental válida y segura para comprobar la hipótesis.",
+"criteria": [
+"Describe los materiales e instrumentos que utilizará, su función y las medidas de seguridad.",
+"Organiza las acciones en una secuencia lógica.",
+"Diseña una tabla que incluya temperaturas, tiempos y repeticiones."
+],
+"rubric": "Verificación de hipótesis a través de diseño de indagación propuesto.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "group",
+"title": "Seleccionamos materiales y organizamos el procedimiento",
+"desc": "Revisamos los acuerdos (15 °C, 25 °C y 35 °C; 50 mL de agua; 5 g de azúcar; 2 g de levadura; 20 minutos), seleccionamos materiales e instrumentos con su función, escribimos las medidas de seguridad y ordenamos los pasos (Anexo Sesión 7)."
+},
+{
+"mode": "group",
+"title": "Diseñamos la tabla de registro",
+"desc": "Diseñamos una tabla con las temperaturas, las repeticiones 1, 2 y 3 y la unidad, y mejoramos el diseño con la retroalimentación «Veo, Pregunto, Sugiero»."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Diseñamos y validamos la indagación",
+"st": "Un buen diseño es claro, ordenado… ¡y seguro! 🧪",
+"sb": "Durante la fermentación se produce gas: si se cerrara herméticamente el recipiente, la presión aumentaría. Por eso nunca lo tapamos.",
+"s": [
+{
+"k": "datos",
+"h": "Principios de un diseño válido",
+"t": "",
+"c": [
+"Principio",
+"Pregunta orientadora"
+],
+"d": [
+[
+"Correspondencia",
+"¿El procedimiento permite responder nuestra pregunta?"
+],
+[
+"Comparación controlada",
+"¿Solo cambia la variable independiente?"
+],
+[
+"Medición común",
+"¿La espuma se medirá de la misma manera en todas las condiciones?"
+],
+[
+"Repetición",
+"¿Cada condición se realizará más de una vez?"
+],
+[
+"Secuencia",
+"¿Los pasos están ordenados y son suficientemente precisos?"
+],
+[
+"Viabilidad",
+"¿Puede realizarse con los materiales y el tiempo disponibles?"
+],
+[
+"Seguridad",
+"¿Evita riesgos previsibles para los estudiantes?"
+]
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "texto",
+"h": "¿Por qué realizar repeticiones?",
+"t": "Una sola medición podría verse afectada por: una diferencia accidental en la cantidad de un ingrediente, una lectura incorrecta de la regla, un recipiente mal etiquetado, una variación en la agitación, burbujas aisladas o una diferencia en el momento de medición.\nSe recomienda realizar tres repeticiones (R1, R2 y R3) por cada valor de la variable independiente. Cada repetición debe prepararse por separado siguiendo el mismo procedimiento.",
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "Medidas generales de seguridad",
+"t": "",
+"it": [
+"Utilizar únicamente levadura para panificación.",
+"No probar ni consumir ninguna mezcla.",
+"No utilizar agua a más de 40 °C.",
+"El docente supervisará la preparación del agua templada.",
+"No cerrar herméticamente los recipientes porque la fermentación produce gas.",
+"No acercar el rostro a la mezcla.",
+"No soplar la levadura, azúcar o sal en polvo.",
+"Evitar el contacto de los materiales con ojos y boca.",
+"Limpiar inmediatamente cualquier derrame.",
+"Mantener secos la balanza y otros instrumentos eléctricos.",
+"Lavarse las manos al finalizar.",
+"Mantener despejada la zona de trabajo."
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "1. Recuperamos nuestros acuerdos.",
+"c": [
+"Elemento",
+"Acuerdo"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Variable que modificaremos",
+"Temperaturas que probaremos",
+"Variable que mediremos",
+"Unidad de medida",
+"Cantidad de agua",
+"Cantidad de azúcar",
+"Cantidad de levadura",
+"Tiempo total",
+"Momentos de medición"
+]
+},
+{
+"k": "tabla",
+"t": "2. Seleccionamos materiales, instrumentos y medidas de seguridad. Materiales e instrumentos:",
+"c": [
+"Material o instrumento",
+"Cantidad",
+"¿Para qué lo utilizaremos?"
+],
+"r": 8,
+"a": 1,
+"hp": "¿Con qué medirás 50 mL de agua? ¿Y los gramos de azúcar y levadura? ¿La temperatura? ¿La altura de la espuma? ¿El tiempo?",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Medidas de seguridad",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 3,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "3. Organizamos el procedimiento: escribe los pasos en el orden en que deberán realizarse.",
+"c": [
+"Paso",
+"Acción"
+],
+"r": 3,
+"a": 1,
+"hp": "Indica qué se hará, qué cantidades se utilizarán, en qué orden y cómo se medirán y registrarán los resultados.",
+"o": 0,
+"it": [
+"1",
+"2",
+"3",
+"4",
+"5",
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"k": "tabla",
+"t": "4. Diseñamos la tabla de registro.",
+"c": [
+"",
+"",
+"",
+"",
+""
+],
+"r": 4,
+"a": 2,
+"hp": "¿Dónde se registrará cada temperatura? ¿Cómo se diferenciarán las tres repeticiones? ¿La unidad aparece en la tabla?",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Unidad utilizada para medir la altura de la espuma:",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "5. Revisamos y mejoramos el diseño. Retroalimentación recibida:",
+"c": [
+"Veo",
+"Pregunto",
+"Sugiero"
+],
+"r": 1,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Ajuste que realizaremos",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Comprobamos el diseño final",
+"c": [
+"Criterio",
+"Sí",
+"Debemos mejorar"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Indicamos los materiales, instrumentos y su función",
+"Incluimos medidas de seguridad",
+"Organizamos las acciones en una secuencia lógica",
+"La tabla incluye temperaturas, tiempos y repeticiones"
+]
+}
+]
+}
+},
+{
+"n": 8,
+"title": "Experimentamos con la levadura",
+"meta": "Ejecuta el procedimiento experimental controlando las condiciones establecidas.",
+"criteria": [
+"Sigue el procedimiento del diseño de acuerdo con las medidas de seguridad.",
+"Registra los datos de todas las repeticiones y trabaja con seguridad."
+],
+"rubric": "Verificación de hipótesis a través de diseño de indagación propuesto.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "group",
+"title": "Preparamos y comprobamos las mezclas",
+"desc": "Rotulamos los recipientes (15 °C, 25 °C y 35 °C), medimos 50 mL de agua, agregamos 5 g de azúcar, ajustamos y comprobamos la temperatura y marcamos el nivel inicial. Todavía no añadimos la levadura (Anexo Sesión 8)."
+},
+{
+"mode": "group",
+"title": "Medimos y registramos los resultados",
+"desc": "Añadimos 2 g de levadura al mismo tiempo en los tres recipientes, mezclamos 10 segundos e iniciamos el cronómetro; medimos la altura de la espuma, la registramos en centímetros y anotamos las incidencias."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Experimentamos con la levadura",
+"st": "¡Llegó el día del experimento! Medimos con cuidado y registramos todo. ⏱️",
+"sb": "Por encima de unos 50 °C las células de la levadura empiezan a dañarse; por eso trabajamos con agua tibia y nunca caliente.",
+"s": [
+{
+"k": "datos",
+"h": "Roles sugeridos",
+"t": "",
+"c": [
+"Rol",
+"Responsabilidad durante el experimento"
+],
+"d": [
+[
+"Responsable de condiciones",
+"Verifica cantidades, temperatura y etiquetado"
+],
+[
+"Responsable del tiempo",
+"Controla el inicio y los momentos de medición"
+],
+[
+"Responsable de medición",
+"Mide la altura de la espuma siguiendo el criterio acordado"
+],
+[
+"Responsable del registro",
+"Anota datos y observaciones sin modificarlos"
+]
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "1. Comprobamos las mezclas antes de iniciar.",
+"c": [
+"Recipiente",
+"Agua",
+"Azúcar",
+"Levadura preparada",
+"Etiqueta colocada"
+],
+"r": 3,
+"a": 1,
+"hp": "Repetición asignada a nuestro equipo: R1, R2 o R3.",
+"o": 0,
+"d": [
+[
+"15 °C",
+"____ mL",
+"____ g",
+"____ g",
+""
+],
+[
+"25 °C",
+"____ mL",
+"____ g",
+"____ g",
+""
+],
+[
+"35 °C",
+"____ mL",
+"____ g",
+"____ g",
+""
+]
+]
+},
+{
+"k": "pregunta",
+"t": "¿Qué ajuste realizamos antes de añadir la levadura?",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "2. Verificamos las medidas de seguridad.",
+"c": [
+"Medida de seguridad",
+"Sí"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Utilizamos agua a una temperatura máxima de 35 °C",
+"Mantuvimos los recipientes sobre una superficie estable",
+"Evitamos consumir o acercar el rostro a las mezclas",
+"Contamos con papel para limpiar los derrames",
+"Nos lavaremos las manos al finalizar"
+]
+},
+{
+"k": "lista",
+"h": "Para medir la espuma",
+"t": "",
+"it": [
+"Mantén el recipiente sobre una superficie plana.",
+"Coloca la regla en posición vertical.",
+"Mide desde la línea inicial de la mezcla hasta la parte superior de la espuma.",
+"Observa la regla a la altura de los ojos.",
+"Registra la medida en centímetros."
+],
+"a": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "3. Registramos los datos en nuestra tabla. Variable dependiente: ______",
+"c": [
+"Variable independiente",
+"Repetición 1",
+"Repetición 2",
+"Repetición 3",
+"Total / Promedio"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Unidad de medida de la variable dependiente:",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "4. Registramos las incidencias.",
+"c": [
+"Incidencia observada",
+"¿En qué recipiente ocurrió?",
+"¿Cómo podría afectar el dato?"
+],
+"r": 2,
+"a": 2,
+"hp": "Si no se presentaron incidencias, escribe: «No se observaron incidencias que afectaran el registro». Un resultado diferente no se borra ni se cambia.",
+"o": 0
+},
+{
+"k": "tabla",
+"t": "5. Registramos la retroalimentación.",
+"c": [
+"¿Qué observación recibimos?",
+"¿Qué pregunta nos ayudó a revisar el procedimiento?",
+"¿Qué ajuste realizamos?"
+],
+"r": 1,
+"a": 2,
+"hp": "",
+"o": 0
+}
+]
+}
+},
+{
+"n": 9,
+"title": "Procesamos los datos obtenidos",
+"meta": "Procesa los datos experimentales para facilitar su comparación.",
+"criteria": [
+"Verifica que los registros estén completos y correspondan a cada temperatura.",
+"Calcula el promedio de la altura de la espuma para cada temperatura.",
+"Organiza los resultados en una tabla de doble entrada y en un gráfico."
+],
+"rubric": "Organiza y procesa datos o información.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "group",
+"title": "Verificamos los registros y calculamos los promedios",
+"desc": "Revisamos que el registro tenga las tres temperaturas, las tres repeticiones, las unidades y las incidencias; luego calculamos el promedio de cada temperatura (Anexo Sesión 9)."
+},
+{
+"mode": "individual",
+"title": "Organizamos y representamos los promedios",
+"desc": "Trasladamos los promedios a una tabla de doble entrada y construimos el gráfico con título, ejes, escala uniforme, colores y leyenda."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Procesamos los datos obtenidos",
+"st": "Sumamos, dividimos y graficamos: ¡los datos empiezan a hablar! 📊",
+"sb": "Los científicos repiten sus mediciones y calculan el promedio porque una sola medida puede tener errores; así sus resultados son más confiables.",
+"s": [
+{
+"k": "datos",
+"h": "Situación: «El promedio que cambió los resultados»",
+"t": "Un equipo registró la altura de la espuma a los 20 minutos:",
+"c": [
+"Temperatura",
+"R1",
+"R2",
+"R3"
+],
+"d": [
+[
+"15 °C",
+"1,0 cm",
+"1,2 cm",
+"1,1 cm"
+],
+[
+"25 °C",
+"2,7 cm",
+"",
+"2,6 cm"
+],
+[
+"35 °C",
+"3,5 cm",
+"3,6 cm",
+"3,4 cm"
+]
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "El equipo tomó estas decisiones:",
+"t": "",
+"it": [
+"Escribió 0 cm en la celda vacía de 25 °C.",
+"Seleccionó el resultado más alto de cada temperatura como si fuera el promedio.",
+"No revisó el registro de incidencias."
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "Preguntas para analizar",
+"t": "",
+"it": [
+"¿La tabla está completa?",
+"¿Una celda vacía significa necesariamente cero?",
+"¿Qué deben revisar antes de calcular?",
+"¿Seleccionar el valor más alto equivale a calcular el promedio?",
+"¿Qué operación debe realizarse?",
+"¿Por qué se calculan promedios por separado?",
+"¿Se deben mezclar los datos de diferentes temperaturas?"
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "1. Verificamos los registros.",
+"c": [
+"Comprobación",
+"Sí",
+"Debo revisar"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Tenemos datos de 15 °C, 25 °C y 35 °C",
+"Contamos con las tres repeticiones",
+"Las medidas están expresadas en centímetros",
+"Registramos las incidencias ocurridas"
+]
+},
+{
+"k": "pregunta",
+"t": "¿Existe algún dato faltante o afectado por una incidencia?",
+"a": 1,
+"hp": "No inventes un dato si el registro está incompleto: marca el espacio vacío y comunícalo.",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "lista",
+"h": "2. Recordamos cómo calcular el promedio",
+"t": "",
+"it": [
+"Selecciona los tres datos de la misma temperatura y el mismo tiempo.",
+"Suma los valores.",
+"Divide el resultado entre tres.",
+"Expresa el promedio en centímetros.",
+"Redondea a un decimal cuando sea necesario.",
+"Ejemplo: (1,0 + 1,2 + 1,1) ÷ 3 = 3,3 ÷ 3 = 1,1 cm"
+],
+"a": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "3. Calculamos los promedios. Variable dependiente: ______",
+"c": [
+"Variable independiente",
+"Repetición 1",
+"Repetición 2",
+"Repetición 3",
+"Total / Promedio"
+],
+"r": 3,
+"a": 1,
+"hp": "¿El promedio está entre el menor y el mayor valor? ¿Incluiste la unidad?",
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "4. Organizamos los promedios. Título de la tabla:",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Completa la tabla de doble entrada.",
+"c": [
+"Variable independiente:",
+"Variable dependiente:"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "tabla",
+"t": "5. Elaboramos el gráfico.",
+"c": [
+"Elemento",
+"Respuesta"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Título",
+"Eje horizontal",
+"Eje vertical",
+"Escala utilizada",
+"Color para 15 °C",
+"Color para 25 °C",
+"Color para 35 °C"
+]
+},
+{
+"k": "cuad",
+"t": "Construye tu gráfico en la cuadrícula.",
+"a": 2,
+"hp": "Cada punto debe representar un promedio de la tabla; no cambies los valores para que el gráfico se vea más ordenado."
+},
+{
+"k": "tabla",
+"t": "Compruebo mi gráfico",
+"c": [
+"Elemento",
+"Sí",
+"Debo revisar"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Tiene un título relacionado con los datos",
+"Los ejes tienen nombres y unidades",
+"La escala aumenta de manera uniforme",
+"Representa los datos de las tres temperaturas",
+"Los puntos coinciden con la tabla",
+"Incluye una leyenda"
+]
+},
+{
+"k": "datos",
+"h": "6. Revisamos y mejoramos",
+"t": "",
+"c": [
+"Código",
+"Significado"
+],
+"d": [
+[
+"D",
+"Revisa los datos seleccionados"
+],
+[
+"O",
+"Revisa la operación"
+],
+[
+"U",
+"Revisa la unidad"
+],
+[
+"G",
+"Revisa la representación en el gráfico"
+]
+],
+"a": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Código recibido:",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 0,
+"o": 0,
+"op": [
+"D",
+"O",
+"U",
+"G"
+]
+},
+{
+"k": "pregunta",
+"t": "¿Qué necesitaba revisar?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Qué error identifiqué?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Qué corrección realicé?",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+}
+]
+}
+},
+{
+"n": 10,
+"title": "Interpretamos patrones y diferencias",
+"meta": "Interpreta los datos para establecer la relación entre la temperatura y la actividad de la levadura.",
+"criteria": [
+"Compara los resultados obtenidos en las tres temperaturas.",
+"Identifica patrones, diferencias y datos inusuales.",
+"Explica qué muestran la tabla y el gráfico."
+],
+"rubric": "Organiza y procesa datos o información.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "group",
+"title": "Comparamos los resultados e identificamos patrones",
+"desc": "Con la tabla y el gráfico de la sesión anterior comparamos la altura promedio de la espuma en las tres temperaturas, identificamos el patrón principal y revisamos si hay datos inusuales (Anexo Sesión 10)."
+},
+{
+"mode": "individual",
+"title": "Elaboramos una interpretación basada en datos",
+"desc": "Organizamos el resultado principal, la comparación, dos evidencias, el patrón y el límite de los resultados, y escribimos nuestra interpretación."
+}
+],
+"ticket": {
+"caso": {
+"t": "Observa la tabla y el gráfico de tu Anexo Sesión 9. Un equipo obtuvo estas alturas promedio de espuma a los 20 minutos:",
+"c": [
+"Temperatura",
+"Altura promedio"
+],
+"d": [
+[
+"15 °C",
+"1,1 cm"
+],
+[
+"25 °C",
+"2,7 cm"
+],
+[
+"35 °C",
+"3,5 cm"
+]
+]
+},
+"questions": [
+{
+"q": "¿Qué patrón muestran los datos?",
+"options": [
+"La altura disminuye con el tiempo.",
+"La altura aumenta con el tiempo en las tres temperaturas.",
+"Todas las temperaturas producen la misma altura.",
+"La espuma desaparece a los 20 minutos."
+],
+"answer": 1,
+"why": "En las tres temperaturas la espuma fue creciendo con el paso del tiempo."
+},
+{
+"q": "¿Cuál es la diferencia entre 35 °C y 15 °C a los 20 minutos?",
+"options": [
+"1,1 cm.",
+"1,6 cm.",
+"2,4 cm.",
+"4,6 cm."
+],
+"answer": 2,
+"why": "3,5 cm − 1,1 cm = 2,4 cm."
+},
+{
+"q": "¿Cuál es la interpretación mejor respaldada?",
+"options": [
+"La levadura únicamente puede vivir a 35 °C.",
+"Cuanto más caliente esté el agua, siempre habrá más espuma.",
+"Dentro del intervalo estudiado, una mayor temperatura inicial se relacionó con mayor altura de espuma.",
+"La temperatura no se relaciona con la espuma."
+],
+"answer": 2,
+"why": "Solo investigamos 15 °C, 25 °C y 35 °C: no podemos usar la palabra «siempre»."
+},
+{
+"q": "Si una repetición presenta un valor muy diferente, lo primero que debe hacerse es:",
+"options": [
+"Borrarlo.",
+"Reemplazarlo por el promedio.",
+"Revisar el registro, el procedimiento y las incidencias.",
+"Copiar el dato de otra repetición."
+],
+"answer": 2,
+"why": "Un dato inusual no se borra: se revisa y se relaciona con las incidencias registradas."
+}
+]
+},
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Interpretamos patrones y diferencias",
+"st": "Medimos la espuma; ahora interpretamos lo que nos dice sobre la levadura. 📈",
+"sb": "Un patrón es un comportamiento que se repite en varios datos; los meteorólogos usan patrones de muchos datos para pronosticar el clima.",
+"s": [
+{
+"k": "texto",
+"h": "Para pensar",
+"t": "«La levadura siempre produce más espuma cuando aumenta la temperatura».\n¿Nuestros datos permiten utilizar la palabra «siempre»? ¿Qué temperaturas investigamos? ¿Qué datos necesitaríamos mencionar para sustentar una interpretación?\nNuestros resultados solamente permiten interpretar lo ocurrido con 15 °C, 25 °C y 35 °C, durante los 20 minutos investigados. No permiten afirmar qué sucederá con cualquier temperatura.",
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "Medir no es lo mismo que interpretar",
+"t": "",
+"it": [
+"Se midió directamente la altura de la espuma.",
+"A partir de la espuma se interpreta la actividad de la levadura.",
+"No es correcto afirmar que «la levadura creció tres centímetros»."
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "1. Comparamos los resultados (consulta la tabla y el gráfico del Anexo Sesión 9). Resultados a los 20 minutos:",
+"c": [
+"Temperatura inicial",
+"Altura promedio de la espuma"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"d": [
+[
+"15 °C",
+"______ cm"
+],
+[
+"25 °C",
+"______ cm"
+],
+[
+"35 °C",
+"______ cm"
+]
+]
+},
+{
+"k": "tabla",
+"t": "Completa.",
+"c": [
+"Pregunta",
+"Respuesta"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Temperatura con mayor altura de espuma",
+"Temperatura con menor altura de espuma",
+"Diferencia entre el valor mayor y el menor (cálculo)",
+"Respuesta"
+]
+},
+{
+"k": "tabla",
+"t": "Comparamos el cambio producido con el tiempo.",
+"c": [
+"Temperatura",
+"Altura inicial",
+"Altura final",
+"Cambio observado"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"d": [
+[
+"15 °C",
+"____ cm",
+"____ cm",
+"____ cm"
+],
+[
+"25 °C",
+"____ cm",
+"____ cm",
+"____ cm"
+],
+[
+"35 °C",
+"____ cm",
+"____ cm",
+"____ cm"
+]
+]
+},
+{
+"k": "pregunta",
+"t": "2. Identificamos el patrón: ¿Qué comportamiento se repite en los datos?",
+"a": 1,
+"hp": "Por ejemplo: la altura de la espuma aumenta con el paso del tiempo; una temperatura presenta valores mayores que las otras; las diferencias entre las temperaturas aumentan o disminuyen.",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Dato 1 que demuestra el patrón:",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Dato 2 que demuestra el patrón:",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "3. Revisamos datos inusuales: ¿Existe algún valor que no siga el patrón principal?",
+"a": 1,
+"hp": "Un dato inusual no debe borrarse; debe revisarse y relacionarse con las incidencias registradas (sección 4 del Anexo Sesión 8).",
+"f": "",
+"ln": 0,
+"o": 0,
+"op": [
+"Sí",
+"No"
+]
+},
+{
+"k": "pregunta",
+"t": "Si marcaste «sí», escribe el dato:",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Qué esperabas observar de acuerdo con el patrón?",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Se registró alguna incidencia que podría relacionarse con ese dato?",
+"a": 1,
+"hp": "",
+"f": "",
+"ln": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "4. Elaboramos nuestra interpretación: organiza tus ideas.",
+"c": [
+"Componente",
+"Respuesta"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Resultado principal",
+"Comparación entre temperaturas",
+"Evidencia 1",
+"Evidencia 2",
+"Patrón identificado",
+"Límite de los resultados"
+]
+},
+{
+"k": "pregunta",
+"t": "Escribe tu interpretación.",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 4,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Metacognición: completa dos expresiones.",
+"a": 0,
+"hp": "Un patrón que identificamos fue… · La diferencia más importante fue… · El dato que nos pareció inusual fue… · Para explicar el gráfico utilizamos… · La evidencia numérica que seleccionamos fue… · Nuestra interpretación mejoró cuando… · Un límite de nuestros datos es… · Antes de elaborar la conclusión necesitamos…",
+"f": "",
+"ln": 2,
+"o": 0
+}
+]
+}
+},
+{
+"n": 11,
+"title": "Argumentamos nuestra conclusión",
+"meta": "Argumenta una conclusión mediante evidencias experimentales y conocimientos científicos.",
+"criteria": [
+"Selecciona información científica que ayude a explicar los resultados.",
+"Relaciona la actividad de la levadura con la producción de gas y espuma.",
+"Contrasta los resultados con la hipótesis planteada."
+],
+"rubric": "Elabora y comunica conclusiones.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "individual",
+"title": "Relacionamos los datos con la información científica",
+"desc": "Recuperamos la pregunta, el resultado principal, dos datos y el patrón; leemos la información científica y la relacionamos con nuestros datos (Anexo Sesión 11)."
+},
+{
+"mode": "individual",
+"title": "Contrastamos la hipótesis y elaboramos la conclusión",
+"desc": "Decidimos si la hipótesis fue respaldada, parcialmente respaldada o no respaldada, escribimos la conclusión y la mejoramos con la retroalimentación «Valoro, Pregunto, Sugiero»."
+}
+],
+"ticket": null,
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Argumentamos nuestra conclusión",
+"st": "Una conclusión responde la pregunta con datos… ¡y con ciencia! 🏁",
+"sb": "El pan es esponjoso gracias a las burbujas de dióxido de carbono que libera la levadura: al hornearse, el gas se expande y deja esos agujeritos.",
+"s": [
+{
+"k": "texto",
+"h": "Para pensar",
+"t": "«La hipótesis fue correcta porque a 35 °C se produjo más espuma».\n¿Qué información falta para saber cuánto más aumentó la espuma? ¿Por qué se produjo la espuma? ¿La expresión «la hipótesis fue correcta» explica si los datos la respaldaron?\nUna conclusión no consiste únicamente en decir qué temperatura produjo más espuma. Debe responder la pregunta, contrastar la hipótesis, utilizar datos concretos y explicar el resultado mediante conocimientos científicos.\nUna hipótesis puede ser respaldada por los resultados, parcialmente respaldada o no respaldada. Que una hipótesis no sea respaldada no significa que la indagación esté mal realizada: significa que los resultados fueron diferentes de lo que inicialmente se esperaba.",
+"a": 0,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "1. Recuperamos nuestros resultados.",
+"c": [
+"Componente",
+"Respuesta"
+],
+"r": 3,
+"a": 1,
+"hp": "",
+"o": 0,
+"it": [
+"Pregunta de indagación",
+"Resultado principal",
+"Dato 1 que demuestra el resultado",
+"Dato 2 que demuestra el resultado",
+"Patrón identificado"
+]
+},
+{
+"k": "texto",
+"h": "2. La actividad de la levadura",
+"t": "La levadura es un microorganismo formado por una sola célula. Cuando dispone de agua y azúcar, puede realizar la fermentación para obtener energía. Durante este proceso libera dióxido de carbono. Las burbujas de este gas contribuyen a formar la espuma.\nLa temperatura influye en la actividad de las células de la levadura. Dentro de un intervalo adecuado, una temperatura más cálida puede favorecer la fermentación y aumentar la producción de dióxido de carbono. A temperaturas bajas, la actividad puede desarrollarse más lentamente. Sin embargo, las temperaturas demasiado altas pueden dañar las células de la levadura.\nEn nuestra indagación solamente probamos temperaturas iniciales de 15 °C, 25 °C y 35 °C durante 10 minutos.",
+"a": 1,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Relacionamos la información con los datos.",
+"c": [
+"Información científica seleccionada",
+"Dato experimental",
+"¿Cómo ayuda a explicar el resultado?"
+],
+"r": 2,
+"a": 1,
+"hp": "¿Qué gas produce la levadura durante la fermentación? ¿Cómo se relaciona ese gas con la espuma? ¿Qué idea no podríamos afirmar porque no investigamos temperaturas superiores a 35 °C?",
+"o": 0
+},
+{
+"k": "tabla",
+"t": "3. Contrastamos la hipótesis.",
+"c": [
+"Componente",
+"Respuesta"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Nuestra hipótesis predijo",
+"Los resultados mostraron"
+]
+},
+{
+"k": "pregunta",
+"t": "Por ello, la hipótesis fue:",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 0,
+"o": 0,
+"op": [
+"Respaldada.",
+"Parcialmente respaldada.",
+"No respaldada."
+]
+},
+{
+"k": "pregunta",
+"t": "Datos que sustentan esta decisión",
+"a": 2,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "4. Elaboramos la conclusión: organiza tus ideas.",
+"c": [
+"Componente",
+"Respuesta"
+],
+"r": 3,
+"a": 2,
+"hp": "",
+"o": 0,
+"it": [
+"Respuesta a la pregunta",
+"Decisión sobre la hipótesis",
+"Evidencia 1",
+"Evidencia 2",
+"Explicación científica",
+"Alcance de los resultados"
+]
+},
+{
+"k": "pregunta",
+"t": "Escribe tu conclusión.",
+"a": 2,
+"hp": "",
+"f": "Los resultados ____ la hipótesis porque ____. A los ___ minutos, ____, mientras que ____. Estos datos muestran que ____. Esto puede explicarse porque la levadura ____ y libera ____. Las burbujas de este gas contribuyen a ____. Por ello, dentro de las temperaturas investigadas, ____.",
+"ln": 4,
+"o": 0
+},
+{
+"k": "tabla",
+"t": "Retroalimentación de mi pareja",
+"c": [
+"Valoro",
+"Pregunto",
+"Sugiero"
+],
+"r": 1,
+"a": 2,
+"hp": "",
+"o": 0
+},
+{
+"k": "lista",
+"h": "Reviso mi conclusión",
+"t": "",
+"it": [
+"¿La conclusión responde la pregunta?",
+"¿Indica si la hipótesis fue respaldada?",
+"¿Incluye al menos dos datos concretos?",
+"¿Relaciona la levadura con la producción de dióxido de carbono?",
+"¿Explica cómo el gas contribuye a formar espuma?",
+"¿Evita afirmar más de lo que permiten los resultados?"
+],
+"a": 2,
+"o": 0
+}
+]
+}
+},
+{
+"n": 12,
+"title": "Evaluamos nuestra capacidad para indagar",
+"meta": "Sustenta decisiones de indagación y conclusiones ante una nueva situación experimental.",
+"criteria": [
+"Organiza la pregunta, la hipótesis, las variables y la estrategia de la nueva indagación.",
+"Analiza los datos presentados en una tabla o un gráfico.",
+"Sustenta una conclusión utilizando evidencias concretas.",
+"Evalúa posibles limitaciones y propone mejoras al procedimiento."
+],
+"rubric": "Elabora y comunica conclusiones.",
+"flipped": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"flipped2": {
+"enabled": false,
+"title": "",
+"desc": "",
+"file": ""
+},
+"activities": [
+{
+"mode": "individual",
+"title": "Planteamos y diseñamos la nueva indagación",
+"desc": "Bloques 1 y 2 (28 min): leemos la situación y la tarjeta científica, describimos el fenómeno, formulamos la pregunta y la hipótesis, organizamos variables y medidas, proponemos la secuencia del diseño y escribimos medidas de seguridad."
+},
+{
+"mode": "individual",
+"title": "Procesamos los datos y concluimos",
+"desc": "Bloques 3 y 4 (29 min): calculamos los promedios con su unidad, construimos el gráfico de barras, comparamos resultados y redactamos una conclusión sustentada."
+},
+{
+"mode": "individual",
+"title": "Evaluamos y mejoramos",
+"desc": "Bloque 5 (8 min): identificamos limitaciones, explicamos su posible efecto, proponemos mejoras y completamos la verificación final."
+}
+],
+"ticket": {
+"questions": []
+},
+"fx": {
+"v": 2,
+"nn": 1,
+"t": "Evaluamos nuestra capacidad para indagar",
+"st": "Hoy demuestras todo lo que aprendiste sobre indagar. ¡Tú puedes! 💪",
+"sb": "",
+"s": [
+{
+"k": "texto",
+"h": "Hoy",
+"t": "Hoy resolveremos individualmente una nueva situación de indagación. Organizarás una investigación, procesarás y analizarás datos, sustentarás una conclusión y propondrás mejoras. Se valorará cómo justificas tus decisiones y cómo usas la evidencia; no si tu hipótesis coincide con el resultado.",
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "Indicaciones",
+"t": "",
+"it": [
+"Tienes 65 minutos y recibirás avisos de tiempo al terminar cada bloque.",
+"Lee la situación y la tarjeta científica antes de responder; escribe las unidades y muestra al menos un cálculo.",
+"Puedes avanzar a tu ritmo y volver a una pregunta: los tiempos por bloque son referencias.",
+"Si necesitas una aclaración, pídela levantando la mano; tu profe no dirá si una respuesta es correcta."
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "datos",
+"h": "Los 5 bloques",
+"t": "",
+"c": [
+"Bloque",
+"Tiempo",
+"Qué haré"
+],
+"d": [
+[
+"1",
+"14 min",
+"Leo la situación y la tarjeta científica; describo el fenómeno; formulo la pregunta y la hipótesis."
+],
+[
+"2",
+"14 min",
+"Organizo variables y medidas; propongo la secuencia del diseño; justifico controles y repeticiones; escribo medidas de seguridad."
+],
+[
+"3",
+"14 min",
+"Calculo los promedios, escribo la unidad, muestro un cálculo y construyo el gráfico de barras; reviso la tabla temporal."
+],
+[
+"4",
+"15 min",
+"Comparo resultados del mismo momento, calculo una diferencia, interpreto el cambio temporal y redacto una conclusión sustentada."
+],
+[
+"5",
+"8 min",
+"Identifico limitaciones, explico su posible efecto, propongo mejoras, priorizo una y completo la verificación final."
+]
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "lista",
+"h": "Antes de entregar, reviso",
+"t": "",
+"it": [
+"Mi nombre y todas las páginas respondidas.",
+"Las unidades y el cálculo visible.",
+"El gráfico y la conclusión.",
+"La relación entre cada limitación y su mejora."
+],
+"a": 0,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "Metacognición: ¿Qué parte te permitió mostrar mejor lo que aprendiste sobre indagar?",
+"a": 0,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Qué decisión de indagación te resultó más desafiante?",
+"a": 0,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+},
+{
+"k": "pregunta",
+"t": "¿Qué estrategia utilizaste para revisar tu conclusión?",
+"a": 0,
+"hp": "",
+"f": "",
+"ln": 2,
+"o": 0
+}
+]
+}
+}
+]
+}

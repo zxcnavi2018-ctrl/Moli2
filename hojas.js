@@ -136,6 +136,8 @@
       r: `<h2 class="w">📚 Elige tu unidad</h2>${U.length ? U.map(u => `<button class="row w" data-a="unidad" data-k="${esc(u.key)}"><span class="ico" style="font-size:1.6em">${esc(u.icon || '📘')}</span><span class="rt"><b>Unidad ${esc(u.num)}</b><small>${esc(u.title)}</small></span><span>›</span></button>`).join('') : '<p class="hand w">Todavía no hay unidades visibles.</p>'}` };
   };
 
+  // ---- el caso del Exit ticket (texto y su tabla), cuando la ficha del colegio lo trae ----
+  const casoHtml = c => c && (L(c.t) || (c.d || []).length) ? `<div class="box w fx-caso">📋 ${esc(c.t || '')}${c.c && c.c.length ? `<table class="fx-t"><tr>${c.c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${(c.d || []).map(f => '<tr>' + c.c.map((_, j) => `<td>${esc(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>` : ''}</div>` : '';
   // ---- la ficha de la sesión (la arma «Trabajar con Molí»): va dentro del cuaderno, en sus propias hojas ----
   const fichaHtml = (fx, n, ses) => {
     if (!fx) return '';
@@ -143,17 +145,21 @@
     if (L(fx.st)) P.push(`<p class="hand w">${esc(fx.st)}</p>`);
     const trozos = t => { const o = [], fr = String(t || '').match(/[^.!?\n]+[.!?]*\s*|\n+/g) || []; let c = ''; fr.forEach(f => { if ((c + f).length > 300 && c.trim()) { o.push(c.trim()); c = ''; } c += f; }); if (c.trim()) o.push(c.trim()); return o; };
     const bloque = (cls, tit, t) => trozos(t).forEach((x, k) => P.push(`<div class="${cls} w">${!k && tit ? `<b>${tit}</b>` : ''}<p>${esc(x).replace(/\n/g, '<br>')}</p></div>`));   // en trocitos: si no entra, sigue en la otra hoja
-    const tabla = (c, r, it = []) => `<table class="fx-t"><tr>${c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => '<tr>' + c.map((_, j) => `<td>${j === 0 && it[i] ? esc(it[i]) : ''}</td>`).join('') + '</tr>').join('')}</table>`;
+    const tabla = (c, r, it = [], d) => `<table class="fx-t"><tr>${c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${(d && d.length ? d : Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => c.map((_, j) => j === 0 && it[i] ? it[i] : ''))).map(f => '<tr>' + c.map((_, j) => `<td>${esc(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>`;   // d: la tabla ya llena (lo vacío se escribe)
+    const marcas = op => op && op.length ? `<div class="fx-op">${op.map(o => `<span>☐ ${esc(o)}</span>`).join('')}</div>` : '';
     const sabias = () => L(fx.sb) ? `<div class="box tip w">💡 <b>¿Sabías que…?</b> <span class="hand">${esc(String(fx.sb).replace(/^\s*¿?\s*sab[ií]as\s+que\s*(…|\.\.\.)?\s*/i, ''))}</span></div>` : '';
     let nq = 0, a0 = 0, sb = false;
+    const N = () => fx.nn ? '✎' : ++nq;                              // nn: la ficha ya trae la numeración del colegio
     if (fx.v === 2) {                                                // la ficha del colegio, en su orden (✨ = lo que agregó Molí)
       (fx.s || []).forEach(x => {
         const m = x.o ? ' <small class="fx-mol">✨ Molí</small>' : '';
         if (x.a && x.a !== a0 && x.k !== 'texto') { a0 = x.a; P.push(`<h3 class="w">🧪 Actividad ${x.a}</h3>`); }
         if (x.k === 'texto') { bloque('fx-bl', (L(x.h) ? esc(x.h) : '') + m, x.t); if (!sb && L(fx.sb)) { P.push(sabias()); sb = true; } }
         else if (x.k === 'lista') P.push(`<div class="fx-bl w">${L(x.h) ? `<b>${esc(x.h)}</b>${m}` : ''}${L(x.t) ? `<p>${esc(x.t)}</p>` : ''}<ul>${(x.it || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`);
-        else if (x.k === 'tabla') P.push(`<div class="fx-q w"><b class="n">${++nq}</b><div><p>${esc(x.t || x.h)}${m}</p>${x.c && x.c.length ? tabla(x.c, x.r, x.it || []) : ''}</div></div>`);
-        else P.push(`<div class="fx-q w"><b class="n">${++nq}</b><div><p>${esc(x.t || x.h)}${m}</p>${L(x.hp) ? `<small>💬 ${esc(x.hp)}</small>` : ''}<div class="fx-ln">${L(x.f) ? `<span>${esc(x.f)}</span>` : ''}</div></div></div>`);
+        else if (x.k === 'datos') P.push(`<div class="fx-bl w">${L(x.h) ? `<b>${esc(x.h)}</b>${m}` : ''}${L(x.t) ? `<p>${esc(x.t)}</p>` : ''}${tabla(x.c || [], 0, [], x.d)}</div>`);
+        else if (x.k === 'tabla') P.push(`<div class="fx-q w"><b class="n">${N()}</b><div><p>${esc(x.t || x.h)}${m}</p>${L(x.hp) ? `<small>💬 ${esc(x.hp)}</small>` : ''}${x.c && x.c.length ? tabla(x.c, x.r, x.it || [], x.d) : ''}</div></div>`);
+        else if (x.k === 'cuad') P.push(`<div class="fx-q w"><b class="n">${N()}</b><div><p>${esc(x.t)}</p>${L(x.hp) ? `<small>💬 ${esc(x.hp)}</small>` : ''}<div class="fx-cuad"></div></div></div>`);
+        else P.push(`<div class="fx-q w"><b class="n">${N()}</b><div><p>${esc(x.t || x.h)}${m}</p>${L(x.hp) ? `<small>💬 ${esc(x.hp)}</small>` : ''}${marcas(x.op)}${x.op && x.op.length && !x.ln ? '' : `<div class="fx-ln"${x.ln > 1 ? ` style="height:${1.55 * (x.ln + 1)}em"` : ''}>${L(x.f) ? `<span>${esc(x.f)}</span>` : ''}</div>`}</div></div>`);
       });
       if (!sb) P.push(sabias());
     } else {                                                         // fichas de antes
@@ -187,13 +193,13 @@
         r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span></button>`).join('')}` }];
       S.forEach(({ s, n }) => {
         const cr = (s.criteria || []).filter(L), acts = (s.activities || []).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
-        const tareas = [s.flipped, s.flipped2].filter(f => f && f.enabled && (L(f.title) || L(f.desc)));
+        const tareas = [[s.flipped2, '📌 Trae para esta clase:'], [s.flipped, '🏠 Para la casa:']].filter(([f]) => f && f.enabled && (L(f.title) || L(f.desc)));
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · ${esc(u.title)}</div><div class="big w">Sesión ${n}</div>${temaCorto(u, s, n) ? `<h2 class="w">${esc(temaCorto(u, s, n))}</h2>` : ''}
             ${L(s.meta) ? `<h3 class="w">🎯 Meta de la sesión</h3><p class="hand w">${esc(s.meta)}</p>` : ''}
             ${cr.length ? `<h3 class="w">✅ Criterios de éxito</h3><ul class="cr hand">${cr.map(c => `<li class="w">${esc(c)}</li>`).join('')}</ul>` : ''}
             ${L(s.rubric) ? `<h3 class="w">📏 Lo que se evalúa</h3><p class="hand w">${esc(s.rubric)}</p>` : ''}`,
           r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${Hojas.videoHtml ? Hojas.videoHtml(a) : ''}`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
-            ${tareas.map(f => `<div class="box tip w"><b>🏠 Para la casa:</b> <span class="hand">${esc(f.title)}${L(f.desc) ? ' — ' + esc(f.desc) : ''}</span></div>`).join('')}
+            ${tareas.map(([f, et]) => `<div class="box tip w"><b>${et}</b> <span class="hand">${esc(f.title)}${L(f.desc) ? ' — ' + esc(f.desc) : ''}</span></div>`).join('')}
             ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} ${q === 1 ? 'pregunta' : 'preguntas'}<br><span class="hand">Respóndelo en tu portafolio verde del locker.</span></div>` : ''}` });
         if (s.fx) H.push({ l: fichaHtml(s.fx, n, s), r: null });
       });
@@ -233,12 +239,15 @@
               return `<button class="row w${!t && !es ? ' off' : ''}" ${t || es ? `data-a="${t ? 'ver' : 'empezar'}" data-n="${n}"` : 'disabled'}><b class="lv" style="background:#dcfce7;color:#166534">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span>${t ? `${nivelChip(t)}<small>${t.score}/${t.total}</small>` : es ? '<span class="bt or" style="font-size:.75em">Responder ›</span>' : '🔒'}</button>`; }).join('')}` }];
       }
       const x = F.x;
-      if (F.modo === 'preg') return x.qs.map((q, k) => ({
-        l: `<div class="crumb w">Sesión ${x.n} · Exit ticket</div><h2 class="w">Pregunta ${k + 1} de ${x.qs.length}</h2><div class="bar w"><i style="width:${k / x.qs.length * 100}%"></i></div><p class="hand w" style="font-size:1.45em;margin-top:.5em">${esc(q.q)}</p>
-            ${x.res[k] != null ? `<p class="why ${x.res[k] ? 'ok-msg' : 'no-msg'}">${x.res[k] ? '✓ ¡Correcto!' : '✗ No era esa'}</p>${L(q.why) ? `<p class="why hand">💡 ${esc(q.why)}</p>` : ''}` : `<img class="moli w" src="${IMG('pensativa')}" alt="" style="width:3.6em">`}`,
-        r: `<h2 class="w">Elige tu respuesta</h2>${q.ord.map((o, j) => { const R = x.res[k], sel = x.sel[k] === o.i, ok = o.i === q.answer;
-            return `<button class="opt w${R != null && ok ? ' ok' : R != null && sel && !ok ? ' no' : ''}" data-a="resp" data-k="${k}" data-o="${o.i}" ${R != null ? 'disabled' : ''}><i>${'ABCD'[j]}</i>${esc(o.t)}</button>`; }).join('')}
-            ${x.res[k] != null ? `<p class="center"><button class="bt gr" data-a="sig">${k + 1 < x.qs.length ? 'Siguiente ›' : 'Ver mi resultado ›'}</button></p>` : ''}` }));
+      if (F.modo === 'preg') return x.qs.map((q, k) => {             // si trae un caso (texto y tabla), el caso va a la izquierda y la pregunta con sus opciones a la derecha
+        const R = x.res[k], c = !!casoHtml(x.caso), fb = R != null ? `<p class="why ${R ? 'ok-msg' : 'no-msg'}">${R ? '✓ ¡Correcto!' : '✗ No era esa'}</p>${L(q.why) ? `<p class="why hand">💡 ${esc(q.why)}</p>` : ''}` : '';
+        return {
+          l: `<div class="crumb w">Sesión ${x.n} · Exit ticket${c ? ` · Pregunta ${k + 1} de ${x.qs.length}` : ''}</div>${c ? '' : `<h2 class="w">Pregunta ${k + 1} de ${x.qs.length}</h2>`}<div class="bar w"><i style="width:${k / x.qs.length * 100}%"></i></div>${c ? casoHtml(x.caso) + fb
+            : `<p class="hand w" style="font-size:1.45em;margin-top:.5em">${esc(q.q)}</p>${fb || `<img class="moli w" src="${IMG('pensativa')}" alt="" style="width:3.6em">`}`}`,
+          r: `${c ? `<p class="hand w" style="font-size:1.2em;margin:.2em 0 .4em">${esc(q.q)}</p>` : '<h2 class="w">Elige tu respuesta</h2>'}${q.ord.map((o, j) => { const sel = x.sel[k] === o.i, ok = o.i === q.answer;
+              return `<button class="opt w${c ? ' chico' : ''}${R != null && ok ? ' ok' : R != null && sel && !ok ? ' no' : ''}" data-a="resp" data-k="${k}" data-o="${o.i}" ${R != null ? 'disabled' : ''}><i>${'ABCD'[j]}</i>${esc(o.t)}</button>`; }).join('')}
+            ${R != null ? `<p class="center"><button class="bt gr" data-a="sig">${k + 1 < x.qs.length ? 'Siguiente ›' : 'Ver mi resultado ›'}</button></p>` : ''}` };
+      });
       if (F.modo === 'fin') { const t = F.T[x.n] || x.guardado, v = t ? MD.nivel(t) : null, p = t ? Math.round(t.score / t.total * 100) : 0;
         return [{ l: `<div class="crumb w">Sesión ${x.n} · Exit ticket</div><h1 class="w">${p === 100 ? '¡Perfecto! 🏆' : p >= 80 ? '¡Muy bien! 🌟' : p >= 60 ? '¡Buen trabajo! 💪' : '¡Sigue practicando! 📚'}</h1>
             ${t ? `<div class="ring w" style="--p:${p};--c:${v.color === '#c9dafb' ? '#8fb2f5' : v.color}"><b>${t.score}/${t.total}</b></div><p class="center w">${nivelChip(t)} ${esc(v.name)}</p>` : `<p class="hand">${x.err ? '📶 No pude guardar. Revisa tu internet e inténtalo otra vez.' : 'Guardando…'}</p>`}
@@ -259,7 +268,7 @@
       if (a === 'unidad') return F.libro.pasar(1, () => abrirUnidad(MD.unidades().find(u => u.key === ds.k)));
       if (a === 'empezar') { const n = +ds.n, s = MD.sesionesDe(F.u).find(z => z.n === n).s;
         const qs = MD.preguntas(s).map(q => ({ ...q, ord: mezcla(q.opts) }));
-        return F.libro.pasar(1, () => { F.x = { n, qs, res: [], sel: [] }; F.modo = 'preg'; F.i = 0; }); }
+        return F.libro.pasar(1, () => { F.x = { n, qs, res: [], sel: [], caso: s.ticket && s.ticket.caso }; F.modo = 'preg'; F.i = 0; }); }
       if (a === 'resp') { const k = +ds.k, o = +ds.o, q = F.x.qs[k]; if (F.x.res[k] != null) return;
         F.x.sel[k] = o; F.x.res[k] = o === q.answer; F.libro.pinta(false); return; }
       if (a === 'sig') { const k = F.i;

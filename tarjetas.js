@@ -42,7 +42,8 @@
   }
   function preguntasHtml(u, n, s) {
     const qs = MD.preguntas(s).slice(0, Li.ans.max);
-    return `<div class="tq"><b class="tq-t">U${esc(u.num)} S${n} · Exit ticket</b>${qs.map((q, i) => `<div class="tq-q"><b>${i + 1}. ${esc(q.q)}</b><div>${q.opts.map((o, k) => `<span><i>${LETRA[k]}</i>${esc(o.t)}</span>`).join('')}</div></div>`).join('')}</div>`;
+    const c = s.ticket && s.ticket.caso, caso = c && (c.t || (c.d || []).length) ? `<div class="caso">${esc(c.t || '')}${c.c && c.c.length ? `<table class="t"><tr>${c.c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${(c.d || []).map(f => '<tr>' + c.c.map((_, j) => `<td>${esc(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>` : ''}</div>` : '';
+    return `<div class="tq"><b class="tq-t">U${esc(u.num)} S${n} · Exit ticket</b>${caso}${qs.map((q, i) => `<div class="tq-q"><b>${i + 1}. ${esc(q.q)}</b><div>${q.opts.map((o, k) => `<span><i>${LETRA[k]}</i>${esc(o.t)}</span>`).join('')}</div></div>`).join('')}</div>`;
   }
   // ---- imprimir: A4 horizontal, 4 tarjetas adelante y sus preguntas atrás ----
   function imprimir(u, n) {
@@ -54,6 +55,7 @@
       .hoja { width: 297mm; height: 210mm; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; page-break-after: always; break-after: page; position: relative; }
       .hoja::before, .hoja::after { content: ''; position: absolute; border: 0 dashed #b5bccb; } .hoja::before { left: 50%; top: 4mm; bottom: 4mm; border-left-width: .25mm; } .hoja::after { top: 50%; left: 4mm; right: 4mm; border-top-width: .25mm; }
       .c { display: flex; align-items: center; justify-content: center; } .c svg { width: 107.5mm; height: 100.8mm; }
+      .caso { font-size: 3mm; margin-bottom: 2mm; } .caso table { border-collapse: collapse; margin-top: 1mm; } .caso td, .caso th { border: .25mm solid #333; padding: .4mm 1.5mm; }
       .tq { width: 128mm; padding: 2mm; font-size: 3.3mm; } .tq-t { display: block; font-size: 4mm; margin-bottom: 2mm; } .tq-q { margin: 0 0 2.4mm; } .tq-q div { display: flex; flex-wrap: wrap; gap: 1mm 4mm; margin-top: 1mm; }
       .tq-q span { display: inline-flex; align-items: center; gap: 1.2mm; } .tq-q i { font-style: normal; font-weight: 700; width: 4mm; height: 4mm; border: .25mm solid #333; border-radius: 50%; display: inline-grid; place-items: center; font-size: 2.6mm; }
       .ayuda { padding: 6mm; font-size: 4mm; } @media print { .ayuda { display: none; } }
@@ -64,15 +66,18 @@
   }
   // ---- imprimir la FICHA de la sesión (como la del colegio, con el estilo de Molí) y al final su cierre con la tarjeta ----
   function fichaPrint(fx) {
-    const P = [], tabla = (c, r, it = []) => `<table class="t"><tr>${c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => '<tr>' + c.map((_, j) => `<td>${j === 0 && it[i] ? esc(it[i]) : ''}</td>`).join('') + '</tr>').join('')}</table>`;
+    const P = [], tabla = (c, r, it = [], d) => `<table class="t"><tr>${c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${(d && d.length ? d : Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => c.map((_, j) => j === 0 && it[i] ? it[i] : ''))).map(f => '<tr>' + c.map((_, j) => `<td>${esc(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>`;
+    const marcas = op => op && op.length ? `<div class="op">${op.map(o => `<span>☐ ${esc(o)}</span>`).join('')}</div>` : '';
     const lineas = (k, f) => `<div class="ln">${f ? `<span>${esc(f)}</span>` : ''}</div>`.repeat(1) + '<div class="ln"></div>'.repeat(k - 1);
     let nq = 0, a0 = 0;
     if (fx.v === 2) (fx.s || []).forEach(x => {
       if (x.a && x.a !== a0 && x.k !== 'texto') { a0 = x.a; P.push(`<h3>Actividad ${x.a}</h3>`); }
       if (x.k === 'texto') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}<p>${esc(x.t).replace(/\n/g, '<br>')}</p></div>`);
       else if (x.k === 'lista') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}${x.t ? `<p>${esc(x.t)}</p>` : ''}<ul>${(x.it || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`);
-      else if (x.k === 'tabla') P.push(`<div class="q"><b>${++nq}.</b> ${esc(x.t || x.h)}${x.c && x.c.length ? tabla(x.c, x.r, x.it || []) : ''}</div>`);
-      else P.push(`<div class="q"><b>${++nq}.</b> ${esc(x.t || x.h)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}${lineas(3, x.f)}</div>`);
+      else if (x.k === 'datos') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}${x.t ? `<p>${esc(x.t)}</p>` : ''}${tabla(x.c || [], 0, [], x.d)}</div>`);
+      else if (x.k === 'tabla') P.push(`<div class="q">${fx.nn ? '' : `<b>${++nq}.</b> `}${esc(x.t || x.h)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}${x.c && x.c.length ? tabla(x.c, x.r, x.it || [], x.d) : ''}</div>`);
+      else if (x.k === 'cuad') P.push(`<div class="q">${fx.nn ? '' : `<b>${++nq}.</b> `}${esc(x.t)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}<div class="cu"></div></div>`);
+      else P.push(`<div class="q">${fx.nn ? '' : `<b>${++nq}.</b> `}${esc(x.t || x.h)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}${marcas(x.op)}${x.op && x.op.length && !x.ln ? '' : lineas(Math.max(2, (x.ln || 1) + 1), x.f)}</div>`);
     });
     else { (fx.b || []).forEach(x => P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}<p>${esc(x.t)}</p></div>`));
       (fx.k || []).forEach(x => { if (x.a && x.a !== a0) { a0 = x.a; P.push(`<h3>Actividad ${x.a}</h3>`); } P.push(`<div class="q"><b>${++nq}.</b> ${esc(x.q)}${x.h ? `<small>${esc(x.h)}</small>` : ''}${x.c && x.c.length ? tabla(x.c, x.r) : lineas(3, x.f)}</div>`); }); }
@@ -91,6 +96,8 @@
       .tx p { margin: 0 0 2mm; text-align: justify; line-height: 1.35; } .q { margin: 2.5mm 0; page-break-inside: avoid; } .q small { display: block; color: #555; font-size: 9pt; margin-top: .5mm; }
       .ln { height: 7mm; border-bottom: .3mm solid #999; } .ln span { color: #666; font-size: 10pt; }
       .t { width: 100%; border-collapse: collapse; margin-top: 1.5mm; } .t th, .t td { border: .3mm solid #333; padding: 1mm 1.5mm; height: 8mm; font-size: 10pt; } .t th { background: #eee; }
+      .op { display: flex; flex-wrap: wrap; gap: 1mm 6mm; margin: 1.5mm 0; font-size: 10.5pt; } .cu { height: 80mm; margin-top: 1.5mm; border: .3mm solid #555; background-image: linear-gradient(#bbb .2mm, transparent .2mm), linear-gradient(90deg, #bbb .2mm, transparent .2mm); background-size: 5mm 5mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .caso { margin: 2mm 0; font-size: 9.5pt; } .caso .t td, .caso .t th { height: 6mm; }
       .sb { margin: 3mm 0; padding: 2mm 3mm; border: .3mm dashed #555; font-size: 10pt; }
       .cierre { page-break-inside: avoid; margin-top: 5mm; border-top: .5mm solid #111; padding-top: 2mm; } .cierre h3 { background: none; padding: 0; }
       .cc { width: 100%; border-collapse: collapse; } .cc td, .cc th { border: .3mm solid #333; padding: 1.2mm 2mm; font-size: 10pt; } .cc th { width: 22mm; }
