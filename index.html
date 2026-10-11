@@ -545,6 +545,7 @@ function addUse(name, x, z, y, fn, verb = 'Abrir') {               // algo que s
 function addSwitch(name, x, z, y, fn) {                            // interruptor que se usa con ABRIR / E (empieza prendido)
   doors.push({ name, x, z, y, leaves: [], col: { on: false }, angle: 0, target: 0, max: 0, open: true, sw: fn });
 }
+let AULA0 = null;                                                   // aula editable: posición base de las mesas y sillas de los estudiantes (la usa editor.js)
 const chairs = [];                                                 // sillas: se arman al final como instancias (asiento, respaldo curvo, 4 patas, tacos)
 function chair(x, z, ox, oz, yaw, fy, color = 0xff7a1a) { chairs.push({ x, z, yaw, fy, color }); }   // (ox, oz): hacia donde queda el respaldo
 const lockerTex = (function () {
@@ -869,10 +870,15 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       F6.pizarra = { obj: scr, scr, beam, glow, dust, spill, offTex, onTex, look: new THREE.Vector3(sx, fy + 1.66, sz), from: new THREE.Vector3(cx3, fy + 1.4, cz3) }; }
     // 5 grupos: dos a cada lado (adelante y atrás) y uno al centro
     const G5 = [[-1.5, 1.6], [2.25, 1.6], [-1.5, 6.0], [2.25, 6.0], [0.4, 3.8]];
-    seatsOut = []; clusters(false, G5); SALON6[rname].seats = seatsOut;
+    // las mesas y sillas de los estudiantes las arma editor.js (la docente las puede mover, quitar y agregar)
+    { const o0 = [Math.cos(Math.PI / 6) * uvec[0] + Math.sin(Math.PI / 6) * svec[0], Math.cos(Math.PI / 6) * uvec[1] + Math.sin(Math.PI / 6) * svec[1]], a0 = Math.atan2(o0[0], o0[1]);
+      const items = G5.map(([uu, ss]) => { const [x, z] = P(uu, ss); return { t: 'hex', x, z, r: 0, s: [1, 1, 1, 1, 1, 1] }; });
+      AULA0 = { fy, a0, P, uvec: uvec.slice(), svec: svec.slice(), items, rname };
+      seatsOut = []; items.forEach(it => { for (let k = 0; k < 6; k++) { const a = a0 + k * Math.PI / 3; seatsOut.push({ x: it.x + Math.sin(a) * 1.05, z: it.z + Math.cos(a) * 1.05, tx: it.x, tz: it.z }); } });
+      SALON6[rname].seats = seatsOut; }
     { const sv = seatsOut.slice(), c = sv[strHash((ME && (ME.key || ME.name)) || '6B') % sv.length], o = [c.x - c.tx, c.z - c.tz], ol = Math.hypot(o[0], o[1]); o[0] /= ol; o[1] /= ol;
       const nb = makeNotebook(), nx = c.tx + o[0] * 0.58, nz = c.tz + o[1] * 0.58; nb.position.set(nx, fy + 0.745, nz); nb.rotation.y = Math.atan2(o[0], o[1]); scene.add(nb);
-      F6.mesa = { obj: nb, look: new THREE.Vector3(nx, fy + 0.74, nz), from: new THREE.Vector3(c.x + o[0] * 0.08, fy + 1.5, c.z + o[1] * 0.08) }; }
+      F6.mesa = { nb, obj: nb, look: new THREE.Vector3(nx, fy + 0.74, nz), from: new THREE.Vector3(c.x + o[0] * 0.08, fy + 1.5, c.z + o[1] * 0.08) }; }
     seatsOut = null;
     const tubeMat = new THREE.MeshBasicMaterial({ color: 0xfdfeff }), lumMat = toon(0xf1f3f6), strMat = new THREE.MeshLambertMaterial({ color: 0xe5e7eb });
     { const [lx, lz] = P(0.4, (Dp - 2 * T) / 2), lamp = { x: lx, z: lz, y: fy + RH - 0.4, fy, on: true }; ROOMLIGHTS.push(lamp);
@@ -1114,7 +1120,7 @@ const laminate = (function () {                                   // laminado bl
   for (let i = 0; i < 1400; i++) { g.fillStyle = 'rgba(150,140,125,' + Math.random() * 0.06 + ')'; g.fillRect(Math.random() * 256, Math.random() * 256, 4 + Math.random() * 18, 1); }
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 2); return t;
 })();
-buildInstanced(furn.tops, new THREE.MeshLambertMaterial({ color: 0xffffff, map: laminate }), topGeo).userData.noInk = true;
+(buildInstanced(furn.tops, new THREE.MeshLambertMaterial({ color: 0xffffff, map: laminate }), topGeo) || { userData: {} }).userData.noInk = true;
 buildInstanced(furn.peds, furnMat); buildInstanced(furn.rims, furnMat, hexGeo, false);
 buildInstanced(furn.frames, furnMat, undefined, false); buildInstanced(furn.tlegs, furnMat, new THREE.CylinderGeometry(0.016, 0.014, 1, 10), false);
 (function buildChairs() {
@@ -2379,5 +2385,6 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
+<script src="editor.js"></script>
 </body>
 </html>

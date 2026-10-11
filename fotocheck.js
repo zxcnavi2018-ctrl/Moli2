@@ -38,6 +38,7 @@
     setTimeout(() => { const i = panel.querySelector('input'); i && i.focus(); }, 250);
   }
   const HERR = [
+    ['editar', '✏️', 'Editar aula', 'Mueve mesas, sillas y más'],
     ['cuenta', '🤖', 'Crear cuenta con Molí', 'Cuentas de tus estudiantes'],
     ['trabajar', '✨', 'Trabajar con Molí', 'Crea la ficha de tu sesión'],
     ['escanear', '📷', 'Escanear', 'Exit tickets en papel'],

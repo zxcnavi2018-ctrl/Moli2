@@ -403,3 +403,23 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
 #fcPanel .fp-out { display: block; width: 100%; margin-top: 8px; border: 0; border-radius: 14px; padding: 12px; background: #ef4444; color: #fff; font: 900 16px system-ui; box-shadow: 0 4px 0 #991b1b; cursor: pointer; }
 #fcPanel .fp-no { flex: 1; margin-top: 8px; border: 2.5px solid #2b2547; border-radius: 14px; padding: 10px; background: #fff; font: 900 15px system-ui; cursor: pointer; }
 #fcPanel .fp-dos { display: flex; gap: 8px; } #fcPanel .fp-dos .fp-out { flex: 1; width: auto; }
+
+/* ===================== ✏️ EDITAR AULA ===================== */
+body.editando #tourBar, body.editando #moliTalk, body.editando #foto, body.editando #rcChip, body.editando #title { display: none !important; }
+#ed { position: fixed; inset: 0; z-index: 50; pointer-events: none; font-family: "Trebuchet MS", system-ui, sans-serif; }
+#ed > * { pointer-events: auto; }
+body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid #ff7a1a; pointer-events: none; z-index: 49; }
+#ed button { border: 2.5px solid #2b2547; border-radius: 12px; background: #fff; padding: 7px 11px; font: 800 13px system-ui; color: #1e293b; box-shadow: 0 3px 0 #2b2547; cursor: pointer; white-space: nowrap; }
+#ed button:active { transform: translateY(2px); box-shadow: 0 1px 0 #2b2547; } #ed button:disabled { opacity: .4; }
+#ed button.ok { background: #16a34a; color: #fff; } #ed button.x { background: #fee2e2; color: #b91c1c; }
+#ed .ed-top { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+#ed .ed-top b { padding: 6px 12px; border-radius: 999px; background: #ff7a1a; color: #fff; font-size: 14px; margin-right: auto; box-shadow: 0 3px 0 #9a3412; }
+#ed .ed-tip { position: absolute; left: 50%; bottom: 62px; transform: translateX(-50%); padding: 5px 12px; border-radius: 999px; background: rgba(15,23,42,.75); color: #fff; font-size: 12px; max-width: 92vw; text-align: center; pointer-events: none; }
+#ed .ed-bot { position: absolute; left: 8px; right: 8px; bottom: 10px; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; } #ed .ed-sep { width: 10px; }
+#ed .ed-panel { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(560px, 94vw); max-height: 80vh; overflow: auto; background: #fff; border: 3px solid #2b2547; border-radius: 20px; padding: 12px 14px; box-shadow: 0 8px 0 rgba(43,37,71,.25); text-align: center; }
+#ed .ed-panel > b { display: block; font-size: 17px; color: #1d4ed8; } #ed .ed-panel p { margin: 4px 0 8px; font-size: 13px; color: #475569; }
+#ed .ed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin: 8px 0; } #ed .ed-grid button { display: flex; flex-direction: column; align-items: center; gap: 2px; white-space: normal; }
+#ed .ed-grid i { font-style: normal; font-size: 26px; }
+#ed .ed-av { position: absolute; top: 56px; left: 50%; transform: translate(-50%, -20px); opacity: 0; transition: all .3s; padding: 8px 14px; border-radius: 12px; background: #fff; border: 2.5px solid #2b2547; font-weight: 800; font-size: 13px; color: #1e3a8a; pointer-events: none; max-width: 90vw; text-align: center; }
+#ed .ed-av.on { opacity: 1; transform: translate(-50%, 0); }
+#ed .ed-volver { position: absolute; top: 10px; right: 10px; background: #ff7a1a !important; color: #fff !important; }
