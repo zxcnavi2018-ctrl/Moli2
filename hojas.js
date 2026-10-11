@@ -64,7 +64,7 @@
     const enRango = () => B.p >= B.first[flujo.i] && B.p <= B.last[flujo.i];
     let tamListo = false, tT = 0;
     const talla = () => { const h = el.clientHeight || 300; el.style.fontSize = Math.max(9, Math.min(17, h / 23)) + 'px';
-      clearTimeout(tT); tT = setTimeout(() => { if (B.ocupado) return; pinta(!tamListo); tamListo = true; }, 160); };
+      clearTimeout(tT); tT = setTimeout(() => { const ae = document.activeElement; if (B.ocupado || (ae && el.contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName))) return; pinta(!tamListo); tamListo = true; }, 160); };   // (si está escribiendo, no se repinta: no se cierra el teclado)
     B.ro = new ResizeObserver(talla); B.ro.observe(el);
     document.fonts && document.fonts.ready.then(() => !B.ocupado && tamListo && pinta(false));
     const escribir = (cont) => { let d = 0; cont.querySelectorAll('.w').forEach(x => { x.style.setProperty('--d', d.toFixed(2) + 's'); d += 0.09; }); };
@@ -132,7 +132,7 @@
   // ---- elegir la unidad ----
   const hojaUnidades = (titulo, icono, frase, me) => {
     const U = MD.unidades();
-    return { l: `<img class="moli w" src="${IMG('feliz')}" alt=""><div class="crumb w">${me ? esc(me.name) + ' · 6° ' + esc(me.section) : 'Ciencia y Tecnología · 6°'}</div><h1 class="w">${icono} ${esc(titulo)}</h1><p class="hand w">${frase}</p>`,
+    return { l: `<img class="moli w" src="${IMG('feliz')}" alt=""><div class="crumb w">${me ? esc(me.name) + (me.docente ? ' · Docente' : ' · 6° ' + esc(me.section)) : 'Ciencia y Tecnología · 6°'}</div><h1 class="w">${icono} ${esc(titulo)}</h1><p class="hand w">${frase}</p>`,
       r: `<h2 class="w">📚 Elige tu unidad</h2>${U.length ? U.map(u => `<button class="row w" data-a="unidad" data-k="${esc(u.key)}"><span class="ico" style="font-size:1.6em">${esc(u.icon || '📘')}</span><span class="rt"><b>Unidad ${esc(u.num)}</b><small>${esc(u.title)}</small></span><span>›</span></button>`).join('') : '<p class="hand w">Todavía no hay unidades visibles.</p>'}` };
   };
 
@@ -154,7 +154,7 @@
             ${L(s.meta) ? `<h3 class="w">🎯 Meta de la sesión</h3><p class="hand w">${esc(s.meta)}</p>` : ''}
             ${cr.length ? `<h3 class="w">✅ Criterios de éxito</h3><ul class="cr hand">${cr.map(c => `<li class="w">${esc(c)}</li>`).join('')}</ul>` : ''}
             ${L(s.rubric) ? `<h3 class="w">📏 Lo que se evalúa</h3><p class="hand w">${esc(s.rubric)}</p>` : ''}`,
-          r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
+          r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${Hojas.videoHtml ? Hojas.videoHtml(a) : ''}`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
             ${tareas.map(f => `<div class="box tip w"><b>🏠 Para la casa:</b> <span class="hand">${esc(f.title)}${L(f.desc) ? ' — ' + esc(f.desc) : ''}</span></div>`).join('')}
             ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} ${q === 1 ? 'pregunta' : 'preguntas'}<br><span class="hand">Respóndelo en tu portafolio verde del locker.</span></div>` : ''}` });
       });
@@ -162,9 +162,10 @@
     };
     F.atras = () => { if (F.u) { F.u = null; F.i = 0; } };
     F.alMover = () => {}; F.pestana = null;
-    F.act = (a, ds) => {
+    F.act = (a, ds, el) => {
       if (a === 'unidad') F.libro.pasar(1, () => { F.u = MD.unidades().find(u => u.key === ds.k); F.i = 0; F.pestana = '📚 Unidades'; });
       if (a === 'ir') F.libro.pasar(1, () => { F.i = +ds.i; });
+      if (a === 'video') el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`;
     };
     F.alTab = () => F.libro.pasar(-1, () => { F.u = null; F.i = 0; F.pestana = null; });
     F.iniciar = () => MD.cargar().then(() => { F.listo = true; F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
@@ -531,11 +532,13 @@ Devuelve JSON:
       Hojas.cerrar();
       host.classList.add('libro');
       if (kind === 'pizarra') { actual = flujoPresentacion(host); actual.iniciar(); return; }
-      const F = kind === 'cuaderno' ? flujoSesiones() : kind === 'folder' ? flujoTickets() : kind === 'docente' ? flujoNotas() : kind === 'mision' ? flujoMisiones() : null;
+      const D = MD.esDocente() && Hojas.docente ? Hojas.docente[kind] : null;     // la docente ve su versión: registro de 6° A-D, avances y editar
+      const F = D ? D() : kind === 'cuaderno' ? flujoSesiones() : kind === 'folder' ? flujoTickets() : kind === 'docente' ? flujoNotas() : kind === 'mision' ? flujoMisiones() : null;
       if (!F) return;
       const tema = { cuaderno: 'ses', folder: 'exit', docente: 'notas', mision: 'mis' }[kind];
       Libro(host, tema, F); actual = F; F.iniciar && F.iniciar();
     },
+    _: { Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades },
     cerrar() { if (actual) { actual.libro && actual.libro.ro && actual.libro.ro.disconnect(); actual.cerrar && actual.cerrar(); actual = null; } }
   };
 })();

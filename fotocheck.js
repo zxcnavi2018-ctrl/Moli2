@@ -44,12 +44,28 @@
     ['remoto', '📱', 'Control remoto', 'Maneja la pantalla desde tu celular'],
     ['equipo', '💻', 'Laptop o celular', 'Qué hace este equipo']
   ];
+  let infoDoc = null;
+  function pedirClave(info) {
+    infoDoc = info;
+    abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
+      <div class="fp-h"><img src="img/moli/decidida.webp" alt=""><div><b>👩‍🏫 Modo docente</b><span>Hola, ${esc(String(info.name).split(' ')[0])}. Escribe tu <b>clave</b>.</span></div></div>
+      <form data-f="clave"><input name="pin" type="password" inputmode="${info.tipo === 'owner' ? 'text' : 'numeric'}" autocomplete="off" placeholder="Clave"><div class="fp-err"></div><button class="fp-ok" type="submit">Entrar ✓</button></form>`);
+    setTimeout(() => { const i = panel.querySelector('input'); i && i.focus(); }, 250);
+  }
+  function pedirCuenta() {
+    abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
+      <div class="fp-h"><img src="img/moli/idea.webp" alt=""><div><b>🔐 Conecta tu cuenta</b><span>Así veo y guardo lo de tus estudiantes de 6° A, B, C y D.</span></div></div>
+      <form data-f="cuenta"><input name="email" type="email" autocomplete="username" placeholder="Correo" value="${esc(Docente.OWNER_EMAIL)}" style="font-size:16px;letter-spacing:0">
+        <input name="pass" type="password" autocomplete="current-password" placeholder="Contraseña" style="font-size:16px;letter-spacing:0"><div class="fp-err"></div>
+        <button class="fp-ok" type="submit">Conectar ✓</button></form>
+      <p class="fp-me"><button data-f="google">Entrar con Google</button> · <button data-f="despues">Después</button></p>`);
+  }
   function menuDocente() {
     const me = MD.yo();
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
       <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || 'profe').split(' ')[0])}! 👩‍🏫</b><span>Tus herramientas de docente.</span></div></div>
       <div class="fp-g">${HERR.map(([k, ic, t, d]) => `<button data-f="h" data-k="${k}"><i>${ic}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div>
-      <p class="fp-me">${esc(me.name)} · <button data-f="salir">Cerrar sesión</button></p>`);
+      <p class="fp-me">${Docente.conectado() ? '✅ Cuenta conectada · ' + esc(Docente.correo()) : '<button data-f="conectar">🔌 Conectar mi cuenta</button>'}<br>${esc(me.name)} · <button data-f="salir">Cerrar sesión</button></p>`);
   }
   card.addEventListener('click', e => {
     e.stopPropagation();
@@ -66,15 +82,30 @@
     if (f === 'x') return cerrar();
     if (f === 'salir') { MD.salir(); cerrar(); pintar(); window.dispatchEvent(new Event('moli2:me')); return; }
     if (f === 'h') { cerrar(); window.dispatchEvent(new CustomEvent('moli2:herramienta', { detail: b.dataset.k })); }
+    if (f === 'conectar') return pedirCuenta();
+    if (f === 'despues') return menuDocente();
+    if (f === 'google') { const err = panel.querySelector('.fp-err'); Docente.conGoogle().then(() => { window.dispatchEvent(new Event('moli2:me')); menuDocente(); })
+      .catch(x => { if (err) err.textContent = /unauthorized-domain/.test(x.code || x.message) ? 'Falta autorizar este sitio en Firebase (Authentication → Dominios autorizados).' : 'No se pudo entrar con Google.'; }); }
   });
   panel.addEventListener('submit', async e => {
     e.preventDefault(); const f = e.target, i = f.querySelector('input'), err = f.querySelector('.fp-err'), b = f.querySelector('button');
     b.disabled = true; b.textContent = 'Un momento…'; err.textContent = '';
+    if (f.dataset.f === 'clave') {
+      try { await Docente.conClave(infoDoc, i.value); window.dispatchEvent(new Event('moli2:me')); pintar(); Docente.conectado() ? menuDocente() : pedirCuenta(); }
+      catch (x) { b.disabled = false; b.textContent = 'Entrar ✓'; i.value = ''; err.textContent = x.message === 'CLAVE' ? 'Clave incorrecta.' : x.message === 'MUCHOS' ? 'Muchos intentos. Espera unos minutos.' : 'No pude conectarme. Revisa tu internet.'; }
+      return;
+    }
+    if (f.dataset.f === 'cuenta') {
+      try { await Docente.conCorreo(f.email.value.trim(), f.pass.value); window.dispatchEvent(new Event('moli2:me')); menuDocente(); }
+      catch (x) { b.disabled = false; b.textContent = 'Conectar ✓'; err.textContent = /INVALID|PASSWORD|EMAIL/.test(x.message) ? 'Correo o contraseña incorrectos.' : /TOO_MANY/.test(x.message) ? 'Muchos intentos. Espera unos minutos.' : 'No pude conectarme.'; }
+      return;
+    }
     try {
       await MD.entrar(i.value);
       window.dispatchEvent(new Event('moli2:me')); pintar();
       if (MD.esDocente()) menuDocente(); else { cerrar(); el.classList.remove('meneo'); void el.offsetWidth; el.classList.add('meneo'); }
     } catch (x) {
+      if (x.message === 'DOCENTE') return pedirClave(x.info);
       b.disabled = false; b.textContent = 'Entrar ✓';
       err.textContent = x.message === 'DNI' ? 'Escribe los 8 números de tu DNI.' : x.message === 'NOEXISTE' ? 'No encuentro ese DNI. Pide a tu profe que cree tu cuenta.' : x.message === 'CLAVE' ? 'Clave incorrecta.' : 'No pude conectarme. Revisa tu internet.';
     }

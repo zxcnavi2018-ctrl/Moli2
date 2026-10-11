@@ -48,12 +48,13 @@
   async function entrar(dni) {
     dni = String(dni || '').replace(/\D/g, '').slice(0, 8);
     if (dni.length !== 8) throw new Error('DNI');
+    if (window.Docente) { const d = await Docente.quien(dni); if (d) { const e = new Error('DOCENTE'); e.info = d; throw e; } }   // DNI de docente: pide su clave
     const key = await idDeDni(dni), st = await get('students', key);
     if (!st) throw new Error('NOEXISTE');
     const me = { key, dni, name: st.name, section: st.section, grade: st.grade || GRADE };
     LS.set(ME_KEY, me); return me;
   }
-  function salir() { try { localStorage.removeItem(ME_KEY); } catch (e) {} }
+  function salir() { try { localStorage.removeItem(ME_KEY); } catch (e) {} if (window.Docente) Docente.salirCuenta(); }
   const esDocente = () => { const m = yo(); return !!(m && (m.docente || m.teacher)); };
 
   // ---- contenido: unidades y sesiones ----
@@ -72,6 +73,27 @@
   const unidades = () => (contenido ? contenido.units : []).filter(u => !u.hidden && lleno(u.title));
   const sesionesDe = u => (u.sessions || []).map((s, i) => ({ s, n: i + 1 })).filter(x => !x.s.hidden && (lleno(x.s.meta) || lleno(x.s.title) || (x.s.activities || []).some(a => lleno(a.title) || lleno(a.desc))));
   const preguntas = s => ((s.ticket && s.ticket.questions) || []).map(q => ({ q: q.q, why: q.why || '', opts: (q.options || []).map((t, i) => ({ t, i })).filter(o => lleno(o.t)), answer: q.answer })).filter(q => lleno(q.q) && q.opts.length >= 2);
+
+  // ---- la docente edita una sesión: se trae lo último publicado, se cambia sólo esa sesión y se publica igual que Molí ----
+  const cH = e => { let t = 5381; for (let a = 0; a < e.length; a++) t = 33 * t + e.charCodeAt(a) | 0; return (t >>> 0).toString(36) + e.length.toString(36); };
+  const cSplit = e => { const t = e.units.map(x => JSON.stringify(x)), a = t.map(cH), o = { data: JSON.stringify({ ...e, units: e.units.map((x, i) => ({ key: x.key, _s: i })), hs: a }), h: JSON.stringify(a) }; t.forEach((x, i) => o['u' + i] = x); return o; };
+  async function crudo() {
+    const c = await get('config', 'content'); if (!c) throw new Error('VACIO');
+    const d = JSON.parse(c.data || '{}'); let units = d.units || [];
+    if (units.length && '_s' in units[0]) units = units.map(x => JSON.parse(c['u' + x._s]));
+    return { d, units, savedAt: +c.savedAt || +d.savedAt || 0 };
+  }
+  async function publicar(cambiar) {                                   // cambiar(units) modifica las unidades; luego se publica todo
+    const { d, units, savedAt } = await crudo();
+    cambiar(units);
+    const n = Math.max(Date.now(), savedAt + 1), obj = { ...d, savedAt: n, units }; delete obj.hs;
+    const full = JSON.stringify(obj); if (full.length > 9e5) throw new Error('GRANDE');
+    const fields = units.length <= 24 ? { ...cSplit(obj), savedAt: n, updatedAt: new Date() } : { data: full, savedAt: n, updatedAt: new Date() };
+    await Docente.commit([{ update: { name: DOC('config', 'content'), fields: toF(fields) } }]);
+    contenido = null; LS.set('moli2:content', null); await cargar(); return true;
+  }
+  const guardarSesion = (uKey, n, s) => publicar(units => { const u = units.find(x => x.key === uKey); if (!u || !u.sessions[n - 1]) throw new Error('NOSES'); u.sessions[n - 1] = s; });
+  const sesionCruda = async (uKey, n) => { const { units } = await crudo(); const u = units.find(x => x.key === uKey); return u && JSON.parse(JSON.stringify(u.sessions[n - 1] || null)); };
 
   // ---- Exit tickets ----
   const ticketId = (u, n, k) => `${u}-s${n}-${k}`;
@@ -114,21 +136,26 @@
   const progKey = me => 'moli2:mis:' + (me ? me.key : 'anon');
   async function avance(me) {
     let p = LS.get(progKey(me), {});
-    if (me && !me.demo) try { const d = await get('mision', 'm1-' + me.key); if (d && d.p) { const r = JSON.parse(d.p); Object.entries(r).forEach(([k, [err, last, n]]) => { if (!p[k] || (p[k].n || 0) < n) p[k] = { err, last, n }; }); } } catch (e) {}
+    if (me && !me.demo) try { const d = await get('mision', 'm1-' + me.key); if (d && d.p) { const r = JSON.parse(d.p); Object.entries(r).filter(([k, v]) => Array.isArray(v)).forEach(([k, [err, last, n]]) => { if (!p[k] || (p[k].n || 0) < n) p[k] = { err, last, n }; }); } } catch (e) {}
     LS.set(progKey(me), p); return p;
   }
   let subirT = 0;
   function marcarActividad(me, id, errores) {
-    const p = LS.get(progKey(me), {}), t = p[id];
-    p[id] = { err: t ? Math.min(t.err, errores) : errores, last: errores, n: (t && t.n || 0) + 1, at: Date.now() };
-    LS.set(progKey(me), p);
+    if (id != null) { const p = LS.get(progKey(me), {}), t = p[id];
+      p[id] = { err: t ? Math.min(t.err, errores) : errores, last: errores, n: (t && t.n || 0) + 1, at: Date.now() };
+      LS.set(progKey(me), p); }
     if (!me || me.demo) return;
     clearTimeout(subirT); subirT = setTimeout(async () => {
       const q = {}; Object.entries(LS.get(progKey(me), {})).forEach(([k, v]) => q[k] = [v.err, v.last, v.n]);
+      const lab = labDe(me); if (Object.keys(lab).length) q._lab = lab;                  // también el avance del laboratorio (lo ve la docente)
       try { await fetch(`${BASE}/mision/m1-${me.key}?key=${FB.apiKey}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fields: toF({ p: JSON.stringify(q), n: String(me.name).slice(0, 60), sec: me.section, at: new Date() }) }) }); } catch (e) {}
     }, 1500);
   }
+  // ---- laboratorio: cuántos pasos lleva en cada juego (se guarda junto a sus misiones) ----
+  const LAB = { circ: 2, plac: 2, ener: 3, evo: 4, enf: 3, maq: 3, sol: 2, luna: 3, cad: 4, eco2: 3, tens: 4, orig: 4, lama: 3, vuln: 4, cin: 4, grav: 4 };
+  function labDe(me) { const o = {}; Object.keys(LAB).forEach(k => { const v = LS.get('lab:' + me.key + ':' + k, null); if (v && typeof v === 'object') { const c = Math.min(LAB[k], Object.values(v).filter(Boolean).length); if (c) o[k] = c; } }); return o; }
+  function subirLab(me) { if (!me || me.demo || me.docente) return; marcarActividad(me, null); }
   const misionCompleta = (m, p) => m.acts.length > 0 && m.acts.every(a => p[a.id]);
 
   // ---- Molí piensa (Gemini por Firebase, el mismo que usa Molí); si no responde, se usan preguntas de plantilla ----
@@ -152,6 +179,6 @@
     throw new Error('IA');
   }
 
-  window.MD = { FB, yo, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
+  window.MD = { _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
     PART, PROD, CUAD, COND, cargarMisiones, misionesDe, avance, marcarActividad, misionCompleta, pensar, LS, lleno, contenido: () => contenido };
 })();

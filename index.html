@@ -146,8 +146,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hojas.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="datos.js"></script>
-<script src="hojas.js"></script><script src="fotocheck.js"></script>
+<script src="datos.js"></script><script src="docente.js"></script>
+<script src="hojas.js"></script><script src="hojas-docente.js"></script><script src="fotocheck.js"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -1796,7 +1796,9 @@ function embed(holder, target) {                                    // Molí den
 addEventListener('message', e => { if (e.data !== 'lab:close') return; const f = sheet.querySelector('iframe.mframe'); if (f && e.source === f.contentWindow) embed(f.parentNode, 'lab'); });
 function fillSheet(kind) {                                          // la laptop abre el laboratorio; lo demás son libros de Molí 2
   if (sheet.dataset.kind !== kind || sheet.style.display !== 'block') return;
-  if (kind === 'laptop') embed(sheet.querySelector('.slot'), 'lab');
+  if (kind === 'laptop') { const slot = sheet.querySelector('.slot');
+    if (MD.esDocente()) Hojas.labDocente(slot, () => embed(slot, 'lab'));   // la docente ve el avance de sus estudiantes (y puede abrir el laboratorio)
+    else embed(slot, 'lab'); }
 }
 const LIBROS = ['cuaderno', 'folder', 'docente', 'mision', 'pizarra'];
 const SHEETS = {                                                    // lo que se agranda (en blanco: aquí se conectará el contenido en cada .slot)
@@ -1853,7 +1855,7 @@ const STOPS = [
     async enter() { const sc = this.obj.userData.screen.material.color, c0 = new THREE.Color(0x0b1220), c1 = new THREE.Color(0x3b82f6), c2 = new THREE.Color(0xf8fbff), h = this.obj.userData.hinge;
       await tween(1000, k => { h.rotation.x = LID_CLOSED + (LID_OPEN - LID_CLOSED) * k; }, outBack);   // se abre la tapa con rebote
       await tween(300, k => sc.copy(c0).lerp(c1, k)); await wait(250); await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen); },
-    async leave() { const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k));
+    async leave() { MD.subirLab(MD.yo()); const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k));
       const h = this.obj.userData.hinge; await tween(650, k => { h.rotation.x = LID_OPEN + (LID_CLOSED - LID_OPEN) * k; }, inCubic); } },   // se apaga y se cierra
   { name: '📌 El corcho', title: 'Mi corcho de unidad', ...FOCUS.corcho },
   { name: '📂 Mesa del profesor', title: 'Mis notas', ...FOCUS.docente,
