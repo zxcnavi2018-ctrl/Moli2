@@ -230,35 +230,51 @@ Devuelve "sections" en orden; cada una con "kind": "texto" (información: "headi
   const OFF = { enabled: false, title: '', desc: '', file: '' };
   async function preparadas() {
     const b = abrir('📦 Sesiones preparadas', 'Tus sesiones con sus fichas del colegio, listas para publicar.', 'estrellas', '<p class="hp-tip">Cargando…</p>', true);
-    let P, hechos = {};
+    let P, T = [];
     try { P = await (await fetch('data/unidad7.json?v=' + Date.now(), { cache: 'no-store' })).json(); await MD.cargar(); }
     catch (e) { b.innerHTML = '<p>📶 No pude cargar las sesiones preparadas. Revisa tu internet.</p>'; return; }
-    try { (await Docente.ticketsUnidad(P.unit)).forEach(t => { const n = +t.session; if (n > 0 && n < 30) hechos[n] = (hechos[n] || 0) + 1; }); }
-    catch (e) { b.innerHTML = `<p>${errTxt(e)}</p>`; return; }
+    try { T = await Docente.ticketsUnidad(P.unit); } catch (e) { b.innerHTML = `<p>${errTxt(e)}</p>`; return; }
     const u = MD.unidades().find(x => x.key === P.unit) || { sessions: [] };
-    b.innerHTML = `<p class="hp-tip">📘 <b>Unidad ${esc(P.num)} · ${esc(P.titulo)}</b>. Cada sesión trae su ficha (la del colegio, en su orden, con las pistas de Molí ✨), su meta, criterios y actividades. Se mantienen tus archivos y videos. Si una sesión ya tiene Exit tickets respondidos, sus preguntas no se cambian (a menos que lo marques).</p>
-      <div class="pq-ls">${P.sesiones.map(x => { const q = x.ticket && x.ticket.questions ? x.ticket.questions.length : -1, h = hechos[x.n] || 0, ya = u.sessions[x.n - 1];
-        return `<div class="pq-s"><input type="checkbox" data-n="${x.n}" id="pq${x.n}" checked><span><label for="pq${x.n}"><b>Sesión ${x.n} · ${esc(x.title)}</b><small>${ya ? '🔄 reemplaza la actual' : '🆕 sesión nueva'} · 📄 ficha · 🧪 ${x.activities.length} actividades · ${q > 0 ? `🎟️ ${q} preguntas (del colegio${x.ticket.questions.some(z => z.m) ? ' + Molí' : ''})` : q === 0 ? '🎟️ sin Exit ticket' : '🎟️ se mantiene el actual'}</small></label>
+    // ¿la unidad todavía tiene la numeración de antes? (su sesión 1 era la de enfermedades) → se renumera como el colegio y sus registros se mudan
+    const R = P.renum, viejo = !!(R && new RegExp(R.si, 'i').test(String((u.sessions[0] || {}).meta || '')));
+    const base = c => c % 30, cod = t => +t.session;
+    const mover = viejo ? T.filter(t => R.mover.includes(base(cod(t))) && cod(t) < 90) : [], quitar = viejo ? T.filter(t => R.quitar.includes(base(cod(t))) && cod(t) < 90) : [];
+    const deN = x => viejo ? x.de : x.n;                                // de qué sesión publicada sale cada sesión nueva
+    const hechos = {}; T.forEach(t => { const n = cod(t); if (n > 0 && n < 30) hechos[n] = (hechos[n] || 0) + 1; });
+    b.innerHTML = `<p class="hp-tip">📘 <b>Unidad ${esc(P.num)} · ${esc(P.titulo)}</b> · ${P.sesiones.length} sesiones como en el colegio. Cada una trae su ficha (fiel al anexo, con las pistas de Molí ✨), meta, criterios, 3 actividades y su Exit ticket. Se mantienen tus archivos y videos; si un Exit ticket ya fue respondido, sus preguntas no se cambian (a menos que lo marques).</p>
+      ${viejo ? `<p class="hp-tip">🔢 Tu unidad tenía otra numeración: ahora la <b>Sesión 1 es Bebras</b> y enfermedades pasa a ser la <b>Sesión 2</b>.${mover.length ? ` Muevo ${mover.length} registros (Exit tickets y notas) de la sesión 1 a la 2.` : ''}${quitar.length ? ` Quito ${quitar.length} registros de la antigua sesión 2 (la tarea de microorganismos, que ahora es la tarea flipped de la sesión 2).` : ''}</p>` : ''}
+      <div class="pq-ls">${P.sesiones.map(x => { const q = x.ticket && x.ticket.questions ? x.ticket.questions.length : -1, d = deN(x), h = d ? hechos[d] || 0 : 0, ya = d && u.sessions[d - 1];
+        return `<div class="pq-s"><input type="checkbox" data-n="${x.n}" id="pq${x.n}" checked><span><label for="pq${x.n}"><b>Sesión ${x.n} · ${esc(x.title)}</b><small>${ya ? '🔄 reemplaza la actual' : '🆕 sesión nueva'} · 📄 ficha · 🧪 ${x.activities.length} actividades · ${q > 0 ? `🎟️ ${q} preguntas (${x.ticket.questions.some(z => !z.m) ? 'del colegio' + (x.ticket.questions.some(z => z.m) ? ' + Molí' : '') : 'de Molí'})` : q === 0 ? '🎟️ sin Exit ticket' : '🎟️ se mantiene el actual'}</small></label>
           ${q > 0 && h ? `<small class="pq-av">⚠️ ${h} ya respondieron su Exit ticket: se mantienen sus preguntas. <label><input type="checkbox" data-r="${x.n}"> Reemplazar igual</label></small>` : ''}</span></div>`; }).join('')}</div>
       <button class="hp-ok" data-h="pub">📤 Publicar las sesiones marcadas</button><p class="hp-msg"></p>`;
     b.querySelector('[data-h="pub"]').addEventListener('click', async e => {
       const bt = e.currentTarget, m = b.querySelector('.hp-msg'), sel = new Set([...b.querySelectorAll('[data-n]:checked')].map(i => +i.dataset.n)), rep = new Set([...b.querySelectorAll('[data-r]:checked')].map(i => +i.dataset.r));
       if (!sel.size) { m.textContent = 'Marca al menos una sesión.'; return; }
-      bt.disabled = true; m.textContent = 'Publicando…';
+      if (viejo && sel.size < P.sesiones.length) { m.textContent = 'Como cambia la numeración, esta vez publica todas las sesiones juntas.'; return; }
+      bt.disabled = true;
       try {
-        await MD.publicar(units => {
+        if (viejo && (quitar.length || mover.length)) {                // 1) los registros se mudan a su nueva sesión (sin perder nada)
+          const D = id => Docente.DOC('exitTickets', id), paso = async (W, txt) => { for (let k = 0; k < W.length; k += 200) { m.textContent = `${txt} (${Math.min(k + 200, W.length)} de ${W.length})…`; await Docente.commit(W.slice(k, k + 200)); } };
+          await paso(quitar.map(t => ({ delete: D(t.id) })), 'Quitando los registros de la antigua sesión 2');
+          await paso(mover.flatMap(t => { const n = cod(t) + 1, rec = { unit: t.unit, unitNum: String(t.unitNum || P.num), session: n, grade: t.grade || '6to', section: t.section, name: t.name, student: t.student, dni: t.dni, score: t.score, total: t.total, answers: t.answers, createdAt: new Date(t.createdAt || Date.now()) };
+            return [{ update: { name: D(`${t.unit}-s${n}-${t.student}`), fields: Docente.toF(rec) }, currentDocument: { exists: false } }, { delete: D(t.id) }]; }), 'Moviendo los registros de la sesión 1 a la 2');
+        }
+        m.textContent = 'Publicando…';
+        await MD.publicar(units => {                                     // 2) las sesiones
           const U = units.find(x => x.key === P.unit); if (!U) throw new Error('NOUNIT');
+          const antes = U.sessions.slice(), vacia = () => ({ title: '', meta: '', criteria: ['', '', ''], rubric: '', flipped: OFF, flipped2: OFF, activities: [], ticket: { questions: [] }, hidden: false });
+          if (viejo) U.sessions = P.sesiones.map(x => vacia());
           P.sesiones.filter(x => sel.has(x.n)).forEach(x => {
-            const s0 = U.sessions[x.n - 1] || { title: '', meta: '', criteria: ['', '', ''], rubric: '', flipped: OFF, flipped2: OFF, activities: [], ticket: { questions: [] }, hidden: false }, A0 = s0.activities || [];
-            const s = { ...s0, title: x.title, flipped: { ...OFF, ...x.flipped, file: (s0.flipped || {}).file || '' }, flipped2: { ...OFF, ...x.flipped2, file: (s0.flipped2 || {}).file || '' }, fx: x.fx };
-            if (x.meta) s.meta = x.meta; if (x.criteria) s.criteria = x.criteria; if (x.rubric) s.rubric = x.rubric;
+            const d = deN(x), s0 = (d && antes[d - 1]) || vacia(), A0 = s0.activities || [];
+            const s = { ...s0, title: x.title, meta: x.meta, criteria: x.criteria, rubric: x.rubric, flipped: { ...OFF, ...x.flipped, file: (s0.flipped || {}).file || '' }, flipped2: { ...OFF, ...x.flipped2, file: (s0.flipped2 || {}).file || '' }, fx: x.fx };
+            if ('hidden' in x) s.hidden = x.hidden;
             s.activities = x.activities.map((a, k) => ({ ficha: 'Ficha de la sesión', file: '', ...(A0[k] || (A0[0] && A0[0].file ? { file: A0[0].file } : {})), mode: a.mode, title: a.title, desc: a.desc }));   // se quedan sus archivos y videos
-            if (x.ticket && (!hechos[x.n] || rep.has(x.n))) s.ticket = x.ticket;
-            while (U.sessions.length < x.n - 1) U.sessions.push({ title: '', meta: '', criteria: ['', '', ''], rubric: '', flipped: OFF, flipped2: OFF, activities: [], ticket: { questions: [] } });
+            if (!(d && hechos[d] && !rep.has(x.n) && s0.ticket && (s0.ticket.questions || []).length)) s.ticket = x.ticket;   // si ya lo respondieron, se quedan sus preguntas
+            while (U.sessions.length < x.n - 1) U.sessions.push(vacia());
             U.sessions[x.n - 1] = s;
           });
         });
-        m.innerHTML = `✅ ¡Listo! Publiqué ${sel.size} ${sel.size === 1 ? 'sesión' : 'sesiones'}. Ya están en el cuaderno de sesiones (y en Molí 1). Revisa cada una y, si quieres, toca «✏️ Editar sesión».`;
+        m.innerHTML = `✅ ¡Listo! Publiqué ${sel.size} ${sel.size === 1 ? 'sesión' : 'sesiones'}${viejo && mover.length ? ` y moví ${mover.length} registros a la sesión 2` : ''}. Ya están en el cuaderno de sesiones (y en Molí 1). Revisa cada una y, si quieres, toca «✏️ Editar sesión».`;
       } catch (x) { bt.disabled = false; m.textContent = x.message === 'NOUNIT' ? 'No encontré la unidad en tus sesiones.' : x.message === 'GRANDE' ? 'El contenido quedó muy grande.' : errTxt(x); }
     });
   }
