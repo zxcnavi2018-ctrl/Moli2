@@ -98,7 +98,7 @@
       <div class="rc-card"><b>🏅 Grupos · +1 punto</b><div class="rc-gp">${GC.map((c, k) => `<button data-rc="g" data-v="${k}" style="--c:${c}">G${k + 1}<small>${p[k] || 0}</small></button>`).join('')}</div></div>
       <div class="rc-card"><b>🎲 Sorteo</b><div class="rc-sr">${['A', 'B', 'C', 'D'].map(x => `<button data-rc="srs" data-v="${x}" class="${sec === x ? 'on' : ''}">6° ${x}</button>`).join('')}<button data-rc="sr" class="rc-go">¡Sortear en 6° ${sec}!</button></div></div>
       <div class="rc-card"><b>🤖 Animaciones de Molí</b><div class="rc-an">${ANIM.map(([k, i, t]) => `<button data-rc="an" data-v="${k}"><i>${i}</i>${t}</button>`).join('')}</div>
-        <div class="rc-mx">${['feliz', 'estrellas', 'sorpresa', 'amor', 'guiño', 'pensativo', 'triste', 'enojado'].map(x => `<button data-rc="mx" data-v="${x}">${{ feliz: '😊', estrellas: '🤩', sorpresa: '😮', amor: '😍', 'guiño': '😉', pensativo: '🤔', triste: '😢', enojado: '😠' }[x]}</button>`).join('')}</div></div>
+        <div class="rc-mx">${['feliz', 'estrellas', 'sorpresa', 'guiño', 'pensativo', 'triste', 'enojado', 'normal'].map(x => `<button data-rc="mx" data-v="${x}">${{ feliz: '😊', estrellas: '🤩', sorpresa: '😮', 'guiño': '😉', pensativo: '🤔', triste: '😢', enojado: '😠', normal: '🙂' }[x]}</button>`).join('')}</div></div>
       <p class="rc-pie"><button data-rc="off">⏻ Apagar el control</button></p>`;
   }
   async function sortear() {
