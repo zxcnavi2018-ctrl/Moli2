@@ -87,13 +87,10 @@
     return P.join('');
   }
   const CSS_FICHA = `
-      @page { size: A4; margin: 15mm 12mm 13mm 12mm;
-        @top-left { content: var(--cab-i); font: 8pt Arial, sans-serif; color: #444; }
-        @top-right { content: var(--cab-d); font: 8pt Arial, sans-serif; color: #444; }
-        @bottom-center { content: "Página " counter(page) " de " counter(pages); font: 8pt Arial, sans-serif; color: #444; } }
+
       * { box-sizing: border-box; } html, body { margin: 0; } body { font: 9.6pt/1.3 Arial, Helvetica, sans-serif; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .cab { display: grid; grid-template-columns: auto 1fr auto; gap: 0; border: .4mm solid #000; font-size: 8.6pt; } .cab div { padding: 1.2mm 2mm; border-right: .3mm solid #000; } .cab div:last-child { border-right: 0; }
-      h1 { font-size: 15pt; text-align: center; margin: 2.5mm 0 .5mm; text-transform: uppercase; letter-spacing: .3px; } .sub { text-align: center; font-style: italic; margin: 0 0 2mm; font-size: 9pt; }
+      h1 { font-size: 15pt; text-align: center; margin: 0 0 .5mm; text-transform: uppercase; letter-spacing: .3px; } .sub { text-align: center; font-style: italic; margin: 0 0 2mm; font-size: 9pt; }
       .dat { display: flex; gap: 4mm; font-size: 9pt; margin: 0 0 2mm; } .dat span { flex: 1; border-bottom: .3mm solid #000; }
       .meta { border: .3mm solid #000; padding: 1.5mm 2.5mm; font-size: 8.8pt; margin-bottom: 1.5mm; } .meta ul { margin: .5mm 0 0; padding-left: 5mm; } .meta li { margin: 0; }
       h3 { font-size: 10pt; margin: 2.5mm 0 1.2mm; padding: .3mm 0 .3mm 2mm; background: none; border-left: 1.2mm solid #000; border-bottom: .3mm solid #000; break-after: avoid; } h3 small { font-weight: 400; }
@@ -117,11 +114,11 @@
     const cr = (s.criteria || []).filter(x => String(x || '').trim()), hayT = cual === 'ficha' && MD.preguntas(s).length;
     const uni = `Unidad ${u.num}${u.title ? ': ' + u.title : ''}`, cabI = `Ciencia y Tecnología · 6.° grado · ${uni}`, cabD = `Sesión ${n}${cual === 'tarea' ? ' · Tarea flipped' : ''}`;
     const q = t => '"' + String(t).replace(/["\\]/g, '') + '"';
-    return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${e2(`U${u.num} S${n} · ${fx.t || 'Ficha'}`)}</title><style>:root { --cab-i: ${q(cabI)}; --cab-d: ${q(cabD)}; }${CSS_FICHA}</style></head><body>
+    return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${e2(`U${u.num} S${n} · ${fx.t || 'Ficha'}`)}</title><style>@page { size: A4; margin: 11mm 12mm 14mm 12mm;
+        @bottom-left { content: ${q(cabI + ' · ' + cabD)}; font: 8pt Arial, sans-serif; color: #333; }
+        @bottom-right { content: "Página " counter(page) " de " counter(pages); font: 8pt Arial, sans-serif; color: #333; } }${CSS_FICHA}</style></head><body>
       ${conBoton ? '<div class="ayuda">Imprime en A4, escala 100 %, blanco y negro. <button onclick="print()">Imprimir</button></div>' : ''}
-      <div class="cab"><div><b>Área:</b> Ciencia y Tecnología</div><div><b>${e2(uni)}</b></div><div><b>6.° grado · Sesión ${n}</b></div></div>
       <h1>${e2(fx.t || s.title || 'Ficha de la sesión')}</h1>${fx.st ? `<p class="sub">${e2(fx.st)}</p>` : ''}
-      <div class="dat">Nombre: <span></span> Sección: <span style="flex:.22"></span> Fecha: <span style="flex:.35"></span></div>
       ${cual === 'ficha' && s.meta ? `<div class="meta"><b>Meta:</b> ${e2(s.meta)}</div>${cr.length ? `<table class="cc"><tr><td><b>Criterios de éxito</b> · ¿Cómo me fue hoy? (marca al terminar)</td><th>Lo logré</th><th>En proceso</th></tr>${cr.map(c => `<tr><td>${e2(c)}</td><td class="bx"></td><td class="bx"></td></tr>`).join('')}</table>` : ''}` : ''}
       ${fichaPrint(fx, cual === 'ficha' ? s : null)}
       ${hayT ? `<div class="exit">${svgTarjeta(u, n, s)}${preguntasHtml(u, n, s)}</div>` : ''}

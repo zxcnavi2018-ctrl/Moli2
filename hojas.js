@@ -180,6 +180,11 @@
     return P.join('');
   };
 
+  // ---- ir a otro libro del aula (el portafolio de Exit tickets o el cuaderno de misiones), ya abierto en esta unidad ----
+  let destino = null;
+  const refDe = (u, n) => MD.misionesDe(u.key).some(m => m.ses && m.ses.n === n);
+  const irA = (titulo, u, n, kind) => { const k = G.STOPS.findIndex(st => st.title === titulo); if (k < 0) return; destino = { u: u.key, n, kind }; G.go(k - G.TOUR.i); };
+  const tomarDestino = kind => { const d = destino && destino.kind === kind ? destino : null; if (d) destino = null; return d; };
   // ---- las fichas de la sesión: solo el PDF para ver o descargar (como en Molí 1) ----
   const fichaDe = (s, cual) => cual === 'tarea' ? { url: s.tareaPdf, id: s.flipped && s.flipped.enabled && s.flipped.file } : { url: s.pdf, id: ((s.activities || []).find(a => a && a.file) || {}).file };
   const pdfs = (s, n) => { const B = [['ficha', '📄 Ficha de la sesión'], ['tarea', '🏠 Tarea flipped']].filter(([c]) => { const f = fichaDe(s, c); return f.url || (f.id && MD.contenido() && (MD.contenido().files || {})[f.id]) || (c === 'tarea' ? s.tarea : s.fx); });
@@ -209,7 +214,7 @@
             ${L(s.rubric) ? `<h3 class="w">📏 Lo que se evalúa</h3><p class="hand w">${esc(s.rubric)}</p>` : ''}`,
           r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${Hojas.videoHtml ? Hojas.videoHtml(a) : ''}`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
             ${tareas.map(([f, et]) => `<div class="box tip w"><b>${et}</b> <span class="hand">${esc(f.title)}${L(f.desc) ? ' — ' + esc(f.desc) : ''}</span></div>`).join('')}
-            ${pdfs(s, n)}` });
+            ${pdfs(s, n)}${q || refDe(u, n) ? `<div class="box w fx-pdfs"><b>➡️ Después de la clase</b><br>${q ? `<button class="bt gr" data-a="irexit" data-n="${n}">🎟️ Exit ticket</button> ` : ''}${refDe(u, n) ? `<button class="bt or" data-a="irref" data-n="${n}">💪 Refuerzo</button>` : ''}</div>` : ''}` });
       });
       return H;
     };
@@ -219,10 +224,12 @@
       if (a === 'unidad') F.libro.pasar(1, () => { F.u = MD.unidades().find(u => u.key === ds.k); F.i = 0; F.pestana = '📚 Unidades'; });
       if (a === 'ir') F.libro.pasar(1, () => { F.i = +ds.i; });
       if (a === 'pdf') return abrirFicha(F.u, +ds.n, ds.c, el);
+      if (a === 'irexit') return irA('Mis Exit tickets', F.u, +ds.n, 'exit');
+      if (a === 'irref') return irA('Mis misiones de refuerzo', F.u, +ds.n, 'ref');
       if (a === 'video') el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`;
     };
     F.alTab = () => F.libro.pasar(-1, () => { F.u = null; F.i = 0; F.pestana = null; });
-    F.iniciar = () => MD.cargar().then(() => { F.listo = true; F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
+    F.iniciar = () => MD.cargar().then(() => MD.cargarMisiones().catch(() => {})).then(() => { F.listo = true; F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
     return F;
   }
 
@@ -298,7 +305,7 @@
     // al responder no se puede pasar con las flechas (sólo con «Siguiente»)
     F.alPintar = (el) => { const bloq = F.modo === 'preg'; el.querySelector('.bk-nav').style.visibility = bloq ? 'hidden' : ''; };
     F.alEntrar = () => F.libro.pasar(1, () => { F.i = 0; });
-    F.iniciar = () => MD.cargar().then(() => { F.listo = true; F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
+    F.iniciar = () => MD.cargar().then(() => { F.listo = true; const d = tomarDestino('exit'), u = d && MD.unidades().find(x => x.key === d.u); if (u) abrirUnidad(u); F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
     return F;
   }
 
@@ -465,7 +472,7 @@
           E.found.push(hit); bien('✓ ¡Encontraste ' + hit + '!'); if (E.found.length >= E.s.words.length) terminar(); return F.libro.pinta(false); }
         E.err++; E.msg = 'Esa no es una de las palabras 🔎'; E.msgOk = false; return F.libro.pinta(false); }
     };
-    F.iniciar = () => Promise.all([MD.cargar(), MD.cargarMisiones()]).then(() => MD.avance(F.me)).then(P => { F.P = P; F.listo = true; F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
+    F.iniciar = () => Promise.all([MD.cargar(), MD.cargarMisiones()]).then(() => MD.avance(F.me)).then(P => { F.P = P; F.listo = true; const d = tomarDestino('ref'), u = d && MD.unidades().find(x => x.key === d.u); if (u) { F.u = u; F.modo = 'lista'; F.pestana = '📚 Unidades'; } F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
     return F;
   }
 
