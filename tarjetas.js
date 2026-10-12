@@ -70,7 +70,7 @@
   const e2 = t => esc(sinEmoji(t));
   function fichaPrint(fx, s) {
     const P = [], A = (s && s.activities) || [];
-    const tabla = (c, r, it = [], d) => `<table class="t"><tr>${c.map(x => `<th>${e2(x)}</th>`).join('')}</tr>${(d && d.length ? d : Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => c.map((_, j) => j === 0 && it[i] ? it[i] : ''))).map(f => '<tr>' + c.map((_, j) => `<td${j === 0 && c.length > 2 && (f[0] || '').length < 40 && !(d && d.length) && it.length ? ' class="c1"' : !(d && d.length) && !it.length && (r || 3) <= 1 ? ' class="alto"' : ''}>${e2(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>`;
+    const tabla = (c, r, it = [], d) => `<table class="t"><tr>${c.map(x => `<th>${e2(x)}</th>`).join('')}</tr>${(d && d.length ? d : Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => c.map((_, j) => j === 0 && it[i] ? it[i] : ''))).map(f => '<tr>' + c.map((_, j) => `<td${j === 0 && !(d && d.length) && it.length ? ` class="c1" style="width:${c.length > 2 && c.slice(1).every(h => sinEmoji(h).length <= 14) ? 100 - 15 * (c.length - 1) : c.length === 2 ? 34 : c.length === 3 ? 28 : 22}%"` : !(d && d.length) && !it.length && (r || 3) <= 1 ? ' class="alto"' : ''}>${e2(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>`;
     const lineas = (k, f) => (f ? `<div class="ln f">${e2(f)}</div>` : '') + '<div class="ln"></div>'.repeat(Math.max(f ? k - 1 : k, f ? 0 : 1));
     let a0 = 0, nq = 0;
     (fx.s || []).forEach(x => {
@@ -98,7 +98,7 @@
       .tx p { margin: 0 0 1mm; text-align: justify; } .tx ul { margin: .5mm 0 1mm; padding-left: 5mm; } .tx li { margin: 0; }
       .q { margin: 1.6mm 0; break-inside: avoid; } .qt { margin: 0 0 .6mm; font-weight: 700; } .hp { display: block; color: #333; font-size: 8.3pt; font-style: italic; margin: -.3mm 0 .6mm; }
       .ln { height: 6.2mm; border-bottom: .25mm solid #777; } .ln.f { height: auto; min-height: 6.2mm; padding-top: 1mm; font-size: 9pt; color: #222; line-height: 1.9; }
-      .t { width: 100%; border-collapse: collapse; margin-top: .6mm; } .t th, .t td { border: .25mm solid #000; padding: .6mm 1.4mm; height: 6.6mm; font-size: 8.8pt; vertical-align: top; text-align: left; } .t th { background: none; font-weight: 700; } .t td.c1 { font-weight: 700; width: 30%; } .t td.alto { height: 15mm; }
+      .t { width: 100%; border-collapse: collapse; margin-top: .6mm; } .t th, .t td { border: .25mm solid #000; padding: .6mm 1.4mm; height: 6.6mm; font-size: 8.8pt; vertical-align: top; text-align: left; } .t th { background: none; font-weight: 700; } .t td.c1 { font-weight: 700; } .t td.alto { height: 15mm; }
       .op { display: flex; flex-wrap: wrap; gap: 1mm 7mm; margin: .6mm 0; }
       .cu { height: 55mm; border: .3mm solid #000; background-image: linear-gradient(#999 .15mm, transparent .15mm), linear-gradient(90deg, #999 .15mm, transparent .15mm); background-size: 5mm 5mm; }
       .sb { margin: 2mm 0; padding: 1.2mm 2.5mm; border: .3mm dashed #000; font-size: 8.6pt; break-inside: avoid; }
