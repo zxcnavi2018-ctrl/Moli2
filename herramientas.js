@@ -241,7 +241,7 @@ Devuelve "sections" en orden; cada una con "kind": "texto" (información: "headi
     const mover = viejo ? T.filter(t => R.mover.includes(base(cod(t))) && cod(t) < 90) : [], quitar = viejo ? T.filter(t => R.quitar.includes(base(cod(t))) && cod(t) < 90) : [];
     const deN = x => viejo ? x.de : x.n;                                // de qué sesión publicada sale cada sesión nueva
     const hechos = {}; T.forEach(t => { const n = cod(t); if (n > 0 && n < 30) hechos[n] = (hechos[n] || 0) + 1; });
-    b.innerHTML = `<p class="hp-tip">📘 <b>Unidad ${esc(P.num)} · ${esc(P.titulo)}</b> · ${P.sesiones.length} sesiones como en el colegio. Cada una trae su ficha (fiel al anexo, con las pistas de Molí ✨), meta, criterios, 3 actividades y su Exit ticket. Se mantienen tus archivos y videos; si un Exit ticket ya fue respondido, sus preguntas no se cambian (a menos que lo marques).</p>
+    b.innerHTML = `<p class="hp-tip">📘 <b>Unidad ${esc(P.num)} · ${esc(P.titulo)}</b> · ${P.sesiones.length} sesiones como en el colegio. Cada una trae su ficha en PDF (1 o 2 hojas, fiel al anexo, para imprimir), meta, criterios, 3 actividades y su Exit ticket de 5 preguntas. Se mantienen tus archivos y videos; si un Exit ticket ya fue respondido, sus preguntas no se cambian (a menos que lo marques).</p>
       ${viejo ? `<p class="hp-tip">🔢 Tu unidad tenía otra numeración: ahora la <b>Sesión 1 es Bebras</b> y enfermedades pasa a ser la <b>Sesión 2</b>.${mover.length ? ` Muevo ${mover.length} registros (Exit tickets y notas) de la sesión 1 a la 2.` : ''}${quitar.length ? ` Quito ${quitar.length} registros de la antigua sesión 2 (la tarea de microorganismos, que ahora es la tarea flipped de la sesión 2).` : ''}</p>` : ''}
       <div class="pq-ls">${P.sesiones.map(x => { const q = x.ticket && x.ticket.questions ? x.ticket.questions.length : -1, d = deN(x), h = d ? hechos[d] || 0 : 0, ya = d && u.sessions[d - 1];
         return `<div class="pq-s"><input type="checkbox" data-n="${x.n}" id="pq${x.n}" checked><span><label for="pq${x.n}"><b>Sesión ${x.n} · ${esc(x.title)}</b><small>${ya ? '🔄 reemplaza la actual' : '🆕 sesión nueva'} · 📄 ficha · 🧪 ${x.activities.length} actividades · ${q > 0 ? `🎟️ ${q} preguntas (${x.ticket.questions.some(z => !z.m) ? 'del colegio' + (x.ticket.questions.some(z => z.m) ? ' + Molí' : '') : 'de Molí'})` : q === 0 ? '🎟️ sin Exit ticket' : '🎟️ se mantiene el actual'}</small></label>
@@ -259,8 +259,18 @@ Devuelve "sections" en orden; cada una con "kind": "texto" (información: "headi
           await paso(mover.flatMap(t => { const n = cod(t) + 1, rec = { unit: t.unit, unitNum: String(t.unitNum || P.num), session: n, grade: t.grade || '6to', section: t.section, name: t.name, student: t.student, dni: t.dni, score: t.score, total: t.total, answers: t.answers, createdAt: new Date(t.createdAt || Date.now()) };
             return [{ update: { name: D(`${t.unit}-s${n}-${t.student}`), fields: Docente.toF(rec) }, currentDocument: { exists: false } }, { delete: D(t.id) }]; }), 'Moviendo los registros de la sesión 1 a la 2');
         }
+        // 2) las fichas en PDF también se guardan como archivos de Molí (así Molí 1 las muestra en «Ver ficha»)
+        const ARCH = {}, b64 = buf => { const u8 = new Uint8Array(buf); let t = ''; for (let k = 0; k < u8.length; k += 32768) t += String.fromCharCode.apply(null, u8.subarray(k, k + 32768)); return btoa(t); };
+        const subir = async (url, id, name) => { const buf = await (await fetch(url, { cache: 'no-store' })).arrayBuffer(), t = b64(buf), parts = Math.ceil(t.length / 880000);
+          for (let k = 0; k < parts; k++) await Docente.commit([{ update: { name: Docente.DOC('files', `${id}-${k}`), fields: Docente.toF({ b64: t.slice(k * 880000, (k + 1) * 880000), updatedAt: new Date() }) } }]);
+          ARCH[id] = { name, type: 'application/pdf', size: buf.byteLength, parts }; };
+        const SS = P.sesiones.filter(x => sel.has(x.n));
+        for (const [k, x] of SS.entries()) { m.textContent = `Subiendo las fichas en PDF (${k + 1} de ${SS.length})…`;
+          if (x.pdf) await subir(x.pdf, `fu${P.num}s${x.n}`, `Ficha · Unidad ${P.num} · Sesión ${x.n}.pdf`);
+          if (x.tareaPdf) await subir(x.tareaPdf, `fu${P.num}s${x.n}t`, `Tarea flipped · Unidad ${P.num} · Sesión ${x.n}.pdf`); }
         m.textContent = 'Publicando…';
-        await MD.publicar(units => {                                     // 2) las sesiones
+        await MD.publicar((units, D) => {                                // 3) las sesiones
+          D.files = { ...(D.files || {}), ...ARCH };
           const U = units.find(x => x.key === P.unit); if (!U) throw new Error('NOUNIT');
           const antes = U.sessions.slice(), vacia = () => ({ title: '', meta: '', criteria: ['', '', ''], rubric: '', flipped: OFF, flipped2: OFF, activities: [], ticket: { questions: [] }, hidden: false });
           if (viejo) U.sessions = P.sesiones.map(x => vacia());
@@ -268,7 +278,8 @@ Devuelve "sections" en orden; cada una con "kind": "texto" (información: "headi
             const d = deN(x), s0 = (d && antes[d - 1]) || vacia(), A0 = s0.activities || [];
             const s = { ...s0, title: x.title, meta: x.meta, criteria: x.criteria, rubric: x.rubric, flipped: { ...OFF, ...x.flipped, file: (s0.flipped || {}).file || '' }, flipped2: { ...OFF, ...x.flipped2, file: (s0.flipped2 || {}).file || '' }, fx: x.fx };
             if ('hidden' in x) s.hidden = x.hidden;
-            s.activities = x.activities.map((a, k) => ({ ficha: 'Ficha de la sesión', file: '', ...(A0[k] || (A0[0] && A0[0].file ? { file: A0[0].file } : {})), mode: a.mode, title: a.title, desc: a.desc }));   // se quedan sus archivos y videos
+            s.activities = x.activities.map((a, k) => ({ ...(A0[k] || {}), ficha: 'Ficha de la sesión', file: k === 0 && x.pdf ? `fu${P.num}s${x.n}` : '', mode: a.mode, title: a.title, desc: a.desc }));   // se quedan sus videos; una sola ficha por sesión
+            if (x.pdf) s.pdf = x.pdf; if (x.tareaPdf) { s.tareaPdf = x.tareaPdf; s.flipped.file = `fu${P.num}s${x.n}t`; } if (x.tarea) s.tarea = x.tarea;
             if (!(d && hechos[d] && !rep.has(x.n) && s0.ticket && (s0.ticket.questions || []).length)) s.ticket = x.ticket;   // si ya lo respondieron, se quedan sus preguntas
             while (U.sessions.length < x.n - 1) U.sessions.push(vacia());
             U.sessions[x.n - 1] = s;

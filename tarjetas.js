@@ -65,57 +65,72 @@
     w.document.close();
   }
   // ---- imprimir la FICHA de la sesión (como la del colegio, con el estilo de Molí) y al final su cierre con la tarjeta ----
-  function fichaPrint(fx) {
-    const P = [], tabla = (c, r, it = [], d) => `<table class="t"><tr>${c.map(x => `<th>${esc(x)}</th>`).join('')}</tr>${(d && d.length ? d : Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => c.map((_, j) => j === 0 && it[i] ? it[i] : ''))).map(f => '<tr>' + c.map((_, j) => `<td>${esc(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>`;
-    const marcas = op => op && op.length ? `<div class="op">${op.map(o => `<span>☐ ${esc(o)}</span>`).join('')}</div>` : '';
-    const lineas = (k, f) => `<div class="ln">${f ? `<span>${esc(f)}</span>` : ''}</div>`.repeat(1) + '<div class="ln"></div>'.repeat(k - 1);
-    let nq = 0, a0 = 0;
-    if (fx.v === 2) (fx.s || []).forEach(x => {
-      if (x.a && x.a !== a0 && x.k !== 'texto') { a0 = x.a; P.push(`<h3>Actividad ${x.a}</h3>`); }
-      if (x.k === 'texto') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}<p>${esc(x.t).replace(/\n/g, '<br>')}</p></div>`);
-      else if (x.k === 'lista') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}${x.t ? `<p>${esc(x.t)}</p>` : ''}<ul>${(x.it || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`);
-      else if (x.k === 'datos') P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}${x.t ? `<p>${esc(x.t)}</p>` : ''}${tabla(x.c || [], 0, [], x.d)}</div>`);
-      else if (x.k === 'tabla') P.push(`<div class="q">${fx.nn ? '' : `<b>${++nq}.</b> `}${esc(x.t || x.h)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}${x.c && x.c.length ? tabla(x.c, x.r, x.it || [], x.d) : ''}</div>`);
-      else if (x.k === 'cuad') P.push(`<div class="q">${fx.nn ? '' : `<b>${++nq}.</b> `}${esc(x.t)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}<div class="cu"></div></div>`);
-      else P.push(`<div class="q">${fx.nn ? '' : `<b>${++nq}.</b> `}${esc(x.t || x.h)}${x.hp ? `<small>${esc(x.hp)}</small>` : ''}${marcas(x.op)}${x.op && x.op.length && !x.ln ? '' : lineas(Math.max(2, (x.ln || 1) + 1), x.f)}</div>`);
+  // ---- la ficha impresa (estilo ficha de colegio, blanco y negro, 1 o 2 hojas): encabezado y pie con el área, la unidad y la página ----
+  const sinEmoji = t => String(t == null ? '' : t).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '').replace(/\s{2,}/g, ' ').trim();
+  const e2 = t => esc(sinEmoji(t));
+  function fichaPrint(fx, s) {
+    const P = [], A = (s && s.activities) || [];
+    const tabla = (c, r, it = [], d) => `<table class="t"><tr>${c.map(x => `<th>${e2(x)}</th>`).join('')}</tr>${(d && d.length ? d : Array.from({ length: Math.max(1, r || 3, it.length) }, (_, i) => c.map((_, j) => j === 0 && it[i] ? it[i] : ''))).map(f => '<tr>' + c.map((_, j) => `<td${j === 0 && c.length > 2 && (f[0] || '').length < 40 && !(d && d.length) && it.length ? ' class="c1"' : !(d && d.length) && !it.length && (r || 3) <= 1 ? ' class="alto"' : ''}>${e2(f[j] || '')}</td>`).join('') + '</tr>').join('')}</table>`;
+    const lineas = (k, f) => (f ? `<div class="ln f">${e2(f)}</div>` : '') + '<div class="ln"></div>'.repeat(Math.max(f ? k - 1 : k, f ? 0 : 1));
+    let a0 = 0, nq = 0;
+    (fx.s || []).forEach(x => {
+      if (x.a && x.a !== a0) { a0 = x.a; const ac = A[x.a - 1]; P.push(`<h3>Actividad ${x.a}${ac ? ': ' + e2(ac.title) : ''}${ac && /group|grupo/.test(ac.mode) ? ' <small>(en equipo)</small>' : ac && /pair|pareja/.test(ac.mode) ? ' <small>(en pareja)</small>' : ''}</h3>`); }
+      const num = fx.nn ? '' : `<b>${++nq}.</b> `, hp = x.hp ? `<small class="hp">${e2(x.hp)}</small>` : '';
+      if (x.k === 'texto') P.push(`<div class="tx">${x.h ? `<h4>${e2(x.h)}</h4>` : ''}${String(x.t || '').split('\n').map(p => `<p>${e2(p)}</p>`).join('')}</div>`);
+      else if (x.k === 'lista') P.push(`<div class="tx">${x.h ? `<h4>${e2(x.h)}</h4>` : ''}${x.t ? `<p>${e2(x.t)}</p>` : ''}<ul>${(x.it || []).map(t => `<li>${e2(t)}</li>`).join('')}</ul></div>`);
+      else if (x.k === 'datos') P.push(`<div class="q">${x.h ? `<h4>${e2(x.h)}</h4>` : ''}${x.t ? `<p class="qt">${e2(x.t)}</p>` : ''}${tabla(x.c || [], 0, [], x.d)}</div>`);
+      else if (x.k === 'tabla') P.push(`<div class="q"><p class="qt">${num}${e2(x.t || x.h)}</p>${hp}${x.c && x.c.length ? tabla(x.c, x.r, x.it || [], x.d) : ''}</div>`);
+      else if (x.k === 'cuad') P.push(`<div class="q"><p class="qt">${num}${e2(x.t)}</p>${hp}<div class="cu"></div></div>`);
+      else P.push(`<div class="q"><p class="qt">${num}${e2(x.t || x.h)}</p>${hp}${x.op && x.op.length ? `<div class="op">${x.op.map(o => `<span>☐ ${e2(o)}</span>`).join('')}</div>` : ''}${x.op && x.op.length && !x.ln ? '' : lineas(x.ln || 1, x.f)}</div>`);
     });
-    else { (fx.b || []).forEach(x => P.push(`<div class="tx">${x.h ? `<h4>${esc(x.h)}</h4>` : ''}<p>${esc(x.t)}</p></div>`));
-      (fx.k || []).forEach(x => { if (x.a && x.a !== a0) { a0 = x.a; P.push(`<h3>Actividad ${x.a}</h3>`); } P.push(`<div class="q"><b>${++nq}.</b> ${esc(x.q)}${x.h ? `<small>${esc(x.h)}</small>` : ''}${x.c && x.c.length ? tabla(x.c, x.r) : lineas(3, x.f)}</div>`); }); }
-    if (fx.sb) P.push(`<div class="sb"><b>¿Sabías que…?</b> ${esc(String(fx.sb).replace(/^\s*¿?\s*sab[ií]as\s+que\s*(…|\.\.\.)?\s*/i, ''))}</div>`);
+    if (fx.sb) P.push(`<div class="sb"><b>¿Sabías que…?</b> ${e2(String(fx.sb).replace(/^\s*¿?\s*sab[ií]as\s+que\s*(…|\.\.\.)?\s*/i, ''))}</div>`);
     return P.join('');
   }
-  function imprimirFicha(u, n) {
-    const s = u.sessions[n - 1]; if (!s || !s.fx) return alert('Esta sesión no tiene ficha.');
-    const cr = (s.criteria || []).filter(x => String(x || '').trim()), f = s.flipped && s.flipped.enabled ? s.flipped : null, hayT = MD.preguntas(s).length;
-    const w = window.open('', '_blank'); if (!w) return alert('Permite las ventanas emergentes para imprimir la ficha.');
-    w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ficha · U${esc(u.num)} S${n}</title><style>
-      @page { size: A4; margin: 12mm 12mm 12mm 12mm; } * { box-sizing: border-box; } body { margin: 0; font: 11pt Arial, Helvetica, sans-serif; color: #111; }
-      .cab { display: flex; justify-content: space-between; font-size: 9pt; color: #444; border-bottom: .4mm solid #111; padding-bottom: 1.5mm; }
-      h1 { font-size: 17pt; margin: 3mm 0 1mm; } .sub { margin: 0 0 2mm; font-style: italic; color: #333; } .dat { display: flex; gap: 6mm; font-size: 10pt; margin-bottom: 3mm; } .dat span { flex: 1; border-bottom: .3mm solid #555; }
-      h3 { font-size: 12pt; margin: 4mm 0 1.5mm; padding: 1mm 2mm; background: #eee; } h4 { margin: 2mm 0 1mm; font-size: 11.5pt; }
-      .tx p { margin: 0 0 2mm; text-align: justify; line-height: 1.35; } .q { margin: 2.5mm 0; page-break-inside: avoid; } .q small { display: block; color: #555; font-size: 9pt; margin-top: .5mm; }
-      .ln { height: 7mm; border-bottom: .3mm solid #999; } .ln span { color: #666; font-size: 10pt; }
-      .t { width: 100%; border-collapse: collapse; margin-top: 1.5mm; } .t th, .t td { border: .3mm solid #333; padding: 1mm 1.5mm; height: 8mm; font-size: 10pt; } .t th { background: #eee; }
-      .op { display: flex; flex-wrap: wrap; gap: 1mm 6mm; margin: 1.5mm 0; font-size: 10.5pt; } .cu { height: 80mm; margin-top: 1.5mm; border: .3mm solid #555; background-image: linear-gradient(#bbb .2mm, transparent .2mm), linear-gradient(90deg, #bbb .2mm, transparent .2mm); background-size: 5mm 5mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .caso { margin: 2mm 0; font-size: 9.5pt; } .caso .t td, .caso .t th { height: 6mm; }
-      .sb { margin: 3mm 0; padding: 2mm 3mm; border: .3mm dashed #555; font-size: 10pt; }
-      .cierre { page-break-inside: avoid; margin-top: 5mm; border-top: .5mm solid #111; padding-top: 2mm; } .cierre h3 { background: none; padding: 0; }
-      .cc { width: 100%; border-collapse: collapse; } .cc td, .cc th { border: .3mm solid #333; padding: 1.2mm 2mm; font-size: 10pt; } .cc th { width: 22mm; }
-      .exit { display: flex; gap: 4mm; align-items: flex-start; margin-top: 3mm; padding: 2mm; border: .3mm dashed #888; page-break-inside: avoid; } .exit svg { width: 96mm; height: 90mm; flex: none; }
-      .tq { flex: 1; font-size: 9pt; } .tq-t { display: block; font-size: 10pt; margin-bottom: 1.5mm; } .tq-q { margin: 0 0 2mm; } .tq-q div { display: flex; flex-wrap: wrap; gap: .8mm 3mm; margin-top: .8mm; }
-      .tq-q i { font-style: normal; font-weight: 700; display: inline-grid; place-items: center; width: 3.6mm; height: 3.6mm; border: .25mm solid #333; border-radius: 50%; font-size: 2.4mm; margin-right: 1mm; }
-      .ayuda { padding: 4mm; background: #fef3c7; font-size: 10pt; } @media print { .ayuda { display: none; } }
-    </style></head><body><div class="ayuda">🖨️ Imprime en A4, escala 100 %. <button onclick="print()">Imprimir</button></div>
-      <div class="cab"><span>Ciencia y Tecnología · 6.° grado · Unidad ${esc(u.num)}${u.title ? ': ' + esc(u.title) : ''}</span><span>Sesión ${n}</span></div>
-      <h1>${esc(s.fx.t || 'Ficha de la sesión')}</h1>${s.fx.st ? `<p class="sub">${esc(s.fx.st)}</p>` : ''}
-      <div class="dat">Nombre: <span></span> Sección: <span style="flex:.25"></span> Fecha: <span style="flex:.4"></span></div>
-      ${s.meta ? `<p><b>Meta:</b> ${esc(s.meta)}</p>` : ''}
-      ${fichaPrint(s.fx)}
-      <div class="cierre">${cr.length ? `<h3>¿Cómo me fue hoy?</h3><table class="cc"><tr><td><b>Criterio de éxito</b></td><th>Lo logré</th><th>En proceso</th></tr>${cr.map(c => `<tr><td>${esc(c)}</td><th></th><th></th></tr>`).join('')}</table>` : ''}
-        ${f && (f.title || f.desc) ? `<p><b>Para la siguiente clase:</b> ${esc(f.title || '')}${f.desc ? ' — ' + esc(f.desc) : ''}</p>` : ''}
-        ${hayT ? `<div class="exit">${svgTarjeta(u, n, s)}${preguntasHtml(u, n, s)}</div>` : ''}</div>
-      <script>setTimeout(() => print(), 700)<\/script></body></html>`);
-    w.document.close();
+  const CSS_FICHA = `
+      @page { size: A4; margin: 15mm 12mm 13mm 12mm;
+        @top-left { content: var(--cab-i); font: 8pt Arial, sans-serif; color: #444; }
+        @top-right { content: var(--cab-d); font: 8pt Arial, sans-serif; color: #444; }
+        @bottom-center { content: "Página " counter(page) " de " counter(pages); font: 8pt Arial, sans-serif; color: #444; } }
+      * { box-sizing: border-box; } html, body { margin: 0; } body { font: 9.6pt/1.3 Arial, Helvetica, sans-serif; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .cab { display: grid; grid-template-columns: auto 1fr auto; gap: 0; border: .4mm solid #000; font-size: 8.6pt; } .cab div { padding: 1.2mm 2mm; border-right: .3mm solid #000; } .cab div:last-child { border-right: 0; }
+      h1 { font-size: 15pt; text-align: center; margin: 2.5mm 0 .5mm; text-transform: uppercase; letter-spacing: .3px; } .sub { text-align: center; font-style: italic; margin: 0 0 2mm; font-size: 9pt; }
+      .dat { display: flex; gap: 4mm; font-size: 9pt; margin: 0 0 2mm; } .dat span { flex: 1; border-bottom: .3mm solid #000; }
+      .meta { border: .3mm solid #000; padding: 1.5mm 2.5mm; font-size: 8.8pt; margin-bottom: 1.5mm; } .meta ul { margin: .5mm 0 0; padding-left: 5mm; } .meta li { margin: 0; }
+      h3 { font-size: 10pt; margin: 2.5mm 0 1.2mm; padding: .3mm 0 .3mm 2mm; background: none; border-left: 1.2mm solid #000; border-bottom: .3mm solid #000; break-after: avoid; } h3 small { font-weight: 400; }
+      h4 { margin: 1.5mm 0 .6mm; font-size: 9.8pt; break-after: avoid; }
+      .tx p { margin: 0 0 1mm; text-align: justify; } .tx ul { margin: .5mm 0 1mm; padding-left: 5mm; } .tx li { margin: 0; }
+      .q { margin: 1.6mm 0; break-inside: avoid; } .qt { margin: 0 0 .6mm; font-weight: 700; } .hp { display: block; color: #333; font-size: 8.3pt; font-style: italic; margin: -.3mm 0 .6mm; }
+      .ln { height: 6.2mm; border-bottom: .25mm solid #777; } .ln.f { height: auto; min-height: 6.2mm; padding-top: 1mm; font-size: 9pt; color: #222; line-height: 1.9; }
+      .t { width: 100%; border-collapse: collapse; margin-top: .6mm; } .t th, .t td { border: .25mm solid #000; padding: .6mm 1.4mm; height: 6.6mm; font-size: 8.8pt; vertical-align: top; text-align: left; } .t th { background: none; font-weight: 700; } .t td.c1 { font-weight: 700; width: 30%; } .t td.alto { height: 15mm; }
+      .op { display: flex; flex-wrap: wrap; gap: 1mm 7mm; margin: .6mm 0; }
+      .cu { height: 55mm; border: .3mm solid #000; background-image: linear-gradient(#999 .15mm, transparent .15mm), linear-gradient(90deg, #999 .15mm, transparent .15mm); background-size: 5mm 5mm; }
+      .sb { margin: 2mm 0; padding: 1.2mm 2.5mm; border: .3mm dashed #000; font-size: 8.6pt; break-inside: avoid; }
+      .cierre { break-inside: avoid; margin-top: 2.5mm; } .cc { width: 100%; border-collapse: collapse; } .cc td, .cc th { border: .25mm solid #000; padding: .7mm 2mm; font-size: 8.6pt; } .cc th { width: 17mm; background: none; } .cc td.bx { width: 17mm; } .cc { margin-bottom: 1.5mm; }
+      .exit { display: flex; gap: 3mm; align-items: flex-start; margin-top: 2.5mm; padding: 1.5mm; border: .3mm dashed #000; break-inside: avoid; } .exit svg { width: 78mm; height: 73mm; flex: none; }
+      .tq { flex: 1; font-size: 8.3pt; } .tq-t { display: block; font-size: 9pt; margin-bottom: 1mm; } .tq-q { margin: 0 0 1.3mm; } .tq-q div { display: flex; flex-wrap: wrap; gap: .5mm 2.5mm; margin-top: .4mm; } .tq-q span { display: inline-flex; gap: .8mm; }
+      .tq-q i { font-style: normal; font-weight: 700; display: inline-grid; place-items: center; width: 3.3mm; height: 3.3mm; border: .25mm solid #000; border-radius: 50%; font-size: 2.2mm; flex: none; }
+      .caso { margin: 0 0 1.2mm; font-size: 8pt; } .caso .t td, .caso .t th { height: auto; padding: .3mm 1mm; font-size: 8pt; }
+      .exit svg * { filter: grayscale(1); } .ayuda { padding: 3mm; background: #eee; font: 10pt Arial; } @media print { .ayuda { display: none; } }`;
+  // la ficha completa (cual: 'ficha' = la de la sesión, con su cierre y su Exit ticket; 'tarea' = la tarea flipped sola)
+  function fichaDoc(u, n, cual = 'ficha', conBoton = true) {
+    const s = u.sessions[n - 1], fx = cual === 'tarea' ? s.tarea || (s.fx && s.fx.tarea) : s.fx; if (!fx) return '';
+    const cr = (s.criteria || []).filter(x => String(x || '').trim()), hayT = cual === 'ficha' && MD.preguntas(s).length;
+    const uni = `Unidad ${u.num}${u.title ? ': ' + u.title : ''}`, cabI = `Ciencia y Tecnología · 6.° grado · ${uni}`, cabD = `Sesión ${n}${cual === 'tarea' ? ' · Tarea flipped' : ''}`;
+    const q = t => '"' + String(t).replace(/["\\]/g, '') + '"';
+    return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${e2(`U${u.num} S${n} · ${fx.t || 'Ficha'}`)}</title><style>:root { --cab-i: ${q(cabI)}; --cab-d: ${q(cabD)}; }${CSS_FICHA}</style></head><body>
+      ${conBoton ? '<div class="ayuda">Imprime en A4, escala 100 %, blanco y negro. <button onclick="print()">Imprimir</button></div>' : ''}
+      <div class="cab"><div><b>Área:</b> Ciencia y Tecnología</div><div><b>${e2(uni)}</b></div><div><b>6.° grado · Sesión ${n}</b></div></div>
+      <h1>${e2(fx.t || s.title || 'Ficha de la sesión')}</h1>${fx.st ? `<p class="sub">${e2(fx.st)}</p>` : ''}
+      <div class="dat">Nombre: <span></span> Sección: <span style="flex:.22"></span> Fecha: <span style="flex:.35"></span></div>
+      ${cual === 'ficha' && s.meta ? `<div class="meta"><b>Meta:</b> ${e2(s.meta)}</div>${cr.length ? `<table class="cc"><tr><td><b>Criterios de éxito</b> · ¿Cómo me fue hoy? (marca al terminar)</td><th>Lo logré</th><th>En proceso</th></tr>${cr.map(c => `<tr><td>${e2(c)}</td><td class="bx"></td><td class="bx"></td></tr>`).join('')}</table>` : ''}` : ''}
+      ${fichaPrint(fx, cual === 'ficha' ? s : null)}
+      ${hayT ? `<div class="exit">${svgTarjeta(u, n, s)}${preguntasHtml(u, n, s)}</div>` : ''}
+      </body></html>`;
   }
-  window.Tarjetas = { elementos, svgTarjeta, preguntasHtml, imprimir, imprimirFicha, bits };
+  function imprimirFicha(u, n, cual = 'ficha') {
+    const s = u.sessions[n - 1]; if (!s || !(cual === 'tarea' ? s.tarea : s.fx)) return alert('Esta sesión no tiene ficha.');
+    const w = window.open('', '_blank'); if (!w) return alert('Permite las ventanas emergentes para imprimir la ficha.');
+    w.document.write(fichaDoc(u, n, cual).replace('</body>', '<script>setTimeout(() => print(), 700)<\/script></body>')); w.document.close();
+  }
+  window.Tarjetas = { elementos, svgTarjeta, preguntasHtml, imprimir, imprimirFicha, fichaDoc, bits };
 })();

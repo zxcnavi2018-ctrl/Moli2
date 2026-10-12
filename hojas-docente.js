@@ -176,10 +176,9 @@
         const cr = (s.criteria || []).filter(L), acts = (s.activities || []).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)}</div><div class="big w">Sesión ${n}</div>${L(s.title) ? `<h2 class="w">${esc(s.title)}</h2>` : ''}
             ${L(s.meta) ? `<h3 class="w">🎯 Meta</h3><p class="hand w">${esc(s.meta)}</p>` : ''}${cr.length ? `<h3 class="w">✅ Criterios</h3><ul class="cr hand">${cr.map(c => `<li class="w">${esc(c)}</li>`).join('')}</ul>` : ''}
-            <p class="center w"><button class="bt or" data-a="editar" data-n="${n}">✏️ Editar sesión</button>${s.fx ? ` <button class="bt" data-a="impficha" data-n="${n}">🖨️ Ficha</button>` : ''}${q ? ` <button class="bt" data-a="tarjetas" data-n="${n}">🖨️ Tarjetas</button>` : ''}</p>`,
+            <p class="center w"><button class="bt or" data-a="editar" data-n="${n}">✏️ Editar sesión</button>${q ? ` <button class="bt" data-a="tarjetas" data-n="${n}">🖨️ Tarjetas</button>` : ''}</p>${Hojas._.pdfs(s, n)}`,
           r: `<h2 class="w">🧪 Actividades</h2>${acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${videoHtml(a)}`).join('') || '<p class="hand w">Sin actividades todavía.</p>'}
-            ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} preguntas</div>` : ''}` });
-        if (s.fx) H.push({ l: fichaHtml(s.fx, n, s), r: null });
+            ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} preguntas <small>(lo responden en el portafolio de Exit tickets)</small></div>` : ''}` });
       });
       return H;
     };
@@ -217,6 +216,7 @@
     F.act2 = async (a, ds, el) => {
       if (a === 'video') { el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`; return; }
       if (a === 'tarjetas') return Tarjetas.imprimir(F.u, +ds.n);
+      if (a === 'pdf') return Hojas._.abrirFicha(F.u, +ds.n, ds.c, el);
       if (a === 'impficha') return Tarjetas.imprimirFicha(F.u, +ds.n);   // la ficha con su cierre y la tarjeta del Exit ticket   // tarjetas del Exit ticket para escanear
       if (a === 'editar') { const n = +ds.n; F.ed = { n, s: {}, estado: 'cargando' }; F.libro.pasar(1, () => { F.i = 0; });
         try { const s = await MD.sesionCruda(F.u.key, n); F.ed = { n, s: s || {}, estado: '' }; } catch (x) { F.ed = null; alert(errTxt(x)); }

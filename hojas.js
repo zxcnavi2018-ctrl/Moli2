@@ -180,6 +180,15 @@
     return P.join('');
   };
 
+  // ---- las fichas de la sesión: solo el PDF para ver o descargar (como en Molí 1) ----
+  const fichaDe = (s, cual) => cual === 'tarea' ? { url: s.tareaPdf, id: s.flipped && s.flipped.enabled && s.flipped.file } : { url: s.pdf, id: ((s.activities || []).find(a => a && a.file) || {}).file };
+  const pdfs = (s, n) => { const B = [['ficha', '📄 Ficha de la sesión'], ['tarea', '🏠 Tarea flipped']].filter(([c]) => { const f = fichaDe(s, c); return f.url || (f.id && MD.contenido() && (MD.contenido().files || {})[f.id]) || (c === 'tarea' ? s.tarea : s.fx); });
+    return B.length ? `<div class="box w fx-pdfs"><b>📎 Fichas</b><br>${B.map(([c, t]) => `<button class="bt" data-a="pdf" data-n="${n}" data-c="${c}">${t} (PDF)</button>`).join(' ')}</div>` : ''; };
+  const abrirFicha = (u, n, cual, el) => { const s = u.sessions[n - 1], f = fichaDe(s, cual), t = el && el.textContent;
+    if (!f.url && !(f.id && (MD.contenido().files || {})[f.id])) return Tarjetas.imprimirFicha(u, n, cual);   // sin PDF todavía: se abre lista para imprimir o guardar como PDF
+    if (el) { el.disabled = true; el.textContent = '⏳ Abriendo…'; }
+    MD.abrirPdf(f.url, f.id, `U${u.num} S${n} ${cual === 'tarea' ? 'Tarea flipped' : 'Ficha'}.pdf`).catch(() => alert('No pude abrir la ficha. Revisa tu internet.')).finally(() => { if (el) { el.disabled = false; el.textContent = t; } }); };
+
   // =================================================================
   //  1) MIS SESIONES DE UNIDAD (cuaderno verde de la mesa)
   // =================================================================
@@ -200,8 +209,7 @@
             ${L(s.rubric) ? `<h3 class="w">📏 Lo que se evalúa</h3><p class="hand w">${esc(s.rubric)}</p>` : ''}`,
           r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${Hojas.videoHtml ? Hojas.videoHtml(a) : ''}`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
             ${tareas.map(([f, et]) => `<div class="box tip w"><b>${et}</b> <span class="hand">${esc(f.title)}${L(f.desc) ? ' — ' + esc(f.desc) : ''}</span></div>`).join('')}
-            ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} ${q === 1 ? 'pregunta' : 'preguntas'}<br><span class="hand">Respóndelo en tu portafolio verde del locker.</span></div>` : ''}` });
-        if (s.fx) H.push({ l: fichaHtml(s.fx, n, s), r: null });
+            ${pdfs(s, n)}` });
       });
       return H;
     };
@@ -210,6 +218,7 @@
     F.act = (a, ds, el) => {
       if (a === 'unidad') F.libro.pasar(1, () => { F.u = MD.unidades().find(u => u.key === ds.k); F.i = 0; F.pestana = '📚 Unidades'; });
       if (a === 'ir') F.libro.pasar(1, () => { F.i = +ds.i; });
+      if (a === 'pdf') return abrirFicha(F.u, +ds.n, ds.c, el);
       if (a === 'video') el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`;
     };
     F.alTab = () => F.libro.pasar(-1, () => { F.u = null; F.i = 0; F.pestana = null; });
@@ -586,7 +595,7 @@ Devuelve JSON:
       const tema = { cuaderno: 'ses', folder: 'exit', docente: 'notas', mision: 'mis' }[kind];
       Libro(host, tema, F); actual = F; F.iniciar && F.iniciar();
     },
-    _: { Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml },
+    _: { Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
     cerrar() { if (actual) { actual.libro && actual.libro.ro && actual.libro.ro.disconnect(); actual.cerrar && actual.cerrar(); actual = null; } }
   };
 })();

@@ -69,6 +69,20 @@
     LS.set('moli2:content', contenido);
     return contenido;
   }
+  async function abrirPdf(url, id, nombre) {                          // la ficha en PDF, para ver y descargar (como en Molí 1)
+    const w = window.open('', '_blank');
+    try {
+      let blob;
+      if (url) { const r = await fetch(url); if (!r.ok) throw new Error('HTTP'); blob = await r.blob(); }
+      else { const f = (contenido && contenido.files || {})[id]; if (!f) throw new Error('NOFILE');
+        const P = []; for (let i = 0; i < (+f.parts || 1); i++) { const d = await get('files', `${id}-${i}`); P.push(d && d.b64 || ''); }
+        const bin = atob(P.join('')), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+        blob = new Blob([u8], { type: f.type || 'application/pdf' }); nombre = nombre || f.name; }
+      const href = URL.createObjectURL(new File([blob], nombre || 'ficha.pdf', { type: 'application/pdf' }));
+      if (w) w.location.href = href; else { const a = document.createElement('a'); a.href = href; a.download = nombre || 'ficha.pdf'; a.click(); }
+      return true;
+    } catch (e) { if (w) w.close(); throw e; }
+  }
   const lleno = t => !!String(t || '').trim();
   const unidades = () => (contenido ? contenido.units : []).filter(u => !u.hidden && lleno(u.title));
   const sesionesDe = u => (u.sessions || []).map((s, i) => ({ s, n: i + 1 })).filter(x => !x.s.hidden && (lleno(x.s.meta) || lleno(x.s.title) || (x.s.activities || []).some(a => lleno(a.title) || lleno(a.desc))));
@@ -85,7 +99,7 @@
   }
   async function publicar(cambiar) {                                   // cambiar(units) modifica las unidades; luego se publica todo
     const { d, units, savedAt } = await crudo();
-    cambiar(units);
+    await cambiar(units, d);
     const n = Math.max(Date.now(), savedAt + 1), obj = { ...d, savedAt: n, units }; delete obj.hs;
     const full = JSON.stringify(obj); if (full.length > 9e5) throw new Error('GRANDE');
     const fields = units.length <= 24 ? { ...cSplit(obj), savedAt: n, updatedAt: new Date() } : { data: full, savedAt: n, updatedAt: new Date() };
@@ -202,6 +216,6 @@
     throw new Error('IA');
   }
 
-  window.MD = { pensarCon, _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
+  window.MD = { abrirPdf, pensarCon, _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
     PART, PROD, CUAD, COND, cargarMisiones, misionesDe, avance, marcarActividad, misionCompleta, pensar, LS, lleno, contenido: () => contenido };
 })();
