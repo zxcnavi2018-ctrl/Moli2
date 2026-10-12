@@ -103,10 +103,10 @@
       .cu { height: 55mm; border: .3mm solid #000; background-image: linear-gradient(#999 .15mm, transparent .15mm), linear-gradient(90deg, #999 .15mm, transparent .15mm); background-size: 5mm 5mm; }
       .sb { margin: 2mm 0; padding: 1.2mm 2.5mm; border: .3mm dashed #000; font-size: 8.6pt; break-inside: avoid; }
       .cierre { break-inside: avoid; margin-top: 2.5mm; } .cc { width: 100%; border-collapse: collapse; } .cc td, .cc th { border: .25mm solid #000; padding: .7mm 2mm; font-size: 8.6pt; } .cc th { width: 17mm; background: none; } .cc td.bx { width: 17mm; } .cc { margin-bottom: 1.5mm; }
-      .exit { display: flex; gap: 3mm; align-items: flex-start; margin-top: 2.5mm; padding: 1.5mm; border: .3mm dashed #000; break-inside: avoid; } .exit svg { width: 78mm; height: 73mm; flex: none; }
-      .tq { flex: 1; font-size: 8.3pt; } .tq-t { display: block; font-size: 9pt; margin-bottom: 1mm; } .tq-q { margin: 0 0 1.3mm; } .tq-q div { display: flex; flex-wrap: wrap; gap: .5mm 2.5mm; margin-top: .4mm; } .tq-q span { display: inline-flex; gap: .8mm; }
-      .tq-q i { font-style: normal; font-weight: 700; display: inline-grid; place-items: center; width: 3.3mm; height: 3.3mm; border: .25mm solid #000; border-radius: 50%; font-size: 2.2mm; flex: none; }
-      .caso { margin: 0 0 1.2mm; font-size: 8pt; } .caso .t td, .caso .t th { height: auto; padding: .3mm 1mm; font-size: 8pt; }
+      .exit { display: flex; gap: 3mm; align-items: flex-start; margin-top: 2.5mm; padding: 1.5mm; border: .3mm dashed #000; break-inside: avoid; } .exit svg { width: 96mm; height: 90mm; flex: none; }
+      .tq { flex: 1; font-size: 9.2pt; line-height: 1.25; } .tq-t { display: block; font-size: 10.5pt; margin-bottom: 1.2mm; } .tq-q { margin: 0 0 1.6mm; } .tq-q div { display: flex; flex-wrap: wrap; gap: .5mm 2.5mm; margin-top: .4mm; } .tq-q span { display: inline-flex; gap: .8mm; }
+      .tq-q i { font-style: normal; font-weight: 700; display: inline-grid; place-items: center; width: 4mm; height: 4mm; border: .25mm solid #000; border-radius: 50%; font-size: 2.6mm; flex: none; }
+      .caso { margin: 0 0 1.5mm; font-size: 9pt; } .caso .t td, .caso .t th { height: auto; padding: .4mm 1.2mm; font-size: 9pt; }
       .exit svg * { filter: grayscale(1); } .ayuda { padding: 3mm; background: #eee; font: 10pt Arial; } @media print { .ayuda { display: none; } }`;
   // la ficha completa (cual: 'ficha' = la de la sesión, con su cierre y su Exit ticket; 'tarea' = la tarea flipped sola)
   function fichaDoc(u, n, cual = 'ficha', conBoton = true) {
@@ -119,7 +119,6 @@
         @bottom-right { content: "Página " counter(page) " de " counter(pages); font: 8pt Arial, sans-serif; color: #333; } }${CSS_FICHA}</style></head><body>
       ${conBoton ? '<div class="ayuda">Imprime en A4, escala 100 %, blanco y negro. <button onclick="print()">Imprimir</button></div>' : ''}
       <h1>${e2(fx.t || s.title || 'Ficha de la sesión')}</h1>${fx.st ? `<p class="sub">${e2(fx.st)}</p>` : ''}
-      ${cual === 'ficha' && s.meta ? `<div class="meta"><b>Meta:</b> ${e2(s.meta)}</div>${cr.length ? `<table class="cc"><tr><td><b>Criterios de éxito</b> · ¿Cómo me fue hoy? (marca al terminar)</td><th>Lo logré</th><th>En proceso</th></tr>${cr.map(c => `<tr><td>${e2(c)}</td><td class="bx"></td><td class="bx"></td></tr>`).join('')}</table>` : ''}` : ''}
       ${fichaPrint(fx, cual === 'ficha' ? s : null)}
       ${hayT ? `<div class="exit">${svgTarjeta(u, n, s)}${preguntasHtml(u, n, s)}</div>` : ''}
       </body></html>`;
