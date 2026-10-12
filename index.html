@@ -1930,12 +1930,13 @@ function tourFrame(t) {                                             // la cámar
 }
 setFov(); TOUR.pos.copy(fromOf(STOPS[0])); TOUR.look.copy(STOPS[0].look); showStop();
 startEl.style.display = 'none'; TOUR.started = true; document.getElementById('tourBar').style.display = 'flex'; musicBtn.style.display = 'none';   // sin texto de inicio: empieza de una
-let firstTap = true;
-addEventListener('pointerdown', () => {                              // al primer toque: música, pantalla completa y horizontal (si el celular lo permite)
-  if (!firstTap) return; firstTap = false;
-  const de = document.documentElement;
-  if (isTouch0 && de.requestFullscreen && !document.fullscreenElement) de.requestFullscreen().then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {});
-}, true);
+const completa = () => {                                              // pantalla completa (y horizontal en el celular) en cuanto se toca o hace clic: el navegador lo pide así
+  const de = document.documentElement, fs = document.fullscreenElement || document.webkitFullscreenElement;
+  if (fs || navigator.webdriver) return;
+  const p = de.requestFullscreen ? de.requestFullscreen({ navigationUI: 'hide' }) : de.webkitRequestFullscreen ? de.webkitRequestFullscreen() : null;
+  Promise.resolve(p).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {});
+};
+addEventListener('pointerdown', completa, true); addEventListener('keydown', e => { if (!/^(Escape|F11)$/.test(e.key)) completa(); }, true);
 document.getElementById('prevBtn').addEventListener('click', e => { e.stopPropagation(); go(-1); });
 document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); go(1); });
 addEventListener('keydown', e => { if (!TOUR.started || moliWin.style.display === 'flex') return; if (e.code === 'ArrowRight') { e.preventDefault(); go(1); } else if (e.code === 'ArrowLeft') { e.preventDefault(); go(-1); } });
