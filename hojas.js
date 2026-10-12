@@ -63,7 +63,7 @@
     }
     const enRango = () => B.p >= B.first[flujo.i] && B.p <= B.last[flujo.i];
     let tamListo = false, tT = 0;
-    const talla = () => { const h = el.clientHeight || 300; el.style.fontSize = Math.max(9, Math.min(17, h / 23)) + 'px';
+    const talla = () => { const h = el.clientHeight || 300, w = el.clientWidth || 600; el.style.fontSize = Math.max(9, Math.min(30, h / 23, w / 44)) + 'px';   // crece con la pantalla (en la PC se lee grande)
       clearTimeout(tT); tT = setTimeout(() => { const ae = document.activeElement; if (B.ocupado || (ae && el.contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName))) return; pinta(!tamListo); tamListo = true; }, 160); };   // (si está escribiendo, no se repinta: no se cierra el teclado)
     B.ro = new ResizeObserver(talla); B.ro.observe(el);
     document.fonts && document.fonts.ready.then(() => !B.ocupado && tamListo && pinta(false));
