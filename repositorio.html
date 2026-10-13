@@ -88,6 +88,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
 .opts button{padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:900;font-size:15px}
 .opts button.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.pq{margin:2px 0 6px;font:italic 700 16px/1.4 var(--serif);color:#0f4c81}.feat .pq{font-size:19px}.card .pq{font-size:14px;margin:0 0 4px}.res .pq{font-size:14.5px;margin:2px 0 4px}
 .tyw{display:inline-flex;align-items:center;gap:3px}.opts button.lock{opacity:.5;cursor:not-allowed;background:#f1f5f9}
 .opts .tlk{padding:6px 8px;border-radius:10px;border:2px dashed #94a3b8;font-size:14px;background:#fff}.opts .tlk.on{border:2px solid #dc2626;background:#fee2e2}
 .photo{display:flex;align-items:center;gap:12px;padding:12px;border:2px dashed #b9d3e8;border-radius:16px;background:#fff;font-weight:800;color:var(--ink2)}
@@ -307,7 +308,14 @@ const tip = (html, img = '', cls = '') => `<div class="tip ${cls}"><span class="
 const fecha = ms => ms ? new Date(ms).toLocaleDateString('es-PE', { day: 'numeric', month: 'long' }) : '';
 const firstName = n => String(n || '').trim().split(/\s+/)[0] || '';
 function phHtml(w) { const t = tipo(w.ty); return `<div class="ph t-${esc(t[0])}">${w.th ? `<img src="${esc(w.th)}" alt="" loading="lazy">` : t[1]}<span class="ty">${t[1]} ${t[2]}</span></div>`; }
-function cardHtml(w, extra = '') { return `<button type="button" class="card" data-open="${esc(w.id)}">${phHtml(w)}<div class="bd"><h3>${esc(w.t)}</h3><span class="by">${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : w.rv === 'tu profe' && !w.sec ? ' · Docente' : ''}</span><span class="dt">${fecha(w.at)}</span>${extra}</div></button>`; }
+function preguntaDe(w) {                                             // la pregunta de investigación (paso 1 de su guía) para mostrarla bajo el título
+  const L = String(w.d || '').split(/\n+/).map(x => x.trim()).filter(Boolean), es = x => /\?\s*$/.test(x) && x.length > 8 && !/^PASO\b/.test(x);
+  const i = L.findIndex(x => /^PASO\b.*(pregunta|tema)/i.test(x));
+  if (i >= 0) { for (let k = i + 1; k < L.length && !/^PASO\b/.test(L[k]); k++) if (es(L[k])) return L[k].slice(0, 180); }
+  const q = L.find(es); return q ? q.slice(0, 180) : '';
+}
+const pqHtml = w => { const q = preguntaDe(w); return q ? `<p class="pq">❓ ${esc(q)}</p>` : ''; };
+function cardHtml(w, extra = '') { return `<button type="button" class="card" data-open="${esc(w.id)}">${phHtml(w)}<div class="bd"><h3>${esc(w.t)}</h3>${pqHtml(w)}<span class="by">${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : w.rv === 'tu profe' && !w.sec ? ' · Docente' : ''}</span><span class="dt">${fecha(w.at)}</span>${extra}</div></button>`; }
 const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(u || '') ? u : '';
 
 // ---- pestañas ----
@@ -372,7 +380,7 @@ function drawRevista() {
   const n = $('#nPub'); if (n) n.textContent = A.length;
   if (rc) { if (!A.length) rc.innerHTML = `<div class="empty"><b>Aún no hay publicaciones</b>Los trabajos aprobados aparecerán aquí, empezando por los más recientes.</div>`;
     else { const [f, ...r] = A, t = tipo(f.ty);
-      rc.innerHTML = `<button type="button" class="feat" data-open="${esc(f.id)}">${phHtml(f)}<div class="bd"><span class="kk">Lo más reciente · ${esc(t[2])}</span><h3>${esc(f.t)}</h3><span class="by">${esc(f.n)}${f.sec ? ' · 6.° ' + esc(f.sec) : ''} · ${fecha(f.at)}</span></div></button>${r.length ? `<div class="trio">${r.slice(0, 3).map(w => cardHtml(w)).join('')}</div>` : ''}`; } }
+      rc.innerHTML = `<button type="button" class="feat" data-open="${esc(f.id)}">${phHtml(f)}<div class="bd"><span class="kk">Lo más reciente · ${esc(t[2])}</span><h3>${esc(f.t)}</h3>${pqHtml(f)}<span class="by">${esc(f.n)}${f.sec ? ' · 6.° ' + esc(f.sec) : ''} · ${fecha(f.at)}</span></div></button>${r.length ? `<div class="trio">${r.slice(0, 3).map(w => cardHtml(w)).join('')}</div>` : ''}`; } }
   const L = A.slice(4);
   el.innerHTML = L.length ? `<div class="grid">${L.map(w => cardHtml(w)).join('')}</div>` : A.length ? `<p class="se-n">Todos los trabajos publicados están arriba. 📰</p>` : '';
 }
@@ -404,7 +412,7 @@ function buscar(q) {
   const R = (W.length ? A.map(w => { const K = norm(kws(w).join(' ')), T = norm(w.t); return { w, s: W.reduce((a, x) => a + (K.includes(x) ? 3 : 0) + (T.includes(x) ? 1 : 0), 0) }; }).filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.w) : A);
   if (!A.length) { el.innerHTML = '<div class="empty"><b>Aún no hay trabajos publicados</b>Cuando se publiquen, podrás encontrarlos aquí por sus palabras clave.</div>'; return; }
   el.innerHTML = `<p class="se-n">${W.length ? `${R.length} resultado${R.length === 1 ? '' : 's'} para «${esc(q.trim())}»` : `Todos los trabajos publicados (${A.length})`}</p>` +
-    (R.length ? R.map(w => { const t = tipo(w.ty); return `<div class="res rv"><div class="u"><span class="fv">${t[1]}</span><div>${esc(t[2])} · ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''}<small>${fecha(w.at)}</small></div></div><a class="t" href="#" data-open="${esc(w.id)}">${esc(w.t)}</a>${kws(w).length ? `<div class="kws">${kws(w).map(k => `<button type="button" data-sq="${esc(k)}" class="${W.some(x => norm(k).includes(x)) ? 'hit' : ''}">${esc(k)}</button>`).join('')}</div>` : ''}</div>`; }).join('')
+    (R.length ? R.map(w => { const t = tipo(w.ty); return `<div class="res rv"><div class="u"><span class="fv">${t[1]}</span><div>${esc(t[2])} · ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''}<small>${fecha(w.at)}</small></div></div><a class="t" href="#" data-open="${esc(w.id)}">${esc(w.t)}</a>${pqHtml(w)}${kws(w).length ? `<div class="kws">${kws(w).map(k => `<button type="button" data-sq="${esc(k)}" class="${W.some(x => norm(k).includes(x)) ? 'hit' : ''}">${esc(k)}</button>`).join('')}</div>` : ''}</div>`; }).join('')
       : `<div class="empty"><b>No encontré trabajos con «${esc(q.trim())}»</b>Prueba con otra palabra clave.</div>`);
 }
 document.addEventListener('submit', e => { if (e.target.id !== 'sF') return; e.preventDefault(); buscar($('#sQ').value); });
