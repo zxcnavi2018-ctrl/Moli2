@@ -110,6 +110,12 @@
   #aviso.on { opacity: 1; }
   @media (max-width: 600px) { #titulo { top: 62px; } }
   @media (max-width: 600px) { #bar button { padding: 8px 10px; font-size: 12px; } #bar .nav { width: 36px; height: 36px; } #tapa { width: 170px; } }
+  @media (max-height: 500px) {                                        /* celular acostado: la barra de abajo más delgada */
+    #bar { bottom: max(6px, env(safe-area-inset-bottom)); padding: 3px 5px; gap: 4px; border-width: 1.5px; }
+    #bar .g { gap: 2px; } #bar button { padding: 4px 9px; font-size: 11px; gap: 4px; } #bar button i { min-width: 17px; height: 17px; font-size: 10px; padding: 0 4px; }
+    #bar .nav { width: 28px; height: 28px; font-size: 13px; } #aviso { bottom: 52px; font-size: 13px; padding: 7px 14px; }
+    #volver { font-size: 13px; padding: 6px 12px; } #editar { height: 34px; font-size: 13px; padding: 0 10px; right: calc(max(10px, env(safe-area-inset-right)) + 84px); }
+    #pcompleta, #sonido { width: 34px; height: 34px; } #pcompleta { right: calc(max(10px, env(safe-area-inset-right)) + 42px); } }
   /* 🤖 Molí en la Biblioteca: su globito con el mini buscador */
   #mGlobo { position: fixed; left: 0; top: 0; z-index: 8; width: min(360px, calc(100vw - 24px)); padding: 14px 16px 12px; border-radius: 20px; background: #fffaf0; border: 3px solid #3b2414; box-shadow: 0 8px 0 rgba(59,36,20,.35), 0 18px 40px rgba(0,0,0,.4); font: 700 15px Nunito, system-ui, sans-serif; color: #3b2414; opacity: 0; pointer-events: none; transition: opacity .2s; }
   #mGlobo.on { opacity: 1; pointer-events: auto; } #mGlobo::after { content: ''; position: absolute; left: var(--tail, 40px); bottom: -14px; width: 22px; height: 22px; background: #fffaf0; border-right: 3px solid #3b2414; border-bottom: 3px solid #3b2414; transform: rotate(45deg); }
