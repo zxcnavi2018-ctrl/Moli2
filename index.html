@@ -1772,9 +1772,9 @@ function loop(now) {
   const a = document.getElementById('bibLink'); if (!a) return; let win = null;
   a.addEventListener('click', e => { e.preventDefault(); if (win) return;
     win = document.createElement('div'); win.id = 'bibWin'; win.innerHTML = '<div class="bw-l"><span>📖</span>Abriendo la biblioteca…</div><iframe title="La Biblioteca Educativa" allow="autoplay; fullscreen"></iframe>'; document.body.appendChild(win);
-    window.BIB_ABIERTA = true; try { callar(); } catch (x) {}
+    window.BIB_ABIERTA = true; try { callar(); } catch (x) {} setTimeout(() => { if (window.BIB_ABIERTA) renderer.domElement.style.visibility = 'hidden'; }, 500);   // el aula se esconde: la tarjeta gráfica sólo dibuja la biblioteca
     requestAnimationFrame(() => { win.classList.add('on'); setTimeout(() => { const f = win && win.querySelector('iframe'); if (f) f.src = 'biblioteca.html'; }, 480); }); });   // primero la cortina, luego se arma la biblioteca (sin tirones)
-  addEventListener('message', e => { if (!e.data || !e.data.bibCerrar || !win) return; const w = win; win = null; w.classList.remove('on'); window.BIB_ABIERTA = false; setTimeout(() => w.remove(), 450); });
+  addEventListener('message', e => { if (!e.data || !e.data.bibCerrar || !win) return; const w = win; win = null; renderer.domElement.style.visibility = ''; w.classList.remove('on'); window.BIB_ABIERTA = false; setTimeout(() => w.remove(), 450); });
 })();
   if (window.BIB_ABIERTA) return;                                     // la Biblioteca está encima: el aula descansa
   const dt = Math.max(0, (now - last) / 1000); last = now;

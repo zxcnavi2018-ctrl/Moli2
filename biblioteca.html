@@ -162,17 +162,15 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1e130b);
 scene.fog = new THREE.Fog(0x2a1a0f, 16, 40);
 const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.05, 120);
-const renderer = new THREE.WebGLRenderer({ antialias: !LOW, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, LOW ? 1.1 : 1.5));
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+const PR_MAX = Math.min(devicePixelRatio, LOW ? 1 : 1.35); let PR = Math.min(PR_MAX, 1); renderer.setPixelRatio(PR);
 renderer.setSize(innerWidth, innerHeight);
 document.body.prepend(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xf2dcb4, 0x3b2414, 0.46));
+scene.add(new THREE.HemisphereLight(0xffd9a8, 0x3b2414, 0.62));
 scene.add(new THREE.AmbientLight(0xd9b98a, 0.16));
 const key = new THREE.DirectionalLight(0xffe2b0, 0.36); key.position.set(-4, 12, 8); scene.add(key);
-const glowLight = new THREE.PointLight(0xffd27a, 0, 9, 1.6); glowLight.position.set(0, 3.3, 0.5); scene.add(glowLight);
-const lampA = new THREE.PointLight(0xffb866, 0.95, 16, 1.6); lampA.position.set(0, 6.6, 3.5); scene.add(lampA);
-const lampB = new THREE.PointLight(0xffb866, 0.8, 16, 1.6); lampB.position.set(0, 6.6, -9); scene.add(lampB);
+const glowLight = { intensity: 0, position: new THREE.Vector3() };                       // (sin luces puntuales: muy pesadas en laptops sencillas)
 
 const TOON_GRAD = (() => { const t = new THREE.DataTexture(new Uint8Array([120, 190, 245]), 3, 1, THREE.LuminanceFormat); t.minFilter = t.magFilter = THREE.NearestFilter; t.generateMipmaps = false; t.needsUpdate = true; return t; })();
 const toon = (color, o = {}) => new THREE.MeshToonMaterial(Object.assign({ color, gradientMap: TOON_GRAD }, o));
@@ -219,7 +217,7 @@ const boveda = new THREE.Mesh(bovGeo, new THREE.MeshBasicMaterial({ map: FRESCO,
 // ===================================================================
 //  ESTANTES: el marco de madera + libros de relleno (todos en UN solo dibujo)
 // ===================================================================
-const LIBROS_MAX = LOW ? 2600 : 5200;
+const LIBROS_MAX = LOW ? 2200 : 4000;
 const libros = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), toon(0xffffff), LIBROS_MAX); let nLib = 0;
 const COLS = ['#6b2a2f', '#7a4126', '#3a5244', '#2c4260', '#5a4060', '#8c6a38', '#4a3020', '#b39c78', '#7d5c3e', '#41585f', '#8c4c40', '#a99070'];
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _c = new THREE.Color();
@@ -415,14 +413,14 @@ izq.rotation.z = -Math.PI;                                              // cerra
 // brillo mágico + chispitas
 const BRILLO = canvasTex(256, 256, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); gr.addColorStop(0, 'rgba(255,246,210,1)'); gr.addColorStop(.25, 'rgba(255,214,120,.65)'); gr.addColorStop(1, 'rgba(255,190,90,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); });
 const brillo = new THREE.Sprite(new THREE.SpriteMaterial({ map: BRILLO, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); brillo.scale.set(4, 4, 1); brillo.position.set(0, 2.7, 0.2); scene.add(brillo);
-const NCH = LOW ? 70 : 140, chPos = new Float32Array(NCH * 3), chVel = [];
+const NCH = LOW ? 40 : 80, chPos = new Float32Array(NCH * 3), chVel = [];
 for (let i = 0; i < NCH; i++) { chPos.set([0, -99, 0], i * 3); chVel.push({ v: new THREE.Vector3(), t: 0, life: 0 }); }
 const chGeo = new THREE.BufferGeometry(); chGeo.setAttribute('position', new THREE.BufferAttribute(chPos, 3));
 const chispas = new THREE.Points(chGeo, new THREE.PointsMaterial({ map: BRILLO, size: 0.12, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffe08a })); scene.add(chispas);
 let chispear = 0;
 function soltarChispa(i) { const c = chVel[i]; chPos[i * 3] = (Math.random() - .5) * 1.4; chPos[i * 3 + 1] = 2.45 + Math.random() * 0.1; chPos[i * 3 + 2] = (Math.random() - .5) * 0.6; c.v.set((Math.random() - .5) * 0.6, 0.6 + Math.random() * 1.2, (Math.random() - .5) * 0.6); c.life = 1.2 + Math.random() * 1.6; c.t = 0; }
 // polvito dorado flotando en toda la sala
-const NP = LOW ? 120 : 260, pPos = new Float32Array(NP * 3); for (let i = 0; i < NP; i++) pPos.set([(Math.random() - .5) * 12, Math.random() * 9, HALL.z1 + Math.random() * (HALL.z0 - HALL.z1)], i * 3);
+const NP = LOW ? 60 : 120, pPos = new Float32Array(NP * 3); for (let i = 0; i < NP; i++) pPos.set([(Math.random() - .5) * 12, Math.random() * 9, HALL.z1 + Math.random() * (HALL.z0 - HALL.z1)], i * 3);
 const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
 scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ map: BRILLO, size: 0.07, transparent: true, depthWrite: false, opacity: 0.6, blending: THREE.AdditiveBlending, color: 0xffe6a8 })));
 
@@ -594,8 +592,14 @@ function sonar(k) { if (mudo) return; try { AC = AC || new (window.AudioContext 
 //  BUCLE
 // ===================================================================
 const clock = new THREE.Clock(); let par = V(0, 0, 0), zoomS = 0; const _dir = V(0, 0, 0), LIBRO_POS = V(0, 2.5, 0);
+let qT = 0, qN = 0, qAcc = 0;
+function calidad(dt) {                                                // si el equipo va lento, baja la resolución; si va sobrado, la sube
+  qAcc += dt; qN++; qT += dt; if (qT < 1.2) return; const ms = qAcc / qN * 1000; qT = qAcc = qN = 0;
+  let n = PR; if (ms > 30) n = Math.max(0.55, PR - 0.15); else if (ms < 17 && PR < PR_MAX) n = Math.min(PR_MAX, PR + 0.1);
+  if (Math.abs(n - PR) > 0.01) { PR = n; renderer.setPixelRatio(PR); renderer.setSize(innerWidth, innerHeight); }
+}
 function frame() {
-  const dt = Math.min(0.05, clock.getDelta()), now = performance.now(), T = clock.elapsedTime;
+  const dtR = clock.getDelta(), dt = Math.min(0.05, dtR), now = performance.now(), T = clock.elapsedTime; if (!document.hidden) calidad(Math.min(dtR, 0.2));
   if (tween) { const k = Math.min(1, (now - tween.t0) / tween.ms), e = ease(k);
     cam.pos.lerpVectors(tween.p0, tween.p1, e); cam.pos.y += Math.sin(Math.PI * e) * tween.alto; cam.look.lerpVectors(tween.l0, tween.l1, e);
     if (k >= 1) { const r = tween.res; tween = null; r(); } }
