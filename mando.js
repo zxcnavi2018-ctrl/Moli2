@@ -171,6 +171,15 @@
   #gruposM button small { display: block; font-size: 15px; color: #64748b; } #gruposM button.on { background: var(--c); color: #fff; transform: scale(1.1); box-shadow: 0 6px 0 rgba(0,0,0,.25); } #gruposM button.on small { color: #fff; }`;
   document.head.appendChild(cssG);
 
+  // ---- pantalla completa: si venía en pantalla completa (aula → Biblioteca → Revista), cualquier botón la devuelve ----
+  const FSQ = 'moli2:quiereFS';
+  addEventListener('fullscreenchange', () => { try { sessionStorage.setItem(FSQ, document.fullscreenElement ? '1' : '0'); } catch (e) {} });
+  addEventListener('pagehide', () => { try { if (document.fullscreenElement) sessionStorage.setItem(FSQ, '1'); } catch (e) {} });
+  let fsAvisado = false;
+  function volverFS() { let q = '0'; try { q = sessionStorage.getItem(FSQ) || '0'; } catch (e) {} if (q !== '1' || document.fullscreenElement) return;
+    const de = document.documentElement; if (!de.requestFullscreen) return;
+    de.requestFullscreen().catch(() => { if (!fsAvisado) { fsAvisado = true; avisar('⛶ Toca la pantalla una vez para volver a pantalla completa'); } }); }
+
   // ---- leer el mando ----
   let prev = [], stk = { l: '', r: '' }, stkT = { l: 0, r: 0 }, raf = 0, ultimo = null, ver = null;
   const mandos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean);
@@ -178,7 +187,7 @@
     raf = 0; const P = mandos(); if (!P.length) { prev = []; pintaEstado(); return; }
     const g = P[0], ahora = performance.now();
     g.buttons.forEach((b, i) => { const on = b.pressed || b.value > 0.5;
-      if (on && !prev[i]) { ultimo = i;
+      if (on && !prev[i]) { ultimo = i; volverFS();
         if ((CR || GR) && i >= 12 && i <= 15) moverSel(['^', 'v', '<', '>'][i - 12]);      // en el cronómetro o los grupos, la cruceta elige
         else if (CFG.on) hacer(CFG.b[i]);
         if (ver) ver(i); }
