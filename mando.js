@@ -82,6 +82,7 @@
     if (a === 'grupos') return abrirGrupos();
     if (a === 'tabS' || a === 'tabA') a = a === 'tabS' ? 'escS' : 'escA';
     if (a === 'salir') {
+      if (cerrarAnim()) return;                                        // B primero quita la animación que esté en pantalla
       const h = document.querySelector('#herr.on [data-h="x"], .fp-x'); if (h && h.offsetParent) return h.click();
       const fv = document.getElementById('fotoVer'); if (fv && fv.classList.contains('on')) return fv.classList.remove('on');
       const mb = document.getElementById('moliBack'), mw = document.getElementById('moliWin'); if (mw && mw.style.display === 'flex' && mb) return mb.click();
@@ -103,6 +104,7 @@
     if (a.startsWith('an:') && window.RemotoCmd) return window.RemotoCmd('an', a.slice(3));
   }
 
+  function cerrarAnim() { const an = document.getElementById('anim'); if (an && an.classList.contains('on') && !an.classList.contains('fuera')) { an.click(); return true; } return false; }
   // ---- 🔍 zoom de la cámara (− aleja, + acerca) ----
   let uz = 0, ZM = false, px = 0, py = 0, zmEl = null;
   function zoom(d) { uz = Math.max(-30, Math.min(16, uz + d * 6)); modoZoom(true);
@@ -208,7 +210,7 @@
   let MM = false, mx = innerWidth / 2, my = innerHeight / 2, cur = null, combo = false, sobre = null;
   const pend = {};
   function boton(i) {
-    if (MM) { if (i === 1) return clicMouse(); if (i === 0) return; }   // en modo mouse: A = clic (B no hace nada)
+    if (MM) { if (i === 1) return clicMouse(); if (i === 0) return cerrarAnim(); }   // en modo mouse: A = clic (B no hace nada)
     if ((CR || GR) && i >= 12 && i <= 15) return moverSel(['^', 'v', '<', '>'][i - 12]);      // en el cronómetro o los grupos, la cruceta elige
     if (CFG.on) hacer(CFG.b[i]);
   }
@@ -220,27 +222,28 @@
   function evento(tipo, el, extra = {}) { const o = { bubbles: true, cancelable: true, composed: true, clientX: mx, clientY: my, button: 0, buttons: tipo.endsWith('down') ? 1 : 0, view: window, ...extra };
     el.dispatchEvent(tipo.startsWith('pointer') ? new PointerEvent(tipo, { pointerId: 9, pointerType: 'mouse', isPrimary: true, ...o }) : new MouseEvent(tipo, o)); }
   const bajo = () => { if (cur) cur.style.display = 'none'; const el = document.elementFromPoint(mx, my); if (cur) cur.style.display = ''; return el; };
-  function moverMouse(x, y, sy) {
+  function moverMouse(x, y, sy, k = 1) {
     const m = v => Math.abs(v) < 0.15 ? 0 : Math.sign(v) * Math.pow((Math.abs(v) - 0.15) / 0.85, 1.6);
-    const vx = m(x), vy = m(y); if (vx || vy) { mx = Math.max(0, Math.min(innerWidth - 4, mx + vx * 16)); my = Math.max(0, Math.min(innerHeight - 4, my + vy * 16)); pintaCur();
+    const vx = m(x), vy = m(y); if (vx || vy) { mx = Math.max(0, Math.min(innerWidth - 4, mx + vx * 15 * k)); my = Math.max(0, Math.min(innerHeight - 4, my + vy * 15 * k)); pintaCur();
       const el = bajo(); if (el) { evento('pointermove', el); evento('mousemove', el); if (el !== sobre) { if (sobre) evento('mouseout', sobre); evento('mouseover', el); sobre = el; } } }
     const s = m(sy); if (s) { const el = bajo(); let c = el; while (c && c !== document.body && !(c.scrollHeight > c.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(c).overflowY))) c = c.parentElement;
-      (c && c !== document.body ? c : document.scrollingElement || document.documentElement).scrollBy(0, s * 22); }
+      (c && c !== document.body ? c : document.scrollingElement || document.documentElement).scrollBy(0, s * 22 * k); }
   }
   function clicMouse() { const el = bajo(); if (!el) return; if (cur) { cur.classList.remove('clic'); void cur.offsetWidth; cur.classList.add('clic'); }
     evento('pointerdown', el); evento('mousedown', el); if (/INPUT|TEXTAREA|SELECT/.test(el.tagName)) el.focus();
     evento('pointerup', el); evento('mouseup', el); evento('click', el); }
   const cssM = document.createElement('style');
-  cssM.textContent = `#mandoCur { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); transition: transform .02s linear; }
+  cssM.textContent = `#mandoCur { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); will-change: transform; }
   #mandoCur.clic svg { animation: mcClic .25s ease; } @keyframes mcClic { 50% { transform: scale(.8); } }`;
   document.head.appendChild(cssM);
 
   // ---- leer el mando ----
+  const rep = {}, stkN = { l: 0, r: 0 };
   let prev = [], stk = { l: '', r: '' }, stkT = { l: 0, r: 0 }, raf = 0, ultimo = null, ver = null;
   const mandos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean);
   function leer() {
     raf = 0; const P = mandos(); if (!P.length) { prev = []; pintaEstado(); return; }
-    const g = P[0], ahora = performance.now();
+    const g = P[0], ahora = performance.now(), k60 = Math.min(4, (ahora - (leer.t || ahora - 16.7)) / 16.7); leer.t = ahora;   // cuánto pasó (en cuadros de 60 fps): se mueve igual de parejo aunque la PC vaya lenta
     const on = g.buttons.map(b => b.pressed || b.value > 0.5);
     if (on[6] && on[7] && !combo) { combo = true; delete pend[6]; delete pend[7]; if (!panelAbierto()) modoMouse(!MM); }   // ZL + ZR juntos: modo mouse
     if (!on[6] && !on[7]) combo = false;
@@ -249,16 +252,22 @@
         if (combo && (i === 6 || i === 7)) {}
         else if (i === 6 || i === 7) pend[i] = ahora;                   // ZL / ZR esperan un instante: por si apretaste los dos juntos
         else boton(i); }
+      if (o && prev[i] && i >= 12 && i <= 15) { const t0 = rep[i] || (rep[i] = { t: ahora, n: 0 }); const espera = t0.n ? 140 : 420;   // cruceta mantenida: repite (primero espera, luego rápido)
+        if (ahora - t0.t > espera) { t0.t = ahora; t0.n++; boton(i); } }
+      if (!o) delete rep[i];
       if (!o && prev[i] && GR && i === grBtn) cerrarGrupos();           // soltaste ZL: se cierran los grupos
       prev[i] = o; });
     [6, 7].forEach(i => { if (pend[i] != null && ahora - pend[i] > 160) { delete pend[i]; if (!combo) { ultimo = i; boton(i); if (!on[i] && GR && i === grBtn) cerrarGrupos(); } } });
-    if (MM) { moverMouse(g.axes[0] || 0, g.axes[1] || 0, g.axes[3] || 0); if (ver) ver(null, g); raf = requestAnimationFrame(leer); return; }   // modo mouse: los joysticks mueven la flecha y bajan la página
-    if (ZM) { const x = g.axes[0] || 0, y = g.axes[1] || 0; if (Math.abs(x) > 0.15 || Math.abs(y) > 0.15) mirar(x, y); }
+    if (MM) { moverMouse(g.axes[0] || 0, g.axes[1] || 0, g.axes[3] || 0, k60); if (ver) ver(null, g); raf = requestAnimationFrame(leer); return; }   // modo mouse: los joysticks mueven la flecha y bajan la página
+    if (ZM) { const x = g.axes[0] || 0, y = g.axes[1] || 0; if (Math.abs(x) > 0.15 || Math.abs(y) > 0.15) mirar(x * k60, y * k60); }
     [['l', 0], ['r', 2]].forEach(([k, ax]) => { const x = g.axes[ax] || 0, y = g.axes[ax + 1] || 0;      // la dirección que más se empuja: ← → ↑ ↓
       if (ZM && k === 'l') return;
       const d = Math.max(Math.abs(x), Math.abs(y)) < 0.6 ? '' : Math.abs(x) >= Math.abs(y) ? (x > 0 ? '>' : '<') : (y > 0 ? 'v' : '^');
       if (k === 'r' && d && videoVisible()) { if (d !== stk[k] || ahora - stkT[k] > 350) { stkT[k] = ahora; if (d === '<' || d === '>') videoSalto(d === '>' ? 10 : -10); else videoVol(d === '^' ? 10 : -10); } stk[k] = d; return; }   // con un video: R3 ← → salta, ↑ ↓ volumen
-      if (d && (d !== stk[k] || ahora - stkT[k] > 600)) { stkT[k] = ahora; if (CR || GR) moverSel(d); else if (CFG.on) hacer(CFG.s[k + d]); if (ver) ver('s' + k + d); }
+      const acc = CFG.s[k + d] || '', lento = /^(esc|e:|aula|bib|revista|an:|crono|grupos|panel|fs)/.test(acc) && !(CR || GR);
+      if (d !== stk[k]) stkN[k] = 0;
+      const espera = !stkN[k] ? 0 : lento ? 700 : stkN[k] === 1 ? 380 : 150;       // al mantener: primero espera un poquito, luego repite
+      if (d && (d !== stk[k] || ahora - stkT[k] > espera)) { stkT[k] = ahora; stkN[k]++; if (CR || GR) moverSel(d); else if (CFG.on) hacer(acc); if (ver) ver('s' + k + d); }
       stk[k] = d; });
     if (ver) ver(null, g);
     raf = requestAnimationFrame(leer);
