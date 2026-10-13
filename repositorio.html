@@ -88,6 +88,10 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
 .opts button{padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:900;font-size:15px}
 .opts button.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.tr-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.tr-slots .sl{display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0;padding:7px 9px;border-radius:12px;border:2px solid #e2e8f0;background:#fff;font:700 12.5px var(--sans);color:#334155}
+.tr-slots .sl b{font-size:11.5px;color:#64748b}.tr-slots .sl em{font-style:normal;font-weight:900;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tr-slots button.sl{cursor:pointer}
+.tr-slots .sl.ok{border-color:#86efac;background:#f0fdf4}.tr-slots .sl.mj{border-color:#fdba74;background:#fff7ed}.tr-slots .sl.rv{border-color:#93c5fd;background:#eff6ff}.tr-slots .sl.pe{border-style:dashed;background:#f8fafc;color:#94a3b8}
+.tr-r .tr-st{min-width:84px}
 .pq{margin:2px 0 6px;font:italic 700 16px/1.4 var(--serif);color:#0f4c81}.feat .pq{font-size:19px}.card .pq{font-size:14px;margin:0 0 4px}.res .pq{font-size:14.5px;margin:2px 0 4px}
 .tyw{display:inline-flex;align-items:center;gap:3px}.opts button.lock{opacity:.5;cursor:not-allowed;background:#f1f5f9}
 .opts .tlk{padding:6px 8px;border-radius:10px;border:2px dashed #94a3b8;font-size:14px;background:#fff}.opts .tlk.on{border:2px solid #dc2626;background:#fee2e2}
@@ -214,7 +218,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .tr-m{display:flex;gap:6px}.tr-m button{width:112px;padding:10px 6px;border-radius:14px;border:2.5px solid #cbd5e1;background:#fff;font:900 14px var(--sans);color:#64748b;cursor:pointer;transition:transform .12s}.tr-m button:hover{transform:translateY(-1px)}
 .tr-m button.ok.on{background:#22c55e;border-color:#16a34a;color:#fff;box-shadow:0 3px 0 #15803d}.tr-m button.pe.on{background:#f59e0b;border-color:#d97706;color:#fff;box-shadow:0 3px 0 #b45309}
 .tr-r.ok{background:#f0fdf4;border-color:#bbf7d0}.tr-msg{min-height:20px;font-weight:800;color:#64748b;font-size:13px}
-@media (max-width:820px){.tr-r{grid-template-columns:30px 1fr}.tr-r .tr-w,.tr-r .tr-st{grid-column:2}}
+@media (max-width:820px){.tr-r{grid-template-columns:30px 1fr}.tr-r .tr-slots,.tr-r .tr-st{grid-column:2}}
 </style>
 </head>
 <body>
@@ -347,18 +351,21 @@ async function vTrabajos() {
 }
 const TR_E = { ok: ['ok', '✅', 'Completado'], no: ['mj', '✏️', 'Mejorando'], pend: ['rv', '📨', 'Por revisar'], '': ['pe', '⏳', 'Pendiente'] };
 function estadoDe(L) { return L.some(w => w.st === 'ok') ? 'ok' : L.some(w => w.st === 'no') && !L.some(w => w.st === 'pend' && (w.at || 0) > Math.max(...L.filter(x => x.st === 'no').map(x => x.at || 0))) ? 'no' : L.some(w => w.st === 'pend') ? 'pend' : ''; }
+const TR_N = 3;                                                        // cada estudiante: mínimo 3 trabajos
 function pintaTrabajos() {
   const V = $('#view'), E = TR.est.filter(s => s.section === TR.sec);
-  const W = k => TR.w.filter(w => w.k === k).sort((a, b) => (b.at || 0) - (a.at || 0));
-  const est = E.map(s => estadoDe(W(s.key))), n = k => est.filter(x => x === k).length;
-  const ST = { ok: '✅', pend: '📨', no: '✏️' };
+  const W = k => TR.w.filter(w => w.k === k).sort((a, b) => (a.at || 0) - (b.at || 0));     // en orden: su 1.º, 2.º, 3.º trabajo
+  const ST = { ok: ['ok', '✅', 'Completado'], no: ['mj', '✏️', 'Mejorando'], pend: ['rv', '📨', 'Por revisar'] };
+  const ok = k => W(k).filter(w => w.st === 'ok').length;
+  const todos = E.filter(s => ok(s.key) >= TR_N).length, nada = E.filter(s => !W(s.key).length).length, fal = E.length - todos;
   V.innerHTML = `<div class="tr-top"><h2>👥 Trabajos de estudiantes</h2><div class="tr-sec">${['A', 'B', 'C', 'D'].map(x => `<button type="button" data-trs="${x}" class="${x === TR.sec ? 'on' : ''}">6.° ${x}</button>`).join('')}</div></div>
-    <div class="tr-res"><span>👥 ${E.length} estudiantes</span><span class="ok">✅ ${n('ok')} completados</span><span class="mj">✏️ ${n('no')} mejorando</span><span class="en">📨 ${n('pend')} por revisar</span><span class="pe">⏳ ${n('')} pendientes</span></div>
-    <p class="tr-msg">Se llena solo: cuando apruebas un trabajo sale <b>Completado</b>; si lo devuelves, <b>Mejorando</b>; si no envió nada, <b>Pendiente</b>.</p>
-    <div class="tr-l">${E.map((s, i) => { const L = W(s.key), e = TR_E[est[i]];
-      return `<div class="tr-r ${e[0]}"><span class="nn">${i + 1}</span><div class="nm">${esc(s.name)}<small>6.° ${esc(s.section)}</small></div>
-        <div class="tr-w">${L.length ? L.map(w => `<button type="button" data-open="${esc(w.id)}" title="${esc(w.t)}">${tipo(w.ty)[1]} ${esc(w.t)}<i>${ST[w.st] || ''}</i></button>`).join('') : '<span class="no">Aún no envía su trabajo</span>'}</div>
-        <span class="tr-st ${e[0]}">${e[1]} ${e[2]}</span></div>`; }).join('') || '<div class="empty"><b>No hay estudiantes en esta sección</b></div>'}</div>`;
+    <div class="tr-res"><span>👥 ${E.length} estudiantes</span><span class="ok">🏆 ${todos} con sus ${TR_N} trabajos</span><span class="mj">📝 ${fal} les faltan trabajos</span><span class="pe">⏳ ${nada} aún no envían nada</span></div>
+    <p class="tr-msg">Cada estudiante tiene <b>${TR_N} espacios</b>. Se llenan solos en orden cuando envían: ✅ aprobado, ✏️ devuelto para mejorar, 📨 por revisar y ⏳ pendiente.</p>
+    <div class="tr-l">${E.map((s, i) => { const L = W(s.key), n = ok(s.key), slots = Array.from({ length: Math.max(TR_N, L.length) }, (_, j) => L[j]);
+      return `<div class="tr-r ${n >= TR_N ? 'ok' : L.length ? 'rv' : ''}"><span class="nn">${i + 1}</span><div class="nm">${esc(s.name)}<small>6.° ${esc(s.section)}</small></div>
+        <div class="tr-slots">${slots.map((w, j) => { if (!w) return `<div class="sl pe"><b>Trabajo ${j + 1}</b><span>⏳ Pendiente</span></div>`; const e = ST[w.st] || ST.pend;
+          return `<button type="button" class="sl ${e[0]}" data-open="${esc(w.id)}" title="${esc(w.t)}"><b>Trabajo ${j + 1} · ${tipo(w.ty)[1]}</b><em>${esc(w.t)}</em><span>${e[1]} ${e[2]}</span></button>`; }).join('')}</div>
+        <span class="tr-st ${n >= TR_N ? 'ok' : n ? 'rv' : 'pe'}">${n >= TR_N ? '🏆' : '📚'} ${n}/${TR_N}</span></div>`; }).join('') || '<div class="empty"><b>No hay estudiantes en esta sección</b></div>'}</div>`;
 }
 $('#view').addEventListener('click', e => {
   if (TAB !== 'trabajos') return;
