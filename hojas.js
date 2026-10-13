@@ -182,9 +182,17 @@
 
   // ---- Sesión 01 de la Unidad 7 (Retos Bebras): 3 desafíos en foto, sin respuestas ----
   const BEBRAS = [
-    { mode: 'individual', title: 'Desafío 1 · El camino más barato', desc: 'Leemos el reto con calma y buscamos el recorrido que le cueste al castor la menor cantidad de monedas.', img: 'img/bebras/reto1.jpg' },
-    { mode: 'pair', title: 'Desafío 2 · El ascensor', desc: 'En parejas probamos cómo repartir a los castores en los dos viajes del ascensor (máximo 30 kg) para que suban la mayor cantidad.', img: 'img/bebras/reto2.jpg' },
-    { mode: 'whole', title: 'Desafío 3 · El código secreto', desc: 'Con toda la clase usamos las 4 pistas, una por una, para descubrir el código de 3 dígitos de la cueva de José.', img: 'img/bebras/reto3.jpg' }];
+    { mode: 'individual', title: 'Desafío 1 · El camino más barato', desc: 'Leemos el reto con calma y buscamos el recorrido que le cueste al castor la menor cantidad de monedas.', img: 'img/bebras/reto1.jpg',
+      en: ['Un castor quiere visitar a todos sus amigos en los pueblos A, B, C, D y E en transporte público.', 'Va a visitar a todos sus amigos en un solo viaje, sin visitar un pueblo más de una vez, y regresando a casa al final del viaje.', 'El precio de cada camino se muestra con monedas 🪙.'],
+      ej: 'Un posible recorrido que cuesta 11 monedas es: Inicio → B → E → A → D → C → Inicio.', fig: 'img/bebras/fig1.jpg',
+      pr: 'Encuentra un orden de visitas que le cueste al castor la menor cantidad de monedas posible. ¡Puede haber varias soluciones!' },
+    { mode: 'pair', title: 'Desafío 2 · El ascensor', desc: 'En parejas probamos cómo repartir a los castores en los dos viajes del ascensor (máximo 30 kg) para que suban la mayor cantidad.', img: 'img/bebras/reto2.jpg',
+      en: ['Un grupo de castores está visitando un parque y quiere tomar el ascensor hasta el mirador.', 'Pero es tarde y el ascensor solo sube dos veces.', 'El ascensor tiene una capacidad de carga de 30 kg (cada castor con su equipaje).'], fig: 'img/bebras/fig2.jpg',
+      pr: '¿Cómo podemos repartir a los castores entre los dos viajes del ascensor para que suban tantos castores como sea posible?' },
+    { mode: 'whole', title: 'Desafío 3 · El código secreto', desc: 'Con toda la clase usamos las 4 pistas, una por una, para descubrir el código de 3 dígitos de la cueva de José.', img: 'img/bebras/reto3.jpg',
+      en: ['José tiene una cueva donde ha escondido todos sus tesoros.', 'Desafortunadamente, olvidó el código de 3 dígitos de la alarma. Por si acaso, había escrito estas pistas:'],
+      pistas: [['172', 'Solo uno de estos dígitos es correcto, pero está en la posición incorrecta.'], ['854', 'Dos de estos dígitos son correctos, pero están en la posición incorrecta.'], ['986', 'Solo uno de estos dígitos es correcto, pero está en la posición incorrecta.'], ['751', 'Solo uno de estos dígitos es correcto y está en la posición correcta.']],
+      pr: '¿Cuál es el código correcto?' }];
   const esBebras = (u, s) => !!(u && s && /unit7/.test(u.key || '') && /bebras/i.test(String(s.title || '') + ' ' + String(s.rubric || '')));
   const actsDe = (u, s) => esBebras(u, s) ? BEBRAS : (s.activities || []);
   const fotoHtml = (a, cls = '') => L(a && a.img) ? `<button type="button" class="foto-reto ${cls}" data-foto="${esc(a.img)}" data-ft="${esc(a.title || '')}" aria-label="Ver la foto en grande"><img src="${esc(a.img)}" alt="${esc(a.title || 'Foto del reto')}" loading="lazy"><i>👁️ Ver grande</i></button>` : '';
@@ -498,7 +506,7 @@
   //  5) MI PRESENTACIÓN (modo Canva, en el proyector)
   // =================================================================
   const CV_K = { uni: ['📘', 'Unidad'], ses: ['🗓️', 'Sesión'], meta: ['🎯', 'Meta y criterios'], rol: ['👥', 'Roles'], acu: ['🤝', 'Acuerdos'], act: ['🧪', 'Actividad'], exit: ['🎟️', 'Exit ticket'], mq: ['🤖', 'Molí pregunta'], aq: ['🤖', 'Molí pregunta'], exa: ['✅', 'Respuestas'], voc: ['📖', 'Palabra nueva'], sab: ['💡', '¿Sabías que?'], ref: ['🪞', 'Reflexión'] };
-  const CV_BG = { meta: ['#2563eb', '#38bdf8'], rol: ['#7c3aed', '#c084fc'], acu: ['#0d9488', '#34d399'], act: ['#ea580c', '#facc15'], exit: ['#db2777', '#f472b6'], mq: ['#4338ca', '#0ea5e9'], aq: ['#0e7490', '#a855f7'], exa: ['#be185d', '#f472b6'], voc: ['#0f766e', '#22d3ee'], sab: ['#c2410c', '#facc15'], ref: ['#4338ca', '#22d3ee'] };
+  const CV_BG = { reto: ['#0b2e4f', '#0a6aa1'], meta: ['#2563eb', '#38bdf8'], rol: ['#7c3aed', '#c084fc'], acu: ['#0d9488', '#34d399'], act: ['#ea580c', '#facc15'], exit: ['#db2777', '#f472b6'], mq: ['#4338ca', '#0ea5e9'], aq: ['#0e7490', '#a855f7'], exa: ['#be185d', '#f472b6'], voc: ['#0f766e', '#22d3ee'], sab: ['#c2410c', '#facc15'], ref: ['#4338ca', '#22d3ee'] };
   const CV_PAL = [['#7c3aed', '#06b6d4'], ['#0ea5e9', '#22c55e'], ['#f97316', '#ec4899'], ['#2563eb', '#8b5cf6'], ['#14b8a6', '#6366f1'], ['#e11d48', '#f59e0b']];
   const CV_ROL = [['🎤', 'SPEAKER', 'Presenta y habla por el equipo'], ['🧰', 'HELPER', 'Trae y organiza los materiales'], ['⏱️', 'TIMER', 'Cuida el tiempo del equipo'], ['🎨', 'DESIGNER', 'Hace que el trabajo se vea bonito y ordenado']];
   const CV_ACU = [['✋', 'Levantar la mano para participar'], ['🤫', 'No conversamos en clase'], ['🪑', 'Nos quedamos en nuestro sitio']];
@@ -517,7 +525,7 @@
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }, { ...b, k: 'aq', x, j: j + 1 }); if (L(C.s) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (L(C.s) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(C.s) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
@@ -569,6 +577,10 @@ Devuelve JSON:
           : mol('estrellas', `<p class="cv-mqt">💡 ¿Sabías que…?</p><p class="cv-sb">${esc(C.s)}</p>`); }
       if (it.k === 'ref') return mol('pensativa', '<p class="cv-mqt">🪞 Nuestra última reflexión de la sesión</p><ol><li>¿Qué aprendí el día de hoy?</li><li>¿Qué necesité para alcanzar la meta?</li><li>¿Cómo o dónde aplicaría lo que aprendí?</li></ol>');
       if (it.k === 'exit') { const n = MD.preguntas(s).length; return mol('decidida', `<p class="cv-mqt">🎟️ Exit ticket</p><p class="cv-sb">¡Es momento de realizar nuestro Exit ticket!</p><p class="cv-mqt">⏱️ 5 minutos${n ? ` · ${n} pregunta${n > 1 ? 's' : ''}` : ''}</p>`); }
+      if (it.k === 'reto') { const x = it.x, top = `<div class="cv-rt"><span class="cv-num">${it.j}</span><b>${esc(x.title)}</b>${MODOS[x.mode] ? `<span class="cv-pill">${MODOS[x.mode]}</span>` : ''}</div>`;
+        if (it.p === 'en') return `<div class="cv-sl cv-reto" ${st}>${top}<div class="cv-rcard"><div class="cv-ren">${x.en.map(t => `<p>${esc(t)}</p>`).join('')}${L(x.ej) ? `<p class="cv-rej">💬 ${esc(x.ej)}</p>` : ''}</div><p class="cv-rpr">🦫 ${esc(x.pr)}</p></div></div>`;
+        if (it.p === 'pis') return `<div class="cv-sl cv-reto" ${st}>${top}<div class="cv-rcard"><ul class="cv-pis">${x.pistas.map(([n, t], k) => `<li><span class="cv-pk">Pista ${k + 1}</span><span class="cv-dig">${[...n].map(c => `<i>${c}</i>`).join('')}</span><span class="cv-pt">${esc(t)}</span></li>`).join('')}</ul><p class="cv-rpr">🔐 ${esc(x.pr)} <span class="cv-dig cv-q"><i>?</i><i>?</i><i>?</i></span></p></div></div>`;
+        return `<div class="cv-sl cv-reto" ${st}>${top}<div class="cv-rfig">${fotoHtml({ img: x.fig, title: x.title }, 'cv-fimg cv-big')}</div><p class="cv-rpr cv-rbar">🦫 ${esc(x.pr)}</p></div>`; }
       if (it.k === 'act') { const x = it.x, m = MODOS[String(x.mode || '').toLowerCase()], C = (s.criteria || []).filter(L), Q = MD.LS.get(hashQ(it), null) || {}, ai = Q.c && +Q.c[it.j - 1], c = C[(ai >= 1 && ai <= C.length ? ai : Math.min(it.j, C.length)) - 1];
         if (L(x.img)) return `<div class="cv-sl cv-foto" ${st}>${crumb(it)}<div class="cv-fw"><div class="cv-ftx"><div class="cv-acth"><span class="cv-num">${it.j}</span><h2 class="cv-h2" style="margin:0">Actividad ${it.j}</h2></div>${m ? `<span class="cv-pill">${m}</span>` : ''}${L(x.title) ? `<h3 class="cv-at">${esc(x.title)}</h3>` : ''}${L(x.desc) ? `<p class="cv-box">${esc(x.desc)}</p>` : ''}${c ? `<div class="cv-crb"><b>✅ Criterio de éxito</b>${esc(c)}</div>` : ''}</div>${fotoHtml(x, 'cv-fimg')}</div></div>`;
         return `<div class="cv-sl" ${st}>${crumb(it)}<div class="cv-acth"><span class="cv-num">${it.j}</span><h2 class="cv-h2" style="margin:0">Actividad ${it.j}</h2>${m ? `<span class="cv-pill">${m}</span>` : ''}</div>${c ? `<div class="cv-crb"><b>✅ Criterio de éxito</b>${esc(c)}</div>` : ''}${L(x.title) ? `<h3 class="cv-at">${esc(x.title)}</h3>` : ''}${L(x.desc) ? `<p class="cv-lead cv-box">${esc(x.desc)}</p>` : ''}${L(x.ficha) ? `<span class="cv-pill">📄 ${esc(x.ficha)}</span>` : ''}</div>`; }
