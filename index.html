@@ -838,6 +838,9 @@ function drawLocker26(mine, name) {                             // placas con el
   const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
 }
 const locker26Tex = drawLocker26(0, '');
+// textos del corcho: la docente los edita (fotocheck → 📌 Editar corcho); se guardan en Firebase (files/fcorcho-0)
+window.CORCHO = { head: '🔬 CIENCIA · 6° GRADO', l1: 'La unidad a trabajar es:', unidad: 'Unidad 7 · Microorganismos en acción', l2: 'El propósito de la unidad es:', prop: '',
+  normasT: 'NORMAS DEL AULA', normas: ['✋ Levanto la mano', '🤝 Trabajo en equipo', '👂 Escucho a todos', '🧹 Cuido mi aula'], cientT: '¡SOMOS CIENTÍFICOS!', pasos: ['Observo', 'Me pregunto', 'Experimento', 'Concluyo'] };
 function corkTex(LL) {                                            // mural de corcho: carteles blancos con letras azules, chinches, cinta y stickers
   const H = 420, W = Math.min(4096, Math.round(H * LL / 1.22)), c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
   const BL = '#1d4ed8', NV = '#1e3a8a', FONT = '"Trebuchet MS", system-ui, sans-serif';
@@ -864,14 +867,17 @@ function corkTex(LL) {                                            // mural de co
   const star = (x, y, r, col) => { g.fillStyle = col; g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rk = k % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rk, y + Math.sin(a) * rk); } g.closePath(); g.fill(); g.stroke(); };
   // al centro: el título y la hoja de la unidad
   const cw = Math.min(W * 0.42, 1100), cx = (W - cw) / 2;
-  card(cx + cw * 0.17, 16, cw * 0.66, 82, -0.012, (x, y, w) => { g.textAlign = 'center'; g.fillStyle = BL; fit('🔬 CIENCIA · 6° GRADO', w - 40, 52); g.fillText('🔬 CIENCIA · 6° GRADO', 0, 3); });
+  const CC = window.CORCHO;
+  card(cx + cw * 0.17, 16, cw * 0.66, 82, -0.012, (x, y, w) => { g.textAlign = 'center'; g.fillStyle = BL; fit(CC.head, w - 40, 52); g.fillText(CC.head, 0, 3); });
   pin(cx + cw * 0.21, 30, '#ef4444'); pin(cx + cw * 0.79, 28, '#3b82f6');
   card(cx, 116, cw, 284, 0.008, (x, y, w) => {
     const L = x + 38, M = w - 76; g.textAlign = 'left';
-    g.fillStyle = NV; fit('La unidad a trabajar es:', M, 36); g.fillText('La unidad a trabajar es:', L, y + 54);
-    g.fillStyle = BL; fit('Unidad 7 · Microorganismos en acción', M, 42); g.fillText('Unidad 7 · Microorganismos en acción', L, y + 108);
-    g.fillStyle = NV; fit('El propósito de la unidad es:', M, 36); g.fillText('El propósito de la unidad es:', L, y + 164);
+    g.fillStyle = NV; fit(CC.l1, M, 36); g.fillText(CC.l1, L, y + 54);
+    g.fillStyle = BL; fit(CC.unidad, M, 42); g.fillText(CC.unidad, L, y + 108);
+    g.fillStyle = NV; fit(CC.l2, M, 36); g.fillText(CC.l2, L, y + 164);
     g.strokeStyle = '#bfdbfe'; g.lineWidth = 3; [208, 248].forEach(yy => { g.beginPath(); g.moveTo(L, y + yy); g.lineTo(L + M, y + yy); g.stroke(); });
+    if (CC.prop) { let fs = 30, ln = []; do { g.font = '600 ' + fs + 'px ' + FONT; ln = []; let l = ''; String(CC.prop).split(/\s+/).forEach(wd => { const t2 = l ? l + ' ' + wd : wd; if (g.measureText(t2).width > M && l) { ln.push(l); l = wd; } else l = t2; }); if (l) ln.push(l); fs -= 2; } while (ln.length > 2 && fs > 14);
+      g.fillStyle = '#334155'; ln.slice(0, 2).forEach((t2, k) => g.fillText(t2, L, y + 192 + k * 40)); }
   });
   tape(cx + 14, 128, -0.62, '#fda4af'); tape(cx + cw - 14, 128, 0.62, '#86efac');
   // a los lados: normas del aula y el método científico
@@ -879,14 +885,14 @@ function corkTex(LL) {                                            // mural de co
   if (sw > 220) {
     const lx = cx - sw - 46, rx = cx + cw + 46;
     card(lx, 44, sw, 330, -0.035, (x, y, w) => {
-      g.textAlign = 'center'; g.fillStyle = BL; fit('NORMAS DEL AULA', w - 60, 40); g.fillText('NORMAS DEL AULA', 0, y + 54);
+      g.textAlign = 'center'; g.fillStyle = BL; fit(CC.normasT, w - 60, 40); g.fillText(CC.normasT, 0, y + 54);
       g.textAlign = 'left'; g.fillStyle = NV;
-      ['✋ Levanto la mano', '🤝 Trabajo en equipo', '👂 Escucho a todos', '🧹 Cuido mi aula'].forEach((t, k) => { fit(t, w - 70, 32, '600'); g.fillText(t, x + 34, y + 116 + k * 54); });
+      CC.normas.slice(0, 4).forEach((t, k) => { fit(t, w - 70, 32, '600'); g.fillText(t, x + 34, y + 116 + k * 54); });
     });
     pin(lx + sw / 2, 56, '#22c55e');
     card(rx, 36, sw, 344, 0.03, (x, y, w) => {
-      g.textAlign = 'center'; g.fillStyle = BL; fit('¡SOMOS CIENTÍFICOS!', w - 60, 40); g.fillText('¡SOMOS CIENTÍFICOS!', 0, y + 54);
-      ['Observo', 'Me pregunto', 'Experimento', 'Concluyo'].forEach((t, k) => {
+      g.textAlign = 'center'; g.fillStyle = BL; fit(CC.cientT, w - 60, 40); g.fillText(CC.cientT, 0, y + 54);
+      CC.pasos.slice(0, 4).forEach((t, k) => {
         const yy = y + 118 + k * 56;
         g.fillStyle = ['#4f8ff7', '#ff8a3d', '#3ccf7a', '#a855f7'][k]; g.beginPath(); g.arc(x + 56, yy, 21, 0, 6.3); g.fill(); g.strokeStyle = INK; g.lineWidth = 2.5; g.stroke();
         g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = 'bold 24px ' + FONT; g.fillText(String(k + 1), x + 56, yy + 1);
@@ -1011,7 +1017,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       }
       const th = pl.rotation.y;
       const cork = new THREE.Mesh(new THREE.PlaneGeometry(LL, 1.22), new THREE.MeshLambertMaterial({ map: corkTex(LL), polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));   // mural de corcho encima de los lockers
-      { const [cx2, cz2] = P(Wc / 2 - T - 0.045, Dp / 2 - T); cork.position.set(cx2, fy + 2.2, cz2); cork.rotation.y = pl.rotation.y; scene.add(cork); }
+      { const [cx2, cz2] = P(Wc / 2 - T - 0.045, Dp / 2 - T); cork.position.set(cx2, fy + 2.2, cz2); cork.rotation.y = pl.rotation.y; scene.add(cork); window.CORK = { mesh: cork, LL }; }
       boxAt(Wc / 2 - T - 0.01, Dp / 2 - T, 1.56, 0.02, 1.3, LL + 0.1, 0xb7793f, false);   // (el corcho va 2,5 cm delante: sin parpadeo)                        // marco de madera
       SALON6[rname] = { plane: pl, LL, fy, x: lx, z: lz, ax: [Math.cos(th), -Math.sin(th)], nrm: [Math.sin(th), Math.cos(th)], rot: th };
       { const n = strHash((ME && (ME.key || ME.name)) || '6B') % 26, q = n % 13, r = Math.floor(n / 13), ax2 = SALON6[rname].ax, nr2 = SALON6[rname].nrm;   // su locker (sin número): ahí está su folder
@@ -2696,7 +2702,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js"></script>
+<script src="revista.js"></script><script src="corcho.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>

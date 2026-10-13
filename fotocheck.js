@@ -39,6 +39,7 @@
   }
   const HERR = [
     ['editar', '✏️', 'Editar aula', 'Mueve mesas, sillas y más'],
+    ['corcho', '📌', 'Editar corcho', 'Unidad y propósito'],
     ['cuenta', '🤖', 'Crear cuenta con Molí', 'Cuentas de tus estudiantes'],
     ['trabajar', '✨', 'Trabajar con Molí', 'Crea la ficha de tu sesión'],
     ['preparadas', '📦', 'Sesiones preparadas', 'Unidad 7 lista para publicar'],
