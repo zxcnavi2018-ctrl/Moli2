@@ -482,3 +482,6 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .bk .u-doc { display: flex; align-items: center; gap: .6em; width: 100%; padding: .45em .7em; border: .12em solid #2b2547; border-radius: .7em; background: #fff; text-align: left; cursor: pointer; box-shadow: 0 .18em 0 #2b2547; font: inherit; color: #1e293b; }
 .bk .u-doc:hover { background: #f0f9ff; } .bk .u-doc:active { transform: translateY(.12em); box-shadow: 0 .06em 0 #2b2547; }
 .bk .u-doc > i { font-style: normal; font-size: 1.5em; } .bk .u-doc span { flex: 1; display: flex; flex-direction: column; } .bk .u-doc small { color: #64748b; font-weight: 700; } .bk .u-doc em { font-style: normal; font-weight: 900; color: #0a6aa1; }
+
+/* meta y criterios: más grande para que llene la diapositiva */
+.cv-meta .cv-h2 { font-size: 2.3em; } .cv-meta .cv-lead { font-size: 1.6em; } .cv-meta h3 { font-size: 1.45em; margin: .6em 0 .3em; } .cv-meta .cv-cards li { font-size: 1.3em; padding: .5em .9em; } .cv-meta .cv-sub { font-size: 1.1em; }

@@ -142,14 +142,15 @@
   #sheet.pizarra { background: #fff; border: 4px solid #2b2547; border-radius: 4px; }
   #sheet.pizarra .paper { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, #ffffff 0 45%, #f1f5f9 100%); }
   /* ---- libro «BIBLIOTECA» (borde derecho, al medio): al pasar el cursor sale su franja; lleva a La Biblioteca Educativa ---- */
-  #bibLink { position: fixed; right: max(10px, env(safe-area-inset-right)); top: 50%; transform: translateY(-50%); z-index: 24; display: flex; flex-direction: row-reverse; align-items: center; text-decoration: none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.28)); transition: opacity .3s, transform .3s; }
-  #bibLink svg { width: 60px; height: 60px; flex: none; position: relative; z-index: 2; transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
-  #bibLink span { margin-right: -16px; padding: 8px 24px 8px 14px; border-radius: 999px 0 0 999px; background: linear-gradient(270deg, #1d4ed8, #3b82f6); border: 3px solid #2b2547; border-right: 0; color: #fff; font: 900 14px "Trebuchet MS", system-ui, sans-serif; letter-spacing: .14em; clip-path: inset(0 0 0 100%); transition: clip-path .35s ease; white-space: nowrap; }
+  #bibLink { position: fixed; right: max(14px, env(safe-area-inset-right)); top: max(14px, env(safe-area-inset-top)); z-index: 24; display: flex; flex-direction: row-reverse; align-items: center; text-decoration: none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.28)); transition: opacity .3s, transform .3s; }
+  #bibLink svg { width: 78px; height: 78px; flex: none; position: relative; z-index: 2; transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+  #bibLink span { margin-right: -20px; padding: 11px 30px 11px 18px; border-radius: 999px 0 0 999px; background: linear-gradient(270deg, #1d4ed8, #3b82f6); border: 3px solid #2b2547; border-right: 0; color: #fff; font: 900 18px "Trebuchet MS", system-ui, sans-serif; letter-spacing: .14em; clip-path: inset(0 0 0 0); transition: clip-path .35s ease; white-space: nowrap; }
   #bibLink:hover span, #bibLink:focus-visible span { clip-path: inset(0 0 0 0); }
   #bibLink:hover svg { transform: rotate(8deg) scale(1.08); }
-  body.open #bibLink, body.tut #bibLink, body.editando #bibLink { opacity: 0; pointer-events: none; transform: translate(20px, -50%); }
+  body.open #bibLink, body.tut #bibLink, body.editando #bibLink { opacity: 0; pointer-events: none; transform: translateY(-20px); }
   @media (hover: none) { #bibLink span { clip-path: inset(0 0 0 0); } }
-  @media (max-height: 500px), (max-width: 600px) { #bibLink svg { width: 46px; height: 46px; } #bibLink span { font-size: 12px; padding: 6px 20px 6px 12px; } }
+  @media (max-height: 500px), (max-width: 600px) { #bibLink svg { width: 56px; height: 56px; } #bibLink span { font-size: 14px; padding: 8px 24px 8px 14px; } }
+  #bibWin { position: fixed; inset: 0; z-index: 9000; background: #1e130b; opacity: 0; transition: opacity .45s; } #bibWin.on { opacity: 1; } #bibWin iframe { width: 100%; height: 100%; border: 0; display: block; }
   #bibBar { position: fixed; left: 50%; top: 12px; transform: translateX(-50%) translateY(-20px); z-index: 31; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 22px; background: #fff; border: 3px solid #2b2547; box-shadow: 0 6px 0 rgba(43,37,71,.25), 0 14px 30px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .3s, transform .4s cubic-bezier(.34,1.56,.64,1); }
   #bibBar.on { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
   body.open #bibBar { opacity: 0; pointer-events: none; }
@@ -1754,6 +1755,15 @@ function autoQuality(dt) {
 const afterRender = [];                                              // lo que se dibuja encima del salón (Molí)
 function loop(now) {
   requestAnimationFrame(loop);
+// ---- La Biblioteca Educativa se abre encima del aula (así no se sale de la pantalla completa) ----
+(function () {
+  const a = document.getElementById('bibLink'); if (!a) return; let win = null;
+  a.addEventListener('click', e => { e.preventDefault(); if (win) return;
+    win = document.createElement('div'); win.id = 'bibWin'; win.innerHTML = '<iframe src="biblioteca.html" title="La Biblioteca Educativa" allow="autoplay; fullscreen"></iframe>'; document.body.appendChild(win);
+    requestAnimationFrame(() => win.classList.add('on')); window.BIB_ABIERTA = true; try { callar(); } catch (x) {} });
+  addEventListener('message', e => { if (!e.data || !e.data.bibCerrar || !win) return; const w = win; win = null; w.classList.remove('on'); window.BIB_ABIERTA = false; setTimeout(() => w.remove(), 450); });
+})();
+  if (window.BIB_ABIERTA) return;                                     // la Biblioteca está encima: el aula descansa
   const dt = Math.max(0, (now - last) / 1000); last = now;
   if (P.started && dt < 1) autoQuality(dt);
   if (TOUR.on) tourFrame(now / 1000); else update(P.started && !uiOpen ? dt : 0);
@@ -2146,7 +2156,7 @@ addEventListener('pointerdown', completa, true); addEventListener('keydown', e =
 document.getElementById('prevBtn').addEventListener('click', e => { e.stopPropagation(); go(-1); });
 document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); go(1); });
 addEventListener('keydown', e => { if (!TOUR.started || moliWin.style.display === 'flex') return; if (e.code === 'ArrowRight') { e.preventDefault(); go(1); } else if (e.code === 'ArrowLeft') { e.preventDefault(); go(-1); } });
-renderer.domElement.addEventListener('pointerup', e => { if (!TOUR.started) return; if (tocarMueble(e)) return; if (typeof tocarMoli === 'function' && tocarMoli(e)) return; go(e.clientX > innerWidth / 2 ? 1 : -1); });   // tocar a Molí: «Trabajar con Molí»; si no, derecha avanza / izquierda regresa   // tocar la derecha: avanza; la izquierda: regresa
+renderer.domElement.addEventListener('pointerup', e => { if (!TOUR.started) return; if (tocarMueble(e)) return; if (typeof tocarMoli === 'function' && tocarMoli(e)) return; });   // tocar a Molí: «Trabajar con Molí» (para avanzar o regresar se usan sólo los botones ‹ ›)
 // ---- Biblioteca de Temas: selector de discos, puertitas y Plantancio ----
 const BIB = { i: -1, last: 0, busy: false, open: false, doors: false, watering: false, here: false };
 const bibBar = document.getElementById('bibBar'), bibName = document.getElementById('bibName');
