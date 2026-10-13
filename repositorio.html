@@ -199,6 +199,19 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 #dniAviso .da-i{font-size:64px;line-height:1}#dniAviso h3{margin:10px 0 6px;font:900 26px var(--serif);color:var(--navy)}#dniAviso p{margin:6px 0;font-weight:700;color:#334155;font-size:17px}#dniAviso .da-s{font-size:15px;color:#64748b}
 #dniAviso .da-b{position:absolute;left:0;bottom:0;height:7px;width:100%;background:#facc15;transform-origin:left;animation:daBar 5s linear forwards}
 @keyframes daBar{to{transform:scaleX(0)}}@keyframes daIn{from{opacity:0}}
+
+.tr-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:4px 0 14px}.tr-top h2{margin:0;font:900 26px var(--serif);color:var(--navy);flex:1;min-width:220px}
+.tr-sec{display:flex;gap:6px}.tr-sec button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font:900 15px var(--sans);color:var(--navy);cursor:pointer}.tr-sec button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.tr-res{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}.tr-res span{padding:8px 14px;border-radius:14px;font-weight:900;background:#f1f5f9;color:#334155}.tr-res .ok{background:#dcfce7;color:#166534}.tr-res .pe{background:#fef3c7;color:#92400e}.tr-res .en{background:#dbeafe;color:#1e40af}
+.tr-l{display:grid;gap:8px}.tr-r{display:grid;grid-template-columns:34px minmax(170px,1.1fr) 2fr auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.tr-r .nn{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sky);font-weight:900;color:var(--navy);font-size:13px}.tr-r .nm{font-weight:900;color:var(--navy)}.tr-r .nm small{display:block;color:#7b8fa3;font-weight:700}
+.tr-w{display:flex;flex-wrap:wrap;gap:6px}.tr-w button{border:1px solid var(--line);background:#f8fbfe;border-radius:10px;padding:5px 9px;font:800 12.5px var(--sans);color:#1e3a8a;cursor:pointer;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tr-w button i{font-style:normal;margin-left:4px}.tr-w .no{color:#94a3b8;font-weight:700;font-size:13px}
+.tr-st{min-width:150px;text-align:center;padding:10px 12px;border-radius:14px;font:900 15px var(--sans);border:2.5px solid}.tr-st.ok{background:#22c55e;border-color:#16a34a;color:#fff}.tr-st.mj{background:#fb923c;border-color:#ea580c;color:#fff}.tr-st.rv{background:#3b82f6;border-color:#2563eb;color:#fff}.tr-st.pe{background:#fff;border-color:#cbd5e1;color:#64748b}
+.tr-r.mj{background:#fff7ed;border-color:#fed7aa}.tr-r.rv{background:#eff6ff;border-color:#bfdbfe}.tr-res .mj{background:#ffedd5;color:#9a3412}
+.tr-m{display:flex;gap:6px}.tr-m button{width:112px;padding:10px 6px;border-radius:14px;border:2.5px solid #cbd5e1;background:#fff;font:900 14px var(--sans);color:#64748b;cursor:pointer;transition:transform .12s}.tr-m button:hover{transform:translateY(-1px)}
+.tr-m button.ok.on{background:#22c55e;border-color:#16a34a;color:#fff;box-shadow:0 3px 0 #15803d}.tr-m button.pe.on{background:#f59e0b;border-color:#d97706;color:#fff;box-shadow:0 3px 0 #b45309}
+.tr-r.ok{background:#f0fdf4;border-color:#bbf7d0}.tr-msg{min-height:20px;font-weight:800;color:#64748b;font-size:13px}
+@media (max-width:820px){.tr-r{grid-template-columns:30px 1fr}.tr-r .tr-w,.tr-r .tr-st{grid-column:2}}
 </style>
 </head>
 <body>
@@ -212,6 +225,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
   <button type="button" data-tab="fuentes">🔍 <span>Buscador</span></button>
   <button type="button" data-tab="enviar">📝 <span>Publicar propuesta</span></button>
   <button type="button" data-tab="bandeja" hidden>📥 <span>Bandeja</span><b class="cnt" hidden></b></button>
+  <button type="button" data-tab="trabajos" hidden>👥 <span>Trabajos de estudiantes</span></button>
 </nav>
 <main id="main"><div class="wrap" id="view"></div></main>
 <div id="modal" hidden></div>
@@ -298,10 +312,48 @@ const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(u || '') ? u : '';
 let TAB = '', CACHE = { ok: null, pend: null };
 function setTab(t) {
   TAB = t; document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  $('#main').scrollTop = 0; ({ revista: vRevista, fuentes: vFuentes, enviar: vEnviar, bandeja: vBandeja })[t]();
+  $('#main').scrollTop = 0; ({ revista: vRevista, fuentes: vFuentes, enviar: vEnviar, bandeja: vBandeja, trabajos: vTrabajos })[t]();
 }
 $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
 
+// ---- 👥 Trabajos de estudiantes (sólo la docente): por sección, lo que envió cada uno y su estado, que se llena solo ----
+let TR = { sec: ls.get('moli2:trsec', 'A'), est: null, w: null };
+async function estudiantesRepo(a) {
+  const c = ls.get('moli2:tcache:est', null); if (c && c.L && Date.now() - c.at < 6 * 3600e3) return c.L;
+  let L = [], pt = '';
+  do { const r = await fetch(`${BASE}/students?pageSize=300${pt ? '&pageToken=' + encodeURIComponent(pt) : ''}&key=${F.apiKey}`, { headers: { Authorization: 'Bearer ' + a } }); if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
+    const j = await r.json(); (j.documents || []).forEach(d => L.push(docOf(d))); pt = j.nextPageToken || ''; } while (pt);
+  L = L.filter(s => /^[A-D]$/.test(s.section) && (!s.grade || s.grade === '6to')).map(s => ({ key: s.id, name: s.name, section: s.section })).sort((x, y) => String(x.name).localeCompare(String(y.name), 'es'));
+  ls.set('moli2:tcache:est', { at: Date.now(), L }); return L;
+}
+async function vTrabajos() {
+  const V = $('#view'); if (!ROLE.t) { V.innerHTML = '<div class="empty"><b>Sólo para la docente</b></div>'; return; }
+  V.innerHTML = '<div class="load">Cargando a tus estudiantes…</div>';
+  try { const a = await staffTok(); if (!a) throw new Error('AUTH');
+    const FL = ['k', 'n', 'sec', 't', 'ty', 'st', 'at'];
+    const [est, w1, w2, w3] = await Promise.all([estudiantesRepo(a), query('ok', a, FL), query('pend', a, FL), query('no', a, FL)]);
+    TR.est = est; TR.w = [...w1, ...w2, ...w3]; pintaTrabajos();
+  } catch (e) { V.innerHTML = `<div class="empty"><b>${e.message === 'AUTH' ? '🔐 Conecta tu cuenta de docente' : '📶 No se pudo cargar'}</b>${e.message === 'AUTH' ? 'En el aula: toca tu fotocheck → «Conectar mi cuenta».' : 'Revisa tu internet e intenta otra vez.'}</div>`; }
+}
+const TR_E = { ok: ['ok', '✅', 'Completado'], no: ['mj', '✏️', 'Mejorando'], pend: ['rv', '📨', 'Por revisar'], '': ['pe', '⏳', 'Pendiente'] };
+function estadoDe(L) { return L.some(w => w.st === 'ok') ? 'ok' : L.some(w => w.st === 'no') && !L.some(w => w.st === 'pend' && (w.at || 0) > Math.max(...L.filter(x => x.st === 'no').map(x => x.at || 0))) ? 'no' : L.some(w => w.st === 'pend') ? 'pend' : ''; }
+function pintaTrabajos() {
+  const V = $('#view'), E = TR.est.filter(s => s.section === TR.sec);
+  const W = k => TR.w.filter(w => w.k === k).sort((a, b) => (b.at || 0) - (a.at || 0));
+  const est = E.map(s => estadoDe(W(s.key))), n = k => est.filter(x => x === k).length;
+  const ST = { ok: '✅', pend: '📨', no: '✏️' };
+  V.innerHTML = `<div class="tr-top"><h2>👥 Trabajos de estudiantes</h2><div class="tr-sec">${['A', 'B', 'C', 'D'].map(x => `<button type="button" data-trs="${x}" class="${x === TR.sec ? 'on' : ''}">6.° ${x}</button>`).join('')}</div></div>
+    <div class="tr-res"><span>👥 ${E.length} estudiantes</span><span class="ok">✅ ${n('ok')} completados</span><span class="mj">✏️ ${n('no')} mejorando</span><span class="en">📨 ${n('pend')} por revisar</span><span class="pe">⏳ ${n('')} pendientes</span></div>
+    <p class="tr-msg">Se llena solo: cuando apruebas un trabajo sale <b>Completado</b>; si lo devuelves, <b>Mejorando</b>; si no envió nada, <b>Pendiente</b>.</p>
+    <div class="tr-l">${E.map((s, i) => { const L = W(s.key), e = TR_E[est[i]];
+      return `<div class="tr-r ${e[0]}"><span class="nn">${i + 1}</span><div class="nm">${esc(s.name)}<small>6.° ${esc(s.section)}</small></div>
+        <div class="tr-w">${L.length ? L.map(w => `<button type="button" data-open="${esc(w.id)}" title="${esc(w.t)}">${tipo(w.ty)[1]} ${esc(w.t)}<i>${ST[w.st] || ''}</i></button>`).join('') : '<span class="no">Aún no envía su trabajo</span>'}</div>
+        <span class="tr-st ${e[0]}">${e[1]} ${e[2]}</span></div>`; }).join('') || '<div class="empty"><b>No hay estudiantes en esta sección</b></div>'}</div>`;
+}
+$('#view').addEventListener('click', e => {
+  if (TAB !== 'trabajos') return;
+  const s = e.target.closest('[data-trs]'); if (s) { TR.sec = s.dataset.trs; ls.set('moli2:trsec', TR.sec); pintaTrabajos(); }
+});
 // ---- 📰 Revista Innovadora: lo aprobado ----
 let FIL = { ty: '', sec: '' };
 async function vRevista() {
@@ -567,6 +619,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   await checkRole();
   if (ROLE.r) { const r = $('#me .rol'); if (!r) $('#me').insertAdjacentHTML('beforeend', '<span class="rol">🧐 Revisor</span>'); }
   if (ROLE.t || ROLE.r) $('#tabs [data-tab="bandeja"]').hidden = false;
+  if (ROLE.t) $('#tabs [data-tab="trabajos"]').hidden = false;
   const want = QS.get('v'); setTab(want === 'bandeja' && (ROLE.t || ROLE.r) ? 'bandeja' : want === 'enviar' ? 'enviar' : want === 'fuentes' ? 'fuentes' : 'revista');
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
