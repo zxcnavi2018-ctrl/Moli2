@@ -88,6 +88,8 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
 .opts button{padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:900;font-size:15px}
 .opts button.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.tyw{display:inline-flex;align-items:center;gap:3px}.opts button.lock{opacity:.5;cursor:not-allowed;background:#f1f5f9}
+.opts .tlk{padding:6px 8px;border-radius:10px;border:2px dashed #94a3b8;font-size:14px;background:#fff}.opts .tlk.on{border:2px solid #dc2626;background:#fee2e2}
 .photo{display:flex;align-items:center;gap:12px;padding:12px;border:2px dashed #b9d3e8;border-radius:16px;background:#fff;font-weight:800;color:var(--ink2)}
 .photo img{width:110px;height:74px;object-fit:cover;border-radius:10px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border:0;border-radius:16px;font-weight:900;font-size:16px;transition:transform .15s,filter .15s}
@@ -409,7 +411,24 @@ document.addEventListener('submit', e => { if (e.target.id !== 'sF') return; e.p
 document.addEventListener('click', e => { const b = e.target.closest('[data-sq]'); if (!b) return; $('#sQ').value = b.dataset.sq; buscar(b.dataset.sq); });
 
 // ---- 📤 Enviar mi trabajo ----
-let FORM = { ty: 'opi', u: 'unit7', img: '', th: '', g: 6, txt: '', fotos: [] };
+// ---- 🔒 candados de los tipos de trabajo: la docente decide cuáles se pueden elegir (al inicio sólo Investigación) ----
+const TYF = 'ftipos-0';
+let TCERR = Object.fromEntries(TIPOS_F.map(t => [t[0], t[0] !== 'inv']));
+const tyCerrado = k => !ROLE.t && !!TCERR[k];
+function tyHtml() {
+  if (tyCerrado(FORM.ty)) { const l = TIPOS_F.find(t => !tyCerrado(t[0])); if (l) FORM.ty = l[0]; }
+  return TIPOS_F.map(t => { const c = !!TCERR[t[0]], b = tyCerrado(t[0]);
+    return `<span class="tyw"><button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}${b ? ' lock' : ''}" ${b ? 'disabled title="Tu profe lo abrirá pronto"' : ''}>${t[1]} ${t[2]}${b ? ' 🔒' : ''}</button>${ROLE.t ? `<button type="button" class="tlk${c ? ' on' : ''}" data-tlk="${t[0]}" title="${c ? 'Cerrado para tus estudiantes: toca para abrirlo' : 'Abierto: toca para cerrarlo'}">${c ? '🔒' : '🔓'}</button>` : ''}</span>`; }).join(''); }
+fetch(`${BASE}/files/${TYF}?key=${F.apiKey}`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue; if (!v) return;
+  const x = JSON.parse(decodeURIComponent(escape(atob(v)))); if (x && x.c) TCERR = { ...TCERR, ...x.c }; const el = $('#eTy'); if (el) { el.innerHTML = tyHtml(); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(FORM.ty); } }).catch(() => {});
+async function guardarTipos() {
+  try { const a = await staffTok(); if (!a) throw new Error('AUTH');
+    const b64 = btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, c: TCERR, at: Date.now() }))));
+    const r = await fetch(`${BASE}/files/${TYF}?key=${F.apiKey}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf({ b64, updatedAt: new Date() }) }) });
+    if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET'); toast('🔒 Guardado: tus estudiantes ya lo ven así.');
+  } catch (e) { toast(e.message === 'AUTH' ? '🔐 Conecta tu cuenta para guardar los candados.' : '📶 No se pudo guardar. Revisa tu internet.', 4500); }
+}
+let FORM = { ty: 'inv', u: 'unit7', img: '', th: '', g: 6, txt: '', fotos: [] };
 function vEnviar() {
   const V = $('#view');
   const T0 = !!(ME && ME.teacher);                                     // sin DNI también ve todo: al subir o enviar le sale el aviso para entrar con su DNI
@@ -417,7 +436,7 @@ function vEnviar() {
   `<section class="citas"><div class="c-top"><span class="c-badge">MÍNIMO 3 CITAS</span><h3>✍️ Citas parafraseadas <small>Normas APA</small></h3><p>Parafrasear es contar lo que dijo un experto <b>con tus propias palabras</b>, sin copiar. Tu trabajo debe tener <b>mínimo 3 citas</b>. Hay dos formas:</p></div>
       <div class="c-2"><article class="c-a"><span class="c-n">A</span><h4>Cita narrativa</h4><p class="c-d">Empiezas con el <b>autor</b> y pones el <b>año</b> entre paréntesis.</p><blockquote>Según <mark>López (2020)</mark>, el desarrollo tecnológico cambió la forma en que aprendemos.</blockquote><p class="c-m">Molde: Según <mark>Apellido (año)</mark>, …</p></article>
       <article class="c-b"><span class="c-n">B</span><h4>Cita parentética</h4><p class="c-d">Escribes la idea con tus palabras y <b>al final</b> pones (Apellido, año).</p><blockquote>El desarrollo tecnológico ha transformado la educación moderna <mark>(Soto, 2019)</mark>.</blockquote><p class="c-m">Molde: … <mark>(Apellido, año)</mark>.</p></article></div></section>
-  <div class="fld" style="margin:0 0 10px"><label style="font:900 18px var(--serif);color:var(--navy)">1. Elige el tipo de trabajo</label><div class="opts" id="eTy">${TIPOS_F.map(t => `<button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}">${t[1]} ${t[2]}</button>`).join('')}</div></div>
+  <div class="fld" style="margin:0 0 10px"><label style="font:900 18px var(--serif);color:var(--navy)">1. Elige el tipo de trabajo</label><div class="opts" id="eTy">${tyHtml()}</div></div>
   <section class="formatos" id="eGuia">${guiaHtml(FORM.ty)}</section>
   <form class="form" id="fEnv" autocomplete="off">
     <h3 class="f-h">2. Publica tu propuesta</h3>
@@ -485,6 +504,7 @@ document.addEventListener('change', async e => {
   } catch (x) { FORM.fotos = []; FORM.th = ''; $('#ePv').textContent = '⚠️ No pude abrir esas fotos. Prueba con otras.'; }
 });
 document.addEventListener('click', e => {
+  const lk = e.target.closest('#eTy [data-tlk]'); if (lk) { const k = lk.dataset.tlk; TCERR[k] = !TCERR[k]; $('#eTy').innerHTML = tyHtml(); return guardarTipos(); }
   const t = e.target.closest('#eTy [data-ty]'), u = e.target.closest('#eU [data-u]');
   if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(FORM.ty); }
   if (u) { FORM.u = u.dataset.u; document.querySelectorAll('#eU button').forEach(b => b.classList.toggle('on', b === u)); }
