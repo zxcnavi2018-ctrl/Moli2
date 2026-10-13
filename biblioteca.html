@@ -153,12 +153,12 @@ const TX = {
   g: { 6: ['SEXTO', 'GRADO'], 7: ['SÉPTIMO', 'GRADO'], 8: ['OCTAVO', 'GRADO'], 9: ['NOVENO', 'GRADO'], 10: ['DÉCIMO', 'GRADO'], 11: ['UNDÉCIMO', 'GRADO'] } };
 // ---- los 6 estantes (como en el dibujo de la profe) ----
 const GRADOS = [
-  { g: 6, n: 'SEXTO', t: 'Sexto grado', x: -6.35, z: 1.8, ry: Math.PI / 2, c: 0x8c2f39 },
-  { g: 7, n: 'SÉPTIMO', t: 'Séptimo grado', x: -6.35, z: -4.8, ry: Math.PI / 2, c: 0x2f5d8c },
-  { g: 8, n: 'OCTAVO', t: 'Octavo grado', x: 6.35, z: -4.8, ry: -Math.PI / 2, c: 0x3d7a4a },
-  { g: 9, n: 'NOVENO', t: 'Noveno grado', x: 6.35, z: 1.8, ry: -Math.PI / 2, c: 0x6b4a8c },
-  { g: 10, n: 'DÉCIMO', t: 'Décimo grado', x: -5.0, y: 4.66, z: -15.35, ry: 0, c: 0x9a5b22 },
-  { g: 11, n: 'UNDÉCIMO', t: 'Undécimo grado', x: 5.0, y: 4.66, z: -15.35, ry: 0, c: 0x1f6f78 }];
+  { g: 6, n: 'SEXTO', t: 'Sexto grado', x: -6.35, z: 1.8, z2: -1.5, ry: Math.PI / 2, c: 0x8c2f39 },          // cada grado tiene DOS estantes (x/z y x2/z2)
+  { g: 7, n: 'SÉPTIMO', t: 'Séptimo grado', x: -6.35, z: -4.8, z2: -8.1, ry: Math.PI / 2, c: 0x2f5d8c },
+  { g: 8, n: 'OCTAVO', t: 'Octavo grado', x: 6.35, z: -4.8, z2: -8.1, ry: -Math.PI / 2, c: 0x3d7a4a },
+  { g: 9, n: 'NOVENO', t: 'Noveno grado', x: 6.35, z: 1.8, z2: -1.5, ry: -Math.PI / 2, c: 0x6b4a8c },
+  { g: 10, n: 'DÉCIMO', t: 'Décimo grado', x: -5.4, x2: -2.75, w: 2.6, y: 4.66, z: -15.35, ry: 0, c: 0x9a5b22 },
+  { g: 11, n: 'UNDÉCIMO', t: 'Undécimo grado', x: 5.4, x2: 2.75, w: 2.6, y: 4.66, z: -15.35, ry: 0, c: 0x1f6f78 }];
 const COL_SEC = { A: '#6b2a2f', B: '#2c4a6e', C: '#35603f', D: '#7d4d22', E: '#55406e', F: '#235a60' };
 const TIPOS = { opi: ['💭', 'Opinión científica'], ens: ['📝', 'Ensayo'], inv: ['🔬', 'Investigación'], pro: ['🛠️', 'Producto'], maq: ['🧩', 'Maqueta'], info: ['🖼️', 'Infografía'], vid: ['🎬', 'Video'], exp: ['⚗️', 'Experimento'] };
 
@@ -262,7 +262,7 @@ function colocar(m, x, y, z, ry) { m.position.set(x, y, z); m.rotation.y = ry; s
 function columna(x, z, h) { const g = new THREE.Group(); box(0.42, h, 0.42, MAD_OSC, 0, h / 2, 0, g); box(0.56, 0.18, 0.56, ORO, 0, h - 0.1, 0, g); box(0.56, 0.22, 0.56, MAD_OSC, 0, 0.11, 0, g);
   const s = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, h * 0.82, 8), MAD_CLARA); s.position.set(0, h / 2, 0.22); g.add(s); g.position.set(x, 0, z); sala.add(g); }
 // paredes laterales: estantes bajos + galería + estantes altos
-const GZ = GRADOS.filter(q => q.ry !== 0).map(q => q.z);
+const GZ = GRADOS.filter(q => q.ry !== 0).flatMap(q => [q.z, q.z2]);
 [-1, 1].forEach(s => {
   const x = s * (HALL.x - 0.3), ry = -s * Math.PI / 2;
   for (let z = 8.4; z > -14.5; z -= 3.3) {
@@ -326,20 +326,28 @@ function etiquetaTex(txt, sub = 'GRADO') { return canvasTex(1024, 336, (g, w, h)
   g.shadowColor = 'rgba(255,214,120,.6)'; g.shadowBlur = 24;
   const gr = g.createLinearGradient(0, 40, 0, 260); gr.addColorStop(0, '#fff6cf'); gr.addColorStop(.5, '#f3cf73'); gr.addColorStop(1, '#c08a32'); g.fillStyle = gr;
   g.font = '900 150px "Cinzel Decorative", Cinzel, Georgia, serif'; g.fillText(txt, w / 2, 130); g.font = '800 72px Cinzel, Georgia, serif'; g.fillText(sub, w / 2, 262); }); }
-const ESTANTES = GRADOS.map(G => {
-  const m = mueble({ w: 3.1, h: 3.55, n: 5, reservar: [0, 1, 2, 3, 4], relleno: 0.95 });
-  const placa = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.65), new THREE.MeshBasicMaterial({ map: placaTex(G.n, 'GRADO', G.c) })); placa.position.set(0, 3.98, 0.36); m.add(placa); placa.userData.placa = 1;
-  box(2.8, 0.8, 0.08, MAD_OSC, 0, 3.98, 0.3, m);
-  const cint = box(3.08, 0.06, 0.02, toon(G.c), 0, 0.24, 0.29, m, false);
+function muebleGrado(G, w, placaMat) {                               // un estante de grado: terciopelo, marco dorado (la placa va una sola por grado)
+  const m = mueble({ w, h: 3.55, n: 5, reservar: [0, 1, 2, 3, 4], relleno: 0.95 });
+  const placa = placaMat ? new THREE.Mesh(new THREE.PlaneGeometry(w - 0.5, 0.65), placaMat) : null; if (placa) { placa.position.set(0, 3.98, 0.36); m.add(placa); placa.userData.placa = 1; }
+  box(w - 0.02, 0.06, 0.02, toon(G.c), 0, 0.24, 0.29, m, false);
   const sh = m.userData.sh, terc = toon(new THREE.Color(G.c).lerp(new THREE.Color(0x3b2414), 0.25));
-  box(3.1 - 0.18, sh[5] - sh[0], 0.02, terc, 0, (sh[0] + sh[5]) / 2, -0.25, m, false);                       // terciopelo detrás de los trabajos
-  [-1, 1].forEach(sx => box(0.07, 3.45, 0.05, ORO, sx * 1.52, 1.78, 0.3, m, false)); box(3.1, 0.07, 0.05, ORO, 0, 3.52, 0.3, m, false);
-  const et = new THREE.Sprite(new THREE.SpriteMaterial({ map: etiquetaTex(G.n), transparent: true, depthWrite: false, depthTest: false })); et.scale.set(4.0, 1.31, 1); et.position.set(0, 3.0, 2.2); et.renderOrder = 5; m.add(et);
-  const halo = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 4.6), new THREE.MeshBasicMaterial({ map: canvasTex(128, 128, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 4, w / 2, w / 2, w / 2); gr.addColorStop(0, 'rgba(255,214,140,.55)'); gr.addColorStop(1, 'rgba(255,214,140,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); }), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
-  halo.position.set(0, 1.9, 0.32); m.add(halo);
-  colocar(m, G.x, G.y || 0, G.z, G.ry);
-  const libs = new THREE.Group(); m.add(libs);
-  return { ...G, s: 'GRADO', m, libs, halo, et, placa, items: [], hit: [] };
+  box(w - 0.18, sh[5] - sh[0], 0.02, terc, 0, (sh[0] + sh[5]) / 2, -0.25, m, false);                       // terciopelo detrás de los trabajos
+  [-1, 1].forEach(sx => box(0.07, 3.45, 0.05, ORO, sx * (w / 2 - 0.03), 1.78, 0.3, m, false)); box(w, 0.07, 0.05, ORO, 0, 3.52, 0.3, m, false);
+  return { m, placa };
+}
+const ESTANTES = GRADOS.map(G => {
+  const w = G.w || 3.1, placaMat = new THREE.MeshBasicMaterial({ map: placaTex(G.n, 'GRADO', G.c) });
+  const A = muebleGrado(G, w, placaMat), B = muebleGrado(G, w, null), m = A.m, m2 = B.m;
+  const haloMat = new THREE.MeshBasicMaterial({ map: canvasTex(128, 128, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 4, w / 2, w / 2, w / 2); gr.addColorStop(0, 'rgba(255,214,140,.55)'); gr.addColorStop(1, 'rgba(255,214,140,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); }), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(w + 0.5, 4.6), haloMat); halo.position.set(0, 1.9, 0.32); m.add(halo);
+  const halo2 = new THREE.Mesh(halo.geometry, haloMat); halo2.position.copy(halo.position); m2.add(halo2);
+  colocar(m, G.x, G.y || 0, G.z, G.ry); colocar(m2, G.x2 != null ? G.x2 : G.x, G.y || 0, G.z2 != null ? G.z2 : G.z, G.ry);
+  const cx = (m.position.x + m2.position.x) / 2, cz = (m.position.z + m2.position.z) / 2;                 // el centro de los dos estantes (para la cámara y el letrero)
+  m.updateMatrixWorld(true); const off = m.worldToLocal(new THREE.Vector3(cx, (G.y || 0), cz));
+  A.placa.position.x = off.x; box(w - 0.3, 0.8, 0.08, MAD_OSC, off.x, 3.98, 0.3, m);                     // un solo letrero, centrado sobre los dos estantes
+  const et = new THREE.Sprite(new THREE.SpriteMaterial({ map: etiquetaTex(G.n), transparent: true, depthWrite: false, depthTest: false })); et.scale.set(4.0, 1.31, 1); et.position.set(off.x, 3.0, 2.2); et.renderOrder = 5; m.add(et);
+  const libs = new THREE.Group(); m.add(libs); const libs2 = new THREE.Group(); m2.add(libs2);
+  return { ...G, cx, cz, s: 'GRADO', m, m2, libs, libs2, halo, halo2, et, placa: A.placa, items: [], hit: [] };
 });
 rellenar.forEach(m => m.userData.fill()); libros.count = nLib;
 // ---- fluidez: todo lo que no se mueve se junta en pocas piezas (una por material) ----
@@ -442,22 +450,24 @@ function lomoTex(t, i) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()]
     let s = String(t.t || 'Trabajo'); while (g.measureText(s).width > h - 120 && s.length > 4) s = s.slice(0, -2); if (s !== String(t.t || 'Trabajo')) s = s.replace(/\s*\S?$/, '') + '…'; g.fillText(s, 0, 0); g.restore();
     g.fillStyle = '#fff8ea'; g.font = '900 24px Nunito, sans-serif'; g.textAlign = 'center'; g.fillText(String(t.n || '').split(' ').slice(0, 2).map(x => x[0] || '').join(''), w / 2, h - 66); }); }
 function ponerLibros() {
-  ESTANTES.forEach(E => { E.libs.children.forEach(o => { [].concat(o.material).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); }); if (o.geometry !== lomoGeo) o.geometry.dispose(); });
-    E.libs.clear(); E.items = []; E.hit = []; });
+  ESTANTES.forEach(E => { [E.libs, E.libs2].forEach(G => { G.children.forEach(o => { [].concat(o.material).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); }); if (o.geometry !== lomoGeo) o.geometry.dispose(); }); G.clear(); });
+    E.items = []; E.hit = []; });
   TRABAJOS.forEach(t => { const g = +t.g || 6; const E = ESTANTES.find(x => x.g === g) || ESTANTES[0]; E.items.push(t); });
   ESTANTES.forEach(E => {
     const sh = E.m.userData.sh, w = E.m.userData.w, d = E.m.userData.d;
-    const porBalda = 14, filas = [3, 2, 1, 4, 0];                               // primero a la altura de los ojos
+    const filas = [3, 2, 1, 4, 0];                               // primero a la altura de los ojos
     if (!E.items.length) {                                                 // estante vacío: cartelito «Pronto»
       const c = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.5), new THREE.MeshBasicMaterial({ map: canvasTex(512, 136, (g, W, H) => { g.fillStyle = '#fbf1da'; g.fillRect(0, 0, W, H); g.strokeStyle = '#c99a45'; g.lineWidth = 6; g.strokeRect(5, 5, W - 10, H - 10); g.fillStyle = '#6b4a2c'; g.textAlign = 'center'; g.font = '800 34px Cinzel, Georgia, serif'; g.fillText('PRÓXIMAMENTE', W / 2, 60); g.font = '700 24px Georgia, serif'; g.fillText('Aquí vivirán sus trabajos', W / 2, 104); }), transparent: true }));
       c.position.set(0, sh[2] + 0.4, 0.2); E.libs.add(c); return;
     }
-    E.items.slice(0, porBalda * 5).forEach((t, i) => {
-      const fila = filas[Math.floor(i / porBalda)], k = i % porBalda, n = Math.min(porBalda, E.items.length - Math.floor(i / porBalda) * porBalda);
-      const bw = 0.15, gap = 0.04, tot = n * bw + (n - 1) * gap, x = -tot / 2 + k * (bw + gap) + bw / 2, hh = (sh[fila + 1] - sh[fila]) - 0.14, bh = hh * (0.86 + ((i * 37) % 10) / 100);
-      const mats = [toon(0x6b2f2f), toon(0x6b2f2f), toon(0xf4e6c6), toon(0xf4e6c6), toon(0xffffff, { map: lomoTex(t, i) }), toon(0x6b2f2f)];
+    const bw = 0.105, gap = 0.03, porB = Math.max(8, Math.floor((w - 0.34) / (bw + gap))), cap = porB * 5;    // libros más delgados: caben más por repisa
+    E.items.slice(0, cap * 2).forEach((t, i0) => {
+      const est = i0 < cap ? 0 : 1, i = i0 % cap, G = est ? E.libs2 : E.libs, enEste = Math.min(cap, E.items.length - est * cap);
+      const fila = filas[Math.floor(i / porB)], k = i % porB, n = Math.min(porB, enEste - Math.floor(i / porB) * porB);
+      const tot = n * bw + (n - 1) * gap, x = -tot / 2 + k * (bw + gap) + bw / 2, hh = (sh[fila + 1] - sh[fila]) - 0.14, bh = hh * (0.86 + ((i0 * 37) % 10) / 100);
+      const mats = [toon(0x6b2f2f), toon(0x6b2f2f), toon(0xf4e6c6), toon(0xf4e6c6), toon(0xffffff, { map: lomoTex(t, i0) }), toon(0x6b2f2f)];
       const b = new THREE.Mesh(lomoGeo, mats); b.scale.set(bw, bh, d * 0.78); b.position.set(x, sh[fila] + 0.025 + bh / 2, 0.06); ink(b);
-      b.userData = { t, x0: 0.06, sal: 0 }; E.libs.add(b); E.hit.push(b);
+      b.userData = { t, x0: 0.06, sal: 0 }; G.add(b); E.hit.push(b);
     });
   });
   pintarBarra();
@@ -486,7 +496,9 @@ const cam = { pos: V(0, 3.15, 1.85), look: V(0, 2.3, 0) }; camera.position.copy(
 let tween = null, modo = 'intro', actual = -1;
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 function volar(pos, look, ms = 1800, alto = 0.6) { const p0 = cam.pos.clone(), l0 = cam.look.clone(); return new Promise(res => { tween = { t0: performance.now(), ms, p0, l0, p1: pos.clone(), l1: look.clone(), alto, res }; }); }
-function frenteDe(E) { const n = V(Math.sin(E.ry), 0, Math.cos(E.ry)); const c = V(E.x, 2.05 + (E.y || 0), E.z); return { pos: c.clone().add(n.clone().multiplyScalar(isTouch && innerWidth < innerHeight ? 7.0 : 4.9)).add(V(0, 0.2, 0)), look: c.clone().add(V(0, 0.1, 0)) }; }
+function frenteDe(E) { const n = V(Math.sin(E.ry), 0, Math.cos(E.ry)); const c = V(E.cx != null ? E.cx : E.x, 2.05 + (E.y || 0), E.cz != null ? E.cz : E.z);     // mira al centro de sus dos estantes
+  const lejos = (E.w ? 5.4 : 5.2) * Math.max(1, 1.25 * innerHeight / innerWidth);
+  return { pos: c.clone().add(n.clone().multiplyScalar(lejos)).add(V(0, 0.2, 0)), look: c.clone().add(V(0, 0.1, 0)) }; }
 const wait = ms => new Promise(r => setTimeout(r, ms));
 let saltado = false, libroAbierto = false;
 function animLibro(abrir, ms = 1400) { libroAbierto = abrir; const z0 = izq.rotation.z, z1 = abrir ? 0 : -Math.PI, o0 = brillo.material.opacity, t0 = performance.now();
@@ -531,7 +543,7 @@ addEventListener('keydown', e => { if ($('#libro').classList.contains('on')) { i
 // ===================================================================
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let hover = null, fijo = null, px = 0, py = 0;
 function tocado(cx, cy, lista) { ptr.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera); const h = ray.intersectObjects(lista, false)[0]; return h ? h.object : null; }
-const estanteDe = o => { while (o) { const E = ESTANTES.find(x => x.m === o); if (E) return E; o = o.parent; } return null; };
+const estanteDe = o => { while (o) { const E = ESTANTES.find(x => x.m === o || x.m2 === o); if (E) return E; o = o.parent; } return null; };
 function portadaHtml(t) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39', ty = TIPOS[t.ty] || TIPOS.inv;
   return `<div class="cover" style="background:linear-gradient(135deg, ${col}, ${shade(col, -35)})"><div class="em">${ty[0]}</div><div class="ti">${esc(t.t || 'Trabajo')}</div><div class="orn"></div>${t.th ? `<img class="th" src="${esc(t.th)}" alt="">` : ''}<div class="au">✍️ ${esc(t.n || '')}<small>6.° ${esc(t.sec || '')} · ${esc(ty[1])}</small></div></div>`; }
 function shade(hex, p) { const n = parseInt(hex.slice(1), 16), f = v => Math.max(0, Math.min(255, v + p)); return '#' + ((f(n >> 16) << 16) | (f((n >> 8) & 255) << 8) | f(n & 255)).toString(16).padStart(6, '0'); }
@@ -559,7 +571,7 @@ renderer.domElement.addEventListener('pointerup', e => {
     if (b) { if (e.pointerType === 'mouse') return abrirLibro(b.userData.t); if (fijo === b) return abrirLibro(b.userData.t); fijo = b; hover = b; mostrarTapa(b, e.clientX, e.clientY, true); sonar('tic'); return; }
     cerrarTapa(); }
   if (modo === 'sala' && tocado(e.clientX, e.clientY, [atrilHit])) return abrirInstrucciones();
-  const m = tocado(e.clientX, e.clientY, ESTANTES.map(E => E.m)); const E = m && estanteDe(m);                 // tocar otro estante = ir a ese estante
+  const m = tocado(e.clientX, e.clientY, ESTANTES.flatMap(E => [E.m, E.m2])); const E = m && estanteDe(m);                 // tocar otro estante = ir a ese estante
   if (E) { const i = ESTANTES.indexOf(E); if (i !== actual) irEstante(i); }
 });
 function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39', ty = TIPOS[t.ty] || TIPOS.inv, d = String(t.d || '').trim();
@@ -704,7 +716,7 @@ function panelEditar() {
     } catch (er) { btn.disabled = false; msg.textContent = er.message === 'AUTH' ? '🔐 Conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo guardar. Revisa tu internet.'; } };
 }
 if (DOCENTE) { const b = $('#editar'); b.hidden = false; b.onclick = panelEditar; }
-juntar(scene, [atril, atrilHit, ...aranas, ...ESTANTES.flatMap(E => [E.libs, E.halo, E.placa, E.et])]);
+juntar(scene, [atril, atrilHit, ...aranas, ...ESTANTES.flatMap(E => [E.libs, E.libs2, E.halo, E.halo2, E.placa, E.et])]);
 window.BIB = { renderer, atril, ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, get actual() { return actual; }, camera, scene };
 const listo = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
