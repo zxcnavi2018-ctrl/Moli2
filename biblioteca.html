@@ -110,6 +110,14 @@
   #aviso.on { opacity: 1; }
   @media (max-width: 600px) { #titulo { top: 62px; } }
   @media (max-width: 600px) { #bar button { padding: 8px 10px; font-size: 12px; } #bar .nav { width: 36px; height: 36px; } #tapa { width: 170px; } }
+  /* 🤖 Molí en la Biblioteca: su globito con el mini buscador */
+  #mGlobo { position: fixed; left: 0; top: 0; z-index: 8; width: min(360px, calc(100vw - 24px)); padding: 14px 16px 12px; border-radius: 20px; background: #fffaf0; border: 3px solid #3b2414; box-shadow: 0 8px 0 rgba(59,36,20,.35), 0 18px 40px rgba(0,0,0,.4); font: 700 15px Nunito, system-ui, sans-serif; color: #3b2414; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  #mGlobo.on { opacity: 1; pointer-events: auto; } #mGlobo::after { content: ''; position: absolute; left: var(--tail, 40px); bottom: -14px; width: 22px; height: 22px; background: #fffaf0; border-right: 3px solid #3b2414; border-bottom: 3px solid #3b2414; transform: rotate(45deg); }
+  #mGlobo b.t { display: block; font: 900 17px Cinzel, Georgia, serif; color: #6b2f2f; margin-bottom: 4px; } #mGlobo .x { position: absolute; right: 8px; top: 6px; border: 0; background: none; font-size: 18px; cursor: pointer; color: #6b2f2f; }
+  #mGlobo form { display: flex; gap: 6px; margin-top: 8px; } #mGlobo input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 999px; border: 2px solid #c99a45; font: 800 15px Nunito, sans-serif; color: #3b2414; background: #fff; outline: none; } #mGlobo input:focus { border-color: #6b2f2f; }
+  #mGlobo form button { border: 0; border-radius: 999px; padding: 9px 14px; background: #6b2f2f; color: #ffe7a3; font: 900 14px Nunito, sans-serif; cursor: pointer; }
+  #mGlobo .rs { margin-top: 8px; max-height: 210px; overflow: auto; display: grid; gap: 5px; } #mGlobo .rs button { text-align: left; border: 1.5px solid #e2c48a; background: #fff; border-radius: 12px; padding: 7px 10px; font: 800 14px Nunito, sans-serif; color: #3b2414; cursor: pointer; } #mGlobo .rs button:hover { background: #fdf0d2; }
+  #mGlobo .rs small { display: block; color: #8a6a44; font-weight: 700; font-size: 12px; } #mGlobo .nada { color: #8a6a44; font-size: 14px; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -125,8 +133,10 @@
 <button id="saltar" type="button">Saltar ⏭</button>
 <div id="tapa"></div>
 <div id="aviso"></div>
+<div id="mGlobo" role="dialog" aria-label="Molí te ayuda a buscar"></div>
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="moli3d.js"></script>
 <script>
 (function () {
 'use strict';
@@ -475,7 +485,7 @@ function ponerLibros() {
 async function cargarTrabajos() {
   if (QS.has('demo')) { TRABAJOS = demo(); return ponerLibros(); }
   try {
-    const sel = ['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'at', 'g', 'rv'].map(f => ({ fieldPath: f }));
+    const sel = ['k', 'n', 'sec', 'u', 'ty', 't', 'kw', 'd', 'f', 'link', 'th', 'at', 'g', 'rv'].map(f => ({ fieldPath: f }));
     const r = await fetch(`${BASE}:runQuery?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'revista' }], where: { fieldFilter: { field: { fieldPath: 'st' }, op: 'EQUAL', value: { stringValue: 'ok' } } }, select: { fields: sel }, limit: 300 } }) });
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -659,7 +669,7 @@ function frame() {
   chGeo.attributes.position.needsUpdate = true;
   for (let i = 0; i < NP; i++) { pPos[i * 3 + 1] += Math.sin(T * 0.3 + i) * 0.0015 + 0.002; if (pPos[i * 3 + 1] > 9) pPos[i * 3 + 1] = 0.2; } pGeo.attributes.position.needsUpdate = true;
   brillo.scale.setScalar(3.6 + Math.sin(T * 2) * 0.2); aranas.forEach((a, i) => a.rotation.y = Math.sin(T * 0.4 + i) * 0.05);
-  renderer.render(scene, camera); requestAnimationFrame(frame);
+  renderer.render(scene, camera); moliFrame(T, dt); requestAnimationFrame(frame);
 }
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < innerHeight ? 72 : 58; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 dispatchEvent(new Event('resize'));
@@ -717,8 +727,66 @@ function panelEditar() {
 }
 if (DOCENTE) { const b = $('#editar'); b.hidden = false; b.onclick = panelEditar; }
 juntar(scene, [atril, atrilHit, ...aranas, ...ESTANTES.flatMap(E => [E.libs, E.libs2, E.halo, E.halo2, E.placa, E.et])]);
-window.BIB = { renderer, atril, ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, get actual() { return actual; }, camera, scene };
+window.BIB = { abrirGlobo: () => abrirGlobo(), renderer, atril, ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, get actual() { return actual; }, camera, scene };
 const listo = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+// ===================================================================
+//  🤖 MOLÍ EN LA BIBLIOTECA: el mismo robotito del aula te acompaña (en el piso; arriba, en Décimo y Undécimo, flota).
+//  Al tocarlo abre su globito con un mini buscador: 1 o 2 palabras clave y te lleva al libro.
+// ===================================================================
+const moliScene = new THREE.Scene(); moliScene.add(new THREE.HemisphereLight(0xfffdf8, 0x7f8ba3, 0.6));
+const mKey = new THREE.DirectionalLight(0xfff4e0, 0.85), mRim = new THREE.DirectionalLight(0xffd29a, 0.4), mAim = new THREE.Object3D(); moliScene.add(mKey, mRim, mAim); mKey.target = mAim; mRim.target = mAim;
+const MOLI = window.crearMoli ? crearMoli(THREE, { renderer }) : null, MSB = 0.3;
+const MB = { pos: new THREE.Vector3(1.4, 1.2, 4.6), vel: new THREE.Vector3(), tgt: new THREE.Vector3(), yaw: 0, mov: 0 };
+const _f = new THREE.Vector3(), _r = new THREE.Vector3(), _h = new THREE.Vector3(), _d = new THREE.Vector3();
+if (MOLI) { MOLI.root.scale.setScalar(MSB); moliScene.add(MOLI.root); }
+const mFloor = MOLI && MOLI.root.children.find((c, i) => i > 0 && c.isGroup);
+function moliFrame(t, dt) {
+  if (!MOLI || dt <= 0) return;
+  camera.getWorldDirection(_f); _r.crossVectors(_f, camera.up).normalize();
+  const arriba = camera.position.y > 5.2;                            // en la galería (Décimo y Undécimo) Molí flota
+  MB.tgt.copy(camera.position).addScaledVector(_f, modo === 'estante' ? 2.3 : 2.8).addScaledVector(_r, innerWidth < innerHeight ? 0.55 : 1.25);
+  MB.tgt.y = arriba ? camera.position.y - 0.75 : Math.max(0.55, Math.min(camera.position.y - 0.9, 1.5));
+  for (let n = Math.min(8, Math.ceil(dt / (1 / 60))), h = dt / n, q = 0; q < n; q++) { MB.vel.addScaledVector(_d.copy(MB.tgt).sub(MB.pos), 40 * h).multiplyScalar(Math.exp(-9 * h)); MB.pos.addScaledVector(MB.vel, h); }
+  MOLI.root.position.copy(MB.pos);
+  MB.mov += (Math.max(-1.6, Math.min(1.6, MB.vel.dot(_r) * 2.2)) - MB.mov) * Math.min(1, dt * 6);
+  let want = Math.atan2(camera.position.x - MB.pos.x, camera.position.z - MB.pos.z), dy = want - MB.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); MB.yaw += dy * Math.min(1, dt * 5); MOLI.root.rotation.y = MB.yaw;
+  MOLI.mirar(camera.position);
+  mAim.position.copy(MB.pos); mKey.position.copy(MB.pos).add(_h.set(-1.6, 3, 2.5).applyQuaternion(camera.quaternion)); mRim.position.copy(MB.pos).add(_d.set(2, 1.6, -3).applyQuaternion(camera.quaternion));
+  if (mFloor) { const piso = arriba ? 4.66 : 0, hh = MB.pos.y - piso; mFloor.position.y = -hh / MSB; mFloor.visible = !arriba && hh < 1.6; }
+  MOLI.update(t, dt, MB.mov);
+  renderer.autoClear = false; renderer.render(moliScene, camera); renderer.autoClear = true;     // se dibuja encima respetando lo que está delante
+  if (globo.classList.contains('on')) {                               // el globito sigue a Molí, arriba de su cabeza
+    MOLI.root.updateMatrixWorld(); _h.set(0, 2.1, 0).applyMatrix4(MOLI.root.matrixWorld).project(camera);
+    const x = (_h.x + 1) / 2 * innerWidth, y = (1 - _h.y) / 2 * innerHeight, w = globo.offsetWidth, hg = globo.offsetHeight;
+    const left = Math.max(10, Math.min(innerWidth - w - 10, x - w + 60)), top = Math.max(10, Math.min(innerHeight - hg - 90, y - hg - 16));
+    globo.style.transform = `translate(${left.toFixed(1)}px, ${top.toFixed(1)}px)`; globo.style.setProperty('--tail', Math.max(16, Math.min(w - 36, x - left - 11)).toFixed(0) + 'px');
+  }
+}
+const globo = $('#mGlobo');
+const sinTilde = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+function abrirGlobo(hola) {
+  globo.innerHTML = `<button class="x" type="button" aria-label="Cerrar">✕</button><b class="t">🔎 ¡Hola! Soy Molí</b>${hola ? `<span>${hola}</span>` : `<span>¿Qué deseas encontrar? Escribe <b>1 o 2 palabras clave</b>.</span><form><input name="q" maxlength="40" placeholder="Ej.: levadura, bacterias" autocomplete="off"><button type="submit">Buscar</button></form><div class="rs"></div>`}`;
+  globo.classList.add('on'); if (!hola) { const i = globo.querySelector('input'); setTimeout(() => i.focus(), 60); MOLI && (MOLI.expr('feliz'), MOLI.accion('saludar', 1)); setTimeout(() => MOLI && MOLI.expr('normal'), 1800); }
+}
+const cerrarGlobo = () => { globo.classList.remove('on'); if (globo.contains(document.activeElement)) document.activeElement.blur(); };
+function buscarMoli(q) {
+  const P = sinTilde(q).split(/[\s,]+/).filter(x => x.length > 1).slice(0, 2), rs = globo.querySelector('.rs'); if (!rs) return;
+  if (!P.length) { rs.innerHTML = '<p class="nada">✏️ Escribe una o dos palabras, por ejemplo: <b>levadura</b>.</p>'; return; }
+  const R = TRABAJOS.filter(t => { const txt = sinTilde([t.t, t.kw, t.n].join(' ')); return P.every(p => txt.includes(p)); }).slice(0, 8);
+  MOLI && MOLI.expr(R.length ? 'estrellas' : 'pensativo'); setTimeout(() => MOLI && MOLI.expr('normal'), 2000);
+  rs.innerHTML = R.length ? R.map(t => `<button type="button" data-id="${esc(t.id)}">📖 ${esc(t.t || 'Trabajo')}<small>${esc(t.n || '')} · ${esc((ESTANTES.find(E => E.g === (+t.g || 6)) || ESTANTES[0]).n)}</small></button>`).join('')
+    : `<p class="nada">🤔 No encontré trabajos con «${esc(q)}». Prueba con otra palabra.</p>`;
+}
+globo.addEventListener('submit', e => { e.preventDefault(); buscarMoli(e.target.elements.q.value); });
+globo.addEventListener('click', async e => { if (e.target.closest('.x')) return cerrarGlobo();
+  const b = e.target.closest('[data-id]'); if (!b) return; const t = TRABAJOS.find(x => x.id === b.dataset.id); if (!t) return;
+  cerrarGlobo(); const i = ESTANTES.findIndex(E => E.g === (+t.g || 6)); if (i >= 0 && i !== actual) { await irEstante(i); await wait(300); } abrirLibro(t); });
+globo.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarGlobo(); return; } if (globo.classList.contains('on')) e.stopPropagation(); });   // al escribir no se mueven los estantes
+const mRay = new THREE.Raycaster(), mNdc = new THREE.Vector2();
+addEventListener('pointerup', e => { if (!MOLI || modo === 'intro' || $('#libro').classList.contains('on') || e.target !== renderer.domElement) return;
+  mNdc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); mRay.setFromCamera(mNdc, camera);
+  if (mRay.intersectObject(MOLI.root, true).length) { e.stopImmediatePropagation(); globo.classList.contains('on') ? cerrarGlobo() : abrirGlobo(); } }, true);
+setTimeout(() => { if (!globo.classList.contains('on') && modo !== 'intro') { abrirGlobo('¡Tócame si buscas un trabajo! Te ayudo a encontrarlo. 📚'); setTimeout(() => { if (!globo.querySelector('form')) cerrarGlobo(); }, 4500); } }, 9000);
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
