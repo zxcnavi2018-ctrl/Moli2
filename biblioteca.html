@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Biblioteca Educativa · Molí</title>
+<meta name="theme-color" content="#3b2414">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;800&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --oro: #e9c46a; --oro2: #b8862f; --tinta: #2b1a0e; --crema: #fff8ea; --vino: #8c2f39; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #2a180c; font-family: Nunito, system-ui, sans-serif; color: var(--tinta); }
+  canvas { display: block; touch-action: none; }
+  button { font: inherit; cursor: pointer; }
+  /* ---- título ---- */
+  #titulo { position: fixed; left: 50%; top: max(14px, env(safe-area-inset-top)); transform: translate(-50%, -30px); opacity: 0; pointer-events: none; text-align: center; transition: opacity 1.2s, transform 1.2s cubic-bezier(.2,.9,.3,1.2); z-index: 5; width: min(92vw, 760px); }
+  #titulo.on { opacity: 1; transform: translate(-50%, 0); }
+  #titulo small { display: block; font: 800 clamp(10px, 1.6vw, 14px) Cinzel, serif; letter-spacing: .4em; color: #f6e2b3; text-shadow: 0 2px 8px rgba(0,0,0,.6); }
+  #titulo h1 { margin: 2px 0 0; font: 900 clamp(22px, 4.6vw, 50px)/1.05 "Cinzel Decorative", Cinzel, serif; color: #ffe7a3; letter-spacing: .03em;
+    background: linear-gradient(180deg, #fff6cf 0%, #f3cf73 45%, #b8862f 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 3px 0 #3b2414) drop-shadow(0 8px 18px rgba(0,0,0,.55)); }
+  #titulo .orla { display: block; height: 14px; margin: 4px auto 0; width: 70%; background: radial-gradient(circle at 50% 50%, #f3cf73 0 3px, transparent 4px) center/18px 14px repeat-x; opacity: .9; }
+  /* ---- banner de escena ---- */
+  #escena { position: fixed; left: 50%; top: 46%; transform: translate(-50%, -50%) scale(.85); opacity: 0; pointer-events: none; z-index: 6; text-align: center; transition: opacity .5s, transform .6s cubic-bezier(.2,.9,.3,1.25); }
+  #escena.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  #escena div { padding: 14px 34px 16px; border-radius: 14px; background: linear-gradient(180deg, rgba(59,36,20,.92), rgba(34,20,10,.92)); border: 3px solid var(--oro); box-shadow: 0 0 0 6px rgba(43,26,14,.55), 0 20px 50px rgba(0,0,0,.5); }
+  #escena small { display: block; font: 800 clamp(11px, 1.6vw, 14px) Cinzel, serif; letter-spacing: .45em; color: #f6e2b3; }
+  #escena b { display: block; font: 900 clamp(22px, 4.4vw, 46px)/1.1 "Cinzel Decorative", Cinzel, serif; color: #ffe7a3; letter-spacing: .04em; }
+  /* ---- barra de grados ---- */
+  #bar { position: fixed; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translate(-50%, 30px); opacity: 0; pointer-events: none; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 999px; background: rgba(43,26,14,.82); border: 2px solid rgba(233,196,106,.7); box-shadow: 0 12px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px); transition: opacity .6s, transform .6s; max-width: calc(100vw - 20px); }
+  #bar.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  #bar .g { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; } #bar .g::-webkit-scrollbar { display: none; }
+  #bar button { border: 0; border-radius: 999px; padding: 9px 14px; background: transparent; color: #f6e2b3; font: 800 14px Cinzel, serif; letter-spacing: .06em; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  #bar button i { font-style: normal; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: rgba(233,196,106,.2); color: #ffe7a3; font: 900 12px Nunito, sans-serif; display: grid; place-items: center; }
+  #bar button:hover { background: rgba(233,196,106,.16); }
+  #bar button.on { background: linear-gradient(180deg, #f3cf73, #b8862f); color: #2b1a0e; } #bar button.on i { background: rgba(43,26,14,.18); color: #2b1a0e; }
+  #bar .nav { width: 42px; height: 42px; padding: 0; justify-content: center; font-size: 18px; background: rgba(233,196,106,.18); flex: none; }
+  #bar .todo { flex: none; }
+  /* ---- volver ---- */
+  #volver { position: fixed; left: max(12px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top)); z-index: 7; border: 2px solid rgba(233,196,106,.8); border-radius: 999px; padding: 8px 14px 8px 10px; background: rgba(43,26,14,.8); color: #f6e2b3; font: 800 14px Nunito, sans-serif; display: flex; align-items: center; gap: 6px; text-decoration: none; backdrop-filter: blur(6px); }
+  #volver:hover { background: rgba(70,42,22,.9); }
+  #sonido { position: fixed; right: max(12px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top)); z-index: 7; width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(233,196,106,.8); background: rgba(43,26,14,.8); color: #f6e2b3; font-size: 18px; }
+  #saltar { position: fixed; right: 16px; bottom: 18px; z-index: 7; border: 2px solid rgba(233,196,106,.7); border-radius: 999px; padding: 8px 16px; background: rgba(43,26,14,.7); color: #f6e2b3; font: 800 13px Nunito, sans-serif; transition: opacity .4s; }
+  /* ---- tarjeta: libro cerrado al pasar el cursor ---- */
+  #tapa { position: fixed; z-index: 8; width: 210px; pointer-events: none; opacity: 0; transform: translateY(8px) scale(.92); transition: opacity .2s, transform .25s cubic-bezier(.2,.9,.3,1.3); }
+  #tapa.on { opacity: 1; transform: none; }
+  #tapa.fijo { pointer-events: auto; }
+  .cover { position: relative; aspect-ratio: 3 / 4; border-radius: 4px 12px 12px 4px; padding: 16px 14px 14px 22px; color: #fff8ea; display: flex; flex-direction: column; box-shadow: inset 7px 0 0 rgba(0,0,0,.22), inset 9px 0 0 rgba(255,255,255,.12), 0 18px 40px rgba(0,0,0,.55); overflow: hidden; }
+  .cover::before { content: ''; position: absolute; inset: 8px 8px 8px 16px; border: 1.5px solid rgba(255,231,163,.75); border-radius: 3px 8px 8px 3px; pointer-events: none; }
+  .cover::after { content: ''; position: absolute; inset: 0; background: radial-gradient(120% 80% at 80% 0%, rgba(255,255,255,.18), transparent 55%); pointer-events: none; }
+  .cover .em { font-size: 34px; margin: 6px 0 4px; text-align: center; filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
+  .cover .ti { font: 800 16px/1.2 Cinzel, serif; text-align: center; color: #ffe7a3; text-shadow: 0 2px 0 rgba(0,0,0,.3); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .cover .orn { height: 10px; margin: 8px auto; width: 60%; background: radial-gradient(circle, #f3cf73 0 2px, transparent 3px) center/12px 10px repeat-x; }
+  .cover .au { margin-top: auto; text-align: center; font: 800 13px Nunito, sans-serif; color: #fff8ea; }
+  .cover .au small { display: block; font-weight: 700; opacity: .8; font-size: 11px; margin-top: 2px; }
+  .cover .th { width: 100%; height: 64px; object-fit: cover; border-radius: 6px; border: 2px solid rgba(255,231,163,.6); margin-top: 6px; }
+  #tapa .hint { margin-top: 8px; text-align: center; font: 800 12px Nunito, sans-serif; color: #ffe7a3; text-shadow: 0 2px 6px rgba(0,0,0,.8); }
+  #tapa .abrir { display: none; margin: 8px auto 0; border: 0; border-radius: 999px; padding: 9px 16px; background: linear-gradient(180deg, #f3cf73, #b8862f); color: #2b1a0e; font: 900 14px Nunito, sans-serif; box-shadow: 0 4px 0 #6b4a1c; }
+  #tapa.fijo .abrir { display: block; } #tapa.fijo .hint { display: none; }
+  /* ---- libro abierto ---- */
+  #libro { position: fixed; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; padding: 16px; background: radial-gradient(circle at 50% 40%, rgba(60,36,18,.55), rgba(10,6,3,.85)); }
+  #libro.on { display: flex; animation: fade .3s ease-out; }
+  @keyframes fade { from { opacity: 0; } }
+  .ab { position: relative; width: min(980px, 100%); max-height: calc(100vh - 32px); display: grid; grid-template-columns: 1fr 1fr; padding: 14px; border-radius: 14px; background: var(--c, #6b2f2f); box-shadow: 0 30px 80px rgba(0,0,0,.6), inset 0 0 0 3px rgba(255,231,163,.5); perspective: 1800px; }
+  .pg { position: relative; background: linear-gradient(90deg, #f7ecd4, #fff8ea 12%, #fff8ea 88%, #f0e2c4); padding: 26px 28px 22px; overflow: auto; min-height: 420px; color: #3b2414; }
+  .pg.l { border-radius: 6px 0 0 6px; box-shadow: inset -18px 0 24px -14px rgba(90,60,30,.45); transform-origin: right center; animation: abrirL .9s cubic-bezier(.2,.8,.2,1); }
+  .pg.r { border-radius: 0 6px 6px 0; box-shadow: inset 18px 0 24px -14px rgba(90,60,30,.45); }
+  @keyframes abrirL { from { transform: rotateY(-100deg); opacity: .4; } }
+  .pg::after { content: ''; position: absolute; left: 0; right: 0; bottom: 8px; height: 0; }
+  .pg h2 { margin: 0 0 6px; font: 800 clamp(20px, 2.6vw, 30px)/1.15 Cinzel, serif; color: #6b2f2f; }
+  .pg .cap { float: left; font: 900 64px/0.85 "Cinzel Decorative", serif; color: #b8862f; margin: 4px 8px 0 0; text-shadow: 2px 2px 0 #f3cf73; }
+  .pg p { font-size: 16px; line-height: 1.55; margin: 0 0 12px; white-space: pre-wrap; }
+  .pg .meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 14px; }
+  .pg .meta span { padding: 4px 10px; border-radius: 999px; background: #f3e3c0; border: 1px solid #d9bd85; font-weight: 800; font-size: 13px; }
+  .pg .autor { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding-top: 12px; border-top: 1.5px dashed #d9bd85; }
+  .pg .autor i { width: 42px; height: 42px; border-radius: 50%; background: var(--c, #6b2f2f); color: #ffe7a3; display: grid; place-items: center; font: 900 16px Cinzel, serif; font-style: normal; }
+  .pg .autor b { display: block; font-size: 16px; } .pg .autor small { color: #7a5a3a; font-weight: 700; }
+  .pg img.foto { width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; background: #f3e3c0; border: 2px solid #d9bd85; cursor: zoom-in; }
+  .pg .ver { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 10px 16px; border-radius: 999px; background: #6b2f2f; color: #ffe7a3; font-weight: 900; text-decoration: none; }
+  .pg .sello { position: absolute; right: 18px; bottom: 14px; font: 800 11px Cinzel, serif; letter-spacing: .2em; color: #b8862f; opacity: .8; }
+  .ab .cerrar { position: absolute; right: -10px; top: -12px; width: 44px; height: 44px; border-radius: 50%; border: 3px solid #3b2414; background: #f3cf73; color: #3b2414; font: 900 18px system-ui; box-shadow: 0 4px 0 #3b2414; z-index: 2; }
+  @media (max-width: 720px) { .ab { grid-template-columns: 1fr; overflow: auto; } .pg { min-height: 0; } .pg.l { border-radius: 6px 6px 0 0; transform-origin: center top; } .pg.r { border-radius: 0 0 6px 6px; } @keyframes abrirL { from { transform: rotateX(80deg); } } }
+  /* ---- cargando ---- */
+  #carga { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: radial-gradient(circle at 50% 45%, #5a3a1e, #1c0f06); color: #f6e2b3; transition: opacity .8s; }
+  #carga div { text-align: center; font: 800 16px Cinzel, serif; letter-spacing: .2em; }
+  #carga span { display: block; font-size: 46px; margin-bottom: 10px; animation: flot 1.6s ease-in-out infinite; }
+  @keyframes flot { 50% { transform: translateY(-10px) rotate(-4deg); } }
+  #aviso { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 6; padding: 10px 18px; border-radius: 999px; background: rgba(43,26,14,.86); border: 2px solid rgba(233,196,106,.7); color: #f6e2b3; font: 800 14px Nunito, sans-serif; text-align: center; opacity: 0; transition: opacity .4s; pointer-events: none; max-width: calc(100vw - 24px); }
+  #aviso.on { opacity: 1; }
+  @media (max-width: 600px) { #titulo { top: 62px; } }
+  @media (max-width: 600px) { #bar button { padding: 8px 10px; font-size: 12px; } #bar .nav { width: 36px; height: 36px; } #tapa { width: 170px; } }
+</style>
+</head>
+<body>
+<div id="carga"><div><span>📖</span>Abriendo la biblioteca…</div></div>
+<a id="volver" href="index.html">← Volver al aula</a>
+<button id="sonido" type="button" aria-label="Sonido">🔊</button>
+<div id="titulo"><small>INNOVA SCHOOLS · CIENCIA Y TECNOLOGÍA</small><h1>La Biblioteca Educativa</h1><span class="orla"></span></div>
+<div id="escena"><div><small>ESCENA</small><b></b></div></div>
+<div id="bar"><button class="nav" type="button" data-nav="-1" aria-label="Estante anterior">◀</button><div class="g"></div><button class="nav" type="button" data-nav="1" aria-label="Estante siguiente">▶</button><button class="todo" type="button" data-todo="1">🏛️ Toda</button></div>
+<button id="saltar" type="button">Saltar ⏭</button>
+<div id="tapa"></div>
+<div id="aviso"></div>
+<div id="libro"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+'use strict';
+// ===================================================================
+//  LA BIBLIOTECA EDUCATIVA
+//   · Al entrar: el libro mágico del atril se abre y la cámara se aleja para mostrar toda la biblioteca.
+//   · 6 estantes: Sexto y Séptimo (izquierda), Octavo y Noveno (derecha), Décimo y Undécimo (al fondo).
+//   · Cada trabajo aprobado en la Revista Innovadora aparece solo como un libro en el estante de su grado.
+// ===================================================================
+const FB = { apiKey: 'AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM', projectId: 'ciencia6abcd' };
+const BASE = `https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents`;
+const QS = new URLSearchParams(location.search);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = s => document.querySelector(s);
+const isTouch = matchMedia('(pointer: coarse)').matches;
+const LOW = isTouch || /[?&]low/.test(location.search);
+
+// ---- los 6 estantes (como en el dibujo de la profe) ----
+const GRADOS = [
+  { g: 6, n: 'SEXTO', t: 'Sexto grado', x: -6.35, z: 2.6, ry: Math.PI / 2, c: 0x8c2f39 },
+  { g: 7, n: 'SÉPTIMO', t: 'Séptimo grado', x: -6.35, z: -5.6, ry: Math.PI / 2, c: 0x2f5d8c },
+  { g: 8, n: 'OCTAVO', t: 'Octavo grado', x: 6.35, z: -5.6, ry: -Math.PI / 2, c: 0x3d7a4a },
+  { g: 9, n: 'NOVENO', t: 'Noveno grado', x: 6.35, z: 2.6, ry: -Math.PI / 2, c: 0x6b4a8c },
+  { g: 10, n: 'DÉCIMO', t: 'Décimo grado', x: -3.3, z: -15.35, ry: 0, c: 0x9a5b22 },
+  { g: 11, n: 'UNDÉCIMO', t: 'Undécimo grado', x: 3.3, z: -15.35, ry: 0, c: 0x1f6f78 }];
+const COL_SEC = { A: '#8c2f39', B: '#2f5d8c', C: '#3d7a4a', D: '#9a5b22', E: '#6b4a8c', F: '#1f6f78' };
+const TIPOS = { inv: ['🔬', 'Investigación'], pro: ['🛠️', 'Producto'], maq: ['🧩', 'Maqueta'], info: ['🖼️', 'Infografía'], vid: ['🎬', 'Video'], exp: ['⚗️', 'Experimento'] };
+const UNIDADES = { unit7: 'Unidad 7 · Microorganismos', unit8: 'Unidad 8 · Sistema reproductor', otra: 'Otro tema de Ciencia' };
+
+// ===================================================================
+//  ESCENA
+// ===================================================================
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x3a2414);
+scene.fog = new THREE.Fog(0x4a2f1a, 22, 46);
+const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.05, 120);
+const renderer = new THREE.WebGLRenderer({ antialias: !LOW, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, LOW ? 1.25 : 2));
+renderer.setSize(innerWidth, innerHeight);
+document.body.prepend(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xfff1d6, 0x6b4426, 0.62));
+scene.add(new THREE.AmbientLight(0xffe2b8, 0.22));
+const key = new THREE.DirectionalLight(0xfff0d0, 0.5); key.position.set(-4, 12, 8); scene.add(key);
+const glowLight = new THREE.PointLight(0xffd27a, 0, 9, 1.6); glowLight.position.set(0, 2.4, 0.2); scene.add(glowLight);
+const lampA = new THREE.PointLight(0xffc98a, 0.7, 18, 1.5); lampA.position.set(0, 6.6, 3.5); scene.add(lampA);
+const lampB = new THREE.PointLight(0xffc98a, 0.6, 18, 1.5); lampB.position.set(0, 6.6, -9); scene.add(lampB);
+
+const TOON_GRAD = (() => { const t = new THREE.DataTexture(new Uint8Array([120, 190, 245]), 3, 1, THREE.LuminanceFormat); t.minFilter = t.magFilter = THREE.NearestFilter; t.generateMipmaps = false; t.needsUpdate = true; return t; })();
+const toon = (color, o = {}) => new THREE.MeshToonMaterial(Object.assign({ color, gradientMap: TOON_GRAD }, o));
+const INK = new THREE.MeshBasicMaterial({ color: 0x2b1a0e, side: THREE.BackSide });
+INK.onBeforeCompile = sh => { sh.vertexShader = sh.vertexShader.replace('#include <project_vertex>', `vec4 wp = modelMatrix * vec4(transformed, 1.0); vec3 dir = normalize(mat3(modelMatrix) * normal); float dd = max(0.1, -(viewMatrix * wp).z); wp.xyz += dir * (0.003 + dd * 0.0022); vec4 mvPosition = viewMatrix * wp; gl_Position = projectionMatrix * mvPosition;`); };
+const ink = m => { if (!LOW) m.add(new THREE.Mesh(m.geometry, INK)); return m; };
+const box = (w, h, d, mat, x = 0, y = 0, z = 0, parent, outline = true) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); if (outline) ink(m); if (parent) parent.add(m); return m; };
+function canvasTex(w, h, draw, rep) { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); draw(g, w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 4; if (rep) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep[0], rep[1]); } return t; }
+let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+
+// ---- maderas y dorados (colores suaves) ----
+const MAD = toon(0x8a5530), MAD_OSC = toon(0x5e3518), MAD_CLARA = toon(0xb07a45), ORO = toon(0xb08236), CREMA = toon(0xf3e3c4);
+const PARQUET = canvasTex(512, 512, (g, w, h) => {
+  g.fillStyle = '#9b6a3c'; g.fillRect(0, 0, w, h);
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) { const v = 0.85 + rnd() * 0.25; g.fillStyle = `rgb(${155 * v | 0},${104 * v | 0},${58 * v | 0})`;
+    if ((x + y) % 2) g.fillRect(x * 64 + 2, y * 64 + 2, 60, 28), g.fillRect(x * 64 + 2, y * 64 + 34, 60, 28); else g.fillRect(x * 64 + 2, y * 64 + 2, 28, 60), g.fillRect(x * 64 + 34, y * 64 + 2, 28, 60); }
+  g.globalAlpha = .08; for (let i = 0; i < 300; i++) { g.fillStyle = rnd() < .5 ? '#000' : '#fff'; g.fillRect(rnd() * w, rnd() * h, rnd() * 40, 1); } }, [10, 18]);
+const ALFOMBRA = canvasTex(256, 512, (g, w, h) => {
+  g.fillStyle = '#8c2f39'; g.fillRect(0, 0, w, h); g.strokeStyle = '#e0b45a'; g.lineWidth = 8; g.strokeRect(16, -10, w - 32, h + 20); g.lineWidth = 2; g.strokeRect(30, -10, w - 60, h + 20);
+  g.fillStyle = 'rgba(224,180,90,.45)'; for (let y = 32; y < h; y += 64) { g.beginPath(); g.moveTo(w / 2, y - 18); g.lineTo(w / 2 + 18, y); g.lineTo(w / 2, y + 18); g.lineTo(w / 2 - 18, y); g.fill(); } }, [1, 6]);
+
+// ===================================================================
+//  LA SALA: piso, alfombra, paredes, galería y bóveda pintada
+// ===================================================================
+const HALL = { x: 7, z0: 10, z1: -16 };
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(HALL.x * 2, HALL.z0 - HALL.z1), toon(0xffffff, { map: PARQUET }));
+piso.rotation.x = -Math.PI / 2; piso.position.z = (HALL.z0 + HALL.z1) / 2; scene.add(piso);
+const alf = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 24), toon(0xffffff, { map: ALFOMBRA })); alf.rotation.x = -Math.PI / 2; alf.position.set(0, 0.012, -3); scene.add(alf);
+// paredes de fondo (detrás de los estantes) y pared del fondo
+const PARED = toon(0x6a4024);
+[-1, 1].forEach(s => { const p = new THREE.Mesh(new THREE.PlaneGeometry(HALL.z0 - HALL.z1, 12), PARED); p.rotation.y = -s * Math.PI / 2; p.position.set(s * HALL.x, 6, (HALL.z0 + HALL.z1) / 2); scene.add(p); });
+const fondo = new THREE.Mesh(new THREE.PlaneGeometry(HALL.x * 2, 12), PARED); fondo.position.set(0, 6, HALL.z1); scene.add(fondo);
+const frente = new THREE.Mesh(new THREE.PlaneGeometry(HALL.x * 2, 12), PARED); frente.rotation.y = Math.PI; frente.position.set(0, 6, HALL.z0); scene.add(frente);
+// bóveda con fresco (cielo suave, nubes y marcos dorados)
+const FRESCO = canvasTex(1024, 512, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#c9dcef'); gr.addColorStop(.5, '#f6dfb8'); gr.addColorStop(1, '#c9dcef'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 70; i++) { const x = rnd() * w, y = h * (.2 + rnd() * .6), r = 20 + rnd() * 60; const cg = g.createRadialGradient(x, y, 0, x, y, r); cg.addColorStop(0, 'rgba(255,255,255,.75)'); cg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = cg; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+  g.strokeStyle = '#c99a45'; g.lineWidth = 14; for (let x = 0; x <= w; x += 128) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+  g.lineWidth = 18; g.beginPath(); g.moveTo(0, 8); g.lineTo(w, 8); g.moveTo(0, h - 8); g.lineTo(w, h - 8); g.stroke();
+  g.fillStyle = '#e8c46e'; for (let x = 64; x < w; x += 128) { g.beginPath(); g.arc(x, h / 2, 16, 0, 7); g.fill(); } }, [3, 1]);
+const bovGeo = new THREE.CylinderGeometry(HALL.x, HALL.x, HALL.z0 - HALL.z1, 40, 1, true, Math.PI / 2, Math.PI); bovGeo.rotateX(Math.PI / 2);
+const boveda = new THREE.Mesh(bovGeo, new THREE.MeshBasicMaterial({ map: FRESCO, side: THREE.BackSide })); boveda.scale.set(1, 0.42, 1); boveda.position.set(0, 8.6, (HALL.z0 + HALL.z1) / 2); scene.add(boveda);
+
+// ===================================================================
+//  ESTANTES: el marco de madera + libros de relleno (todos en UN solo dibujo)
+// ===================================================================
+const LIBROS_MAX = LOW ? 2600 : 5200;
+const libros = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), toon(0xffffff), LIBROS_MAX); let nLib = 0;
+const COLS = ['#7d2e35', '#8f4a2a', '#3f5e4a', '#2f4a6b', '#6b4a6b', '#a3773a', '#5a3a26', '#cdb48a', '#946b47', '#4a6670', '#a85a4a', '#d9c3a0'];
+const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _c = new THREE.Color();
+function libroRelleno(world, x, y, z, w, h, d, tilt) {
+  if (nLib >= LIBROS_MAX) return; _e.set(0, 0, tilt || 0); _q.setFromEuler(_e);
+  _m.compose(new THREE.Vector3(x, y, z), _q, new THREE.Vector3(w, h, d)).premultiply(world); libros.setMatrixAt(nLib, _m); libros.setColorAt(nLib, _c.set(COLS[(rnd() * COLS.length) | 0]).multiplyScalar(0.85 + rnd() * 0.25)); nLib++;
+}
+// mueble: ancho w, alto h, fondo d, nShelves baldas. «reservar» = baldas que quedan vacías (ahí van los trabajos).
+function mueble({ w, h, d = 0.55, n = 5, reservar = [], corona = true, relleno = 0.92 }) {
+  const g = new THREE.Group();
+  const tb = 0.08;
+  box(tb, h, d, MAD_OSC, -w / 2 + tb / 2, h / 2, 0, g); box(tb, h, d, MAD_OSC, w / 2 - tb / 2, h / 2, 0, g);
+  box(w, 0.04, d * 0.98, MAD, 0, h / 2, -d / 2 + 0.02, g, false).scale.set(1, h / 0.04, 0.05);           // fondo
+  box(w + 0.14, 0.16, d + 0.1, MAD_OSC, 0, 0.08, 0.02, g);                                             // zócalo
+  const sh = []; for (let i = 0; i <= n; i++) { const y = 0.16 + i * (h - 0.3) / n; sh.push(y); box(w - tb * 2, 0.05, d * 0.94, MAD, 0, y, 0.01, g, i === 0 || i === n); }
+  if (corona) { box(w + 0.24, 0.14, d + 0.18, MAD_OSC, 0, h + 0.04, 0.04, g); box(w + 0.1, 0.06, d + 0.1, ORO, 0, h - 0.06, 0.05, g, false); }
+  g.userData.fill = () => {                                                                             // libros de relleno (después de colocar el mueble)
+    g.updateMatrixWorld(true); const W = g.matrixWorld;
+    for (let i = 0; i < n; i++) {
+      if (reservar.includes(i)) continue; const y0 = sh[i] + 0.025, hh = (h - 0.3) / n - 0.08; let x = -w / 2 + tb + 0.02;
+      while (x < w / 2 - tb - 0.06) {
+        if (rnd() > relleno) { x += 0.05 + rnd() * 0.12; continue; }
+        const bw = 0.05 + rnd() * 0.06, bh = hh * (0.62 + rnd() * 0.36), bd = d * (0.6 + rnd() * 0.3), lean = rnd() < 0.06 ? (rnd() - .5) * .5 : 0;
+        if (x + bw > w / 2 - tb - 0.02) break;
+        libroRelleno(W, x + bw / 2, y0 + bh / 2, 0.02 + (d * 0.94 - bd) / 2 - 0.02, bw, bh, bd, lean); x += bw + 0.004 + (lean ? 0.03 : 0);
+      }
+    }
+  };
+  g.userData.sh = sh; g.userData.w = w; g.userData.h = h; g.userData.d = d;
+  return g;
+}
+const rellenar = []; const sala = new THREE.Group(); scene.add(sala);
+function colocar(m, x, y, z, ry) { m.position.set(x, y, z); m.rotation.y = ry; sala.add(m); rellenar.push(m); return m; }
+// columnas con capitel dorado
+function columna(x, z, h) { const g = new THREE.Group(); box(0.42, h, 0.42, MAD_OSC, 0, h / 2, 0, g); box(0.56, 0.18, 0.56, ORO, 0, h - 0.1, 0, g); box(0.56, 0.22, 0.56, MAD_OSC, 0, 0.11, 0, g);
+  const s = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, h * 0.82, 8), MAD_CLARA); s.position.set(0, h / 2, 0.22); g.add(s); g.position.set(x, 0, z); sala.add(g); }
+// paredes laterales: estantes bajos + galería + estantes altos
+const GZ = GRADOS.filter(q => q.ry !== 0).map(q => q.z);
+[-1, 1].forEach(s => {
+  const x = s * (HALL.x - 0.3), ry = -s * Math.PI / 2;
+  for (let z = 8.4; z > -14.5; z -= 3.3) {
+    if (!GZ.some(gz => Math.abs(gz - z) < 1.7)) colocar(mueble({ w: 3.1, h: 4.1, n: 6 }), x, 0, z, ry);
+    colocar(mueble({ w: 3.1, h: 3.2, n: 5, corona: false }), x, 4.75, z, ry);
+    columna(s * (HALL.x - 0.45), z - 1.65, 8.2);
+  }
+  // galería (balcón) con baranda
+  box(1.5, 0.22, HALL.z0 - HALL.z1, MAD_OSC, s * (HALL.x - 0.75), 4.55, (HALL.z0 + HALL.z1) / 2, sala);
+  box(0.12, 0.12, HALL.z0 - HALL.z1, ORO, s * (HALL.x - 1.48), 5.55, (HALL.z0 + HALL.z1) / 2, sala, false);
+  box(0.16, 0.1, HALL.z0 - HALL.z1, MAD_OSC, s * (HALL.x - 1.48), 5.6, (HALL.z0 + HALL.z1) / 2, sala);
+});
+const bal = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.035, 0.05, 0.9, 6), MAD_CLARA, 2 * 60); let nb = 0;
+[-1, 1].forEach(s => { for (let z = HALL.z0 - 0.2; z > HALL.z1; z -= 0.42) { if (nb >= 120) break; _m.makeTranslation(s * (HALL.x - 1.48), 5.1, z); bal.setMatrixAt(nb++, _m); } }); bal.count = nb; sala.add(bal);
+// pared del fondo: puerta en arco con luz + estantes de Décimo y Undécimo + ventanal
+(function () {
+  const z = HALL.z1 + 0.01;
+  const luz = canvasTex(256, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#f6dca6'); gr.addColorStop(1, '#c98f4a'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = 'rgba(255,240,200,.35)'; for (let i = 0; i < 6; i++) g.fillRect(40 + i * 34, 0, 10, h); });
+  const arcoSh = new THREE.Shape(); arcoSh.moveTo(-1.2, 0); arcoSh.lineTo(-1.2, 3.4); arcoSh.absarc(0, 3.4, 1.2, Math.PI, 0, true); arcoSh.lineTo(1.2, 0); arcoSh.lineTo(-1.2, 0);
+  const puerta = new THREE.Mesh(new THREE.ShapeGeometry(arcoSh, 24), new THREE.MeshBasicMaterial({ map: luz })); puerta.position.set(0, 0, z + 0.02); scene.add(puerta);
+  const marco = new THREE.Mesh(new THREE.TorusGeometry(1.32, 0.12, 8, 32, Math.PI), ORO); marco.position.set(0, 3.4, z + 0.06); scene.add(marco);
+  box(0.24, 3.4, 0.2, MAD_OSC, -1.32, 1.7, z + 0.08); box(0.24, 3.4, 0.2, MAD_OSC, 1.32, 1.7, z + 0.08);
+  const ven = new THREE.Mesh(new THREE.CircleGeometry(1.5, 40), new THREE.MeshBasicMaterial({ map: canvasTex(256, 256, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 10, w / 2, w / 2, w / 2); gr.addColorStop(0, '#fff8de'); gr.addColorStop(1, '#f0c27c'); g.fillStyle = gr; g.fillRect(0, 0, w, w); g.strokeStyle = '#8a5530'; g.lineWidth = 10; for (let a = 0; a < 8; a++) { g.beginPath(); g.moveTo(w / 2, w / 2); g.lineTo(w / 2 + Math.cos(a * Math.PI / 4) * w, w / 2 + Math.sin(a * Math.PI / 4) * w); g.stroke(); } g.beginPath(); g.arc(w / 2, w / 2, 40, 0, 7); g.stroke(); }) }));
+  ven.position.set(0, 7.4, z + 0.03); scene.add(ven);
+  const anillo = new THREE.Mesh(new THREE.TorusGeometry(1.55, 0.12, 8, 40), ORO); anillo.position.set(0, 7.4, z + 0.08); scene.add(anillo);
+  colocar(mueble({ w: 3.2, h: 3.0, n: 4, corona: false }), -5.2, 4.75, HALL.z1 + 0.3, 0); colocar(mueble({ w: 3.2, h: 3.0, n: 4, corona: false }), 5.2, 4.75, HALL.z1 + 0.3, 0);
+  box(HALL.x * 2, 0.22, 1.2, MAD_OSC, 0, 4.55, HALL.z1 + 0.6, sala);
+})();
+// rayos de luz suaves desde el ventanal
+const RAYO = canvasTex(64, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,236,190,.55)'); gr.addColorStop(1, 'rgba(255,236,190,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+for (let i = 0; i < 3; i++) { const r = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 12), new THREE.MeshBasicMaterial({ map: RAYO, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.16, side: THREE.DoubleSide }));
+  r.position.set(-0.8 + i * 0.8, 4.2, HALL.z1 + 5); r.rotation.set(-1.0, 0, (i - 1) * 0.12); scene.add(r); }
+// lámparas de araña
+function arana(z) { const g = new THREE.Group(); const aro = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.05, 6, 28), ORO); aro.rotation.x = Math.PI / 2; g.add(aro);
+  const cad = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2.2, 4), ORO); cad.position.y = 1.1; g.add(cad);
+  const vela = new THREE.MeshBasicMaterial({ color: 0xfff1c9 }); for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2, v = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), vela); v.position.set(Math.cos(a) * 0.9, 0.12, Math.sin(a) * 0.9); g.add(v); }
+  g.position.set(0, 7.2, z); scene.add(g); return g; }
+const aranas = [arana(4), arana(-3), arana(-10)];
+// mesas de lectura con lamparitas verdes
+function mesa(x, z) { const g = new THREE.Group(); box(1.1, 0.08, 2.4, MAD_CLARA, 0, 0.78, 0, g); [[-.45, -1.05], [.45, -1.05], [-.45, 1.05], [.45, 1.05]].forEach(([a, b]) => box(0.08, 0.76, 0.08, MAD_OSC, a, 0.38, b, g));
+  const lam = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 0.14, 12, 1, true), toon(0x2f6b4a, { side: THREE.DoubleSide })); lam.position.set(0, 1.12, 0.5); g.add(lam);
+  box(0.03, 0.3, 0.03, ORO, 0, 0.95, 0.5, g, false); const b = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshBasicMaterial({ color: 0xfff1c9 })); b.position.set(0, 1.07, 0.5); g.add(b);
+  [-0.4, 0.4].forEach(dx => { const sil = new THREE.Group(); box(0.42, 0.06, 0.4, toon(0x8c2f39), 0, 0.46, 0, sil); box(0.42, 0.5, 0.06, toon(0x8c2f39), 0, 0.72, -0.2, sil); [[-.17, -.17], [.17, -.17], [-.17, .17], [.17, .17]].forEach(([a, c]) => box(0.04, 0.44, 0.04, MAD_OSC, a, 0.22, c, sil, false)); sil.position.set(dx < 0 ? -0.85 : 0.85, 0, dx * 1.6); sil.rotation.y = dx < 0 ? Math.PI / 2 : -Math.PI / 2; g.add(sil); });
+  g.position.set(x, 0, z); scene.add(g); }
+mesa(-3.4, -1.2); mesa(3.4, -1.2); mesa(-3.4, -9.2); mesa(3.4, -9.2);
+
+// ===================================================================
+//  LOS 6 ESTANTES DE GRADO (con su placa) — ahí van los trabajos de la Revista
+// ===================================================================
+function placaTex(txt, sub, col) { return canvasTex(1024, 256, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#5e3518'); gr.addColorStop(1, '#3b2010'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#e0b45a'; g.lineWidth = 10; g.strokeRect(14, 14, w - 28, h - 28); g.lineWidth = 3; g.strokeRect(30, 30, w - 60, h - 60);
+  g.fillStyle = '#e0b45a'; [[40, 40], [w - 40, 40], [40, h - 40], [w - 40, h - 40]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); });
+  g.fillStyle = '#ffe7a3'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 96px "Cinzel Decorative", Cinzel, Georgia, serif'; g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowOffsetY = 4; g.fillText(txt, w / 2, h / 2 - 18);
+  g.shadowOffsetY = 0; g.font = '800 38px Cinzel, Georgia, serif'; g.fillStyle = '#f6e2b3'; g.fillText(sub, w / 2, h / 2 + 62); }); }
+function etiquetaTex(txt) { return canvasTex(1024, 336, (g, w, h) => {
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+  g.font = '900 150px "Cinzel Decorative", Cinzel, Georgia, serif'; g.lineWidth = 22; g.strokeStyle = 'rgba(43,26,14,.92)'; g.strokeText(txt, w / 2, 130); g.font = '800 72px Cinzel, Georgia, serif'; g.lineWidth = 16; g.strokeText('GRADO', w / 2, 262);
+  g.shadowColor = 'rgba(255,214,120,.6)'; g.shadowBlur = 24;
+  const gr = g.createLinearGradient(0, 40, 0, 260); gr.addColorStop(0, '#fff6cf'); gr.addColorStop(.5, '#f3cf73'); gr.addColorStop(1, '#c08a32'); g.fillStyle = gr;
+  g.font = '900 150px "Cinzel Decorative", Cinzel, Georgia, serif'; g.fillText(txt, w / 2, 130); g.font = '800 72px Cinzel, Georgia, serif'; g.fillText('GRADO', w / 2, 262); }); }
+const ESTANTES = GRADOS.map(G => {
+  const m = mueble({ w: 3.3, h: 3.55, n: 5, reservar: [1, 2, 3], relleno: 0.95 });
+  const placa = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.65), new THREE.MeshBasicMaterial({ map: placaTex(G.n, 'GRADO', G.c) })); placa.position.set(0, 3.98, 0.36); m.add(placa);
+  box(2.8, 0.8, 0.08, MAD_OSC, 0, 3.98, 0.3, m);
+  const cint = box(3.28, 0.06, 0.02, toon(G.c), 0, 0.24, 0.29, m, false);
+  const sh = m.userData.sh, terc = toon(new THREE.Color(G.c).lerp(new THREE.Color(0x3b2414), 0.25));
+  box(3.3 - 0.18, sh[4] - sh[1], 0.02, terc, 0, (sh[1] + sh[4]) / 2, -0.25, m, false);                       // terciopelo detrás de los trabajos
+  [-1, 1].forEach(sx => box(0.07, 3.45, 0.05, ORO, sx * 1.62, 1.78, 0.3, m, false)); box(3.3, 0.07, 0.05, ORO, 0, 3.52, 0.3, m, false);
+  const et = new THREE.Sprite(new THREE.SpriteMaterial({ map: etiquetaTex(G.n), transparent: true, depthWrite: false, depthTest: false })); et.scale.set(4.0, 1.31, 1); et.position.set(0, 3.0, 2.2); et.renderOrder = 5; m.add(et);
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 4.6), new THREE.MeshBasicMaterial({ map: canvasTex(128, 128, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 4, w / 2, w / 2, w / 2); gr.addColorStop(0, 'rgba(255,214,140,.55)'); gr.addColorStop(1, 'rgba(255,214,140,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); }), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+  halo.position.set(0, 1.9, 0.32); m.add(halo);
+  colocar(m, G.x, 0, G.z, G.ry);
+  const libs = new THREE.Group(); m.add(libs);
+  return { ...G, m, libs, halo, et, items: [], hit: [] };
+});
+rellenar.forEach(m => m.userData.fill()); libros.count = nLib; libros.instanceMatrix.needsUpdate = true; if (libros.instanceColor) libros.instanceColor.needsUpdate = true; scene.add(libros);
+
+// ===================================================================
+//  EL ATRIL Y EL LIBRO MÁGICO
+// ===================================================================
+const atril = new THREE.Group(); scene.add(atril);
+(function () {
+  const pie = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.62, 1.25, 4), MAD); pie.rotation.y = Math.PI / 4; pie.position.y = 0.72; ink(pie); atril.add(pie);
+  box(1.3, 0.12, 1.0, MAD_OSC, 0, 0.06, 0, atril); box(1.1, 0.08, 0.85, ORO, 0, 0.15, 0, atril, false);
+  const top = box(1.5, 0.08, 1.05, MAD_OSC, 0, 1.42, 0, atril); top.rotation.x = 0.32;
+  box(1.52, 0.04, 0.06, ORO, 0, 1.3, 0.5, atril, false).rotation.x = 0.32;
+  const placa = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.26), new THREE.MeshBasicMaterial({ map: canvasTex(512, 148, (g, w, h) => { g.fillStyle = '#3b2010'; g.fillRect(0, 0, w, h); g.strokeStyle = '#e0b45a'; g.lineWidth = 6; g.strokeRect(6, 6, w - 12, h - 12); g.fillStyle = '#ffe7a3'; g.textAlign = 'center'; g.font = '800 40px Cinzel, Georgia, serif'; g.fillText('BIBLIOTECA', w / 2, 62); g.font = '800 34px Cinzel, Georgia, serif'; g.fillText('EDUCATIVA', w / 2, 108); }) }));
+  placa.position.set(0, 0.9, 0.42); placa.rotation.y = 0; atril.add(placa); placa.position.z = 0.36; placa.rotation.x = -0.18;
+})();
+// libro: mitad derecha fija; mitad izquierda gira sobre el lomo (cerrado → abierto)
+const PAG_TXT = [
+  canvasTex(512, 640, (g, w, h) => { g.fillStyle = '#fbf1da'; g.fillRect(0, 0, w, h); g.strokeStyle = '#c99a45'; g.lineWidth = 6; g.strokeRect(26, 26, w - 52, h - 52);
+    g.fillStyle = '#8c2f39'; g.fillRect(56, 70, 150, 170); g.fillStyle = '#e0b45a'; g.font = '900 150px Georgia, serif'; g.fillText('B', 78, 210);
+    g.fillStyle = '#6b4a2c'; for (let i = 0; i < 15; i++) { const y = 92 + i * 30, x0 = y < 250 ? 226 : 56; g.fillRect(x0, y, (w - 56 - x0) * (0.7 + rnd() * 0.3), 7); }
+    g.strokeStyle = '#3d7a4a'; g.lineWidth = 5; g.beginPath(); for (let x = 60; x < w - 60; x += 4) g.lineTo(x, h - 80 + Math.sin(x / 18) * 10); g.stroke(); }),
+  canvasTex(512, 640, (g, w, h) => { g.fillStyle = '#fbf1da'; g.fillRect(0, 0, w, h); g.strokeStyle = '#c99a45'; g.lineWidth = 6; g.strokeRect(26, 26, w - 52, h - 52);
+    g.textAlign = 'center'; g.fillStyle = '#8c2f39'; g.font = '800 46px Cinzel, Georgia, serif'; g.fillText('LA', w / 2, 170); g.font = '900 60px Cinzel, Georgia, serif'; g.fillText('BIBLIOTECA', w / 2, 240); g.fillText('EDUCATIVA', w / 2, 310);
+    g.fillStyle = '#c99a45'; for (let i = 0; i < 9; i++) { g.beginPath(); g.arc(w / 2 - 120 + i * 30, 360, 5, 0, 7); g.fill(); }
+    g.fillStyle = '#6b4a2c'; g.font = '700 26px Georgia, serif'; g.fillText('Los trabajos de nuestros', w / 2, 430); g.fillText('científicos de Innova', w / 2, 466); g.font = '40px serif'; g.fillText('🦫 📚 🔬', w / 2, 540); })];
+const BW = 0.62, BD = 0.84, BT = 0.07;
+const libroMagico = new THREE.Group(); libroMagico.position.set(0, 1.5, 0.02); libroMagico.rotation.x = 0.32; atril.add(libroMagico);
+const TAPA = toon(0x6b2f2f), HOJAS = toon(0xf4e6c6);
+const der = new THREE.Group(); libroMagico.add(der);
+box(BW + 0.03, 0.025, BD + 0.04, TAPA, BW / 2, 0.012, 0, der); box(BW - 0.02, BT, BD - 0.03, HOJAS, BW / 2 - 0.005, 0.025 + BT / 2, 0, der);
+const pagDer = new THREE.Mesh(new THREE.PlaneGeometry(BW - 0.04, BD - 0.06), new THREE.MeshBasicMaterial({ map: PAG_TXT[1] })); pagDer.rotation.x = -Math.PI / 2; pagDer.position.set(BW / 2 - 0.005, 0.026 + BT, 0); der.add(pagDer);
+const izq = new THREE.Group(); izq.position.set(0, 0.025 + BT, 0); libroMagico.add(izq);
+box(BW + 0.03, 0.025, BD + 0.04, TAPA, -BW / 2, -(0.025 + BT) - 0.012 + 0.0, 0, izq); box(BW - 0.02, BT, BD - 0.03, HOJAS, -BW / 2 + 0.005, -BT / 2, 0, izq);
+const pagIzq = new THREE.Mesh(new THREE.PlaneGeometry(BW - 0.04, BD - 0.06), new THREE.MeshBasicMaterial({ map: PAG_TXT[0] })); pagIzq.rotation.x = -Math.PI / 2; pagIzq.position.set(-BW / 2 + 0.005, 0.001, 0); izq.add(pagIzq);
+const tapaDeco = new THREE.Mesh(new THREE.PlaneGeometry(BW - 0.1, BD - 0.14), new THREE.MeshBasicMaterial({ map: canvasTex(256, 340, (g, w, h) => { g.fillStyle = '#6b2f2f'; g.fillRect(0, 0, w, h); g.strokeStyle = '#e0b45a'; g.lineWidth = 6; g.strokeRect(12, 12, w - 24, h - 24); g.beginPath(); g.arc(w / 2, h / 2, 54, 0, 7); g.stroke(); g.fillStyle = '#e0b45a'; g.font = '64px serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('📖', w / 2, h / 2 + 4); }) }));
+tapaDeco.rotation.x = Math.PI / 2; tapaDeco.position.set(-BW / 2, -(0.025 + BT) - 0.026, 0); izq.add(tapaDeco);
+izq.rotation.z = -Math.PI;                                              // cerrado
+// brillo mágico + chispitas
+const BRILLO = canvasTex(256, 256, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); gr.addColorStop(0, 'rgba(255,246,210,1)'); gr.addColorStop(.25, 'rgba(255,214,120,.65)'); gr.addColorStop(1, 'rgba(255,190,90,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); });
+const brillo = new THREE.Sprite(new THREE.SpriteMaterial({ map: BRILLO, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); brillo.scale.set(3, 3, 1); brillo.position.set(0, 1.85, 0.1); scene.add(brillo);
+const NCH = LOW ? 70 : 140, chPos = new Float32Array(NCH * 3), chVel = [];
+for (let i = 0; i < NCH; i++) { chPos.set([0, -99, 0], i * 3); chVel.push({ v: new THREE.Vector3(), t: 0, life: 0 }); }
+const chGeo = new THREE.BufferGeometry(); chGeo.setAttribute('position', new THREE.BufferAttribute(chPos, 3));
+const chispas = new THREE.Points(chGeo, new THREE.PointsMaterial({ map: BRILLO, size: 0.12, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffe08a })); scene.add(chispas);
+let chispear = 0;
+function soltarChispa(i) { const c = chVel[i]; chPos[i * 3] = (Math.random() - .5) * 0.9; chPos[i * 3 + 1] = 1.7 + Math.random() * 0.1; chPos[i * 3 + 2] = (Math.random() - .5) * 0.6; c.v.set((Math.random() - .5) * 0.6, 0.6 + Math.random() * 1.2, (Math.random() - .5) * 0.6); c.life = 1.2 + Math.random() * 1.6; c.t = 0; }
+// polvito dorado flotando en toda la sala
+const NP = LOW ? 120 : 260, pPos = new Float32Array(NP * 3); for (let i = 0; i < NP; i++) pPos.set([(Math.random() - .5) * 12, Math.random() * 9, HALL.z1 + Math.random() * (HALL.z0 - HALL.z1)], i * 3);
+const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ map: BRILLO, size: 0.07, transparent: true, depthWrite: false, opacity: 0.6, blending: THREE.AdditiveBlending, color: 0xffe6a8 })));
+
+// ===================================================================
+//  LIBROS DE LOS ESTUDIANTES (Revista Innovadora aprobada → estante de su grado)
+// ===================================================================
+let TRABAJOS = [];
+const lomoGeo = new THREE.BoxGeometry(1, 1, 1);
+function lomoTex(t, i) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39';
+  return canvasTex(96, 512, (g, w, h) => { g.fillStyle = col; g.fillRect(0, 0, w, h); const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, 'rgba(0,0,0,.25)'); gr.addColorStop(.35, 'rgba(255,255,255,.15)'); gr.addColorStop(1, 'rgba(0,0,0,.3)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#e0b45a'; [26, 40, h - 46, h - 32].forEach(y => g.fillRect(0, y, w, 6)); g.save(); g.translate(w / 2 + 12, h / 2); g.rotate(-Math.PI / 2); g.textAlign = 'center'; g.fillStyle = '#ffe7a3'; g.font = '800 30px Cinzel, Georgia, serif';
+    let s = String(t.t || 'Trabajo'); while (g.measureText(s).width > h - 120 && s.length > 4) s = s.slice(0, -2); if (s !== String(t.t || 'Trabajo')) s = s.replace(/\s*\S?$/, '') + '…'; g.fillText(s, 0, 0); g.restore();
+    g.fillStyle = '#fff8ea'; g.font = '900 24px Nunito, sans-serif'; g.textAlign = 'center'; g.fillText(String(t.n || '').split(' ').slice(0, 2).map(x => x[0] || '').join(''), w / 2, h - 66); }); }
+function ponerLibros() {
+  ESTANTES.forEach(E => { E.libs.clear(); E.items = []; E.hit = []; });
+  TRABAJOS.forEach(t => { const g = +t.g || 6; const E = ESTANTES.find(x => x.g === g) || ESTANTES[0]; E.items.push(t); });
+  ESTANTES.forEach(E => {
+    const sh = E.m.userData.sh, w = E.m.userData.w, d = E.m.userData.d;
+    const porBalda = 15, filas = [3, 2, 1];                               // primero a la altura de los ojos
+    if (!E.items.length) {                                                 // estante vacío: cartelito «Pronto»
+      const c = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.5), new THREE.MeshBasicMaterial({ map: canvasTex(512, 136, (g, W, H) => { g.fillStyle = '#fbf1da'; g.fillRect(0, 0, W, H); g.strokeStyle = '#c99a45'; g.lineWidth = 6; g.strokeRect(5, 5, W - 10, H - 10); g.fillStyle = '#6b4a2c'; g.textAlign = 'center'; g.font = '800 34px Cinzel, Georgia, serif'; g.fillText('PRÓXIMAMENTE', W / 2, 60); g.font = '700 24px Georgia, serif'; g.fillText('Aquí vivirán sus trabajos', W / 2, 104); }), transparent: true }));
+      c.position.set(0, sh[2] + 0.4, 0.2); E.libs.add(c); return;
+    }
+    E.items.slice(0, porBalda * 3).forEach((t, i) => {
+      const fila = filas[Math.floor(i / porBalda)], k = i % porBalda, n = Math.min(porBalda, E.items.length - Math.floor(i / porBalda) * porBalda);
+      const bw = 0.15, gap = 0.04, tot = n * bw + (n - 1) * gap, x = -tot / 2 + k * (bw + gap) + bw / 2, hh = (sh[fila + 1] - sh[fila]) - 0.14, bh = hh * (0.86 + ((i * 37) % 10) / 100);
+      const mats = [toon(0x6b2f2f), toon(0x6b2f2f), toon(0xf4e6c6), toon(0xf4e6c6), toon(0xffffff, { map: lomoTex(t, i) }), toon(0x6b2f2f)];
+      const b = new THREE.Mesh(lomoGeo, mats); b.scale.set(bw, bh, d * 0.78); b.position.set(x, sh[fila] + 0.025 + bh / 2, 0.06); ink(b);
+      b.userData = { t, x0: 0.06, sal: 0 }; E.libs.add(b); E.hit.push(b);
+    });
+  });
+  pintarBarra();
+}
+async function cargarTrabajos() {
+  if (QS.has('demo')) { TRABAJOS = demo(); return ponerLibros(); }
+  try {
+    const sel = ['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'at', 'g', 'rv'].map(f => ({ fieldPath: f }));
+    const r = await fetch(`${BASE}:runQuery?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'revista' }], where: { fieldFilter: { field: { fieldPath: 'st' }, op: 'EQUAL', value: { stringValue: 'ok' } } }, select: { fields: sel }, limit: 300 } }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const dec = v => !v ? null : 'stringValue' in v ? v.stringValue : 'timestampValue' in v ? Date.parse(v.timestampValue) : 'integerValue' in v ? +v.integerValue : 'doubleValue' in v ? v.doubleValue : 'booleanValue' in v ? v.booleanValue : null;
+    TRABAJOS = (await r.json()).filter(x => x.document).map(x => ({ id: x.document.name.split('/').pop(), ...Object.fromEntries(Object.entries(x.document.fields || {}).map(([k, v]) => [k, dec(v)])) })).sort((a, b) => (a.at || 0) - (b.at || 0));
+  } catch (e) { TRABAJOS = []; aviso('📶 No pude traer los trabajos de la Revista. Revisa tu internet.', 4); }
+  ponerLibros();
+}
+function demo() { const T = [['La levadura y la temperatura', 'Ana Quispe', 'B', 'exp'], ['Microbios buenos en el yogur', 'Luis Rojas', 'A', 'inv'], ['Infografía: lavado de manos', 'Mía Flores', 'C', 'info'], ['Maqueta de una bacteria', 'Diego Mamani', 'D', 'maq'], ['¿Por qué se pudre el pan?', 'Sofía Condori', 'A', 'inv'], ['Video: hongos a la vista', 'Mateo Ticona', 'B', 'vid'], ['Mi filtro casero de agua', 'Valeria Apaza', 'C', 'pro']];
+  return T.map(([t, n, sec, ty], i) => ({ id: 'demo' + i, t, n, sec, ty, u: 'unit7', g: 6, d: 'Así lo hicimos: observamos, medimos y comparamos. Nuestra conclusión es que la temperatura cambia la rapidez con que trabaja la levadura.', at: Date.now() - i * 864e5 })); }
+
+// ===================================================================
+//  CÁMARA: intro mágica, vista general y escenas por estante
+// ===================================================================
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const VISTA = { pos: V(0, 3.6, 12.2), look: V(0, 2.3, -6) };
+const cam = { pos: V(0, 2.05, 1.25), look: V(0, 1.55, 0) }; camera.position.copy(cam.pos); camera.lookAt(cam.look);
+let tween = null, modo = 'intro', actual = -1;
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function volar(pos, look, ms = 1800, alto = 0.6) { const p0 = cam.pos.clone(), l0 = cam.look.clone(); return new Promise(res => { tween = { t0: performance.now(), ms, p0, l0, p1: pos.clone(), l1: look.clone(), alto, res }; }); }
+function frenteDe(E) { const n = V(Math.sin(E.ry), 0, Math.cos(E.ry)); const c = V(E.x, 2.05, E.z); return { pos: c.clone().add(n.clone().multiplyScalar(isTouch && innerWidth < innerHeight ? 7.0 : 4.9)).add(V(0, 0.2, 0)), look: c.clone().add(V(0, 0.1, 0)) }; }
+const wait = ms => new Promise(r => setTimeout(r, ms));
+let saltado = false;
+async function intro() {
+  $('#carga').style.opacity = 0; setTimeout(() => $('#carga').remove(), 900);
+  await wait(QS.has('rapido') ? 0 : 700); if (saltado) return;
+  sonar('magia'); chispear = 1;
+  const t0 = performance.now(); await new Promise(res => { (function f() { const k = Math.min(1, (performance.now() - t0) / 1700), e = ease(k); izq.rotation.z = -Math.PI * (1 - e); brillo.material.opacity = Math.sin(k * Math.PI) * 0.9 + e * 0.35; glowLight.intensity = e * 2.2; if (k < 1 && !saltado) requestAnimationFrame(f); else res(); })(); });
+  if (saltado) return;
+  await wait(500); if (saltado) return;
+  $('#titulo').classList.add('on');
+  await volar(VISTA.pos, VISTA.look, 3400, 1.2); if (saltado) return;
+  finIntro();
+}
+function finIntro() { if (modo !== 'intro') return; modo = 'sala'; izq.rotation.z = 0; brillo.material.opacity = 0.35; glowLight.intensity = 2.2; chispear = 0.35;
+  $('#titulo').classList.add('on'); $('#bar').classList.add('on'); $('#saltar').style.opacity = 0; setTimeout(() => $('#saltar').remove(), 500);
+  if (!tween) { cam.pos.copy(VISTA.pos); cam.look.copy(VISTA.look); }
+  aviso(isTouch ? '👆 Toca un estante para visitarlo' : '🖱️ Haz clic en un estante o usa la barra de abajo', 4); }
+$('#saltar').onclick = () => { saltado = true; tween = null; cam.pos.copy(VISTA.pos); cam.look.copy(VISTA.look); finIntro(); };
+let banT = 0;
+async function irEstante(i) {
+  if (modo === 'intro') return; i = (i + ESTANTES.length) % ESTANTES.length; actual = i; modo = 'estante'; cerrarTapa();
+  const E = ESTANTES[i], f = frenteDe(E); ESTANTES.forEach((x, k) => { x.haloT = k === i ? 1 : 0; });
+  $('#titulo').classList.remove('on');
+  const ban = $('#escena'); ban.querySelector('b').textContent = 'Estante ' + E.t; ban.classList.add('on'); clearTimeout(banT); banT = setTimeout(() => ban.classList.remove('on'), 1900);
+  sonar('pasar'); pintarBarra();
+  await volar(f.pos, f.look, 1700, 0.9);
+  if (actual === i) aviso(E.items.length ? (isTouch ? `📚 ${E.items.length} trabajo${E.items.length > 1 ? 's' : ''} · toca un libro para ver su portada` : `📚 ${E.items.length} trabajo${E.items.length > 1 ? 's' : ''} · pasa el cursor por un libro y haz clic para abrirlo`) : '✨ Este estante aún espera sus primeros trabajos', 3.5);
+}
+async function irSala() { if (modo === 'intro') return; modo = 'sala'; actual = -1; cerrarTapa(); ESTANTES.forEach(x => x.haloT = 0); $('#titulo').classList.add('on'); pintarBarra(); await volar(VISTA.pos, VISTA.look, 1700, 1); }
+
+// ---- barra de grados ----
+function pintarBarra() { $('#bar .g').innerHTML = ESTANTES.map((E, i) => `<button type="button" data-i="${i}" class="${i === actual ? 'on' : ''}">${E.n}<i>${E.items.length}</i></button>`).join('');
+  const on = $('#bar .g .on'); on && on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); }
+$('#bar').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.i != null) return irEstante(+b.dataset.i); if (b.dataset.nav) return irEstante(actual < 0 ? (+b.dataset.nav > 0 ? 0 : ESTANTES.length - 1) : actual + +b.dataset.nav); if (b.dataset.todo) return irSala(); });
+addEventListener('keydown', e => { if ($('#libro').classList.contains('on')) { if (e.key === 'Escape') cerrarLibro(); return; }
+  if (e.key === 'ArrowRight') irEstante(actual + 1); else if (e.key === 'ArrowLeft') irEstante(actual < 0 ? ESTANTES.length - 1 : actual - 1); else if (e.key === 'Escape') irSala(); });
+
+// ===================================================================
+//  PUNTERO: pasar el cursor = libro cerrado con portada · clic = se abre
+// ===================================================================
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let hover = null, fijo = null, px = 0, py = 0;
+function tocado(cx, cy, lista) { ptr.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera); const h = ray.intersectObjects(lista, false)[0]; return h ? h.object : null; }
+const estanteDe = o => { while (o) { const E = ESTANTES.find(x => x.m === o); if (E) return E; o = o.parent; } return null; };
+function portadaHtml(t) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39', ty = TIPOS[t.ty] || TIPOS.inv;
+  return `<div class="cover" style="background:linear-gradient(135deg, ${col}, ${shade(col, -35)})"><div class="em">${ty[0]}</div><div class="ti">${esc(t.t || 'Trabajo')}</div><div class="orn"></div>${t.th ? `<img class="th" src="${esc(t.th)}" alt="">` : ''}<div class="au">✍️ ${esc(t.n || '')}<small>6.° ${esc(t.sec || '')} · ${esc(ty[1])}</small></div></div>`; }
+function shade(hex, p) { const n = parseInt(hex.slice(1), 16), f = v => Math.max(0, Math.min(255, v + p)); return '#' + ((f(n >> 16) << 16) | (f((n >> 8) & 255) << 8) | f(n & 255)).toString(16).padStart(6, '0'); }
+function mostrarTapa(b, cx, cy, fij) { const t = b.userData.t, el = $('#tapa');
+  el.innerHTML = portadaHtml(t) + (fij ? '<button class="abrir" type="button">📖 Abrir libro</button>' : '<div class="hint">🖱️ Clic para abrir</div>');
+  const W = el.offsetWidth || 210, H = (W * 4 / 3) + 50; let x = cx + 24, y = cy - H / 2; if (x + W > innerWidth - 10) x = cx - W - 24; y = Math.max(10, Math.min(innerHeight - H - 80, y));
+  el.style.left = x + 'px'; el.style.top = y + 'px'; el.classList.add('on'); el.classList.toggle('fijo', !!fij);
+  if (fij) el.querySelector('.abrir').onclick = () => abrirLibro(t); }
+function cerrarTapa() { $('#tapa').classList.remove('on', 'fijo'); hover = null; fijo = null; }
+addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; if (e.pointerType !== 'mouse' || modo !== 'estante' || fijo) return;
+  const E = ESTANTES[actual], b = tocado(px, py, E.hit); if (b !== hover) { hover = b; if (b) { mostrarTapa(b, px, py, false); sonar('tic'); } else $('#tapa').classList.remove('on'); } else if (b) mostrarTapa(b, px, py, false);
+  renderer.domElement.style.cursor = b ? 'pointer' : 'default'; });
+let down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10) return; down = null;
+  if (modo === 'intro') return;
+  if (modo === 'estante') { const E = ESTANTES[actual], b = tocado(e.clientX, e.clientY, E.hit);
+    if (b) { if (e.pointerType === 'mouse') return abrirLibro(b.userData.t); if (fijo === b) return abrirLibro(b.userData.t); fijo = b; hover = b; mostrarTapa(b, e.clientX, e.clientY, true); sonar('tic'); return; }
+    cerrarTapa(); }
+  const m = tocado(e.clientX, e.clientY, ESTANTES.map(E => E.m)); const E = m && estanteDe(m);                 // tocar otro estante = ir a ese estante
+  if (E) { const i = ESTANTES.indexOf(E); if (i !== actual) irEstante(i); }
+});
+function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39', ty = TIPOS[t.ty] || TIPOS.inv, d = String(t.d || '').trim();
+  const fecha = t.at ? new Date(t.at).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const L = $('#libro'); L.style.setProperty('--c', col);
+  L.innerHTML = `<div class="ab" role="dialog" aria-label="${esc(t.t)}"><button class="cerrar" type="button" aria-label="Cerrar">✕</button>
+    <div class="pg l"><h2>${esc(t.t || 'Trabajo')}</h2><div class="meta"><span>${ty[0]} ${esc(ty[1])}</span><span>📘 ${esc(UNIDADES[t.u] || 'Ciencia y Tecnología')}</span></div>
+      ${t.th || t.img ? `<img class="foto" src="${esc(t.img || t.th)}" alt="Foto del trabajo">` : `<div style="font-size:90px;text-align:center;margin:20px 0">${ty[0]}</div>`}
+      <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>6.° ${esc(t.sec || '')}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div></div>
+    <div class="pg r">${d ? `<span class="cap">${esc(d[0])}</span><p>${esc(d.slice(1))}</p>` : '<p>Este trabajo no trae descripción.</p>'}
+      ${t.f ? `<p><b>💡 Lo que aprendimos:</b> ${esc(t.f)}</p>` : ''}${t.link ? `<a class="ver" href="${esc(t.link)}" target="_blank" rel="noopener">🔗 Ver el trabajo completo</a>` : ''}
+      <span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div></div>`;
+  L.classList.add('on');
+  if (!t.img && t.id && !String(t.id).startsWith('demo')) fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.img && j.fields.img.stringValue; if (v) { t.img = v; const im = L.querySelector('img.foto'); if (im) im.src = v; } }).catch(() => {});
+}
+function cerrarLibro() { $('#libro').classList.remove('on'); sonar('cerrar'); }
+$('#libro').addEventListener('click', e => { if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
+
+// ---- avisos y sonidos suaves ----
+let avT = 0; function aviso(txt, s = 3) { const a = $('#aviso'); a.textContent = txt; a.classList.add('on'); clearTimeout(avT); avT = setTimeout(() => a.classList.remove('on'), s * 1000); }
+let AC = null, mudo = false; try { mudo = localStorage.getItem('moli2:bibmudo') === '1'; } catch (e) {} $('#sonido').textContent = mudo ? '🔇' : '🔊';
+$('#sonido').onclick = () => { mudo = !mudo; $('#sonido').textContent = mudo ? '🔇' : '🔊'; try { localStorage.setItem('moli2:bibmudo', mudo ? '1' : '0'); } catch (e) {} };
+function sonar(k) { if (mudo) return; try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); const t = AC.currentTime;
+  const nota = (f, d, at, tipo = 'sine', v = 0.06) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = tipo; o.frequency.value = f; g.gain.setValueAtTime(0, t + at); g.gain.linearRampToValueAtTime(v, t + at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + at + d); o.connect(g).connect(AC.destination); o.start(t + at); o.stop(t + at + d + 0.05); };
+  if (k === 'magia') [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => nota(f, 0.9, i * 0.09, 'triangle', 0.05));
+  else if (k === 'pasar') { nota(392, 0.4, 0, 'sine', 0.04); nota(587, 0.5, 0.08, 'sine', 0.035); }
+  else if (k === 'abrir') { nota(660, 0.25, 0, 'triangle', 0.05); nota(990, 0.35, 0.06, 'triangle', 0.04); }
+  else if (k === 'cerrar') nota(440, 0.2, 0, 'triangle', 0.04);
+  else if (k === 'tic') nota(1200, 0.06, 0, 'sine', 0.02); } catch (e) {} }
+
+// ===================================================================
+//  BUCLE
+// ===================================================================
+const clock = new THREE.Clock(); let par = V(0, 0, 0);
+function frame() {
+  const dt = Math.min(0.05, clock.getDelta()), now = performance.now(), T = clock.elapsedTime;
+  if (tween) { const k = Math.min(1, (now - tween.t0) / tween.ms), e = ease(k);
+    cam.pos.lerpVectors(tween.p0, tween.p1, e); cam.pos.y += Math.sin(Math.PI * e) * tween.alto; cam.look.lerpVectors(tween.l0, tween.l1, e);
+    if (k >= 1) { const r = tween.res; tween = null; r(); } }
+  // un poquito de paralaje con el mouse (vida)
+  const tx = modo === 'intro' ? 0 : (px / innerWidth - 0.5) * 0.35, ty = modo === 'intro' ? 0 : (py / innerHeight - 0.5) * 0.2; par.x += (tx - par.x) * 0.04; par.y += (ty - par.y) * 0.04;
+  camera.position.set(cam.pos.x + par.x, cam.pos.y - par.y, cam.pos.z); camera.lookAt(cam.look);
+  // libros que salen un poquito al pasar el cursor
+  ESTANTES.forEach(E => { E.halo.material.opacity += ((E.haloT || 0) * 0.8 - E.halo.material.opacity) * (1 - Math.exp(-dt * 4)); const eo = modo === 'sala' ? 1 : 0; E.et.material.opacity += (eo - E.et.material.opacity) * (1 - Math.exp(-dt * 7)); E.et.visible = E.et.material.opacity > 0.02; E.et.position.y = 3.0 + Math.sin(T * 1.3 + E.g) * 0.06;
+    E.hit.forEach(b => { const want = (b === hover || b === fijo) ? 0.2 : 0; b.userData.sal += (want - b.userData.sal) * 0.25; b.position.z = b.userData.x0 + b.userData.sal; b.rotation.y = b.userData.sal * -0.3; }); });
+  // chispitas del libro mágico
+  if (chispear > 0) for (let i = 0; i < NCH; i++) { const c = chVel[i]; if (c.life <= 0 || c.t > c.life) { if (Math.random() < chispear * 0.08) soltarChispa(i); else { chPos[i * 3 + 1] = -99; c.life = 0; } continue; }
+    c.t += dt; chPos[i * 3] += c.v.x * dt; chPos[i * 3 + 1] += c.v.y * dt; chPos[i * 3 + 2] += c.v.z * dt; c.v.multiplyScalar(0.985); }
+  chGeo.attributes.position.needsUpdate = true;
+  for (let i = 0; i < NP; i++) { pPos[i * 3 + 1] += Math.sin(T * 0.3 + i) * 0.0015 + 0.002; if (pPos[i * 3 + 1] > 9) pPos[i * 3 + 1] = 0.2; } pGeo.attributes.position.needsUpdate = true;
+  brillo.scale.setScalar(2.6 + Math.sin(T * 2) * 0.15); aranas.forEach((a, i) => a.rotation.y = Math.sin(T * 0.4 + i) * 0.05);
+  renderer.render(scene, camera); requestAnimationFrame(frame);
+}
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < innerHeight ? 72 : 58; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+dispatchEvent(new Event('resize'));
+window.BIB = { ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, camera, scene };
+const listo = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+Promise.race([listo, wait(2500)]).then(() => { ESTANTES.forEach(E => E.m.children.filter(c => c.material && c.material.map && c.geometry.type === 'PlaneGeometry' && c.position.y > 4).forEach(c => { c.material.map = placaTex(E.n, 'GRADO', E.c); })); ESTANTES.forEach(E => { E.et.material.map = etiquetaTex(E.n); }); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
+})();
+</script>
+</body>
+</html>

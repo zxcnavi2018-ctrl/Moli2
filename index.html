@@ -141,6 +141,15 @@
   #sheet.laptop { border-radius: 12px; } #sheet.laptop .paper { position: absolute; inset: 7px; background: #fff; border-radius: 6px; }
   #sheet.pizarra { background: #fff; border: 4px solid #2b2547; border-radius: 4px; }
   #sheet.pizarra .paper { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, #ffffff 0 45%, #f1f5f9 100%); }
+  /* ---- libro «BIBLIOTECA» (abajo a la izquierda): al pasar el cursor sale su franja; lleva a La Biblioteca Educativa ---- */
+  #bibLink { position: fixed; left: max(14px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 24; display: flex; align-items: center; text-decoration: none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.28)); transition: opacity .3s, transform .3s; }
+  #bibLink svg { width: 64px; height: 64px; flex: none; position: relative; z-index: 2; transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+  #bibLink span { margin-left: -18px; padding: 9px 16px 9px 26px; border-radius: 0 999px 999px 0; background: linear-gradient(90deg, #1d4ed8, #3b82f6); border: 3px solid #2b2547; border-left: 0; color: #fff; font: 900 15px "Trebuchet MS", system-ui, sans-serif; letter-spacing: .14em; clip-path: inset(0 100% 0 0); transition: clip-path .35s ease; white-space: nowrap; }
+  #bibLink:hover span, #bibLink:focus-visible span, #bibLink.asoma span { clip-path: inset(0 0 0 0); }
+  #bibLink:hover svg { transform: rotate(-8deg) scale(1.08); }
+  body.open #bibLink, body.tut #bibLink, body.editando #bibLink { opacity: 0; pointer-events: none; transform: translateY(20px); }
+  @media (max-width: 600px) { #bibLink svg { width: 52px; height: 52px; } #bibLink span { font-size: 13px; } }
+  @media (pointer: coarse) { #bibLink { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 170px); } #bibLink span { clip-path: inset(0 0 0 0); } }
   #bibBar { position: fixed; left: 50%; top: 12px; transform: translateX(-50%) translateY(-20px); z-index: 31; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 22px; background: #fff; border: 3px solid #2b2547; box-shadow: 0 6px 0 rgba(43,37,71,.25), 0 14px 30px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .3s, transform .4s cubic-bezier(.34,1.56,.64,1); }
   #bibBar.on { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
   body.open #bibBar { opacity: 0; pointer-events: none; }
@@ -223,6 +232,7 @@
 <div id="bookPanel"><h2 id="bookTitle"></h2><div id="books"></div><button id="bookClose">Cerrar</button></div>
 <div id="moliWin"><div id="moliBar"><button id="moliBack">← Volver al aula</button><span id="moliHint"></span></div><iframe id="moliFrame" allow="autoplay; fullscreen"></iframe></div>
 <div id="tourBar"><button id="prevBtn" aria-label="Anterior">◀</button><div id="stopName"><div id="dots"></div></div><button id="nextBtn" aria-label="Siguiente">▶</button></div>
+<a id="bibLink" href="biblioteca.html" aria-label="Ir a La Biblioteca Educativa"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 14 q0-6 6-6 h34 v40 H16 q-6 0-6 6z" fill="#3b82f6" stroke="#2b2547" stroke-width="3" stroke-linejoin="round"/><path d="M10 54 q0-6 6-6 h34 v8 H16 q-6 0-6-2z" fill="#f8fafc" stroke="#2b2547" stroke-width="3" stroke-linejoin="round"/><path d="M18 8 v40" stroke="#1d4ed8" stroke-width="3"/><rect x="24" y="16" width="20" height="8" rx="2" fill="#dbeafe" stroke="#2b2547" stroke-width="2"/><path d="M14 52 h34" stroke="#cbd5e1" stroke-width="2"/></svg><span>BIBLIOTECA</span></a>
 <div id="bibBar"><button type="button" id="bibPrev" aria-label="Disco anterior">◀</button><div id="bibName"></div><button type="button" id="bibNext" aria-label="Disco siguiente">▶</button><button type="button" id="bibPlay">🎮 Jugar</button><button type="button" id="bibAv" hidden>📊 Avance</button></div>
 <div id="sheet"></div>
 <div id="title"></div>
