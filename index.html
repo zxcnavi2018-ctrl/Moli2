@@ -1764,11 +1764,13 @@ function autoQuality(dt) {
   if (pr !== Q.pr) { Q.pr = pr; renderer.setPixelRatio(pr); renderer.setSize(innerWidth, innerHeight); }
 }
 const afterRender = [];                                              // lo que se dibuja encima del salón (Molí)
+let nLoop = 0;
 function loop(now) {
   requestAnimationFrame(loop);
+  const tapado = document.body.classList.contains('open'); if (tapado && nLoop++ % 2) return;   // con una hoja abierta, el salón de fondo se dibuja a la mitad
 
   const dt = Math.max(0, (now - last) / 1000); last = now;
-  if (P.started && dt < 1) autoQuality(dt);
+  if (P.started && dt < 1 && !tapado) autoQuality(dt);
   if (TOUR.on) tourFrame(now / 1000); else update(P.started && !uiOpen ? dt : 0);
   if (P.started) { checkLocker(); updateRoomLamp(); }
   for (const t of moliTags) t.sp.position.y = t.y + Math.sin(now / 600 + t.ph) * 0.05;
