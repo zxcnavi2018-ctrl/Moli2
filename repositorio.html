@@ -194,6 +194,11 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 @keyframes fade{from{opacity:0}}
 @media (max-width:640px){.top{padding:10px 14px}.top .moli{width:46px;height:46px}.me .nm{display:none}.tabs button span{display:none}.tabs button{padding:10px 14px;font-size:18px}main{padding:14px 12px 30px}.cover{grid-template-columns:1fr;padding:18px}.cover img{display:none}}
 @media (max-height:520px){.top{padding:8px 16px}.top .moli{width:40px;height:40px}.brand small{display:none}.tabs{padding:6px 12px}.tabs button{padding:7px 13px;font-size:14px}main{padding:12px 16px 24px}}
+#dniAviso{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(11,46,79,.55);padding:16px;animation:daIn .25s ease}#dniAviso[hidden]{display:none}
+#dniAviso .da-c{position:relative;overflow:hidden;max-width:460px;width:100%;background:#fff;border-radius:22px;padding:26px 26px 30px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35);border:4px solid #facc15}
+#dniAviso .da-i{font-size:64px;line-height:1}#dniAviso h3{margin:10px 0 6px;font:900 26px var(--serif);color:var(--navy)}#dniAviso p{margin:6px 0;font-weight:700;color:#334155;font-size:17px}#dniAviso .da-s{font-size:15px;color:#64748b}
+#dniAviso .da-b{position:absolute;left:0;bottom:0;height:7px;width:100%;background:#facc15;transform-origin:left;animation:daBar 5s linear forwards}
+@keyframes daBar{to{transform:scaleX(0)}}@keyframes daIn{from{opacity:0}}
 </style>
 </head>
 <body>
@@ -211,6 +216,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 <main id="main"><div class="wrap" id="view"></div></main>
 <div id="modal" hidden></div>
 <div id="toast" hidden></div>
+<div id="dniAviso" hidden><div class="da-c"><div class="da-i">🪪</div><h3>¡Primero entra con tu DNI!</h3><p>Así tu trabajo aparecerá con <b>tu nombre</b> en la Revista y en la Biblioteca.</p><p class="da-s">Ve a «Mi aula», toca tu <b>fotocheck</b> y escribe tu DNI. Luego vuelve aquí.</p><i class="da-b"></i></div></div>
 <script>
 'use strict';
 // ---- datos de Molí (misma web): cuenta del estudiante y de la docente ----
@@ -354,8 +360,8 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-sq]'
 let FORM = { ty: 'opi', u: 'unit7', img: '', th: '', g: 6, txt: '', fotos: [] };
 function vEnviar() {
   const V = $('#view');
-  if (!ME) { V.innerHTML = `<div class="empty"><b>Primero entra con tu DNI</b>Toca tu fotocheck en «Mi aula», escribe tu DNI y vuelve aquí para enviar tu trabajo.</div>`; return; }
-  V.innerHTML = (ME.teacher ? `<div class="teach">👩‍🏫 Profe: tu publicación sale <b>directo</b> en la Revista Innovadora y en la Biblioteca (no pasa por revisión).</div>` : tip(`¡Hola, ${esc(firstName(ME.name))}! Comparte tu investigación o tu producto. Un <b>Revisor</b> o tu profe lo leerá y, si está listo, ¡saldrá en la <b>Revista Innovadora</b>! 📰`, 'emocionada')) +
+  const T0 = !!(ME && ME.teacher);                                     // sin DNI también ve todo: al subir o enviar le sale el aviso para entrar con su DNI
+  V.innerHTML = (T0 ? `<div class="teach">👩‍🏫 Profe: tu publicación sale <b>directo</b> en la Revista Innovadora y en la Biblioteca (no pasa por revisión).</div>` : tip(`¡Hola, ${ME ? esc(firstName(ME.name)) : ''}! Comparte tu investigación o tu producto. Un <b>Revisor</b> o tu profe lo leerá y, si está listo, ¡saldrá en la <b>Revista Innovadora</b>! 📰`, 'emocionada')) +
   `<section class="citas"><div class="c-top"><span class="c-badge">MÍNIMO 3 CITAS</span><h3>✍️ Citas parafraseadas <small>Normas APA</small></h3><p>Parafrasear es contar lo que dijo un experto <b>con tus propias palabras</b>, sin copiar. Tu trabajo debe tener <b>mínimo 3 citas</b>. Hay dos formas:</p></div>
       <div class="c-2"><article class="c-a"><span class="c-n">A</span><h4>Cita narrativa</h4><p class="c-d">Empiezas con el <b>autor</b> y pones el <b>año</b> entre paréntesis.</p><blockquote>Según <mark>López (2020)</mark>, el desarrollo tecnológico cambió la forma en que aprendemos.</blockquote><p class="c-m">Molde: Según <mark>Apellido (año)</mark>, …</p></article>
       <article class="c-b"><span class="c-n">B</span><h4>Cita parentética</h4><p class="c-d">Escribes la idea con tus palabras y <b>al final</b> pones (Apellido, año).</p><blockquote>El desarrollo tecnológico ha transformado la educación moderna <mark>(Soto, 2019)</mark>.</blockquote><p class="c-m">Molde: … <mark>(Apellido, año)</mark>.</p></article></div></section>
@@ -365,13 +371,17 @@ function vEnviar() {
     <h3 class="f-h">2. Publica tu propuesta</h3>
     <div class="fld"><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" required placeholder="El mismo título de tu guía"></div>
     <div class="fld"><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" required placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
-    ${ME.teacher ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
+    ${T0 ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
     <div class="fld"><label>Sube tu guía completada (Word)</label><label class="photo" id="eDocL"><input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="eDoc" hidden><span id="eDocV">📄 Toca aquí para elegir tu guía .docx</span></label><small>Lo que escribiste en tu guía será el contenido de tu libro en la Biblioteca.</small></div>
     <div class="fld"><label>Anexos: fotos de tu trabajo <span style="font-weight:700;color:var(--ink2)">(hasta 3, opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" multiple hidden><span id="ePv">📷 Toca aquí para elegir tus fotos</span></label><small>Irán al final de tu libro, en la página de Anexos.</small></div>
-    <div><button type="submit" class="btn go" id="eGo">${ME.teacher ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
+    <div><button type="submit" class="btn go" id="eGo">${T0 ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
   </form><div class="mine" id="mine"></div>`;
   FORM.img = FORM.th = ''; FORM.txt = ''; FORM.fotos = []; drawMine();
 }
+let dniT = 0;
+function avisoDni() { const a = $('#dniAviso'); a.hidden = false; const b = a.querySelector('.da-b'); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; clearTimeout(dniT); dniT = setTimeout(() => a.hidden = true, 5000); }
+$('#dniAviso').addEventListener('click', () => { $('#dniAviso').hidden = true; clearTimeout(dniT); });
+document.addEventListener('click', e => { if (ME || !e.target.closest('#eDocL, #ePh, #eGo')) return; e.preventDefault(); e.stopPropagation(); avisoDni(); }, true);   // sin DNI: al subir archivos o enviar, el aviso de 5 segundos
 async function shrinkImg(file, max, q) {
   const url = URL.createObjectURL(file);
   try {
@@ -428,6 +438,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
+  if (!ME) return avisoDni();
   const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = FORM.txt, f = '', link = '';
   if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
   if (!d) return toast('📄 Sube tu guía completada en Word.');
