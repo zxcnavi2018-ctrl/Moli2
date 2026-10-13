@@ -1766,13 +1766,6 @@ function autoQuality(dt) {
 const afterRender = [];                                              // lo que se dibuja encima del salón (Molí)
 function loop(now) {
   requestAnimationFrame(loop);
-// ---- La Biblioteca Educativa: página propia (el aula se cierra y libera la tarjeta gráfica); la pantalla completa vuelve al primer toque ----
-(function () {
-  const a = document.getElementById('bibLink'); if (!a) return;
-  a.addEventListener('click', () => { try { sessionStorage.setItem('moli2:fs', document.fullscreenElement ? '1' : '0'); } catch (x) {} });
-  let fs = '0'; try { fs = sessionStorage.getItem('moli2:fs') || '0'; sessionStorage.removeItem('moli2:fs'); } catch (x) {}
-  if (fs === '1') addEventListener('pointerdown', () => { if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); }, { once: true, capture: true });
-})();
 
   const dt = Math.max(0, (now - last) / 1000); last = now;
   if (P.started && dt < 1) autoQuality(dt);
@@ -1791,6 +1784,13 @@ function loop(now) {
 if (myRoom()) seatInRoom(myRoom());                                 // de fondo, ya se ve su salón desde su silla
 camera.position.set(P.x, P.y + (P.seated ? 1.15 : 1.6), P.z); camera.rotation.set(P.pitch, P.yaw, 0);
 requestAnimationFrame(loop);
+// ---- La Biblioteca Educativa: página propia (el aula se cierra y libera la tarjeta gráfica); la pantalla completa vuelve al primer toque ----
+(function () {
+  const a = document.getElementById('bibLink'); if (!a) return;
+  a.addEventListener('click', () => { try { sessionStorage.setItem('moli2:fs', document.fullscreenElement ? '1' : '0'); } catch (x) {} });
+  let fs = '0'; try { fs = sessionStorage.getItem('moli2:fs') || '0'; sessionStorage.removeItem('moli2:fs'); } catch (x) {}
+  if (fs === '1') addEventListener('pointerdown', () => { if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); }, { once: true, capture: true });
+})();
 // ---- SOLO AULA 6B: quitar del escenario todo lo que quedó fuera del aula ----
 (function () {
   const keepTop = new Set([sky, clouds, rain, roomLamp]);
