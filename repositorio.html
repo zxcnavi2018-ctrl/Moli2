@@ -418,7 +418,9 @@ document.addEventListener('change', async e => {
       const r = await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() });
       const txt = await limpiarGuia(String(r.value || ''));
       if (txt.replace(/^PASO.*$/gm, '').replace(/\s+/g, ' ').length < 40) throw new Error('VACIO');
-      FORM.txt = txt.slice(0, 20000); v.innerHTML = `✅ <b>${esc(f.name)}</b> · ${FORM.txt.split(/\s+/).length} palabras leídas. Toca para cambiarla.`;
+      FORM.txt = txt.slice(0, 20000);
+      FORM.doc = f.size <= 650000 ? { n: f.name.slice(0, 120), b64: await new Promise((ok, no) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1] || ''); fr.onerror = no; fr.readAsDataURL(f); }) } : null;   // el Word original: le llega a la profe para revisarlo
+      v.innerHTML = `✅ <b>${esc(f.name)}</b> · ${FORM.txt.split(/\s+/).length} palabras leídas. Toca para cambiarla.`;
     } catch (x) { FORM.txt = ''; v.textContent = x.message === 'VACIO' ? '⚠️ Tu guía parece vacía. Complétala y vuelve a subirla.' : '⚠️ No pude leer ese archivo. Debe ser la guía en Word (.docx).'; }
     return;
   }
@@ -453,6 +455,7 @@ document.addEventListener('submit', async e => {
     const h = { 'Content-Type': 'application/json' }; if (ME.teacher) { const t = await staffTok(); if (!t) throw new Error('AUTHT'); h.Authorization = 'Bearer ' + t; }
     const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf(w) }) });
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
+    if (FORM.doc) fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf({ n: FORM.doc.n, b64: FORM.doc.b64, at: new Date() }) }) }).catch(() => {});
     if (ME.teacher) CACHE.ok = null;
     const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40));
     try { parent !== window && parent.postMessage({ revistaSent: 1 }, '*'); } catch (x) {}
@@ -502,6 +505,18 @@ document.addEventListener('submit', async e => {
 });
 
 // ---- ver un trabajo (artículo de la revista o revisión) ----
+async function bajarWord(id, b) {                                     // el Word que subió el estudiante (sólo la profe y los Revisores)
+  const t0 = b.textContent; b.disabled = true; b.textContent = '⏳ Buscando el Word…';
+  try { const a = await staffTok(); if (!a) throw new Error('AUTH');
+    const r = await fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}`, { headers: { Authorization: 'Bearer ' + a } });
+    if (r.status === 404) throw new Error('NO'); if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
+    const j = await r.json(), b64 = j.fields.b64.stringValue, n = (j.fields.n || {}).stringValue || 'trabajo.docx';
+    const bin = atob(b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([u8], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
+    const l = document.createElement('a'); l.href = url; l.download = n; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000);
+  } catch (x) { toast(x.message === 'NO' ? '📄 Este trabajo se envió sin el Word (fue antes de este cambio o el archivo era muy grande).' : x.message === 'AUTH' ? '🔐 Conecta tu cuenta para descargar el Word.' : '📶 No pude bajar el Word. Revisa tu internet.', 5000); }
+  b.disabled = false; b.textContent = t0;
+}
 async function openArt(id) {
   const M = $('#modal'); M.hidden = false; M.innerHTML = '<div class="art"><div class="load">📖 Abriendo…</div></div>';
   let w = [...(CACHE.ok || []), ...(CACHE.pend || [])].find(x => x.id === id);
@@ -510,6 +525,7 @@ async function openArt(id) {
   const staff = (ROLE.t || ROLE.r) && TAB === 'bandeja' && w.st === 'pend', own = ME && w.k === ME.key, link = safeUrl(w.link), t = tipo(w.ty);
   M.innerHTML = `<article class="art" role="dialog" aria-modal="true"><div class="hero"><small>${t[1]} ${t[2]} · ${unidad(w.u)[1]} ${esc(unidad(w.u)[2])}</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
   <div class="bd"><p>${esc(w.d)}</p>${[w.img, w.img2, w.img3].filter(Boolean).length ? `<h4>📎 Anexos</h4><div class="anx">${[w.img, w.img2, w.img3].filter(Boolean).map((x, i) => `<figure><img src="${esc(x)}" alt="Anexo ${i + 1}"><figcaption>Anexo ${i + 1}</figcaption></figure>`).join('')}</div>` : ''}${w.f ? `<h4>📚 Fuentes</h4><p style="font-size:14.5px">${esc(w.f)}</p>` : ''}
+ ${ROLE.t || ROLE.r ? '<button type="button" class="btn blue" data-word style="justify-self:start">📄 Descargar su Word</button>' : ''}
   ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
   ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
   ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Consejo para el estudiante (obligatorio si lo devuelves). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
@@ -521,6 +537,7 @@ async function openArt(id) {
 $('#modal').addEventListener('click', async e => {
   const M = $('#modal');
   if (e.target === M || e.target.closest('[data-x]')) { M.hidden = true; M.innerHTML = ''; return; }
+  if (e.target.closest('[data-word]')) return bajarWord(M.dataset.id, e.target.closest('[data-word]'));
   const b = e.target.closest('[data-rv]'); if (!b) return;
   const id = M.dataset.id, act = b.dataset.rv, fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
   if (act === 'no' && fb.length < 8) { toast('💬 Escribe un consejo para que el estudiante sepa qué mejorar.'); $('#rvFb').focus(); return; }
@@ -530,6 +547,7 @@ $('#modal').addEventListener('click', async e => {
   try {
     let r;
     if (act === 'del') r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } });
+    if (act === 'del') fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }).catch(() => {});
     else {
       const up = { st: act, rv: ROLE.t ? 'tu profe' : String(ROLE.rn || ME.name || 'Revisor').slice(0, 60), rvAt: new Date(), fb: act === 'no' ? fb.slice(0, 500) : fb.slice(0, 500) };
       r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&` + Object.keys(up).map(k => 'updateMask.fieldPaths=' + k).join('&') + '&currentDocument.exists=true', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });

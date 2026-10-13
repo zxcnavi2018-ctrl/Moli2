@@ -596,6 +596,7 @@ async function eliminarLibro(t, btn) {                                       // 
   try { const a = await token(); if (!a) throw new Error('AUTH');
     const r = await fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } });
     if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? 'AUTH' : 'RED');
+    fetch(`${BASE}/revdoc/${encodeURIComponent(t.id)}?key=${FB.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }).catch(() => {});
     TRABAJOS = TRABAJOS.filter(x => x.id !== t.id); cerrarLibro(); ponerLibros(); aviso('🗑 Libro eliminado de la Biblioteca y de la Revista.', 3.5);
   } catch (er) { btn.disabled = false; btn.textContent = '🗑 Eliminar libro'; aviso(er.message === 'AUTH' ? '🔐 Conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo eliminar. Revisa tu internet.', 4.5); }
 }
