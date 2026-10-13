@@ -314,7 +314,7 @@ function preguntaDe(w) {                                             // la pregu
   if (i >= 0) { for (let k = i + 1; k < L.length && !/^PASO\b/.test(L[k]); k++) if (es(L[k])) return L[k].slice(0, 180); }
   const q = L.find(es); return q ? q.slice(0, 180) : '';
 }
-const pqHtml = w => { const q = preguntaDe(w); return q ? `<p class="pq">❓ ${esc(q)}</p>` : ''; };
+const pqHtml = w => { if (w.ty !== 'inv') return ''; const q = preguntaDe(w);   // sólo en las Investigaciones return q ? `<p class="pq">❓ ${esc(q)}</p>` : ''; };
 function cardHtml(w, extra = '') { return `<button type="button" class="card" data-open="${esc(w.id)}">${phHtml(w)}<div class="bd"><h3>${esc(w.t)}</h3>${pqHtml(w)}<span class="by">${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : w.rv === 'tu profe' && !w.sec ? ' · Docente' : ''}</span><span class="dt">${fecha(w.at)}</span>${extra}</div></button>`; }
 const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(u || '') ? u : '';
 
