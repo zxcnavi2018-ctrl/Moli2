@@ -93,6 +93,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .tr-slots .sl.ok{border-color:#86efac;background:#f0fdf4}.tr-slots .sl.mj{border-color:#fdba74;background:#fff7ed}.tr-slots .sl.rv{border-color:#93c5fd;background:#eff6ff}.tr-slots .sl.pe{border-style:dashed;background:#f8fafc;color:#94a3b8}
 .tr-r .tr-st{min-width:84px}
 .pq{margin:2px 0 6px;font:italic 700 16px/1.4 var(--serif);color:#0f4c81}.feat .pq{font-size:19px}.card .pq{font-size:14px;margin:0 0 4px}.res .pq{font-size:14.5px;margin:2px 0 4px}
+.pdfb{justify-self:start;padding:6px 12px!important;font-size:13px!important}
 .tyw{display:inline-flex;align-items:center;gap:3px}.opts button.lock{opacity:.5;cursor:not-allowed;background:#f1f5f9}
 .opts .tlk{padding:6px 8px;border-radius:10px;border:2px dashed #94a3b8;font-size:14px;background:#fff}.opts .tlk.on{border:2px solid #dc2626;background:#fee2e2}
 .photo{display:flex;align-items:center;gap:12px;padding:12px;border:2px dashed #b9d3e8;border-radius:16px;background:#fff;font-weight:800;color:var(--ink2)}
@@ -616,16 +617,18 @@ async function openArt(id) {
  ${ROLE.t || ROLE.r ? '<button type="button" class="btn blue" data-word style="justify-self:start">📄 Descargar su Word</button>' : ''}
   ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
   ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
+  ${w.st === 'ok' ? '<button type="button" class="btn soft pdfb" data-pdf>📄 Descargar PDF</button>' : ''}
   ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Consejo para el estudiante (obligatorio si lo devuelves). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
     <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ ${ROLE.t ? 'Devolver (se borra)' : 'Devolver para mejorar'}</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
   ${ROLE.t && w.st === 'ok' && TAB === 'revista' ? '<div class="acts"><button type="button" class="btn soft" data-rv="pend">↩️ Quitar de la revista</button><button type="button" class="btn red" data-rv="del">🗑 Borrar</button></div>' : ''}
   </div></article>`;
-  M.dataset.id = id;
+  M.dataset.id = id; M._w = w;
 }
 $('#modal').addEventListener('click', async e => {
   const M = $('#modal');
   if (e.target === M || e.target.closest('[data-x]')) { M.hidden = true; M.innerHTML = ''; return; }
   if (e.target.closest('[data-word]')) return bajarWord(M.dataset.id, e.target.closest('[data-word]'));
+  if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
   const b = e.target.closest('[data-rv]'); if (!b) return;
   const id = M.dataset.id, act = b.dataset.rv, fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
   const borra = act === 'del' || (act === 'no' && ROLE.t);           // la profe al devolver: se borra (con su Word) para que lo envíe corregido
@@ -663,6 +666,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="mando.js"></script>
+<script src="pdftrabajo.js"></script><script src="mando.js"></script>
 </body>
 </html>
