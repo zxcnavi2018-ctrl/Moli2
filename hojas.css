@@ -434,3 +434,26 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .bk .fx-cierre { margin: .5em 0; padding: .45em .6em; border: 2px dashed #16a34a; border-radius: .6em; background: rgba(220,252,231,.45); }
 .bk .fx-cierre > b { color: #15803d; } .bk .fx-cierre small { color: #64748b; }
 .bk .fx-cr { display: flex; align-items: center; gap: .4em; margin: .25em 0; font-size: .9em; } .bk .fx-cr span { flex: 1; } .bk .fx-cr i { font-style: normal; width: 1.6em; height: 1.6em; border: 1.5px solid #94a3b8; border-radius: .3em; display: grid; place-items: center; font-size: .85em; }
+
+/* ---- fotos de los retos (Sesión 01 · Bebras) y visor en grande ---- */
+.foto-reto { position: relative; display: block; width: 100%; max-width: 18em; margin: .35em 0 .2em; padding: 0; border: .14em solid #2b2547; border-radius: .7em; overflow: hidden; background: #fff; cursor: zoom-in; box-shadow: 0 .2em 0 rgba(43,37,71,.25); }
+.foto-reto img { display: block; width: 100%; height: 9em; object-fit: cover; object-position: top; }
+.foto-reto > i { position: absolute; right: .35em; bottom: .35em; padding: .25em .6em; border-radius: 999px; background: #2b2547; color: #fff; font: 800 .72em "Trebuchet MS", system-ui, sans-serif; font-style: normal; box-shadow: 0 .15em .4em rgba(0,0,0,.3); }
+.foto-reto:hover > i, .foto-reto:focus-visible > i { background: #ff7a2f; }
+.cv-foto { justify-content: flex-start; }
+.cv-fw { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 1.2em; align-items: center; }
+.cv-ftx { display: flex; flex-direction: column; gap: .45em; min-width: 0; } .cv-ftx .cv-pill { align-self: flex-start; } .cv-ftx .cv-box { font-size: 1.05em; margin: 0; }
+.foto-reto.cv-fimg { max-width: none; height: 100%; max-height: 100%; margin: 0; border: .25em solid #fff; border-radius: 1em; background: #fff; box-shadow: 0 .6em 1.6em rgba(0,0,0,.3); }
+.foto-reto.cv-fimg img { height: 100%; object-fit: contain; object-position: center; }
+.foto-reto.cv-fimg > i { font-size: .8em; right: .6em; bottom: .6em; }
+@media (max-aspect-ratio: 1/1) { .cv-fw { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); } }
+#fotoVer { position: fixed; inset: 0; z-index: 9999; display: none; flex-direction: column; background: rgba(15,12,35,.92); backdrop-filter: blur(4px); }
+#fotoVer.on { display: flex; animation: fvIn .25s ease-out; }
+@keyframes fvIn { from { opacity: 0; } to { opacity: 1; } }
+#fotoVer .fv-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: #fff; font: 800 17px "Trebuchet MS", system-ui, sans-serif; }
+#fotoVer .fv-top b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#fotoVer .fv-x { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 3px solid #2b2547; background: #ffd34d; color: #2b2547; font: 900 18px system-ui; box-shadow: 0 4px 0 #2b2547; cursor: pointer; }
+#fotoVer .fv-sc { flex: 1; min-height: 0; overflow: auto; display: flex; padding: 0 12px; }
+#fotoVer .fv-sc img { margin: auto; max-width: 100%; max-height: 100%; border-radius: 12px; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,.5); cursor: zoom-in; }
+#fotoVer.z .fv-sc img { max-width: none; max-height: none; width: min(1600px, 200vw); cursor: zoom-out; }
+#fotoVer .fv-tip { margin: 6px 0 10px; text-align: center; color: #cbd5e1; font: 700 13px system-ui, sans-serif; }

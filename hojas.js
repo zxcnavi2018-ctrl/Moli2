@@ -180,6 +180,24 @@
     return P.join('');
   };
 
+  // ---- Sesión 01 de la Unidad 7 (Retos Bebras): 3 desafíos en foto, sin respuestas ----
+  const BEBRAS = [
+    { mode: 'individual', title: 'Desafío 1 · El camino más barato', desc: 'Leemos el reto con calma y buscamos el recorrido que le cueste al castor la menor cantidad de monedas.', img: 'img/bebras/reto1.jpg' },
+    { mode: 'pair', title: 'Desafío 2 · El ascensor', desc: 'En parejas probamos cómo repartir a los castores en los dos viajes del ascensor (máximo 30 kg) para que suban la mayor cantidad.', img: 'img/bebras/reto2.jpg' },
+    { mode: 'whole', title: 'Desafío 3 · El código secreto', desc: 'Con toda la clase usamos las 4 pistas, una por una, para descubrir el código de 3 dígitos de la cueva de José.', img: 'img/bebras/reto3.jpg' }];
+  const esBebras = (u, s) => !!(u && s && /unit7/.test(u.key || '') && /bebras/i.test(String(s.title || '') + ' ' + String(s.rubric || '')));
+  const actsDe = (u, s) => esBebras(u, s) ? BEBRAS : (s.activities || []);
+  const fotoHtml = (a, cls = '') => L(a && a.img) ? `<button type="button" class="foto-reto ${cls}" data-foto="${esc(a.img)}" data-ft="${esc(a.title || '')}" aria-label="Ver la foto en grande"><img src="${esc(a.img)}" alt="${esc(a.title || 'Foto del reto')}" loading="lazy"><i>👁️ Ver grande</i></button>` : '';
+  function verFoto(src, t) {
+    let v = document.getElementById('fotoVer');
+    if (!v) { v = document.createElement('div'); v.id = 'fotoVer'; document.body.appendChild(v);
+      v.addEventListener('click', e => { if (e.target === v || e.target.closest('.fv-x')) { v.classList.remove('on'); } else if (e.target.tagName === 'IMG') v.classList.toggle('z'); }); }
+    v.innerHTML = `<div class="fv-top"><b>${esc(t || '')}</b><button type="button" class="fv-x" aria-label="Cerrar">✕</button></div><div class="fv-sc"><img src="${esc(src)}" alt="${esc(t || '')}"></div><p class="fv-tip">👆 Toca la foto para acercarla o alejarla</p>`;
+    v.classList.remove('z'); v.classList.add('on');
+  }
+  document.addEventListener('click', e => { const f = e.target.closest && e.target.closest('[data-foto]'); if (!f) return; e.stopPropagation(); e.preventDefault(); verFoto(f.dataset.foto, f.dataset.ft); }, true);
+  addEventListener('keydown', e => { const v = document.getElementById('fotoVer'); if (e.key === 'Escape' && v && v.classList.contains('on')) { e.stopPropagation(); v.classList.remove('on'); } }, true);
+
   // ---- ir a otro libro del aula (el portafolio de Exit tickets o el cuaderno de misiones), ya abierto en esta unidad ----
   let destino = null;
   const refDe = (u, n) => MD.misionesDe(u.key).some(m => m.ses && m.ses.n === n);
@@ -206,15 +224,15 @@
       const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Mi cuaderno de sesiones</p><p class="hand w">${S.length} ${S.length === 1 ? 'sesión' : 'sesiones'} · pasa la hoja ›</p>`,
         r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span></button>`).join('')}` }];
       S.forEach(({ s, n }) => {
-        const cr = (s.criteria || []).filter(L), acts = (s.activities || []).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
+        const cr = (s.criteria || []).filter(L), acts = actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length, bb = esBebras(u, s);
         const tareas = [[s.flipped2, '📌 Trae para esta clase:'], [s.flipped, '🏠 Para la casa:']].filter(([f]) => f && f.enabled && (L(f.title) || L(f.desc)));
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · ${esc(u.title)}</div><div class="big w">Sesión ${n}</div>${temaCorto(u, s, n) ? `<h2 class="w">${esc(temaCorto(u, s, n))}</h2>` : ''}
             ${L(s.meta) ? `<h3 class="w">🎯 Meta de la sesión</h3><p class="hand w">${esc(s.meta)}</p>` : ''}
             ${cr.length ? `<h3 class="w">✅ Criterios de éxito</h3><ul class="cr hand">${cr.map(c => `<li class="w">${esc(c)}</li>`).join('')}</ul>` : ''}
             ${L(s.rubric) ? `<h3 class="w">📏 Lo que se evalúa</h3><p class="hand w">${esc(s.rubric)}</p>` : ''}`,
-          r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${Hojas.videoHtml ? Hojas.videoHtml(a) : ''}`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
+          r: `<h2 class="w">🧪 Actividades</h2>${acts.length ? acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}${fotoHtml(a)}</div>${Hojas.videoHtml ? Hojas.videoHtml(a) : ''}`).join('') : '<p class="hand w">Tu profe aún no escribe las actividades.</p>'}
             ${tareas.map(([f, et]) => `<div class="box tip w"><b>${et}</b> <span class="hand">${esc(f.title)}${L(f.desc) ? ' — ' + esc(f.desc) : ''}</span></div>`).join('')}
-            ${pdfs(s, n)}${q || refDe(u, n) ? `<div class="box w fx-pdfs"><b>➡️ Después de la clase</b><br>${q ? `<button class="bt gr" data-a="irexit" data-n="${n}">🎟️ Exit ticket</button> ` : ''}${refDe(u, n) ? `<button class="bt or" data-a="irref" data-n="${n}">💪 Refuerzo</button>` : ''}</div>` : ''}` });
+            ${bb ? '' : pdfs(s, n)}${q || refDe(u, n) ? `<div class="box w fx-pdfs"><b>➡️ Después de la clase</b><br>${q ? `<button class="bt gr" data-a="irexit" data-n="${n}">🎟️ Exit ticket</button> ` : ''}${refDe(u, n) ? `<button class="bt or" data-a="irref" data-n="${n}">💪 Refuerzo</button>` : ''}</div>` : ''}` });
       });
       return H;
     };
@@ -484,7 +502,7 @@
   const CV_PAL = [['#7c3aed', '#06b6d4'], ['#0ea5e9', '#22c55e'], ['#f97316', '#ec4899'], ['#2563eb', '#8b5cf6'], ['#14b8a6', '#6366f1'], ['#e11d48', '#f59e0b']];
   const CV_ROL = [['🎤', 'SPEAKER', 'Presenta y habla por el equipo'], ['🧰', 'HELPER', 'Trae y organiza los materiales'], ['⏱️', 'TIMER', 'Cuida el tiempo del equipo'], ['🎨', 'DESIGNER', 'Hace que el trabajo se vea bonito y ordenado']];
   const CV_ACU = [['✋', 'Levantar la mano para participar'], ['🤫', 'No conversamos en clase'], ['🪑', 'Nos quedamos en nuestro sitio']];
-  const hashQ = it => { const t = JSON.stringify([it.u.title, it.s.title, it.s.meta, (it.s.activities || []).slice(0, 3).map(x => x && [x.title, x.desc]), it.prev && [it.prev.s.title, it.prev.s.meta]]); let h = 5381; for (let i = 0; i < t.length; i++) h = (h * 33 ^ t.charCodeAt(i)) >>> 0; return 'moli2:cv:' + h.toString(36); };
+  const hashQ = it => { const t = JSON.stringify([it.u.title, it.s.title, it.s.meta, actsDe(it.u, it.s).slice(0, 3).map(x => x && [x.title, x.desc]), it.prev && [it.prev.s.title, it.prev.s.meta]]); let h = 5381; for (let i = 0; i < t.length; i++) h = (h * 33 ^ t.charCodeAt(i)) >>> 0; return 'moli2:cv:' + h.toString(36); };
   function flujoPresentacion(host) {
     const P = { L: [], i: 0, ia: {}, pide: new Set() };
     const actOk = x => x && (L(x.title) || L(x.desc));
@@ -498,7 +516,7 @@
           Lst.push({ ...b, k: 'ses' }, { ...b, k: 'meta' }, { ...b, k: 'mq' });
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
-          const acts = (s.activities || []).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
+          const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
           acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }, { ...b, k: 'aq', x, j: j + 1 }); if (L(C.s) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(C.s) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
@@ -512,7 +530,7 @@
       const p = String(temaDe(it.prev.s, it.prev.n)).replace(/[¿?¡!«»"]/g, '').trim(); return [`¿Qué hicimos en la sesión anterior${p ? `, «${p}»` : ''}?`, '¿Qué aprendimos la clase pasada?']; };
     async function pedirIA(it) {                                         // Molí piensa sus preguntas, la palabra nueva y el dato curioso (una vez por sesión)
       const k = hashQ(it); if (P.pide.has(k) || MD.LS.get(k, null)) return; P.pide.add(k);
-      const s = it.s, acts = (s.activities || []).slice(0, 3), A = { type: 'ARRAY', items: { type: 'STRING' } };
+      const s = it.s, acts = actsDe(it.u, s).slice(0, 3), A = { type: 'ARRAY', items: { type: 'STRING' } };
       const pr = `Eres Molí, un robot amigable que acompaña a una docente de Ciencia y Tecnología de 6.° grado de primaria en Perú. Escribe preguntas que tú, Molí, harás en voz alta a las niñas y niños en una diapositiva gigante. Cada pregunta: corta (máximo 14 palabras), clara, abierta, en primera persona del plural («¿Qué observamos…?»), sin la respuesta dentro, con signos ¿?.
 Unidad ${it.u.num}: «${it.u.title}».
 Sesión ${it.n}: «${s.title || ''}». Meta: «${s.meta || ''}».
@@ -552,6 +570,7 @@ Devuelve JSON:
       if (it.k === 'ref') return mol('pensativa', '<p class="cv-mqt">🪞 Nuestra última reflexión de la sesión</p><ol><li>¿Qué aprendí el día de hoy?</li><li>¿Qué necesité para alcanzar la meta?</li><li>¿Cómo o dónde aplicaría lo que aprendí?</li></ol>');
       if (it.k === 'exit') { const n = MD.preguntas(s).length; return mol('decidida', `<p class="cv-mqt">🎟️ Exit ticket</p><p class="cv-sb">¡Es momento de realizar nuestro Exit ticket!</p><p class="cv-mqt">⏱️ 5 minutos${n ? ` · ${n} pregunta${n > 1 ? 's' : ''}` : ''}</p>`); }
       if (it.k === 'act') { const x = it.x, m = MODOS[String(x.mode || '').toLowerCase()], C = (s.criteria || []).filter(L), Q = MD.LS.get(hashQ(it), null) || {}, ai = Q.c && +Q.c[it.j - 1], c = C[(ai >= 1 && ai <= C.length ? ai : Math.min(it.j, C.length)) - 1];
+        if (L(x.img)) return `<div class="cv-sl cv-foto" ${st}>${crumb(it)}<div class="cv-fw"><div class="cv-ftx"><div class="cv-acth"><span class="cv-num">${it.j}</span><h2 class="cv-h2" style="margin:0">Actividad ${it.j}</h2></div>${m ? `<span class="cv-pill">${m}</span>` : ''}${L(x.title) ? `<h3 class="cv-at">${esc(x.title)}</h3>` : ''}${L(x.desc) ? `<p class="cv-box">${esc(x.desc)}</p>` : ''}${c ? `<div class="cv-crb"><b>✅ Criterio de éxito</b>${esc(c)}</div>` : ''}</div>${fotoHtml(x, 'cv-fimg')}</div></div>`;
         return `<div class="cv-sl" ${st}>${crumb(it)}<div class="cv-acth"><span class="cv-num">${it.j}</span><h2 class="cv-h2" style="margin:0">Actividad ${it.j}</h2>${m ? `<span class="cv-pill">${m}</span>` : ''}</div>${c ? `<div class="cv-crb"><b>✅ Criterio de éxito</b>${esc(c)}</div>` : ''}${L(x.title) ? `<h3 class="cv-at">${esc(x.title)}</h3>` : ''}${L(x.desc) ? `<p class="cv-lead cv-box">${esc(x.desc)}</p>` : ''}${L(x.ficha) ? `<span class="cv-pill">📄 ${esc(x.ficha)}</span>` : ''}</div>`; }
       const qs = ((s.ticket && s.ticket.questions) || []).filter(x => x && L(x.q));
       return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">✅ Respuestas del Exit ticket</h2>${qs.length ? `<ol class="cv-cards cv-q">${qs.map(x => `<li><b>${esc(x.q)}</b><ul>${(x.options || []).map((o, k) => L(o) ? `<li class="${k === x.answer ? 'ok' : ''}">${k === x.answer ? '✓ ' : ''}${esc(o)}</li>` : '').join('')}</ul></li>`).join('')}</ol>` : '<p class="cv-lead">Sin preguntas todavía.</p>'}</div>`;
@@ -602,7 +621,7 @@ Devuelve JSON:
       const tema = { cuaderno: 'ses', folder: 'exit', docente: 'notas', mision: 'mis' }[kind];
       Libro(host, tema, F); actual = F; F.iniciar && F.iniciar();
     },
-    _: { Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
+    _: { actsDe, fotoHtml, esBebras, Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
     cerrar() { if (actual) { actual.libro && actual.libro.ro && actual.libro.ro.disconnect(); actual.cerrar && actual.cerrar(); actual = null; } }
   };
 })();

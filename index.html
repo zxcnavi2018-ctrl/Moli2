@@ -141,6 +141,20 @@
   #sheet.laptop { border-radius: 12px; } #sheet.laptop .paper { position: absolute; inset: 7px; background: #fff; border-radius: 6px; }
   #sheet.pizarra { background: #fff; border: 4px solid #2b2547; border-radius: 4px; }
   #sheet.pizarra .paper { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, #ffffff 0 45%, #f1f5f9 100%); }
+  #bibBar { position: fixed; left: 50%; top: 12px; transform: translateX(-50%) translateY(-20px); z-index: 31; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 22px; background: #fff; border: 3px solid #2b2547; box-shadow: 0 6px 0 rgba(43,37,71,.25), 0 14px 30px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .3s, transform .4s cubic-bezier(.34,1.56,.64,1); }
+  #bibBar.on { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
+  body.open #bibBar { opacity: 0; pointer-events: none; }
+  #bibBar > button { width: 46px; height: 46px; border-radius: 50%; border: 3px solid #2b2547; background: linear-gradient(180deg, #a78bfa, #7c3aed); color: #fff; font-size: 18px; font-weight: 900; box-shadow: 0 4px 0 #2b2547; }
+  #bibBar > button:active { transform: translateY(3px); box-shadow: 0 1px 0 #2b2547; }
+  #bibBar #bibPlay, #bibBar #bibAv { width: auto; padding: 0 18px; border-radius: 999px; background: linear-gradient(180deg, #9ad24d, #6aa52b); color: #123000; font: 900 16px "Trebuchet MS", system-ui, sans-serif; }
+  #bibName { min-width: min(300px, 40vw); max-width: 40vw; text-align: center; font: 800 13px/1.25 "Trebuchet MS", system-ui, sans-serif; color: #1e3a8a; }
+  #bibName small { display: block; color: #7c3aed; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+  #bibName b { display: block; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } #bibName span { color: #ea580c; }
+  #sheet.biblio { background: #8b5a2b; border: 4px solid #2b2547; border-radius: 16px; }
+  #sheet.biblio .paper { position: absolute; inset: 10px 10px 50px 10px; background: #fff; border: 2px solid #2b2547; border-radius: 8px; overflow: hidden; }
+  #sheet.biblio .bibx { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); border: 3px solid #2b2547; border-radius: 999px; padding: 5px 18px; background: #fde68a; color: #2b2547; font: 900 14px "Trebuchet MS", system-ui, sans-serif; box-shadow: 0 3px 0 #2b2547; }
+  @media (max-height: 520px) { #bibBar { top: 6px; padding: 5px 8px; gap: 6px; } #bibBar > button { width: 38px; height: 38px; font-size: 15px; } #bibName b { font-size: 14px; } }
+  #bibBar #bibAv { background: linear-gradient(180deg, #7dd3fc, #0a6aa1); color: #fff; } #bibBar #bibAv[hidden] { display: none; }
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
@@ -209,6 +223,7 @@
 <div id="bookPanel"><h2 id="bookTitle"></h2><div id="books"></div><button id="bookClose">Cerrar</button></div>
 <div id="moliWin"><div id="moliBar"><button id="moliBack">← Volver al aula</button><span id="moliHint"></span></div><iframe id="moliFrame" allow="autoplay; fullscreen"></iframe></div>
 <div id="tourBar"><button id="prevBtn" aria-label="Anterior">◀</button><div id="stopName"><div id="dots"></div></div><button id="nextBtn" aria-label="Siguiente">▶</button></div>
+<div id="bibBar"><button type="button" id="bibPrev" aria-label="Disco anterior">◀</button><div id="bibName"></div><button type="button" id="bibNext" aria-label="Disco siguiente">▶</button><button type="button" id="bibPlay">🎮 Jugar</button><button type="button" id="bibAv" hidden>📊 Avance</button></div>
 <div id="sheet"></div>
 <div id="title"></div>
 <div id="moliTalk"></div>
@@ -623,6 +638,173 @@ function makeLaptop() {                                            // base con t
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.312, 0.196), new THREE.MeshBasicMaterial({ color: 0x0b1220 })); scr.position.set(0, 0.116, 0.001); hinge.add(scr);
   g.userData.hinge = hinge; g.userData.screen = scr; return g;
 }
+// ---- Biblioteca de Temas: librero de nogal (3 repisas + 2 puertitas) con los juegos de ciencia como discos ----
+const JUEGOS = [
+  ['⚡', 'Circuitos simples y compuestos', 'Arma y enciende', 'circuitos.html', ['#fbbf24', '#f97316', '#dc2626']],
+  ['🌋', 'Placas tectónicas', 'Gira el planeta', 'placas.html', ['#38bdf8', '#2563eb', '#1e3a8a']],
+  ['☀️', 'Energías renovables y no renovables', 'Salva tu isla', 'energias.html', ['#4ade80', '#10b981', '#0f766e']],
+  ['🐢', 'Evolución con Darwin', '¿Sobrevivirás?', 'evolucion.html', ['#facc15', '#84cc16', '#3f6212']],
+  ['🦠', 'Enfermedades', 'Duelo de cartas', 'enfermedades.html', ['#fb7185', '#e11d48', '#7c3aed']],
+  ['⚙️', 'Máquinas simples y compuestas', 'Teatro de 9 obras', 'maquinas.html', ['#f87171', '#b91c1c', '#6d28d9']],
+  ['🪐', 'Sistema solar', 'Viaja por los planetas', 'solar.html', ['#a78bfa', '#6d28d9', '#1e1b4b']],
+  ['🌙', 'La Tierra y la Luna', 'Mareas y fases', 'luna.html', ['#67e8f9', '#0284c7', '#172554']],
+  ['🦊', 'Cadenas alimenticias', '¿Quién se come a quién?', 'cadenas.html', ['#bef264', '#65a30d', '#14532d']],
+  ['🌳', 'Tipos de ecosistemas', 'Explora y clasifica', 'ecosistemas.html', ['#5eead4', '#0d9488', '#134e4a']],
+  ['💧', 'Tensión superficial y capilaridad', 'Laboratorio del agua', 'agua.html', ['#7dd3fc', '#0ea5e9', '#4338ca']],
+  ['🧫', 'Orígenes de la vida', '4 historias para jugar', 'origenes.html', ['#a78bfa', '#7c3aed', '#581c87']],
+  ['🦒', 'Lamarck: uso y desuso', 'Haz evolucionar animales', 'lamarck.html', ['#fb923c', '#d97706', '#92400e']],
+  ['🏠', 'Teatro de la vulnerabilidad', 'Prepárate para el sismo', 'vulnerabilidad.html', ['#dc2626', '#991b1b', '#7f1d1d']],
+  ['🛹', 'Energía cinética y potencial', 'Pista de skate', 'energia.html', ['#fb923c', '#2563eb', '#1e1b4b']],
+  ['🍎', 'Gravedad y atracción', 'Caída, planetas y órbitas', 'gravedad.html', ['#c084fc', '#4338ca', '#0b0a24']]
+];
+const NOGAL = 0x8b5a2b, NOGAL_CL = 0x9a6634, NOGAL_OS = 0x5c3a1e;          // la misma madera de los lockers
+function wrapText(g, txt, x, y, maxW, lh, maxL) {
+  const words = txt.split(' '), lines = []; let ln = '';
+  for (const w of words) { const t = ln ? ln + ' ' + w : w; if (g.measureText(t).width > maxW && ln) { lines.push(ln); ln = w; } else ln = t; }
+  if (ln) lines.push(ln); lines.slice(0, maxL).forEach((l, i) => g.fillText(l, x, y + i * lh)); return Math.min(lines.length, maxL);
+}
+function coverTexJ(j) {                                             // portada del disco: degradado del juego, emoji grande y su nombre
+  const [ic, t, s, , C] = j, c = document.createElement('canvas'); c.width = 270; c.height = 380; const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 270, 380); gr.addColorStop(0, C[0]); gr.addColorStop(0.5, C[1]); gr.addColorStop(1, C[2]); g.fillStyle = gr; g.fillRect(0, 0, 270, 380);
+  g.fillStyle = 'rgba(255,255,255,.14)'; for (let k = 0; k < 7; k++) { g.beginPath(); g.arc(30 + k * 45, 40 + (k % 3) * 25, 6 + (k % 2) * 4, 0, 6.3); g.fill(); }
+  g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(0, 0, 270, 34); g.fillStyle = '#fff'; g.font = 'bold 15px "Trebuchet MS", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('📚 BIBLIOTECA DE TEMAS', 135, 18);
+  g.font = '96px sans-serif'; g.fillText(ic, 135, 135);
+  rrect(g, 16, 208, 238, 150, 18); g.fillStyle = 'rgba(255,255,255,.92)'; g.fill(); g.lineWidth = 4; g.strokeStyle = INK; g.stroke();
+  g.fillStyle = '#1e3a8a'; g.font = 'bold 25px "Trebuchet MS", sans-serif'; const n = wrapText(g, t, 135, 240, 210, 28, 3);
+  g.fillStyle = '#ea580c'; g.font = 'bold 17px "Trebuchet MS", sans-serif'; g.fillText(s, 135, 248 + n * 28);
+  const tx = new THREE.CanvasTexture(c); tx.anisotropy = 8; return tx;
+}
+function spineTexJ(j) {                                             // lomo: su color, el emoji arriba y el nombre de costado
+  const [ic, t, , , C] = j, c = document.createElement('canvas'); c.width = 64; c.height = 380; const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 0, 380); gr.addColorStop(0, C[0]); gr.addColorStop(1, C[1]); g.fillStyle = gr; g.fillRect(0, 0, 64, 380);
+  g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(0, 8, 64, 3); g.fillRect(0, 369, 64, 3);
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '34px sans-serif'; g.fillText(ic, 32, 40);
+  g.save(); g.translate(32, 220); g.rotate(-Math.PI / 2); g.fillStyle = '#fff'; g.font = 'bold 22px "Trebuchet MS", sans-serif';
+  let tt = t; while (g.measureText(tt).width > 290 && tt.length > 4) tt = tt.slice(0, -2); if (tt !== t) tt += '…'; g.fillText(tt, 0, 0); g.restore();
+  const tx = new THREE.CanvasTexture(c); tx.anisotropy = 4; return tx;
+}
+function discTexJ(j) {                                              // el disco: brillo plateado con la etiqueta del juego
+  const [ic, t, , , C] = j, c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  const sh = g.createConicGradient ? g.createConicGradient(0, 128, 128) : null;
+  if (sh) { ['#e5e7eb', '#bfdbfe', '#f5d0fe', '#fef9c3', '#bbf7d0', '#e5e7eb'].forEach((col, k, a) => sh.addColorStop(k / (a.length - 1), col)); g.fillStyle = sh; } else g.fillStyle = '#e5e7eb';
+  g.beginPath(); g.arc(128, 128, 127, 0, 6.3); g.fill();
+  const gr = g.createLinearGradient(40, 40, 216, 216); gr.addColorStop(0, C[0]); gr.addColorStop(1, C[2]); g.fillStyle = gr; g.beginPath(); g.arc(128, 128, 92, 0, 6.3); g.fill();
+  g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '44px sans-serif'; g.fillText(ic, 128, 70);
+  g.font = 'bold 15px "Trebuchet MS", sans-serif'; wrapText(g, t, 128, 168, 130, 17, 2);
+  g.fillStyle = '#d1d5db'; g.beginPath(); g.arc(128, 128, 20, 0, 6.3); g.fill(); g.fillStyle = '#1f2937'; g.beginPath(); g.arc(128, 128, 9, 0, 6.3); g.fill();
+  const tx = new THREE.CanvasTexture(c); tx.anisotropy = 4; return tx;
+}
+const CASE_W = 0.135, CASE_H = 0.19, CASE_T = 0.024;
+function makeCase(j) {                                             // estuche: bandeja de atrás con el disco + tapa con la portada (bisagra en el lomo)
+  const g = new THREE.Group(), dark = toon(0x1f2937), C = new THREE.Color(j[4][1]);
+  const tray = new THREE.Mesh(new THREE.BoxGeometry(CASE_W, CASE_H, CASE_T - 0.006), [toon(0x111827), dark, dark, dark, toon(0x374151), dark]); tray.position.z = -0.003; g.add(tray);
+  const spine = new THREE.Mesh(new THREE.BoxGeometry(0.004, CASE_H, CASE_T), [dark, toon(0xffffff, { map: spineTexJ(j) }), dark, dark, dark, dark]);
+  spine.position.x = -CASE_W / 2 - 0.002; g.add(spine);
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.058, 0.058, 0.002, 40), [toon(0xd1d5db), toon(0xffffff, { map: discTexJ(j) }), toon(0xd1d5db)]);
+  disc.rotation.x = Math.PI / 2; disc.position.set(0, 0, (CASE_T - 0.006) / 2 - 0.002); disc.userData.noInk = true;
+  const discG = new THREE.Group(); discG.add(disc); g.add(discG);
+  const hinge = new THREE.Group(); hinge.position.set(-CASE_W / 2, 0, CASE_T / 2 - 0.002); g.add(hinge);
+  const cm = toon(C.getHex()), lid = new THREE.Mesh(new THREE.BoxGeometry(CASE_W, CASE_H, 0.004), [cm, cm, cm, cm, toon(0xffffff, { map: coverTexJ(j) }), cm]);
+  lid.position.x = CASE_W / 2; hinge.add(lid);
+  g.userData = { hinge, discG, lid, j }; return g;
+}
+function plantTag() {                                              // cartelito con su nombre
+  const c = document.createElement('canvas'); c.width = 256; c.height = 96; const g = c.getContext('2d');
+  rrect(g, 6, 6, 244, 84, 20); g.fillStyle = '#fefce8'; g.fill(); g.lineWidth = 6; g.strokeStyle = INK; g.stroke();
+  g.fillStyle = '#15803d'; g.font = 'bold 40px "Trebuchet MS", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🌱 Plantancio', 128, 50);
+  const tx = new THREE.CanvasTexture(c); tx.anisotropy = 8; return tx;
+}
+function makePlantancio() {                                         // macetita de barro, tallito y 3 hojas; ojitos y sonrisa en la maceta
+  const g = new THREE.Group(), pot = new THREE.Group(); g.add(pot);
+  const barro = toon(0xc2683a), barroOs = toon(0xa0522d);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.056, 0.12, 24), barro); body.position.y = 0.06; pot.add(body);
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.084, 0.084, 0.03, 24), barroOs); rim.position.y = 0.125; pot.add(rim);
+  const soil = new THREE.Mesh(new THREE.CylinderGeometry(0.074, 0.074, 0.01, 24), toon(0x4a2f1b)); soil.position.y = 0.139; soil.userData.noInk = true; pot.add(soil);
+  const face = (function () { const c = document.createElement('canvas'); c.width = 128; c.height = 64; const x = c.getContext('2d'); x.fillStyle = INK;
+    x.beginPath(); x.ellipse(40, 26, 7, 10, 0, 0, 6.3); x.fill(); x.beginPath(); x.ellipse(88, 26, 7, 10, 0, 0, 6.3); x.fill();
+    x.fillStyle = '#fff'; x.beginPath(); x.arc(42, 22, 3, 0, 6.3); x.fill(); x.beginPath(); x.arc(90, 22, 3, 0, 6.3); x.fill();
+    x.strokeStyle = INK; x.lineWidth = 5; x.lineCap = 'round'; x.beginPath(); x.arc(64, 36, 13, 0.2, Math.PI - 0.2); x.stroke();
+    x.fillStyle = 'rgba(244,114,182,.55)'; x.beginPath(); x.ellipse(24, 44, 9, 5, 0, 0, 6.3); x.fill(); x.beginPath(); x.ellipse(104, 44, 9, 5, 0, 0, 6.3); x.fill();
+    return new THREE.CanvasTexture(c); })();
+  const fc = new THREE.Mesh(new THREE.PlaneGeometry(0.09, 0.045), new THREE.MeshBasicMaterial({ map: face, transparent: true, depthWrite: false }));
+  fc.position.set(0, 0.07, 0.072); fc.rotation.x = -0.16; pot.add(fc);
+  const sway = new THREE.Group(); sway.position.y = 0.14; g.add(sway);                    // lo verde se mece
+  const tallo = toon(0x3f9b2f), hoja = toon(0x5cc24a);
+  const s1 = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.009, 0.16, 10), tallo); s1.position.y = 0.08; sway.add(s1);
+  const top = new THREE.Group(); top.position.y = 0.16; top.rotation.z = 0.12; sway.add(top);
+  const s2 = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.007, 0.1, 10), tallo); s2.position.y = 0.05; top.add(s2);
+  const leafGeo = new THREE.SphereGeometry(1, 16, 10), leaves = [];
+  [[0.1, -0.9, 0.02, 0], [0.06, 0.95, 0.065, 2.1], [0.1, 0.1, 0.1, 4.2]].forEach(([y, rz, s, ry], k) => {   // 3 hojas
+    const lp = new THREE.Group(); lp.position.y = k === 2 ? 0.1 : y + (k ? 0.0 : -0.03); lp.rotation.y = ry; top.add(lp);
+    const lf = new THREE.Mesh(leafGeo, hoja); lf.scale.set(0.05, 0.012, 0.028); lf.position.x = 0.045; lf.rotation.z = k === 2 ? 0.9 : 0.35; lp.add(lf);
+    const vena = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.002, 0.003), toon(0x2f7a22)); vena.position.set(0.046, 0.011, 0); vena.rotation.z = lf.rotation.z; vena.userData.noInk = true; lp.add(vena);
+    leaves.push(lp); });
+  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.15, 6), toon(0xd6b98c)); stick.position.set(0.055, 0.2, 0.035); stick.userData.noInk = true; g.add(stick);
+  const tag = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.049), new THREE.MeshBasicMaterial({ map: plantTag(), transparent: true, depthWrite: false })); tag.position.set(0.055, 0.285, 0.038); tag.rotation.y = -0.25; g.add(tag);
+  g.userData = { sway, top, leaves, tag }; return g;
+}
+function makeRegadera() {                                           // regadera celeste: cuerpo, pico largo, regador y asa
+  const g = new THREE.Group(), cel = toon(0x38bdf8), cel2 = toon(0x0284c7);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.056, 0.1, 22), cel); body.position.y = 0.05; g.add(body);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.012, 18), cel2); cap.position.y = 0.105; g.add(cap);
+  const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, 0.13, 10), cel); sp.position.set(0.075, 0.075, 0); sp.rotation.z = -1.0; g.add(sp);
+  const rose = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.01, 0.025, 14), cel2); rose.position.set(0.13, 0.112, 0); rose.rotation.z = -1.0; g.add(rose);
+  const handle = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.008, 8, 20, Math.PI), cel2); handle.position.set(-0.035, 0.08, 0); handle.rotation.z = Math.PI / 2 + 0.3; g.add(handle);
+  g.userData = { rose }; return g;
+}
+function makeBiblioteca() {                                         // ancho 62 cm, alto 1,72 m, fondo 30 cm (como el librero de 6 niveles)
+  const W = 0.62, H = 1.72, D = 0.3, t = 0.018, g = new THREE.Group(), body = new THREE.Group(); g.add(body);
+  const m = toon(NOGAL), mc = toon(NOGAL_CL), mo = toon(NOGAL_OS);
+  const box = (w, h, d, x, y, z, mt) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mt); b.position.set(x, y, z); body.add(b); return b; };
+  box(t, H, D, -W / 2 + t / 2, H / 2, 0, m); box(t, H, D, W / 2 - t / 2, H / 2, 0, m);           // costados
+  box(W + 0.012, t + 0.004, D + 0.012, 0, H - t / 2, 0.003, mc);                                 // tapa de arriba
+  box(W - 2 * t, 0.06, D - 0.03, 0, 0.03, -0.012, mo);                                           // zócalo
+  box(W - 2 * t, H - 0.07, 0.008, 0, 0.06 + (H - 0.07) / 2, -D / 2 + 0.004, mo);                // fondo
+  const yB = 0.06, yC = 0.68, shelves = [yB, yC, 1.02, 1.37];                                    // piso, techo del mueble de puertas y 2 repisas
+  shelves.forEach(y => box(W - 2 * t, t, D - 0.012, 0, y + t / 2, 0.004, mc));
+  // 2 puertitas con bisagra en los costados (se abren hacia afuera)
+  const dw = (W - 2 * t) / 2 - 0.003, dh = yC - yB - 0.012, doors = [];
+  [-1, 1].forEach(sd => {
+    const hg = new THREE.Group(); hg.position.set(sd * (W / 2 - t), yB + t + dh / 2 + 0.002, D / 2 + 0.002); g.add(hg);
+    const dr = new THREE.Mesh(new THREE.BoxGeometry(dw, dh, 0.016), m); dr.position.x = -sd * dw / 2; hg.add(dr);
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(dw - 0.05, dh - 0.06, 0.004), mc); panel.position.set(-sd * dw / 2, 0, 0.009); hg.add(panel);
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.011, 12, 10), toon(0xd1d5db)); knob.position.set(-sd * (dw - 0.035), dh / 2 - 0.07, 0.018); hg.add(knob);
+    hg.userData = { sd, dr, panel, knob, dyn: true }; doors.push(hg); });
+  // adentro del mueble: Plantancio y su regadera
+  const plant = makePlantancio(); plant.position.set(-0.07, yB + t, 0.02); plant.userData.dyn = true; g.add(plant);
+  const can = makeRegadera(); can.position.set(0.16, yB + t, 0.03); can.rotation.y = 0.5; can.userData.dyn = true; g.add(can);
+  // los discos parados en las 3 repisas abiertas, con el lomo hacia afuera
+  const slots = [], comps = [[yC + t, 6], [1.02 + t, 5], [1.37 + t, 5]], cases = [];
+  let k = 0;
+  comps.forEach(([y0, n]) => { for (let q = 0; q < n && k < JUEGOS.length; q++, k++) {
+    const c = makeCase(JUEGOS[k]), x = -W / 2 + t + 0.03 + q * (CASE_T + 0.006) + CASE_T / 2;
+    const home = { pos: new THREE.Vector3(x, y0 + CASE_H / 2 + 0.002, 0.02), rotY: Math.PI / 2 };
+    c.position.copy(home.pos); c.rotation.y = home.rotY; c.userData.dyn = true; g.add(c); slots.push(home); cases.push(c); } });
+  // adornos de las repisas: un globo terráqueo y libros echados
+  { const gl = new THREE.Group(); gl.position.set(0.17, yC + t, 0.0); g.add(gl);
+    const st = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.02, 16), mo); st.position.y = 0.01; gl.add(st);
+    const ax = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.17, 6), toon(0xfbbf24)); ax.position.y = 0.1; ax.rotation.z = 0.4; gl.add(ax);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.07, 20, 14), toon(0x3b82f6)); ball.position.y = 0.11; gl.add(ball);
+    const land = new THREE.Mesh(new THREE.SphereGeometry(0.0705, 10, 7, 0.4, 1.6, 0.6, 1.3), toon(0x22c55e)); land.position.y = 0.11; land.userData.noInk = true; gl.add(land); }
+  [[0x16a34a, 0.035], [0xf59e0b, 0.03], [0x2563eb, 0.028]].forEach(([col, th], i) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.17, th, 0.2), toon(col));
+    b.position.set(0.15, 1.02 + t + 0.004 + [0, 0.035, 0.065][i] + th / 2, 0.01); b.rotation.y = 0.12 * (i - 1); g.add(b); });
+  { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.03, 0.09, 12), toon(0xef4444)); r.position.set(0.19, 1.37 + t + 0.045, 0.02); g.add(r);   // trofeo chiquito
+    const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.02, 0.06, 16), toon(0xfbbf24)); cup.position.set(0.19, 1.37 + t + 0.12, 0.02); g.add(cup); }
+  g.userData = { doors, plant, can, slots, cases, W, H, D, plantY: plant.position.y };
+  return g;
+}
+function repoScreenTex() {                                          // lo que se ve en la laptop prendida: el Repositorio Educativo
+  const c = document.createElement('canvas'); c.width = 512; c.height = 320; const g = c.getContext('2d');
+  g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, 512, 320);
+  const gr = g.createLinearGradient(0, 0, 512, 0); gr.addColorStop(0, '#0b2e4f'); gr.addColorStop(0.65, '#0a6aa1'); gr.addColorStop(1, '#1a8bc9'); g.fillStyle = gr; g.fillRect(0, 0, 512, 78);
+  g.fillStyle = '#cfe8a7'; g.font = 'bold 13px "Trebuchet MS", sans-serif'; g.fillText('INNOVA SCHOOLS · 6.° GRADO', 22, 26);
+  g.fillStyle = '#fff'; g.font = 'bold 30px Georgia, serif'; g.fillText('Repositorio Educativo', 22, 60);
+  [['📰 Revista', '#0b2e4f'], ['🔎 Fuentes', '#fff'], ['📤 Enviar', '#fff']].forEach(([t, bg], i) => { rrect(g, 18 + i * 128, 92, 118, 34, 12); g.fillStyle = bg; g.fill(); g.strokeStyle = '#d9e4ee'; g.lineWidth = 2; g.stroke(); g.fillStyle = bg === '#fff' ? '#4b6075' : '#fff'; g.font = 'bold 15px "Trebuchet MS", sans-serif'; g.fillText(t, 30 + i * 128, 115); });
+  [['#e7f2fa', '🔬'], ['#eef8e3', '🛠️'], ['#fff4d6', '🧩']].forEach(([bg, ic], i) => { const x = 18 + i * 162; rrect(g, x, 142, 150, 160, 16); g.fillStyle = '#fff'; g.fill(); g.strokeStyle = '#d9e4ee'; g.stroke();
+    g.fillStyle = bg; g.fillRect(x + 2, 144, 146, 80); g.font = '40px sans-serif'; g.fillText(ic, x + 52, 198); g.fillStyle = '#0b2e4f'; g.fillRect(x + 14, 240, 110, 10); g.fillStyle = '#8cc63f'; g.fillRect(x + 14, 262, 70, 10); });
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
+}
+let REPO_TEX = null;
 function projTex(on) {                                              // lo que se ve en el ecran: apagado (gris) o prendido (en blanco, listo para conectar)
   const c = document.createElement('canvas'); c.width = 512; c.height = 220; const g = c.getContext('2d');
   if (!on) { g.fillStyle = '#d6d3c8'; g.fillRect(0, 0, 512, 220); g.fillStyle = 'rgba(0,0,0,.05)'; for (let x = 0; x < 512; x += 24) g.fillRect(x, 0, 2, 220); }
@@ -827,6 +1009,11 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
         const base = at(ac, yc - 0.15, -0.36); W.position.copy(base); scene.add(W);
         F6.locker = { obj: W, folder: fd, base, out: at(ac, yc - 0.06, 0.12), look: at(ac, yc - 0.08, -0.15), from: at(ac + 0.35, yc + 0.5, 1.2) }; }
       F6.corcho = { look: new THREE.Vector3(cork.position.x, fy + 2.1, cork.position.z), from: new THREE.Vector3(cork.position.x + Math.sin(th) * 3.0, fy + 1.8, cork.position.z + Math.cos(th) * 3.0) }; }
+    { const bu = Wc / 2 - T - 0.85, bs = Dp - 2 * T - 0.165, [bx, bz] = P(bu, bs), [qx, qz] = P(bu, bs - 1), bib = makeBiblioteca();   // Biblioteca de Temas: librero de nogal debajo del ventilador derecho
+      bib.position.set(bx, fy, bz); bib.rotation.y = Math.atan2(qx - bx, qz - bz); scene.add(bib); bib.updateMatrixWorld(true);
+      addCollider(bx, bz, 0.62, 0.3, rotU, fy, fy + 1.72);
+      const at = (x, y, z) => bib.localToWorld(new THREE.Vector3(x, y, z));
+      F6.biblio = { bib, look: at(-0.05, 0.93, 0), from: at(0.7, 1.95, 1.2) }; }
     // mesa del profesor: junto a la pizarra, pegada a la pared del fondo, con el folder "Mis notas" (para el docente)
     { const du = -(Wc / 2 - T) + 1.05, ds = Dp - 2 * T - 1.0;                           // mesa del profesor mirando a las mesitas de los niños; su silla contra la pared de la pizarra
       boxAt(du, ds, 0, 0.68, 0.72, 1.2, 0xc98a4b, true);                                 // cuerpo de la mesa
@@ -1315,7 +1502,7 @@ const lockerPanel = document.getElementById('lockerPanel');
 let toastT = 0, moliPoll = 0, myLocker = null;
 function toast(msg, sec = 4) { toastEl.textContent = msg; toastEl.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => toastEl.style.display = 'none', sec * 1000); }
 function refreshChip() {
-  ME = readMe();
+  ME = MD.yo() || readMe();
   chipEl.textContent = myRoom() ? '👋 ' + (firstName() || 'Estudiante') + ' · 6to B' : ME && ME.teacher ? '👩‍🏫 Docente · Molí' : '🔑 Entrar con Molí';
   if (myRoom()) {                                                  // alumno con cuenta: sólo su salón
     document.getElementById('introH').textContent = '🏫 Mi salón ' + myRoom();
@@ -1379,7 +1566,7 @@ function openMoli(target) {
   let src = MOLI_BASE + 'index.html#/', hint = '', act = null, arg;
   if (target.startsWith('u:')) { src = MOLI_BASE + 'index.html#/u/' + target.slice(2); hint = '📗 Cuaderno · Unidad ' + target.slice(-1); }
   else if (target.startsWith('n:')) { act = 'notes'; arg = target.slice(2); hint = '📂 Mis notas · Unidad ' + target.slice(-1); }
-  else if (target === 'lab') { src = MOLI_BASE + 'lab/index.html?u=' + encodeURIComponent(key) + '&n=' + nm + '&t=' + Date.now(); hint = '🧪 Laboratorio de Molí'; }
+  else if (target === 'lab') { src = MOLI_BASE + 'lab/index.html?u=' + encodeURIComponent(key) + '&n=' + nm + '&t=' + Date.now(); hint = '📚 Biblioteca de Temas'; }
   else if (target === 'exit') { act = 'exit'; hint = '📁 Mis libritos de Exit ticket'; }
   else if (target === 'reg') { act = 'reg'; hint = '📂 Mis notas · Registro del docente'; }
   else if (target === 'mis') { act = 'mis'; hint = '💪 Mis mapas de refuerzo'; }
@@ -1778,6 +1965,8 @@ function moliTarget(target) {
   if (target.startsWith('u:')) return { src: MOLI_BASE + 'index.html#/u/' + target.slice(2) };
   if (target.startsWith('n:')) return { src: MOLI_BASE + 'index.html#/', act: 'notes', arg: target.slice(2) };
   if (target === 'lab') return { src: MOLI_BASE + 'lab/index.html?u=' + encodeURIComponent(key) + '&n=' + nm + '&t=' + Date.now() };
+  if (target.startsWith('game:')) return { src: MOLI_BASE + 'lab/' + target.slice(5) + '?u=' + encodeURIComponent(key) + '&n=' + nm + '&t=' + Date.now() };
+  if (target === 'repo') return { src: MOLI_BASE + 'repositorio.html' };
   return { src: MOLI_BASE + 'index.html#/', act: target === 'login' ? null : target };
 }
 function moliSend(frame, act, arg) {                                 // le pide a Molí que abra esa pantalla (misma web: directo; desde un archivo: por mensaje)
@@ -1802,15 +1991,19 @@ function embed(holder, target) {                                    // Molí den
 addEventListener('message', e => { if (e.data !== 'lab:close') return; const f = sheet.querySelector('iframe.mframe'); if (f && e.source === f.contentWindow) embed(f.parentNode, 'lab'); });
 function fillSheet(kind) {                                          // la laptop abre el laboratorio; lo demás son libros de Molí 2
   if (sheet.dataset.kind !== kind || sheet.style.display !== 'block') return;
-  if (kind === 'laptop') { const slot = sheet.querySelector('.slot');
-    if (MD.esDocente()) Hojas.labDocente(slot, () => embed(slot, 'lab'));   // la docente ve el avance de sus estudiantes (y puede abrir el laboratorio)
-    else embed(slot, 'lab'); }
+  const slot = sheet.querySelector('.slot');
+  if (kind === 'laptop') embed(slot, 'repo');                                       // la laptop: Repositorio Educativo y Revista Innovadora
+  else if (kind === 'labav') Hojas.labDocente(slot, () => embed(slot, 'lab'));      // la docente ve el avance de sus estudiantes en los juegos
+  else if (kind === 'biblio') { const j = JUEGOS[BIB.i >= 0 ? BIB.i : BIB.last]; embed(slot, 'game:' + j[3]); const f = slot.querySelector('iframe');
+    f.addEventListener('load', () => { try { if (/\/lab\/(index\.html)?$/.test(f.contentWindow.location.pathname)) bibCloseGame(); } catch (e) {} }); }
 }
 const LIBROS = ['cuaderno', 'folder', 'docente', 'mision', 'pizarra'];
 const SHEETS = {                                                    // lo que se agranda (en blanco: aquí se conectará el contenido en cada .slot)
   cuaderno: { t: '📗 Mi cuaderno verde', ar: [1.3, 2.0], html: '<div class="pg l"><div class="slot" id="slot-cuaderno-izq"></div></div><div class="ring"></div><div class="pg r"><div class="slot" id="slot-cuaderno-der"></div></div>' },
   folder: { t: '📁 Mi portafolio · Exit tickets', ar: [1.3, 2.0], html: '<div class="paper"><div class="slot" id="slot-folder"></div></div>' },
-  laptop: { t: '💻 Laptop', ar: [1.3, 2.5], big: true, html: '<div class="paper"><div class="slot" id="slot-laptop"></div></div>' },
+  laptop: { t: '💻 Repositorio Educativo', ar: [1.3, 2.5], big: true, html: '<div class="paper"><div class="slot" id="slot-laptop"></div></div>' },
+  biblio: { t: '📚 Biblioteca de Temas', ar: [1.3, 2.5], big: true, html: '<div class="paper"><div class="slot"></div></div><button type="button" class="bibx">📀 Guardar disco</button>' },
+  labav: { t: '📊 Avance de la Biblioteca', ar: [1.3, 2.5], big: true, html: '<div class="paper"><div class="slot"></div></div><button type="button" class="bibx">✕ Cerrar</button>' },
   mision: { t: '📗 Mis misiones de refuerzo', ar: [1.3, 2.0], html: '<div class="paper"><div class="slot"></div></div>' },
   docente: { t: '📂 Mis notas', ar: [1.3, 2.0], html: '<div class="paper"><div class="slot" id="slot-docente"></div></div>' },
   pizarra: { t: '📽️ Pizarra', ar: [1.6, 2.4], html: '<div class="paper"><div class="slot" id="slot-pizarra"></div></div>' }
@@ -1857,11 +2050,14 @@ const STOPS = [
       await hingeTo(f, 1.25, 600, outBack); await expand('folder', W); },
     async leave() { const W = this.obj, b = this.base, o = this.out, f = this.folder, r1 = f.rotation.x; await shrink(W); await hingeTo(f, 0, 380, inCubic);
       await tween(700, k => { W.position.lerpVectors(o, b, k); W.position.y += Math.sin(Math.PI * k) * 0.05; f.rotation.x = r1 + 0.3 * k; }, ease); } },
-  { name: '💻 La laptop', title: 'Laboratorio de Molí', ...FOCUS.laptop,
+  { name: '📚 Biblioteca de Temas', title: 'Biblioteca de Temas', kind: 'biblio', fa: 12, ...FOCUS.biblio,   // fa: ángulo de visión un poco más amplio (el mueble es alto)
+    async enter() { await guiar(); bibBarOn(true); await bibShow(BIB.last); },
+    async leave() { bibBarOn(false); if (BIB.open) await bibCloseGame(); for (let k = 0; k < 60 && BIB.busy; k++) await wait(60); if (BIB.i >= 0) { BIB.busy = true; try { await bibPutBack(); } finally { BIB.busy = false; } } } },
+  { name: '💻 La laptop', title: 'Repositorio Educativo', ...FOCUS.laptop,
     async enter() { const sc = this.obj.userData.screen.material.color, c0 = new THREE.Color(0x0b1220), c1 = new THREE.Color(0x3b82f6), c2 = new THREE.Color(0xf8fbff), h = this.obj.userData.hinge;
       await tween(1000, k => { h.rotation.x = LID_CLOSED + (LID_OPEN - LID_CLOSED) * k; }, outBack);   // se abre la tapa con rebote
-      await tween(300, k => sc.copy(c0).lerp(c1, k)); await wait(250); await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen); },
-    async leave() { MD.subirLab(MD.yo()); const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k));
+      await tween(300, k => sc.copy(c0).lerp(c1, k)); await wait(250); const sm = this.obj.userData.screen.material; sm.map = REPO_TEX || (REPO_TEX = repoScreenTex()); sm.needsUpdate = true; await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen); },
+    async leave() { const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k)); const sm = this.obj.userData.screen.material; sm.map = null; sm.needsUpdate = true;
       const h = this.obj.userData.hinge; await tween(650, k => { h.rotation.x = LID_OPEN + (LID_CLOSED - LID_OPEN) * k; }, inCubic); } },   // se apaga y se cierra
   { name: '📌 El corcho', title: 'Mi corcho de unidad', ...FOCUS.corcho },
   { name: '📂 Mesa del profesor', title: 'Mis notas', ...FOCUS.docente,
@@ -1902,8 +2098,8 @@ function showTitle(text, n) {                                       // nombre de
 function hideTitle() { clearTimeout(titleT); clearTimeout(titleT2); titleOpen(); if (titleEl.style.display === 'block') { titleEl.classList.add('out'); titleT2 = setTimeout(() => { titleEl.style.display = 'none'; }, 800); } }
 function showStop() { [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === TOUR.i)); }
 async function fly(st, dir = 1) {                                   // vuelo en arco, con un leve giro hacia el lado del movimiento y un zoom que se asienta al llegar
-  const p0 = TOUR.pos.clone(), l0 = TOUR.look.clone(), p1 = fromOf(st), d = p0.distanceTo(p1), ms = Math.min(2000, 900 + d * 150);
-  await tween(ms, k => { TOUR.pos.lerpVectors(p0, p1, k); TOUR.pos.y += Math.sin(Math.PI * k) * Math.min(0.45, d * 0.08); TOUR.look.lerpVectors(l0, st.look, k);
+  const p0 = TOUR.pos.clone(), l0 = TOUR.look.clone(), p1 = fromOf(st), d = p0.distanceTo(p1), ms = Math.min(2000, 900 + d * 150), fa0 = TOUR.fa || 0, fa1 = st.fa || 0;
+  await tween(ms, k => { TOUR.fa = fa0 + (fa1 - fa0) * k; TOUR.pos.lerpVectors(p0, p1, k); TOUR.pos.y += Math.sin(Math.PI * k) * Math.min(0.45, d * 0.08); TOUR.look.lerpVectors(l0, st.look, k);
     TOUR.roll = Math.sin(Math.PI * k) * 0.035 * dir; TOUR.zoom = Math.sin(Math.PI * k) * 5; });
   TOUR.roll = 0; TOUR.zoom = 0;
 }
@@ -1926,7 +2122,7 @@ async function go(dir) {
 function tourFrame(t) {                                             // la cámara "respira" un poquito cuando está quieta
   camera.position.copy(TOUR.pos); camera.position.x += Math.sin(t * 0.5) * 0.01; camera.position.y += Math.sin(t * 0.7) * 0.007; camera.lookAt(TOUR.look);
   if (TOUR.roll) camera.rotateZ(TOUR.roll);
-  const f = baseFov + TOUR.zoom; if (Math.abs(camera.fov - f) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
+  const f = baseFov + TOUR.zoom + (TOUR.fa || 0); if (Math.abs(camera.fov - f) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
 }
 setFov(); TOUR.pos.copy(fromOf(STOPS[0])); TOUR.look.copy(STOPS[0].look); showStop();
 startEl.style.display = 'none'; TOUR.started = true; document.getElementById('tourBar').style.display = 'flex'; musicBtn.style.display = 'none';   // sin texto de inicio: empieza de una
@@ -1940,7 +2136,100 @@ addEventListener('pointerdown', completa, true); addEventListener('keydown', e =
 document.getElementById('prevBtn').addEventListener('click', e => { e.stopPropagation(); go(-1); });
 document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); go(1); });
 addEventListener('keydown', e => { if (!TOUR.started || moliWin.style.display === 'flex') return; if (e.code === 'ArrowRight') { e.preventDefault(); go(1); } else if (e.code === 'ArrowLeft') { e.preventDefault(); go(-1); } });
-renderer.domElement.addEventListener('pointerup', e => { if (!TOUR.started) return; if (typeof tocarMoli === 'function' && tocarMoli(e)) return; go(e.clientX > innerWidth / 2 ? 1 : -1); });   // tocar a Molí: «Trabajar con Molí»; si no, derecha avanza / izquierda regresa   // tocar la derecha: avanza; la izquierda: regresa
+renderer.domElement.addEventListener('pointerup', e => { if (!TOUR.started) return; if (tocarMueble(e)) return; if (typeof tocarMoli === 'function' && tocarMoli(e)) return; go(e.clientX > innerWidth / 2 ? 1 : -1); });   // tocar a Molí: «Trabajar con Molí»; si no, derecha avanza / izquierda regresa   // tocar la derecha: avanza; la izquierda: regresa
+// ---- Biblioteca de Temas: selector de discos, puertitas y Plantancio ----
+const BIB = { i: -1, last: 0, busy: false, open: false, doors: false, watering: false, here: false };
+const bibBar = document.getElementById('bibBar'), bibName = document.getElementById('bibName');
+const bibStop = () => STOPS.findIndex(s => s.kind === 'biblio');
+function bibLabel(i) { const j = JUEGOS[i]; bibName.innerHTML = `<small>Disco ${i + 1} de ${JUEGOS.length}</small><b>${j[0]} ${j[1]}</b><span>${j[2]}</span>`; }
+function bibBarOn(on) { BIB.here = on; bibBar.classList.toggle('on', on && !BIB.open); document.getElementById('bibAv').hidden = !MD.esDocente(); }
+async function bibTakeOut(i) {                                       // sale de la repisa, vuela hacia ti mostrando la portada y se abre
+  const B = FOCUS.biblio.bib.userData, c = B.cases[i], h = B.slots[i], u = c.userData; bibLabel(i);
+  const z0 = h.pos.z, p1 = h.pos.clone(); p1.z += 0.19;
+  await tween(320, k => { c.position.z = z0 + (p1.z - z0) * k; }, outCubic);
+  const p2 = new THREE.Vector3(0.06, 1.2, 0.5), r0 = c.rotation.y, cam = FOCUS.biblio.bib.worldToLocal(FOCUS.biblio.from.clone()), r1 = Math.atan2(cam.x - p2.x, cam.z - p2.z);
+  await tween(720, k => { c.position.lerpVectors(p1, p2, k); c.position.y += Math.sin(Math.PI * k) * 0.1; c.rotation.y = r0 + (r1 - r0) * k; c.scale.setScalar(1 + 1.1 * k); }, outBack);
+  await wait(1000); await tween(560, k => { u.hinge.rotation.y = -1.95 * k; }, outBack);
+  await tween(260, k => { u.discG.position.z = 0.012 * k; }, outCubic);
+  BIB.i = i;
+}
+async function bibPutBack() {                                        // se cierra y vuelve a su sitio en la repisa
+  const i = BIB.i; if (i < 0) return; BIB.i = -1;
+  const B = FOCUS.biblio.bib.userData, c = B.cases[i], h = B.slots[i], u = c.userData;
+  await tween(200, k => { u.discG.position.z = 0.012 * (1 - k); });
+  await tween(300, k => { u.hinge.rotation.y = -1.95 * (1 - k); }, inCubic);
+  const p0 = c.position.clone(), p1 = h.pos.clone(); p1.z += 0.19; const s0 = c.scale.x;
+  await tween(560, k => { c.position.lerpVectors(p0, p1, k); c.position.y += Math.sin(Math.PI * k) * 0.06; c.rotation.y = h.rotY * k; c.scale.setScalar(s0 + (1 - s0) * k); }, ease);
+  await tween(260, k => { c.position.z = p1.z + (h.pos.z - p1.z) * k; }, inCubic);
+  c.position.copy(h.pos); c.rotation.y = h.rotY; c.scale.setScalar(1);
+}
+async function bibShow(i) {
+  if (BIB.busy || BIB.open) return; BIB.busy = true;
+  try { i = (i + JUEGOS.length) % JUEGOS.length; bibLabel(i); if (BIB.i >= 0) await bibPutBack(); if (BIB.here) await bibTakeOut(i); BIB.last = i; }
+  finally { BIB.busy = false; }
+}
+async function bibPlay() {                                           // el disco se agranda: se juega dentro del aula
+  if (BIB.busy || BIB.open || BIB.i < 0) return; BIB.open = true; bibBarOn(BIB.here);
+  const c = FOCUS.biblio.bib.userData.cases[BIB.i]; await expand('biblio', c);
+}
+async function bibCloseGame() {
+  if (!BIB.open) return; try { MD.subirLab(MD.yo()); } catch (e) {} const c = BIB.i >= 0 ? FOCUS.biblio.bib.userData.cases[BIB.i] : FOCUS.biblio.bib;
+  await shrink(c); BIB.open = false; bibBarOn(BIB.here);
+}
+document.getElementById('bibPrev').addEventListener('click', e => { e.stopPropagation(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) - 1); });
+document.getElementById('bibNext').addEventListener('click', e => { e.stopPropagation(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) + 1); });
+document.getElementById('bibPlay').addEventListener('click', e => { e.stopPropagation(); if (BIB.i < 0) bibShow(BIB.last).then(bibPlay); else bibPlay(); });
+sheet.addEventListener('click', e => { if (e.target.closest('.bibx')) { e.stopPropagation(); bibCloseGame(); } });
+addEventListener('keydown', e => { if (!BIB.here || BIB.open || moliWin.style.display === 'flex') return; if (e.code === 'ArrowUp') { e.preventDefault(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) + 1); } else if (e.code === 'ArrowDown') { e.preventDefault(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) - 1); } else if (e.code === 'Enter') { e.preventDefault(); bibPlay(); } }, true);
+// puertitas: se abren y se cierran al tocarlas (no es una escena)
+async function bibDoors(open) {
+  const B = FOCUS.biblio.bib.userData; if (BIB.doorBusy) return; BIB.doorBusy = true; BIB.doors = open;
+  try { await Promise.all(B.doors.map((d, k) => wait(k * 90).then(() => { const a0 = d.rotation.y, a1 = open ? d.userData.sd * 1.9 : 0; return tween(open ? 760 : 480, q => { d.rotation.y = a0 + (a1 - a0) * q; }, open ? outBack : inCubic); })));
+    if (open) { plantHop(); toast(PLANT.n ? '🌱 ¡Hola otra vez! Soy Plantancio. ¿Me riegas? 💧' : '🌱 ¡Hola! Soy Plantancio. Toca la regadera para regarme 💧', 4); } }
+  finally { BIB.doorBusy = false; }
+}
+const PLANT = (() => { let n = 0; try { n = +localStorage.getItem('aula6b:plantancio') || 0; } catch (e) {} return { n, hop: 0 }; })();
+const plantGrow = () => 1 + Math.min(0.35, PLANT.n * 0.035);
+function plantHop() { PLANT.hop = performance.now(); }
+const dropMat = new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.9 }), dropGeo = new THREE.SphereGeometry(0.008, 8, 6);
+async function regar() {                                             // la regadera sube, se inclina sobre Plantancio y caen gotitas
+  const B = FOCUS.biblio.bib.userData, can = B.can, pl = B.plant; if (BIB.watering || !BIB.doors) return; BIB.watering = true;
+  try {
+    const p0 = can.position.clone(), r0 = can.rotation.y, p1 = new THREE.Vector3(pl.position.x + 0.17, p0.y + 0.2, pl.position.z + 0.02);
+    can.rotation.order = 'YZX';
+    await tween(600, k => { can.position.lerpVectors(p0, p1, k); can.position.y += Math.sin(Math.PI * k) * 0.05; can.rotation.y = r0 + (Math.PI - r0) * k; }, ease);
+    await tween(380, k => { can.rotation.z = -0.75 * k; }, outCubic);
+    const drops = [], t0 = performance.now(), parent = FOCUS.biblio.bib, rose = B.can.userData.rose, wp = new THREE.Vector3();
+    await new Promise(res => { (function step(now) {
+      const el = now - t0; if (el < 1500 && drops.length < 40 && Math.random() < 0.6) { rose.getWorldPosition(wp); parent.worldToLocal(wp); const d = new THREE.Mesh(dropGeo, dropMat); d.position.copy(wp); d.userData.v = new THREE.Vector3((Math.random() - 0.5) * 0.15, -0.1, (Math.random() - 0.5) * 0.1); parent.add(d); drops.push(d); }
+      for (const d of drops) { if (!d.visible) continue; d.userData.v.y -= 9.8 * 0.016 * 0.35; d.position.addScaledVector(d.userData.v, 0.016); if (d.position.y < pl.position.y + 0.14) d.visible = false; }
+      if (el < 2100) requestAnimationFrame(step); else { drops.forEach(d => parent.remove(d)); res(); } })(t0); });
+    PLANT.n++; try { localStorage.setItem('aula6b:plantancio', PLANT.n); } catch (e) {} plantHop();
+    toast(['💧 ¡Gracias! Plantancio está feliz 🌱', '🌿 ¡Plantancio creció un poquito!', '😊 ¡Glu, glu! Qué rica agua 💧'][PLANT.n % 3], 3);
+    await tween(300, k => { can.rotation.z = -0.75 * (1 - k); });
+    await tween(600, k => { can.position.lerpVectors(p1, p0, k); can.position.y += Math.sin(Math.PI * k) * 0.04; can.rotation.y = Math.PI + (r0 - Math.PI) * k; }, ease);
+  } finally { BIB.watering = false; }
+}
+animHooks.push((t, dt) => {                                          // Plantancio se mece; al regarlo da un saltito y sus hojas crecen; el disco gira
+  const B = FOCUS.biblio && FOCUS.biblio.bib && FOCUS.biblio.bib.userData; if (!B) return;
+  const pu = B.plant.userData, g = plantGrow(), hp = Math.max(0, 1 - (performance.now() - PLANT.hop) / 900);
+  pu.sway.rotation.z = Math.sin(t * 1.4) * 0.05 + Math.sin(hp * 18) * 0.12 * hp; pu.sway.scale.setScalar(g * (1 + 0.08 * Math.sin(hp * Math.PI)));
+  pu.leaves.forEach((l, k) => { l.rotation.x = Math.sin(t * 2 + k * 2) * 0.08; });
+  B.plant.position.y = B.plantY + Math.abs(Math.sin(hp * Math.PI * 2)) * 0.03 * hp;
+  if (BIB.i >= 0) B.cases[BIB.i].userData.discG.rotation.z += dt * 1.6;
+});
+const bibRay = new THREE.Raycaster(), bibNdc = new THREE.Vector2();
+function tocarMueble(e) {                                           // ¿tocaste las puertitas, la regadera o el disco?
+  const B = FOCUS.biblio && FOCUS.biblio.bib && FOCUS.biblio.bib.userData; if (!B || document.body.classList.contains('open')) return false;
+  bibNdc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); bibRay.setFromCamera(bibNdc, camera);
+  const objs = [...B.doors, B.can, ...(BIB.i >= 0 ? [B.cases[BIB.i]] : [])], hit = bibRay.intersectObjects(objs, true)[0]; if (!hit || hit.distance > 6) return false;
+  let o = hit.object; while (o && !objs.includes(o)) o = o.parent;
+  if (B.doors.includes(o)) { bibDoors(!BIB.doors); return true; }
+  if (o === B.can) { if (BIB.doors) regar(); else bibDoors(true); return true; }
+  if (BIB.i >= 0 && o === B.cases[BIB.i]) { bibPlay(); return true; }
+  return false;
+}
+document.getElementById('bibAv').addEventListener('click', async e => { e.stopPropagation(); if (BIB.busy || BIB.open || !MD.esDocente()) return; BIB.open = true; bibBarOn(BIB.here); await expand('labav', FOCUS.biblio.bib); });
 // ===================================================================
 //  MOLÍ 3D (mismo diseño que moli3d.html)
 // ===================================================================
@@ -2242,7 +2531,8 @@ const GUIA = [
   '¡Hola' + (nombre ? ' <b>' + nombre + '</b>' : '') + '! 👋 Soy <b>Molí</b>, tu guía. Esta es tu <b>aula de sexto grado</b>. Toca <b>▶</b> o la derecha de la pantalla y te muestro cada lugar.',
   'Esta es <b>tu mesa</b>. Aquí está tu <b>cuaderno verde</b> con tus <b>sesiones de unidad</b>: lo que aprendes en cada clase. 📗',
   'Este es <b>tu locker</b>. Adentro está tu <b>portafolio verde</b> con tus <b>Exit tickets</b>: lo que respondes al final de cada clase. 🎒',
-  'En esta <b>laptop</b> está el <b>Laboratorio de Molí</b>: ¡juegos y experimentos de ciencia! 🧪',
+  'Este es el mueble de la <b>Biblioteca de Temas</b> 📚: cada <b>disco</b> es un juego de ciencia. Elige uno con las flechitas y toca <b>🎮 Jugar</b>. ¡Y abre las <b>puertitas</b> para conocer a <b>Plantancio</b>! 🌱',
+  'En esta <b>laptop</b> está el <b>Repositorio Educativo</b> 💻: <b>fuentes confiables</b> para investigar y la <b>Revista Innovadora</b>, donde subes tus investigaciones y productos. 📰',
   'Este es el <b>corcho de la unidad</b>: aquí ves qué unidad estamos trabajando y su propósito. 📌',
   'Esta es la <b>mesa del profesor</b>. En su folder azul están <b>tus notas</b>. 📂',
   'Y en la mesa del profesor también está este <b>cuaderno verde</b> con <b>tus misiones de refuerzo</b>: para practicar lo que más te cuesta. 💪',
@@ -2386,6 +2676,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
+<script src="revista.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>

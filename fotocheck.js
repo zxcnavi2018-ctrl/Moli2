@@ -44,7 +44,9 @@
     ['preparadas', '📦', 'Sesiones preparadas', 'Unidad 7 lista para publicar'],
     ['escanear', '📷', 'Escanear', 'Exit tickets en papel'],
     ['remoto', '📱', 'Control remoto', 'Maneja la pantalla desde tu celular'],
-    ['equipo', '💻', 'Laptop o celular', 'Qué hace este equipo']
+    ['equipo', '💻', 'Laptop o celular', 'Qué hace este equipo'],
+    ['bandeja', '📥', 'Bandeja de la Revista', 'Trabajos por revisar'],
+    ['revisores', '🧐', 'Revisores', 'Estudiantes que aprueban trabajos']
   ];
   let infoDoc = null;
   function pedirClave(info) {
@@ -66,6 +68,7 @@
     const me = MD.yo();
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
       <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || '').split(' ')[0])}! 👋</b><span>${esc(me.name)} · 6° ${esc(me.section || '')}</span></div></div>
+      ${window.Revista && Revista.esRevisor() ? '<button class="fp-ok" data-f="h" data-k="bandeja">📥 Mi bandeja de Revisor</button>' : ''}
       <button class="fp-out" data-f="salir1">🚪 Salir de cuenta</button>`);
   }
   function confirmarSalir() {

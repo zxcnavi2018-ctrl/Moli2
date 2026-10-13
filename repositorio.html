@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Repositorio Educativo · Molí</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0b2e4f;--blue:#0a6aa1;--blue2:#1583c4;--sky:#e7f2fa;--green:#8cc63f;--green2:#6aa52b;--mint:#eef8e3;--cream:#fbfaf6;--ink:#17324d;--ink2:#4b6075;--line:#d9e4ee;--gold:#f5b62a;--red:#e2483d;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;--sans:"Nunito","Trebuchet MS",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100%}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+/* encabezado */
+.top{position:relative;display:flex;align-items:center;gap:14px;padding:14px 20px 12px;color:#fff;background:linear-gradient(115deg,var(--navy) 0%,var(--blue) 62%,#1a8bc9 100%);overflow:hidden;flex:none}
+.top::after{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(140,198,63,.55),rgba(140,198,63,0) 68%);pointer-events:none}
+.top .moli{width:62px;height:62px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.3));flex:none;animation:bob 3s ease-in-out infinite}
+.brand{flex:1;min-width:0}
+.brand small{display:block;font-weight:900;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#cfe8a7}
+.brand h1{margin:2px 0 0;font:900 clamp(22px,3.2vw,34px)/1.05 var(--serif);letter-spacing:.01em}
+.me{position:relative;z-index:1;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:rgba(255,255,255,.14);font-weight:800;font-size:13px;white-space:nowrap}
+.me i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--green);color:var(--navy);font-style:normal;font-weight:900}
+.me .rol{padding:2px 8px;border-radius:999px;background:var(--gold);color:#3b2a00;font-size:11px;font-weight:900}
+/* pestañas */
+.tabs{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{position:relative;display:flex;align-items:center;gap:8px;padding:11px 18px;border:2px solid var(--line);border-radius:16px;background:#fff;font-weight:900;font-size:15px;color:var(--ink2);white-space:nowrap;transition:all .2s}
+.tabs button:hover{border-color:var(--blue2);color:var(--blue)}
+.tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 6px 16px -6px rgba(11,46,79,.6)}
+.tabs button .cnt{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;display:grid;place-items:center}
+.tabs button[hidden],.tabs button .cnt[hidden]{display:none}
+main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
+.wrap{max-width:1100px;margin:0 auto}
+/* globo de Molí */
+.tip{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:12px 16px;border-radius:18px;background:var(--sky);border:2px solid #cfe3f3;font-weight:800;color:var(--navy)}
+.tip img{width:46px;height:46px;object-fit:contain;flex:none}
+.tip.green{background:var(--mint);border-color:#d4ecb8}
+/* portada de la revista */
+.cover{position:relative;display:grid;grid-template-columns:1fr auto;align-items:end;gap:10px;padding:24px 26px;border-radius:24px;color:#fff;background:linear-gradient(130deg,var(--navy),var(--blue) 70%);overflow:hidden;margin-bottom:16px}
+.cover::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 18px);pointer-events:none}
+.cover .ed{font-weight:900;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#cfe8a7}
+.cover h2{margin:4px 0 6px;font:900 clamp(30px,5vw,54px)/1 var(--serif)}
+.cover h2 em{font-style:normal;color:var(--green)}
+.cover p{margin:0;max-width:560px;font-weight:700;opacity:.92}
+.cover img{width:clamp(80px,12vw,130px);filter:drop-shadow(0 10px 16px rgba(0,0,0,.35));position:relative}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.chip{padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:#fff;font-weight:900;font-size:14px;color:var(--ink2)}
+.chip.on{background:var(--green);border-color:var(--green);color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;text-align:left;padding:0;border:0;border-radius:20px;background:#fff;box-shadow:0 2px 0 var(--line),0 10px 24px -14px rgba(11,46,79,.45);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 2px 0 var(--line),0 18px 30px -14px rgba(11,46,79,.55)}
+.card .ph{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,var(--sky),#d5ebf8);display:grid;place-items:center;font-size:54px;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .ty{position:absolute;left:10px;top:10px;padding:4px 10px;border-radius:999px;background:rgba(11,46,79,.85);color:#fff;font-size:12px;font-weight:900}
+.card .bd{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{margin:0;font:800 18px/1.2 var(--serif);color:var(--navy)}
+.card .by{font-size:13px;font-weight:800;color:var(--ink2)}
+.card .un{align-self:flex-start;padding:3px 9px;border-radius:999px;background:var(--mint);color:var(--green2);font-size:12px;font-weight:900}
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:30px 16px;text-align:center;color:var(--ink2);font-weight:800}
+.empty img{width:120px}
+.empty b{font:900 22px var(--serif);color:var(--navy)}
+/* fuentes */
+.src-sec{margin:0 0 20px}
+.src-sec h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font:900 21px var(--serif);color:var(--navy)}
+.src-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.src{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:18px;background:#fff;border:2px solid var(--line);text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+.src:hover{border-color:var(--green);transform:translateY(-2px)}
+.src .ic{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:var(--sky);font-size:26px}
+.src b{display:block;font-size:16px;color:var(--navy)}
+.src span{display:block;font-size:13.5px;font-weight:700;color:var(--ink2);line-height:1.35;margin-top:2px}
+.src small{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;background:var(--mint);color:var(--green2);font-weight:900;font-size:11.5px}
+.check{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:0 0 20px;padding:0;list-style:none}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:#fff;border:2px dashed #c9dced;font-weight:800;font-size:14.5px}
+.check li i{font-style:normal;font-size:22px;line-height:1}
+.cite{padding:14px 16px;border-radius:16px;background:#fff7e0;border:2px solid #f6dc8b;font-weight:800;color:#5b4300}
+.cite code{display:block;margin-top:6px;padding:8px 10px;border-radius:10px;background:#fff;font-family:inherit;font-weight:700;color:var(--ink)}
+/* formulario */
+.form{display:grid;gap:14px;max-width:760px}
+.fld label{display:block;margin:0 0 6px;font-weight:900;font-size:15px;color:var(--navy)}
+.fld small{display:block;margin-top:4px;font-weight:700;color:var(--ink2);font-size:13px}
+.fld input[type=text],.fld input[type=url],.fld textarea{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;font-weight:700;font-size:16px;outline:none;transition:border-color .2s}
+.fld textarea{min-height:110px;resize:vertical}
+.fld input:focus,.fld textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 4px rgba(21,131,196,.15)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:900;font-size:15px}
+.opts button.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.photo{display:flex;align-items:center;gap:12px;padding:12px;border:2px dashed #b9d3e8;border-radius:16px;background:#fff;font-weight:800;color:var(--ink2)}
+.photo img{width:110px;height:74px;object-fit:cover;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border:0;border-radius:16px;font-weight:900;font-size:16px;transition:transform .15s,filter .15s}
+.btn:active{transform:translateY(2px)}
+.btn.go{background:linear-gradient(180deg,#9ad24d,var(--green2));color:#123000;box-shadow:0 4px 0 #4f7f1d}
+.btn.blue{background:var(--blue);color:#fff;box-shadow:0 4px 0 #07486e}
+.btn.soft{background:#fff;color:var(--navy);border:2px solid var(--line)}
+.btn.red{background:#fff;color:var(--red);border:2px solid #f3c4c0}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.mine{display:grid;gap:10px;margin-top:22px;max-width:760px}
+.mine h3{margin:0;font:900 20px var(--serif);color:var(--navy)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#fff;border:2px solid var(--line)}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;color:var(--navy)}
+.row .t span{font-size:13px;font-weight:700;color:var(--ink2)}
+.st{padding:5px 10px;border-radius:999px;font-weight:900;font-size:12.5px;white-space:nowrap}
+.st.pend{background:#fff4d6;color:#8a6100}.st.ok{background:var(--mint);color:var(--green2)}.st.no{background:#fde8e6;color:#b23a30}
+.fb{margin-top:6px;padding:8px 10px;border-radius:12px;background:#fff7e0;font-weight:800;font-size:13.5px;color:#5b4300}
+/* artículo / revisión */
+#modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,26,45,.6);backdrop-filter:blur(3px);animation:fade .2s}
+#modal[hidden]{display:none}
+.art{position:relative;width:min(860px,100%);max-height:100%;overflow:auto;border-radius:24px;background:var(--cream);box-shadow:0 30px 70px rgba(0,0,0,.45);animation:pop .35s cubic-bezier(.2,1.3,.4,1)}
+.art .hero{position:relative;background:linear-gradient(130deg,var(--navy),var(--blue));color:#fff;padding:22px 24px 18px}
+.art .hero small{font-weight:900;letter-spacing:.2em;font-size:11px;text-transform:uppercase;color:#cfe8a7}
+.art .hero h2{margin:6px 0 4px;font:900 clamp(24px,4vw,36px)/1.1 var(--serif)}
+.art .hero .by{font-weight:800;opacity:.9}
+.art .x{position:absolute;right:12px;top:12px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;font-weight:900}
+.art .img{display:block;width:100%;max-height:420px;object-fit:contain;background:#0b1b2c}
+.art .bd{padding:18px 24px 22px;display:grid;gap:12px}
+.art .bd p{margin:0;font-weight:700;font-size:16.5px;line-height:1.55;white-space:pre-line}
+.art .bd h4{margin:6px 0 0;font:900 16px var(--serif);color:var(--navy)}
+.art .rv{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--mint);color:var(--green2);font-weight:900;font-size:13px;justify-self:start}
+.art .acts{display:flex;flex-wrap:wrap;gap:10px;padding-top:6px;border-top:2px dashed var(--line)}
+.art textarea{width:100%;min-height:80px;padding:12px;border:2px solid var(--line);border-radius:14px;font-weight:700}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;padding:12px 18px;border-radius:16px;background:var(--navy);color:#fff;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:pop .3s}
+#toast[hidden]{display:none}
+.pin{display:grid;gap:10px;justify-items:center;text-align:center;padding:24px;max-width:360px;margin:30px auto;border-radius:24px;background:#fff;border:2px solid var(--line)}
+.pin input{width:150px;padding:12px;border:2px solid var(--line);border-radius:14px;text-align:center;font-size:26px;font-weight:900;letter-spacing:.4em}
+.load{padding:30px;text-align:center;font-weight:900;color:var(--ink2)}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(10px)}}
+@keyframes fade{from{opacity:0}}
+@media (max-width:640px){.top{padding:10px 14px}.top .moli{width:46px;height:46px}.me .nm{display:none}.tabs button span{display:none}.tabs button{padding:10px 14px;font-size:18px}main{padding:14px 12px 30px}.cover{grid-template-columns:1fr;padding:18px}.cover img{display:none}}
+@media (max-height:520px){.top{padding:8px 16px}.top .moli{width:40px;height:40px}.brand small{display:none}.tabs{padding:6px 12px}.tabs button{padding:7px 13px;font-size:14px}main{padding:12px 16px 24px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <img class="moli" src="img/moli/hola.webp" alt="">
+  <div class="brand"><small>Innova Schools · Ciencia y Tecnología · 6.° grado</small><h1>Repositorio Educativo</h1></div>
+  <div class="me" id="me" hidden></div>
+</header>
+<nav class="tabs" id="tabs">
+  <button type="button" data-tab="revista" class="on">📰 <span>Revista Innovadora</span></button>
+  <button type="button" data-tab="fuentes">🔎 <span>Fuentes confiables</span></button>
+  <button type="button" data-tab="enviar">📤 <span>Enviar mi trabajo</span></button>
+  <button type="button" data-tab="bandeja" hidden>📥 <span>Bandeja</span><b class="cnt" hidden></b></button>
+</nav>
+<main id="main"><div class="wrap" id="view"></div></main>
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+<script>
+'use strict';
+// ---- datos de Molí (misma web): cuenta del estudiante y de la docente ----
+const DOC = '1ba4092d0e', F = { apiKey: 'AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM', projectId: 'ciencia6abcd' };
+const BASE = `https://firestore.googleapis.com/v1/projects/${F.projectId}/databases/(default)/documents`;
+const K_ME = 'moli2:me', K_ME1 = 'ciencia4b:me:' + DOC, K_T = 'moli2:auth', K_T1 = 'ciencia4b:auth:' + DOC, K_R = 'moli2:rauth', K_MY = 'moli2:revista', K_HU = 'moli2:hu';
+const ls = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } } };
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const ME = (m => m && m.key ? m : null)(ls.get(K_ME, null)) || (m => m && m.key && !m.demo ? m : null)(ls.get(K_ME1, null)), QS = new URLSearchParams(location.search);
+const TIPOS = [['inv', '🔬', 'Investigación'], ['pro', '🛠️', 'Producto'], ['maq', '🧩', 'Maqueta'], ['info', '🖼️', 'Infografía'], ['vid', '🎬', 'Video'], ['exp', '⚗️', 'Experimento']];
+const UNITS = [['unit7', '🦠', 'Unidad 7 · Microorganismos'], ['unit8', '🧬', 'Unidad 8 · Sistema reproductor'], ['otra', '🌎', 'Otro tema de Ciencia']];
+const tipo = k => TIPOS.find(t => t[0] === k) || TIPOS[0], unidad = k => UNITS.find(u => u[0] === k) || UNITS[2];
+if (ME && ME.docente) ME.teacher = true;
+const ROLE = { t: !!(ME && ME.teacher), r: false, rh: '', rx: '', rn: '' };
+
+// ---- Firestore (REST) ----
+const enc = v => v === null || v === undefined ? { nullValue: null } : v instanceof Date ? { timestampValue: v.toISOString() } : typeof v === 'number' ? (Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v }) : typeof v === 'boolean' ? { booleanValue: v } : { stringValue: String(v) };
+const dec = v => !v ? null : 'stringValue' in v ? v.stringValue : 'timestampValue' in v ? Date.parse(v.timestampValue) : 'integerValue' in v ? +v.integerValue : 'doubleValue' in v ? v.doubleValue : 'booleanValue' in v ? v.booleanValue : 'mapValue' in v ? Object.fromEntries(Object.entries(v.mapValue.fields || {}).map(([k, x]) => [k, dec(x)])) : 'arrayValue' in v ? (v.arrayValue.values || []).map(dec) : null;
+const docOf = d => ({ id: d.name.split('/').pop(), ...Object.fromEntries(Object.entries(d.fields || {}).map(([k, v]) => [k, dec(v)])) });
+const fieldsOf = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, enc(v)]));
+async function tok(key) {                                            // token de la docente (o del revisor); se renueva solo
+  const t = ls.get(key, null); if (!t || !t.refreshToken) return null;
+  if (Date.now() < (t.exp || 0) - 6e4) return t.idToken;
+  try {
+    const r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${F.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(t.refreshToken) });
+    if (!r.ok) { if (r.status === 400) localStorage.removeItem(key); return null; }
+    const j = await r.json(); ls.set(key, { ...t, idToken: j.id_token, refreshToken: j.refresh_token, exp: Date.now() + 1e3 * (+j.expires_in || 3600) }); return j.id_token;
+  } catch (e) { return null; }
+}
+const staffTok = async () => (ROLE.t ? await tok(K_T) || await tok(K_T1) : null) || (ROLE.r ? await tok(K_R) : null);
+async function query(st, auth, fields) {
+  const q = { structuredQuery: { from: [{ collectionId: 'revista' }], where: { fieldFilter: { field: { fieldPath: 'st' }, op: 'EQUAL', value: { stringValue: st } } }, limit: 300 } };
+  if (fields) q.structuredQuery.select = { fields: fields.map(f => ({ fieldPath: f })) };
+  const h = { 'Content-Type': 'application/json' }; if (auth) h.Authorization = 'Bearer ' + auth;
+  const r = await fetch(`${BASE}:runQuery?key=${F.apiKey}`, { method: 'POST', headers: h, body: JSON.stringify(q) });
+  if (!r.ok) throw new Error(r.status === 403 || r.status === 401 ? 'AUTH' : 'NET');
+  return (await r.json()).filter(x => x.document).map(x => docOf(x.document)).sort((a, b) => (b.at || 0) - (a.at || 0));
+}
+async function getDoc(id) { const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`); if (r.status === 404) return null; if (!r.ok) throw new Error('NET'); return docOf(await r.json()); }
+const LIST_F = ['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'st', 'rv', 'fb', 'at', 'rvAt'];
+
+// ---- Revisor: la docente le da el título y una clave de 4 números ----
+async function pbkdf(pass, salt, iter, bits) {
+  const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveBits']);
+  const b = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: iter }, k, bits);
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+async function huella(dni) { const c = ls.get(K_HU, {}); if (c[dni]) return c[dni]; const h = 'r' + await pbkdf(dni, 'ciencia6-rank', 15e4, 80); c[dni] = h; ls.set(K_HU, c); return h; }
+async function checkRole() {
+  if (!ME || ME.teacher || !ME.dni) return;
+  try {
+    const r = await fetch(`${BASE}/config/site?key=${F.apiKey}`, { cache: 'no-store' }); if (!r.ok) return;
+    const rev = docOf(await r.json()).rev || {}, h = await huella(String(ME.dni));
+    if (rev[h]) { const [x, n] = String(rev[h]).split('|'); Object.assign(ROLE, { r: true, rh: h, rx: x, rn: n || ME.name }); }
+    else if (ls.get(K_R, null)) localStorage.removeItem(K_R);          // ya no es revisor
+  } catch (e) {}
+}
+async function revLogin(pin) {
+  const pass = await pbkdf(pin, 'ciencia-apin-' + ROLE.rh + '|' + ROLE.rx, 2e5, 256), email = `${ROLE.rh}-${ROLE.rx}@${F.projectId}.firebaseapp.com`;
+  const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${F.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: pass, returnSecureToken: true }) });
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error && j.error.message || 'AUTH');
+  ls.set(K_R, { email: j.email, idToken: j.idToken, refreshToken: j.refreshToken, exp: Date.now() + 1e3 * (+j.expiresIn || 3600) });
+}
+
+// ---- utilidades de pantalla ----
+let toastT = 0;
+function toast(m, ms = 3200) { const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, ms); }
+const tip = (html, img = 'feliz', cls = '') => `<div class="tip ${cls}"><img src="img/moli/${img}.webp" alt=""><div>${html}</div></div>`;
+const fecha = ms => ms ? new Date(ms).toLocaleDateString('es-PE', { day: 'numeric', month: 'long' }) : '';
+const firstName = n => String(n || '').trim().split(/\s+/)[0] || '';
+function phHtml(w) { const t = tipo(w.ty); return `<div class="ph">${w.th ? `<img src="${esc(w.th)}" alt="" loading="lazy">` : t[1]}<span class="ty">${t[1]} ${t[2]}</span></div>`; }
+function cardHtml(w, extra = '') { return `<button type="button" class="card" data-open="${esc(w.id)}">${phHtml(w)}<div class="bd"><h3>${esc(w.t)}</h3><span class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')}</span><span class="un">${unidad(w.u)[1]} ${esc(unidad(w.u)[2])}</span>${extra}</div></button>`; }
+const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(u || '') ? u : '';
+
+// ---- pestañas ----
+let TAB = '', CACHE = { ok: null, pend: null };
+function setTab(t) {
+  TAB = t; document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  $('#main').scrollTop = 0; ({ revista: vRevista, fuentes: vFuentes, enviar: vEnviar, bandeja: vBandeja })[t]();
+}
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
+
+// ---- 📰 Revista Innovadora: lo aprobado ----
+let FIL = { u: '', sec: '' };
+async function vRevista() {
+  const V = $('#view');
+  V.innerHTML = `<section class="cover"><div><div class="ed">Edición ${new Date().getFullYear()} · Ciencia y Tecnología</div><h2>Revista <em>Innovadora</em></h2><p>Las investigaciones y productos de nuestros científicos de 6.° grado. ¡Cada trabajo fue revisado antes de publicarse! ✨</p></div><img src="img/moli/orgullosa.webp" alt=""></section>
+  <div class="filters" id="fil">${[['', '🌟 Todo'], ...UNITS.map(u => [u[0], u[1] + ' ' + u[2].split(' · ')[0]])].map(([k, l]) => `<button type="button" class="chip${FIL.u === k ? ' on' : ''}" data-fu="${k}">${esc(l)}</button>`).join('')}
+  ${['', 'A', 'B', 'C', 'D'].map(s => `<button type="button" class="chip${FIL.sec === s ? ' on' : ''}" data-fs="${s}">${s ? '6.° ' + s : 'Todas las secciones'}</button>`).join('')}</div>
+  <div id="list"><div class="load">📰 Abriendo la revista…</div></div>`;
+  try { if (!CACHE.ok) CACHE.ok = await query('ok', null, LIST_F); drawRevista(); }
+  catch (e) { $('#list').innerHTML = `<div class="empty"><img src="img/moli/preo.webp" alt=""><b>No pude abrir la revista</b>Revisa tu internet e intenta otra vez.</div>`; }
+}
+function drawRevista() {
+  const L = (CACHE.ok || []).filter(w => (!FIL.u || w.u === FIL.u) && (!FIL.sec || w.sec === FIL.sec)), el = $('#list'); if (!el) return;
+  el.innerHTML = L.length ? `<div class="grid">${L.map(w => cardHtml(w)).join('')}</div>` : `<div class="empty"><img src="img/moli/curiosa.webp" alt=""><b>¡Aún no hay trabajos aquí!</b>Sé el primero: envía tu investigación o tu producto en «📤 Enviar mi trabajo». 🚀</div>`;
+}
+$('#view').addEventListener('click', e => {
+  const u = e.target.closest('[data-fu]'), s = e.target.closest('[data-fs]');
+  if (u) { FIL.u = u.dataset.fu; document.querySelectorAll('[data-fu]').forEach(b => b.classList.toggle('on', b === u)); drawRevista(); }
+  if (s) { FIL.sec = s.dataset.fs; document.querySelectorAll('[data-fs]').forEach(b => b.classList.toggle('on', b === s)); drawRevista(); }
+  const o = e.target.closest('[data-open]'); if (o) openArt(o.dataset.open);
+});
+
+// ---- 🔎 Fuentes confiables ----
+const FUENTES = [
+  ['📚 Para investigar cualquier tema', [
+    ['🇵🇪', 'PerúEduca', 'Recursos del Ministerio de Educación del Perú para estudiantes.', 'https://www.perueduca.pe', 'Ministerio de Educación'],
+    ['🎓', 'Khan Academy en español', 'Videos y lecturas de ciencias explicados paso a paso.', 'https://es.khanacademy.org', 'Organización educativa'],
+    ['📖', 'Vikidia', 'Enciclopedia escrita para chicos de 8 a 13 años.', 'https://es.vikidia.org', 'Enciclopedia para niños'],
+    ['🚀', 'NASA Space Place', 'El espacio, la Tierra y el clima, en español y para niños.', 'https://spaceplace.nasa.gov/sp/', 'Agencia espacial de EE. UU.']]],
+  ['🦠 Unidad 7 · Microorganismos y salud', [
+    ['🏥', 'Ministerio de Salud (MINSA)', 'Información oficial sobre enfermedades y cómo prevenirlas.', 'https://www.gob.pe/minsa', 'Gobierno del Perú'],
+    ['🌍', 'Organización Mundial de la Salud', 'Datos confiables sobre virus, bacterias y vacunas.', 'https://www.who.int/es', 'Organización mundial'],
+    ['🧒', 'KidsHealth en español', 'Salud y cuerpo humano explicado para niños.', 'https://kidshealth.org/es/kids/', 'Médicos pediatras']]],
+  ['🧬 Unidad 8 · Cuerpo humano y crecimiento', [
+    ['🧒', 'KidsHealth: tu cuerpo', 'Los sistemas del cuerpo y los cambios al crecer.', 'https://kidshealth.org/es/kids/', 'Médicos pediatras'],
+    ['💙', 'UNICEF Perú', 'Derechos, salud y bienestar de niñas y niños.', 'https://www.unicef.org/peru/', 'Naciones Unidas'],
+    ['🎓', 'Khan Academy: biología', 'Células, órganos y sistemas del cuerpo.', 'https://es.khanacademy.org/science/biology', 'Organización educativa']]],
+  ['🌋 Tierra, clima y desastres', [
+    ['🌎', 'Instituto Geofísico del Perú', 'Sismos, volcanes y la Tierra en nuestro país.', 'https://www.gob.pe/igp', 'Gobierno del Perú'],
+    ['🦺', 'INDECI', 'Cómo prepararnos ante sismos y emergencias.', 'https://www.gob.pe/indeci', 'Gobierno del Perú'],
+    ['🌦️', 'SENAMHI', 'Clima, lluvias y temperatura en todo el Perú.', 'https://www.gob.pe/senamhi', 'Gobierno del Perú']]]
+];
+function vFuentes() {
+  $('#view').innerHTML = tip('Antes de creer lo que leas en internet, ¡revisa que la fuente sea <b>confiable</b>! Aquí tienes páginas seguras para investigar. 🔎', 'idea', 'green') +
+  `<div class="src-sec"><h3>✅ ¿Es confiable? Hazte estas preguntas</h3><ul class="check">
+    <li><i>👩‍🔬</i>¿Quién lo escribió? Mejor si es una institución, un científico o un ministerio.</li>
+    <li><i>📅</i>¿Es reciente? Busca la fecha de publicación.</li>
+    <li><i>🔗</i>¿Dice de dónde saca sus datos?</li>
+    <li><i>⚖️</i>¿Otras fuentes confiables dicen lo mismo?</li>
+    <li><i>🛒</i>¿Quiere venderte algo? ¡Cuidado!</li>
+    <li><i>🏛️</i>Páginas que terminan en <b>.gob.pe</b>, <b>.edu</b> u <b>.org</b> suelen ser más serias.</li></ul></div>` +
+  FUENTES.map(([h, L]) => `<div class="src-sec"><h3>${h}</h3><div class="src-grid">${L.map(([ic, n, d, u, w]) => `<a class="src" href="${u}" target="_blank" rel="noopener"><span class="ic">${ic}</span><div><b>${n}</b><span>${d}</span><small>✔ ${w}</small></div></a>`).join('')}</div></div>`).join('') +
+  `<div class="cite">📝 <b>Así escribes tus fuentes en tu trabajo:</b><code>Institución o autor. (Año). Título de la página. Nombre del sitio web.</code><code>Ejemplo: Ministerio de Salud. (2025). Dengue: síntomas y prevención. gob.pe.</code></div>`;
+}
+
+// ---- 📤 Enviar mi trabajo ----
+let FORM = { ty: 'inv', u: 'unit7', img: '', th: '' };
+function vEnviar() {
+  const V = $('#view');
+  if (!ME) { V.innerHTML = `<div class="empty"><img src="img/moli/hola.webp" alt=""><b>Primero entra con tu DNI</b>Toca tu fotocheck en «Mi aula», escribe tu DNI y vuelve aquí para enviar tu trabajo.</div>`; return; }
+  if (ME.teacher) { V.innerHTML = tip('Profe, aquí tus estudiantes envían sus trabajos. Tú los revisas en <b>📥 Bandeja</b> y, al aprobarlos, se publican en la <b>Revista Innovadora</b>. También puedes nombrar <b>Revisores</b> desde tu fotocheck (🧐 Revisores). 🧐', 'orgullosa') + `<div class="empty"><img src="img/moli/estrellas.webp" alt=""><b>Vista de estudiante</b>Cada estudiante ve aquí un formulario sencillo y el estado de sus envíos.</div>`; return; }
+  V.innerHTML = tip(`¡Hola, ${esc(firstName(ME.name))}! Comparte tu investigación o tu producto. Un <b>Revisor</b> o tu profe lo leerá y, si está listo, ¡saldrá en la <b>Revista Innovadora</b>! 📰`, 'emocionada') +
+  `<form class="form" id="fEnv" autocomplete="off">
+    <div class="fld"><label for="eT">1. ¿Cómo se llama tu trabajo?</label><input type="text" id="eT" maxlength="100" required placeholder="Ej.: ¿Cómo influye la temperatura en la levadura?"></div>
+    <div class="fld"><label>2. ¿Qué es?</label><div class="opts" id="eTy">${TIPOS.map(t => `<button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}">${t[1]} ${t[2]}</button>`).join('')}</div></div>
+    <div class="fld"><label>3. ¿De qué unidad es?</label><div class="opts" id="eU">${UNITS.map(u => `<button type="button" data-u="${u[0]}" class="${FORM.u === u[0] ? 'on' : ''}">${u[1]} ${u[2]}</button>`).join('')}</div></div>
+    <div class="fld"><label for="eD">4. Cuéntanos de qué trata</label><textarea id="eD" maxlength="1500" required placeholder="¿Qué querías averiguar? ¿Qué hiciste? ¿Qué descubriste?"></textarea><small>Escribe con tus palabras: qué hiciste y qué aprendiste.</small></div>
+    <div class="fld"><label for="eF">5. ¿Qué fuentes usaste?</label><textarea id="eF" maxlength="600" style="min-height:70px" placeholder="Ej.: Ministerio de Salud. (2025). Dengue. gob.pe"></textarea><small>Mira la pestaña 🔎 Fuentes confiables.</small></div>
+    <div class="fld"><label for="eL">6. Link de tu trabajo (opcional)</label><input type="url" id="eL" maxlength="400" placeholder="https://drive.google.com/… · Canva · YouTube"><small>Si está en Drive o Canva, compártelo como «Cualquier persona con el enlace».</small></div>
+    <div class="fld"><label>7. Una foto de tu trabajo (opcional)</label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" hidden><span id="ePv">📷 Toca aquí para elegir una foto</span></label></div>
+    <div><button type="submit" class="btn go" id="eGo">🚀 Enviar mi trabajo</button></div>
+  </form><div class="mine" id="mine"></div>`;
+  FORM.img = FORM.th = ''; drawMine();
+}
+async function shrinkImg(file, max, q) {
+  const url = URL.createObjectURL(file);
+  try {
+    const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const k = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas');
+    c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', q);
+  } finally { URL.revokeObjectURL(url); }
+}
+document.addEventListener('change', async e => {
+  if (e.target.id !== 'eImg' || !e.target.files[0]) return;
+  const f = e.target.files[0]; $('#ePv').textContent = '⏳ Preparando tu foto…';
+  try {
+    let img = await shrinkImg(f, 1280, 0.72); if (img.length > 680000) img = await shrinkImg(f, 960, 0.62);
+    FORM.img = img; FORM.th = await shrinkImg(f, 420, 0.6);
+    $('#ePv').innerHTML = `<img src="${FORM.th}" alt=""> ✅ ¡Foto lista! Toca para cambiarla.`;
+  } catch (x) { FORM.img = FORM.th = ''; $('#ePv').textContent = '⚠️ No pude abrir esa foto. Prueba con otra.'; }
+});
+document.addEventListener('click', e => {
+  const t = e.target.closest('#eTy [data-ty]'), u = e.target.closest('#eU [data-u]');
+  if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); }
+  if (u) { FORM.u = u.dataset.u; document.querySelectorAll('#eU button').forEach(b => b.classList.toggle('on', b === u)); }
+});
+document.addEventListener('submit', async e => {
+  if (e.target.id !== 'fEnv') return; e.preventDefault();
+  const t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = $('#eD').value.trim(), f = $('#eF').value.trim(), link = $('#eL').value.trim();
+  if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
+  if (d.length < 20) return toast('✏️ Cuéntanos un poco más de tu trabajo.');
+  if (link && !safeUrl(link)) return toast('🔗 El link debe empezar con https://');
+  const b = $('#eGo'); b.disabled = true; b.textContent = '⏳ Enviando…';
+  const id = ME.key + '-' + Date.now().toString(36);
+  const w = { k: ME.key, n: String(ME.name || '').slice(0, 60), sec: String(ME.section || '').toUpperCase().slice(-1), u: FORM.u, ty: FORM.ty, t: t.slice(0, 100), d: d.slice(0, 1500), f: f.slice(0, 600), link, th: FORM.th, img: FORM.img, st: 'pend', at: new Date() };
+  if (!w.link) delete w.link; if (!w.f) delete w.f; if (!w.th) { delete w.th; delete w.img; }
+  try {
+    const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: fieldsOf(w) }) });
+    if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
+    const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40));
+    try { parent !== window && parent.postMessage({ revistaSent: 1 }, '*'); } catch (x) {}
+    vEnviar(); toast('🎉 ¡Enviado! Un Revisor o tu profe lo revisará pronto.', 4500);
+  } catch (x) { b.disabled = false; b.textContent = '🚀 Enviar mi trabajo'; toast(x.message === 'AUTH' ? '🔐 Tu cuenta todavía no puede enviar. Avísale a tu profe.' : '📶 No se pudo enviar. Revisa tu internet e intenta otra vez.', 5000); }
+});
+async function drawMine() {
+  const el = $('#mine'), ids = ls.get(K_MY, []); if (!el) return;
+  if (!ids.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<h3>📬 Mis envíos</h3><div class="load">Buscando…</div>';
+  const L = (await Promise.all(ids.slice(0, 15).map(id => getDoc(id).catch(() => null)))).filter(Boolean);
+  if (!$('#mine')) return;
+  el.innerHTML = '<h3>📬 Mis envíos</h3>' + (L.map(w => `<div class="row"><span style="font-size:28px">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>Enviado el ${fecha(w.at)}</span>${w.st === 'no' && w.fb ? `<div class="fb">💬 ${esc(w.fb)}</div>` : ''}</div><span class="st ${esc(w.st)}">${w.st === 'ok' ? '✅ ¡Publicado!' : w.st === 'no' ? '✏️ Por mejorar' : '⏳ En revisión'}</span></div>`).join('') || '<p class="load">Todavía no hay envíos.</p>');
+}
+
+// ---- 📥 Bandeja: la docente y los revisores aprueban o devuelven ----
+async function vBandeja() {
+  const V = $('#view');
+  if (ROLE.r && !ROLE.t && !await tok(K_R)) {
+    V.innerHTML = `<form class="pin" id="fPin"><img src="img/moli/decidida.webp" alt="" style="width:90px"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`;
+    setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return;
+  }
+  V.innerHTML = tip(ROLE.t ? 'Profe, aquí llegan los trabajos de tus estudiantes. Ábrelos, léelos y decide: <b>✅ Publicar</b> o <b>✏️ Devolver para mejorar</b> con un consejo.' : `¡Hola, Revisor <b>${esc(firstName(ROLE.rn || ME.name))}</b>! 🧐 Lee cada trabajo con cuidado. Si está listo, publícalo; si le falta algo, devuélvelo con un consejo amable.`, 'pensativa') + '<div id="blist"><div class="load">📥 Abriendo la bandeja…</div></div>';
+  try {
+    const a = await staffTok(); if (!a) throw new Error('AUTH');
+    CACHE.pend = await query('pend', a, LIST_F); drawBandeja();
+  } catch (e) {
+    const el = $('#blist'); if (!el) return;
+    if (e.message === 'AUTH' && ROLE.r && !ROLE.t) { localStorage.removeItem(K_R); return vBandeja(); }
+    el.innerHTML = `<div class="empty"><img src="img/moli/preo.webp" alt=""><b>No pude abrir la bandeja</b>${e.message === 'AUTH' ? 'Profe: toca tu fotocheck → «Conectar mi cuenta» y vuelve aquí.' : 'Revisa tu internet e intenta otra vez.'}</div>`;
+  }
+}
+function drawBandeja() {
+  const el = $('#blist'); if (!el) return; const L = CACHE.pend || []; setCount(L.length);
+  el.innerHTML = L.length ? `<div class="grid">${L.map(w => cardHtml(w, `<span class="st pend" style="align-self:flex-start">⏳ Por revisar · ${fecha(w.at)}</span>`)).join('')}</div>` : `<div class="empty"><img src="img/moli/estrellas.webp" alt=""><b>¡Bandeja al día!</b>No hay trabajos por revisar. 🎉</div>`;
+}
+function setCount(n) {
+  const b = $('#tabs [data-tab="bandeja"] .cnt'); if (b) { b.hidden = !n; b.textContent = n; }
+  try { parent !== window && parent.postMessage({ rvCount: n }, '*'); } catch (e) {}
+}
+document.addEventListener('submit', async e => {
+  if (e.target.id !== 'fPin') return; e.preventDefault();
+  const p = $('#pinIn').value.replace(/\D/g, ''); if (p.length !== 4) return toast('Son 4 números 🔢');
+  const b = e.target.querySelector('button'); b.disabled = true; b.textContent = '⏳ Revisando…';
+  try { await revLogin(p); toast('✅ ¡Bienvenido, Revisor!'); vBandeja(); }
+  catch (x) { b.disabled = false; b.textContent = 'Entrar'; toast(/INVALID|PASSWORD|CREDENTIAL/i.test(x.message) ? '❌ Esa clave no es. Pídela a tu profe.' : '📶 No pude conectarme. Intenta otra vez.', 4500); }
+});
+
+// ---- ver un trabajo (artículo de la revista o revisión) ----
+async function openArt(id) {
+  const M = $('#modal'); M.hidden = false; M.innerHTML = '<div class="art"><div class="load">📖 Abriendo…</div></div>';
+  let w = [...(CACHE.ok || []), ...(CACHE.pend || [])].find(x => x.id === id);
+  try { const full = await getDoc(id); if (full) w = full; } catch (e) {}
+  if (!w) { M.hidden = true; return toast('No encontré ese trabajo.'); }
+  const staff = (ROLE.t || ROLE.r) && TAB === 'bandeja' && w.st === 'pend', own = ME && w.k === ME.key, link = safeUrl(w.link), t = tipo(w.ty);
+  M.innerHTML = `<article class="art" role="dialog" aria-modal="true"><div class="hero"><small>${t[1]} ${t[2]} · ${unidad(w.u)[1]} ${esc(unidad(w.u)[2])}</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
+  ${w.img || w.th ? `<img class="img" src="${esc(w.img || w.th)}" alt="Foto del trabajo">` : ''}
+  <div class="bd"><p>${esc(w.d)}</p>${w.f ? `<h4>📚 Fuentes</h4><p style="font-size:14.5px">${esc(w.f)}</p>` : ''}
+  ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
+  ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
+  ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Consejo para el estudiante (obligatorio si lo devuelves). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
+    <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver para mejorar</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
+  ${ROLE.t && w.st === 'ok' && TAB === 'revista' ? '<div class="acts"><button type="button" class="btn soft" data-rv="pend">↩️ Quitar de la revista</button><button type="button" class="btn red" data-rv="del">🗑 Borrar</button></div>' : ''}
+  </div></article>`;
+  M.dataset.id = id;
+}
+$('#modal').addEventListener('click', async e => {
+  const M = $('#modal');
+  if (e.target === M || e.target.closest('[data-x]')) { M.hidden = true; M.innerHTML = ''; return; }
+  const b = e.target.closest('[data-rv]'); if (!b) return;
+  const id = M.dataset.id, act = b.dataset.rv, fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
+  if (act === 'no' && fb.length < 8) { toast('💬 Escribe un consejo para que el estudiante sepa qué mejorar.'); $('#rvFb').focus(); return; }
+  if (act === 'del' && !confirm('¿Borrar este trabajo para siempre?')) return;
+  const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
+  M.querySelectorAll('[data-rv]').forEach(x => x.disabled = true);
+  try {
+    let r;
+    if (act === 'del') r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } });
+    else {
+      const up = { st: act, rv: ROLE.t ? 'tu profe' : String(ROLE.rn || ME.name || 'Revisor').slice(0, 60), rvAt: new Date(), fb: act === 'no' ? fb.slice(0, 500) : fb.slice(0, 500) };
+      r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&` + Object.keys(up).map(k => 'updateMask.fieldPaths=' + k).join('&') + '&currentDocument.exists=true', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });
+    }
+    if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
+    M.hidden = true; M.innerHTML = '';
+    toast(act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
+    CACHE.ok = null; if (CACHE.pend) CACHE.pend = CACHE.pend.filter(x => x.id !== id);
+    if (TAB === 'bandeja') drawBandeja(); else vRevista();
+  } catch (x) { M.querySelectorAll('[data-rv]').forEach(y => y.disabled = false); toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
+});
+addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden) { $('#modal').hidden = true; $('#modal').innerHTML = ''; } });
+
+// ---- inicio ----
+(async function () {
+  if (ME) { const me = $('#me'); me.hidden = false; me.innerHTML = `<i>${esc((firstName(ME.name)[0] || '🙂').toUpperCase())}</i><span class="nm">${esc(firstName(ME.name) || 'Hola')}</span>${ME.teacher ? '<span class="rol">Docente</span>' : ''}`; }
+  await checkRole();
+  if (ROLE.r) { const r = $('#me .rol'); if (!r) $('#me').insertAdjacentHTML('beforeend', '<span class="rol">🧐 Revisor</span>'); }
+  if (ROLE.t || ROLE.r) $('#tabs [data-tab="bandeja"]').hidden = false;
+  const want = QS.get('v'); setTab(want === 'bandeja' && (ROLE.t || ROLE.r) ? 'bandeja' : want === 'enviar' ? 'enviar' : want === 'fuentes' ? 'fuentes' : 'revista');
+  if ((ROLE.t || ROLE.r) && TAB !== 'bandeja') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
+})();
+</script>
+</body>
+</html>

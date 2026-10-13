@@ -69,7 +69,7 @@
     pin = String(pin || '').trim(); if (!pin) throw new Error('CLAVE');
     if (info.tipo === 'owner') { if ('p' + await pbkdf(pin, 'ciencia6-pin', 150000, 80) !== PIN_H) throw new Error('CLAVE'); }
     else {
-      const pass = await pbkdf(info.rid + '|' + info.s, 'ciencia-apin-' + pin, 200000, 256);
+      const pass = await pbkdf(pin, 'ciencia-apin-' + info.rid + '|' + info.s, 200000, 256);   // igual que Molí 1 (la clave es la «contraseña» y la cuenta va en la sal)
       try { await conCorreo(`${info.rid}-${info.s}@${FB.authDomain}`, pass); } catch (e) { throw new Error(/TOO_MANY/.test(e.message) ? 'MUCHOS' : /INVALID|PASSWORD|EMAIL_NOT_FOUND|USER_DISABLED/.test(e.message) ? 'CLAVE' : 'RED'); }
     }
     const rcs = hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('moli2-rc|' + info.rid + '|' + pin))).slice(0, 32);   // canal del control remoto (celular y laptop con la misma cuenta)

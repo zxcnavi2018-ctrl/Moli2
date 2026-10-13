@@ -173,11 +173,11 @@
       const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Cuaderno de sesiones · ${S.length} sesiones</p>`,
         r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span></button>`).join('')}` }];
       S.forEach(({ s, n }) => {
-        const cr = (s.criteria || []).filter(L), acts = (s.activities || []).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
+        const cr = (s.criteria || []).filter(L), acts = Hojas._.actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)}</div><div class="big w">Sesión ${n}</div>${L(s.title) ? `<h2 class="w">${esc(s.title)}</h2>` : ''}
             ${L(s.meta) ? `<h3 class="w">🎯 Meta</h3><p class="hand w">${esc(s.meta)}</p>` : ''}${cr.length ? `<h3 class="w">✅ Criterios</h3><ul class="cr hand">${cr.map(c => `<li class="w">${esc(c)}</li>`).join('')}</ul>` : ''}
-            <p class="center w"><button class="bt or" data-a="editar" data-n="${n}">✏️ Editar sesión</button>${q ? ` <button class="bt" data-a="tarjetas" data-n="${n}">🖨️ Tarjetas</button>` : ''}</p>${Hojas._.pdfs(s, n)}`,
-          r: `<h2 class="w">🧪 Actividades</h2>${acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}</div>${videoHtml(a)}`).join('') || '<p class="hand w">Sin actividades todavía.</p>'}
+            <p class="center w"><button class="bt or" data-a="editar" data-n="${n}">✏️ Editar sesión</button>${q ? ` <button class="bt" data-a="tarjetas" data-n="${n}">🖨️ Tarjetas</button>` : ''}</p>${Hojas._.esBebras(u, s) ? '' : Hojas._.pdfs(s, n)}`,
+          r: `<h2 class="w">🧪 Actividades</h2>${acts.map((a, j) => `<div class="act w"><b class="n">${j + 1}</b>${MODOS[String(a.mode || '').toLowerCase()] ? `<span class="chip">${MODOS[String(a.mode || '').toLowerCase()]}</span>` : ''}<div><b>${esc(a.title || 'Actividad ' + (j + 1))}</b></div>${L(a.desc) ? `<p class="hand">${esc(a.desc)}</p>` : ''}${Hojas._.fotoHtml(a)}</div>${videoHtml(a)}`).join('') || '<p class="hand w">Sin actividades todavía.</p>'}
             ${q ? `<div class="box w">🎟️ <b>Exit ticket</b> · ${q} preguntas <small>(lo responden en el portafolio de Exit tickets)</small></div>` : ''}` });
       });
       return H;
