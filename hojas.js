@@ -595,12 +595,24 @@ Devuelve JSON:
       const qs = ((s.ticket && s.ticket.questions) || []).filter(x => x && L(x.q));
       return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">✅ Respuestas del Exit ticket</h2>${qs.length ? `<ol class="cv-cards cv-q">${qs.map(x => `<li><b>${esc(x.q)}</b><ul>${(x.options || []).map((o, k) => L(o) ? `<li class="${k === x.answer ? 'ok' : ''}">${k === x.answer ? '✓ ' : ''}${esc(o)}</li>` : '').join('')}</ul></li>`).join('')}</ol>` : '<p class="cv-lead">Sin preguntas todavía.</p>'}</div>`;
     }
+    function ajustar(d) {                                               // la diapositiva usa todo el cuadro: agranda la letra hasta llenarlo sin cortarse
+      if (!d || d.classList.contains('cv-foto') || d.querySelector('.cv-rfig')) return;
+      const H = d.clientHeight, Wd = d.clientWidth; if (!H || !Wd) return;
+      const prev = d.style.justifyContent; d.style.justifyContent = 'flex-start'; d.style.overflow = 'visible';
+      const cabe = () => { const kids = [...d.children].filter(c => getComputedStyle(c).position !== 'absolute'); if (!kids.length) return true;
+        const top = kids[0].getBoundingClientRect().top, bot = Math.max(...kids.map(c => c.getBoundingClientRect().bottom)), r = d.getBoundingClientRect(), cs = getComputedStyle(d);
+        const der = Math.max(...kids.map(c => Math.max(c.getBoundingClientRect().right, c.scrollWidth > c.clientWidth + 2 ? 1e9 : 0)));
+        return bot - top <= r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4 && der <= r.right - parseFloat(cs.paddingRight) + 2; };
+      let lo = 0.7, hi = 2.6; for (let k = 0; k < 9; k++) { const m = (lo + hi) / 2; d.style.fontSize = m + 'em'; if (cabe()) lo = m; else hi = m; }
+      d.style.fontSize = (lo * 0.97) + 'em'; d.style.justifyContent = prev; d.style.overflow = '';
+      const cr = d.querySelector('.cv-crumb'); if (cr) cr.style.fontSize = (0.8 / (lo * 0.97)) + 'em';
+    }
     let el = null;
     function pinta(anim) {
       if (!el) return;
       const sl = el.querySelector('.cv-stage'); if (!P.L.length) { sl.innerHTML = `<div class="cv-sl cv-c" style="--c1:#7c3aed;--c2:#06b6d4"><div class="cv-ico">🎨</div><h2 class="cv-h1">Aún no hay sesiones</h2></div>`; return; }
       P.i = Math.max(0, Math.min(P.L.length - 1, P.i)); const it = P.L[P.i];
-      sl.innerHTML = slide(it); if (anim) sl.firstChild.classList.add('cv-in');
+      sl.innerHTML = slide(it); ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in');
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
       el.querySelector('.cv-n').textContent = `${P.i + 1} / ${P.L.length}`;
       el.querySelector('[data-cv="-1"]').disabled = P.i === 0; el.querySelector('[data-cv="1"]').disabled = P.i === P.L.length - 1;
@@ -609,7 +621,7 @@ Devuelve JSON:
     function montar() {
       armar();
       host.innerHTML = `<div class="cv"><div class="cv-stage"></div><div class="cv-bar"><button data-cv="-1" aria-label="Anterior">‹</button><select aria-label="Ir a">${MD.unidades().map(u => `<option value="u:${esc(u.key)}">📘 Unidad ${esc(u.num)} · ${esc(u.title)}</option>${MD.sesionesDe(u).map(({ s, n }) => `<option value="s:${esc(u.key)}:${n}">   🗓️ Sesión ${n} · ${esc(temaDe(s, n)).slice(0, 50)}</option>`).join('')}`).join('')}</select><span class="cv-n"></span><button data-cv="1" aria-label="Siguiente">›</button></div></div>`;
-      el = host.firstChild; const fs = () => { el.style.fontSize = Math.max(8, Math.min(60, el.clientHeight / 32.5, el.clientWidth / 57)) + 'px'; }; fs(); P.ro = new ResizeObserver(fs); P.ro.observe(el);
+      el = host.firstChild; const fs = () => { el.style.fontSize = Math.max(8, Math.min(60, el.clientHeight / 32.5, el.clientWidth / 57)) + 'px'; const d = el.querySelector('.cv-stage > .cv-sl'); if (d) { d.style.fontSize = ''; ajustar(d); } }; fs(); P.ro = new ResizeObserver(fs); P.ro.observe(el);
       el.addEventListener('click', e => { const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); P.i += +b.dataset.cv; pinta(true); });
       el.querySelector('select').addEventListener('change', e => { const v = e.target.value.split(':'); const k = P.L.findIndex(z => v[0] === 'u' ? z.k === 'uni' && z.u.key === v[1] : z.k === 'ses' && z.u.key === v[1] && z.n === +v[2]); if (k >= 0) { P.i = k; pinta(true); } });
       let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) { P.i += dx < 0 ? 1 : -1; pinta(true); } });

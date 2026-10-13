@@ -163,7 +163,7 @@ scene.background = new THREE.Color(0x1e130b);
 scene.fog = new THREE.Fog(0x2a1a0f, 16, 40);
 const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.05, 120);
 const renderer = new THREE.WebGLRenderer({ antialias: !LOW, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, LOW ? 1.25 : 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, LOW ? 1.1 : 1.5));
 renderer.setSize(innerWidth, innerHeight);
 document.body.prepend(renderer.domElement);
 
@@ -336,7 +336,22 @@ const ESTANTES = GRADOS.map(G => {
   const libs = new THREE.Group(); m.add(libs);
   return { ...G, s: 'GRADO', m, libs, halo, et, placa, items: [], hit: [] };
 });
-rellenar.forEach(m => m.userData.fill()); libros.count = nLib; libros.instanceMatrix.needsUpdate = true; if (libros.instanceColor) libros.instanceColor.needsUpdate = true; scene.add(libros);
+rellenar.forEach(m => m.userData.fill()); libros.count = nLib;
+// ---- fluidez: todo lo que no se mueve se junta en pocas piezas (una por material) ----
+function juntar(root, saltar) {
+  root.updateMatrixWorld(true); const porMat = new Map(), quitar = [];
+  root.traverse(o => { if (!o.isMesh || o.isInstancedMesh) return; for (let a = o; a; a = a.parent) if (saltar.includes(a)) return;
+    quitar.push(o);
+    const g = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()); g.applyMatrix4(o.matrixWorld);
+    if (!g.attributes.uv) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
+    (porMat.get(o.material) || porMat.set(o.material, []).get(o.material)).push(g); });
+  quitar.forEach(o => o.parent && o.parent.remove(o));
+  porMat.forEach((L, mat) => { const n = L.reduce((a, g) => a + g.attributes.position.count, 0), P = new Float32Array(n * 3), N = new Float32Array(n * 3), U = new Float32Array(n * 2); let k = 0;
+    L.forEach(g => { P.set(g.attributes.position.array, k * 3); N.set(g.attributes.normal.array, k * 3); U.set(g.attributes.uv.array, k * 2); k += g.attributes.position.count; g.dispose(); });
+    const G = new THREE.BufferGeometry(); G.setAttribute('position', new THREE.BufferAttribute(P, 3)); G.setAttribute('normal', new THREE.BufferAttribute(N, 3)); G.setAttribute('uv', new THREE.BufferAttribute(U, 2)); G.computeBoundingSphere();
+    scene.add(new THREE.Mesh(G, mat)); });
+}
+ libros.instanceMatrix.needsUpdate = true; if (libros.instanceColor) libros.instanceColor.needsUpdate = true; scene.add(libros);
 
 // ===================================================================
 //  EL ATRIL Y EL LIBRO MÁGICO
@@ -650,9 +665,10 @@ function panelEditar() {
     } catch (er) { btn.disabled = false; msg.textContent = er.message === 'AUTH' ? '🔐 Conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo guardar. Revisa tu internet.'; } };
 }
 if (DOCENTE) { const b = $('#editar'); b.hidden = false; b.onclick = panelEditar; }
-window.BIB = { atril, ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, camera, scene };
+juntar(scene, [atril, atrilHit, ...aranas, ...ESTANTES.flatMap(E => [E.libs, E.halo, E.placa, E.et])]);
+window.BIB = { renderer, atril, ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, camera, scene };
 const listo = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
-Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
+Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
 </body>

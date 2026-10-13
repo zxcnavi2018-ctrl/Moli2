@@ -146,7 +146,7 @@
 .cv-crb { background: rgba(255,255,255,.95); color: #166534; border-radius: .7em; padding: .4em .7em; margin: .3em 0; font-weight: 700; } .cv-crb b { display: block; color: #15803d; }
 .cv-acth { display: flex; align-items: center; gap: .6em; } .cv-num { width: 1.8em; height: 1.8em; border-radius: 50%; background: #fff; color: #ea580c; display: grid; place-items: center; font-weight: 900; font-size: 1.4em; }
 .cv-at { font-size: 1.4em; margin: .2em 0; }
-.cv-q { grid-template-columns: 1fr 1fr; font-size: .85em; } .cv-q ul { margin: .2em 0 0; padding-left: 1em; font-weight: 600; } .cv-q li.ok { color: #15803d; font-weight: 900; }
+.cv-q { grid-template-columns: 1fr 1fr; font-size: .85em; gap: .55em; } .cv-q > li { padding: .5em .7em; } .cv-q ul { margin: .35em 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: .25em .5em; font-weight: 600; } .cv-q ul li { padding: .15em .45em; border-radius: .4em; background: #f1f5f9; font-size: .92em; } .cv-q li.ok { color: #15803d; font-weight: 900; background: #dcfce7; }
 .cv-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2.6em; display: flex; align-items: center; gap: .6em; padding: 0 .8em; background: rgba(15,23,42,.35); z-index: 3; }
 .cv-bar button { height: 1.9em; min-width: 1.9em; border-radius: 999px; border: 2px solid #fff; background: rgba(255,255,255,.15); color: #fff; font: 900 .9em system-ui; cursor: pointer; padding: 0 .6em; }
 .cv-bar select { flex: 1; min-width: 0; height: 1.9em; border-radius: .5em; border: 0; font: 700 .8em "Trebuchet MS", system-ui; padding: 0 .4em; }

@@ -54,9 +54,15 @@
   #tourBar button { width: 58px; height: 58px; border-radius: 50%; border: 0; background: linear-gradient(180deg, #ffb15c, #ff7a2f); color: #fff; font-size: 24px; font-weight: 900; box-shadow: 0 5px 0 #c2410c, 0 10px 22px rgba(0,0,0,.35); }
   #tourBar button:active { transform: translateY(3px); box-shadow: 0 2px 0 #c2410c; }
   #stopName { min-width: 120px; text-align: center; background: rgba(255,255,255,.94); color: #1e3a8a; border: 3px solid #2b2547; border-radius: 999px; padding: 8px 18px; font-weight: 900; font-size: 16px; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
-  #dots { display: flex; gap: 6px; justify-content: center; padding: 6px 0; }
-  #dots i { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; display: block; transition: all .3s; }
-  #dots i.on { background: #ff7a2f; width: 20px; border-radius: 6px; }
+  #stopName { max-width: calc(100vw - 170px); padding: 5px !important; overflow: hidden; }
+  #dots { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
+  #dots::-webkit-scrollbar { display: none; }
+  #dots button { flex: none; width: auto; height: auto; border: 0; border-radius: 999px; padding: 7px 13px; background: transparent; color: #1e3a8a; font: 900 14px "Trebuchet MS", system-ui, sans-serif; white-space: nowrap; box-shadow: none; cursor: pointer; transition: background .2s, color .2s; }
+  #dots button:hover { background: #fff1e6; }
+  #dots button.on { background: linear-gradient(180deg, #ffb15c, #ff7a2f); color: #fff; box-shadow: 0 2px 0 #c2410c; }
+  #dots button:active { transform: none; }
+  body.tut #dots button { pointer-events: none; }
+  @media (max-width: 700px) { #dots button { padding: 6px 10px; font-size: 12px; } #stopName { max-width: calc(100vw - 120px); } }
   #sheet { position: fixed; z-index: 25; display: none; opacity: 0; overflow: hidden; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.45);
     transition: left .7s cubic-bezier(.34,1.28,.5,1), top .7s cubic-bezier(.34,1.28,.5,1), width .7s cubic-bezier(.34,1.28,.5,1), height .7s cubic-bezier(.34,1.28,.5,1), opacity .3s; }
   #sheet.closing { transition: transform .42s cubic-bezier(.55,0,.75,.2), opacity .26s .16s ease-in; }   /* se cierra entero (sin deformarse) volando hacia el objeto */
@@ -150,7 +156,7 @@
   body.open #bibLink, body.tut #bibLink, body.editando #bibLink { opacity: 0; pointer-events: none; transform: translateY(-20px); }
   @media (hover: none) { #bibLink span { clip-path: inset(0 0 0 0); } }
   @media (max-height: 500px), (max-width: 600px) { #bibLink svg { width: 56px; height: 56px; } #bibLink span { font-size: 14px; padding: 8px 24px 8px 14px; } }
-  #bibWin { position: fixed; inset: 0; z-index: 9000; background: #1e130b; opacity: 0; transition: opacity .45s; } #bibWin.on { opacity: 1; } #bibWin iframe { width: 100%; height: 100%; border: 0; display: block; }
+  #bibWin { position: fixed; inset: 0; z-index: 9000; background: #1e130b; opacity: 0; transition: opacity .45s; } #bibWin.on { opacity: 1; } #bibWin iframe { position: relative; width: 100%; height: 100%; border: 0; display: block; background: transparent; } #bibWin .bw-l { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; color: #f6e2b3; font: 800 17px Georgia, serif; letter-spacing: .14em; } #bibWin .bw-l span { display: block; font-size: 46px; margin-bottom: 10px; animation: bwF 1.4s ease-in-out infinite; } @keyframes bwF { 50% { transform: translateY(-8px); } }
   #bibBar { position: fixed; left: 50%; top: 12px; transform: translateX(-50%) translateY(-20px); z-index: 31; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 22px; background: #fff; border: 3px solid #2b2547; box-shadow: 0 6px 0 rgba(43,37,71,.25), 0 14px 30px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .3s, transform .4s cubic-bezier(.34,1.56,.64,1); }
   #bibBar.on { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
   body.open #bibBar { opacity: 0; pointer-events: none; }
@@ -1765,8 +1771,9 @@ function loop(now) {
 (function () {
   const a = document.getElementById('bibLink'); if (!a) return; let win = null;
   a.addEventListener('click', e => { e.preventDefault(); if (win) return;
-    win = document.createElement('div'); win.id = 'bibWin'; win.innerHTML = '<iframe src="biblioteca.html" title="La Biblioteca Educativa" allow="autoplay; fullscreen"></iframe>'; document.body.appendChild(win);
-    requestAnimationFrame(() => win.classList.add('on')); window.BIB_ABIERTA = true; try { callar(); } catch (x) {} });
+    win = document.createElement('div'); win.id = 'bibWin'; win.innerHTML = '<div class="bw-l"><span>📖</span>Abriendo la biblioteca…</div><iframe title="La Biblioteca Educativa" allow="autoplay; fullscreen"></iframe>'; document.body.appendChild(win);
+    window.BIB_ABIERTA = true; try { callar(); } catch (x) {}
+    requestAnimationFrame(() => { win.classList.add('on'); setTimeout(() => { const f = win && win.querySelector('iframe'); if (f) f.src = 'biblioteca.html'; }, 480); }); });   // primero la cortina, luego se arma la biblioteca (sin tirones)
   addEventListener('message', e => { if (!e.data || !e.data.bibCerrar || !win) return; const w = win; win = null; w.classList.remove('on'); window.BIB_ABIERTA = false; setTimeout(() => w.remove(), 450); });
 })();
   if (window.BIB_ABIERTA) return;                                     // la Biblioteca está encima: el aula descansa
@@ -2111,7 +2118,9 @@ const fromOf = st => inRoom(portrait() ? st.look.clone().lerp(st.from, st.pf || 
 let baseFov = 55;
 function setFov() { baseFov = portrait() ? 70 : 55; camera.fov = baseFov; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize', () => { setFov(); if (!TOUR.busy) TOUR.pos.copy(fromOf(STOPS[TOUR.i])); if (sheet.style.display === 'block') place(bigRect(SHEETS[sheet.dataset.kind].ar, SHEETS[sheet.dataset.kind].big)); });
-const dotsEl = document.getElementById('dots'); STOPS.forEach(() => dotsEl.appendChild(document.createElement('i')));
+const dotsEl = document.getElementById('dots');
+STOPS.forEach((st, k) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = st.name.replace(/^(\S+)\s+(El |La |Mi |Mis )/, '$1 '); b.title = st.title || st.name;
+  b.addEventListener('click', e => { e.stopPropagation(); if (TOUR.busy || k === TOUR.i || document.body.classList.contains('tut')) return; go(k - TOUR.i); }); dotsEl.appendChild(b); });
 const titleEl = document.getElementById('title'); let titleT = 0, titleT2 = 0, titleGate = Promise.resolve(), titleOpen = () => {};
 function showTitle(text, n) {                                       // nombre de la escena: franja, "ESCENA n", título grande con líneas doradas; luego se desvanece
   clearTimeout(titleT); clearTimeout(titleT2);
@@ -2122,7 +2131,7 @@ function showTitle(text, n) {                                       // nombre de
   titleT2 = setTimeout(() => { titleEl.style.display = 'none'; }, 3150);
 }
 function hideTitle() { clearTimeout(titleT); clearTimeout(titleT2); titleOpen(); if (titleEl.style.display === 'block') { titleEl.classList.add('out'); titleT2 = setTimeout(() => { titleEl.style.display = 'none'; }, 800); } }
-function showStop() { [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === TOUR.i)); }
+function showStop() { [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === TOUR.i)); const on = dotsEl.children[TOUR.i]; if (on) dotsEl.scrollTo({ left: on.offsetLeft - (dotsEl.clientWidth - on.offsetWidth) / 2, behavior: 'smooth' }); }
 async function fly(st, dir = 1) {                                   // vuelo en arco, con un leve giro hacia el lado del movimiento y un zoom que se asienta al llegar
   const p0 = TOUR.pos.clone(), l0 = TOUR.look.clone(), p1 = fromOf(st), d = p0.distanceTo(p1), ms = Math.min(2000, 900 + d * 150), fa0 = TOUR.fa || 0, fa1 = st.fa || 0;
   await tween(ms, k => { TOUR.fa = fa0 + (fa1 - fa0) * k; TOUR.pos.lerpVectors(p0, p1, k); TOUR.pos.y += Math.sin(Math.PI * k) * Math.min(0.45, d * 0.08); TOUR.look.lerpVectors(l0, st.look, k);
@@ -2699,7 +2708,7 @@ window.SPLASH.then(function arrancar() {                                        
     else requestAnimationFrame(tick); };
   requestAnimationFrame(tick);
 });
-window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
+window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
 <script src="revista.js"></script><script src="corcho.js"></script>
