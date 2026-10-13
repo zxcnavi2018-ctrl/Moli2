@@ -17,9 +17,9 @@
   const NOM = Object.fromEntries(BOT);
   // los joysticks: cada dirección hace algo (el izquierdo mueve las escenas)
   const STK = [['l<', 'Joystick izq. ←'], ['l>', 'Joystick izq. →'], ['l^', 'Joystick izq. ↑'], ['lv', 'Joystick izq. ↓'], ['r<', 'Joystick der. ←'], ['r>', 'Joystick der. →'], ['r^', 'Joystick der. ↑'], ['rv', 'Joystick der. ↓']];
-  const DEF = { v: 5, on: true, b: { 1: 'aceptar', 0: 'salir', 3: 'bib', 2: 'crono', 4: 'tabA', 5: 'tabS', 6: 'grupos', 7: 'revista', 8: 'zoomM', 9: 'zoomP', 12: 'pagA', 13: 'pagS', 14: 'pagA', 15: 'pagS', 16: 'aula', 17: 'panel' },
+  const DEF = { v: 5, on: true, b: { 1: 'aceptar', 0: 'salir', 3: 'bib', 2: 'crono', 4: 'tabA', 5: 'tabS', 6: 'grupos', 7: 'revista', 8: 'zoomM', 9: 'zoomP', 11: 'vidGrande', 12: 'pagA', 13: 'pagS', 14: 'pagA', 15: 'pagS', 16: 'aula', 17: 'video' },
     s: { 'l<': 'escA', 'l>': 'escS', 'l^': 'escA', 'lv': 'escS', 'r^': 'an:shh', 'rv': 'an:drum', 'r<': 'an:angry', 'r>': 'an:acu' } };
-  let CFG = (c => c && c.b && c.v >= 5 ? { v: 5, on: c.on !== false, b: { ...c.b }, s: { ...DEF.s, ...(c.s || {}) } } : JSON.parse(JSON.stringify(DEF)))(LS.get(KEY, null));
+  let CFG = (c => c && c.b && c.v >= 5 && c.b[17] === 'video' ? { v: 5, on: c.on !== false, b: { ...c.b }, s: { ...DEF.s, ...(c.s || {}) } } : JSON.parse(JSON.stringify(DEF)))(LS.get(KEY, null));
   const guardar = () => LS.set(KEY, CFG);
   let P = null, SEL = null, btn = null, CR = null, GR = null, grBtn = -1;                     // panel, botón elegido, botón 🎮 y el selector del cronómetro
   const panelAbierto = () => !!(P && P.classList.contains('on'));
@@ -33,7 +33,7 @@
       A.push(['crono', '⏱️ Cronómetro (elige el tiempo con las flechas)'], ['bib', '📚 Ir a la Biblioteca'], ['fs', '⛶ Pantalla completa'], ['moli', '🤖 Molí salta y saluda'],
         ['an:shh', '🤫 Animación: Silencio'], ['an:drum', '🥁 Animación: Tambor'], ['an:angry', '😠 Animación: Atención'], ['an:acu', '🤝 Animación: Acuerdos'], ['an:rol', '👥 Animación: Roles'], ['an:fin', '🏆 Animación: Final'],
         ['panel', '🎮 Abrir este panel']);
-      A.push(['tabS', '➡ Pestaña siguiente (en la Revista)'], ['tabA', '⬅ Pestaña anterior (en la Revista)'], ['revista', '📰 Abrir la Revista Innovadora'], ['grupos', '🏅 Grupos: mantén apretado y da +1 punto'], ['zoomP', '🔍 Acercar (zoom +)'], ['zoomM', '🔎 Alejar (zoom −)'], ['aula', '🏫 Volver al salón general']);
+      A.push(['tabS', '➡ Pestaña siguiente (en la Revista)'], ['tabA', '⬅ Pestaña anterior (en la Revista)'], ['revista', '📰 Abrir la Revista Innovadora'], ['grupos', '🏅 Grupos: mantén apretado y da +1 punto'], ['video', '🎬 Video: iniciar o pausar'], ['vidGrande', '🎬 Video: agrandar o achicar'], ['zoomP', '🔍 Acercar (zoom +)'], ['zoomM', '🔎 Alejar (zoom −)'], ['aula', '🏫 Volver al salón general']);
     } else A.push(['escS', '⏭ Estante siguiente (Biblioteca)'], ['escA', '⏮ Estante anterior (Biblioteca)'], ['tabS', '➡ Pestaña siguiente'], ['tabA', '⬅ Pestaña anterior'], ['revista', '📰 Abrir la Revista Innovadora'], ['zoomP', '🔍 Acercar (zoom +)'], ['zoomM', '🔎 Alejar (zoom −)'], ['aula', '🏫 Volver al aula'], ['fs', '⛶ Pantalla completa']);
     return A;
   }
@@ -76,6 +76,8 @@
       const bb = document.getElementById('bibBar'); if (bb && bb.classList.contains('on')) { const b = document.getElementById(d > 0 ? 'bibNext' : 'bibPrev'); if (b) return b.click(); }   // los juegos: disco siguiente / anterior
       if (a === 'pagS' || a === 'pagA') return;                        // «página» nunca cambia de escena
       return G.go(d); }
+    if (a === 'video') return videoPlay();
+    if (a === 'vidGrande') return videoGrande();
     if (a === 'crono') return abrirCrono();
     if (a === 'grupos') return abrirGrupos();
     if (a === 'tabS' || a === 'tabA') a = a === 'tabS' ? 'escS' : 'escA';
@@ -139,6 +141,28 @@
     grI = (grI + m + 6) % 6; pintaGrupos(); }
   const dirMov = d => ({ '>': 1, '<': -1, 'v': 3, '^': -3 }[d] || 0);   // en las listas: ← → de uno en uno, ↑ ↓ por filas de 3
 
+  // ---- 🎬 videos de YouTube (en las hojas o la proyección): Captura inicia / pausa, R3 agranda, R3 ← → salta 10 s ----
+  const VT = new WeakMap(), VP = new WeakMap(), VV = new WeakMap();
+  const vids = () => [...document.querySelectorAll('.vid')].filter(v => { const r = v.getBoundingClientRect(); return r.width > 40 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth; });
+  const videoVisible = () => vids().some(v => v.querySelector('iframe'));
+  addEventListener('message', e => { if (!/youtube/.test(e.origin)) return; let d = e.data; try { d = typeof d === 'string' ? JSON.parse(d) : d; } catch (er) { return; }
+    const f = [...document.querySelectorAll('.vid iframe')].find(x => x.contentWindow === e.source); if (!f || !d || !d.info) return;
+    if (typeof d.info.currentTime === 'number') VT.set(f, d.info.currentTime); if (typeof d.info.playerState === 'number') VP.set(f, d.info.playerState); if (typeof d.info.volume === 'number') VV.set(f, d.info.volume); });
+  const yt = (f, func, args = []) => f.contentWindow && f.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
+  const escuchar = f => { if (f.dataset.esc) return; f.dataset.esc = '1'; const go = () => f.contentWindow && f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1 }), '*'); go(); f.addEventListener('load', go); setTimeout(go, 1500); };
+  function videoPlay() { const V = vids(); if (!V.length) return;
+    const f = V.map(v => v.querySelector('iframe')).find(Boolean); if (!f) { const b = V.find(v => v.dataset.a === 'video'); if (b) { b.click(); setTimeout(() => { const n = document.querySelector('.vid.on iframe'); if (n) escuchar(n); }, 300); } return; }
+    escuchar(f); const st = VP.get(f); yt(f, st === 1 ? 'pauseVideo' : 'playVideo'); VP.set(f, st === 1 ? 2 : 1); }
+  function videoGrande() { const v = vids().find(x => x.querySelector('iframe')) || document.querySelector('.vid.grande'); if (!v) return videoPlay();
+    v.classList.toggle('grande'); }
+  function videoSalto(s) { const f = vids().map(v => v.querySelector('iframe')).find(Boolean); if (!f) return; escuchar(f);
+    const t = Math.max(0, (VT.get(f) || 0) + s); yt(f, 'seekTo', [t, true]); VT.set(f, t); avisar(s > 0 ? '⏩ +10 s' : '⏪ −10 s'); }
+  function videoVol(s) { const f = vids().map(v => v.querySelector('iframe')).find(Boolean); if (!f) return; escuchar(f);
+    const v = Math.max(0, Math.min(100, (VV.has(f) ? VV.get(f) : 100) + s)); if (v > 0) yt(f, 'unMute'); yt(f, 'setVolume', [v]); VV.set(f, v); avisar((v ? '🔊 Volumen ' : '🔇 Volumen ') + v + '%'); }
+  const cssV = document.createElement('style');
+  cssV.textContent = `.vid.grande { position: fixed !important; inset: 3vh 3vw !important; width: auto !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; margin: 0 !important; z-index: 2147483000 !important; background: #000; box-shadow: 0 0 0 100vmax rgba(0,0,0,.75); border-radius: 14px !important; }`;
+  document.head.appendChild(cssV);
+
   // ---- ⏱️ cronómetro: Y lo abre, las flechas eligen el tiempo, A lo pone, B sale ----
   const TIEMPOS = [1, 2, 3, 5, 10, 15, 20, 30, 0];
   let crI = 3;
@@ -180,23 +204,60 @@
     const de = document.documentElement; if (!de.requestFullscreen) return;
     de.requestFullscreen().catch(() => { if (!fsAvisado) { fsAvisado = true; avisar('⛶ Toca la pantalla una vez para volver a pantalla completa'); } }); }
 
+  // ---- 🖱️ modo mouse: ZL + ZR juntos lo prenden y lo apagan; L3 mueve la flecha, A hace clic, R3 baja o sube ----
+  let MM = false, mx = innerWidth / 2, my = innerHeight / 2, cur = null, combo = false, sobre = null;
+  const pend = {};
+  function boton(i) {
+    if (MM) { if (i === 1) return clicMouse(); if (i === 0) return; }   // en modo mouse: A = clic (B no hace nada)
+    if ((CR || GR) && i >= 12 && i <= 15) return moverSel(['^', 'v', '<', '>'][i - 12]);      // en el cronómetro o los grupos, la cruceta elige
+    if (CFG.on) hacer(CFG.b[i]);
+  }
+  function modoMouse(on) { MM = on;
+    if (on) { if (!cur) { cur = document.createElement('div'); cur.id = 'mandoCur'; cur.innerHTML = '<svg viewBox="0 0 32 32" width="40" height="40"><path d="M4 2 L4 26 L10 20 L15 30 L19 28 L14 18 L23 18 Z" fill="#fff" stroke="#111827" stroke-width="2.2" stroke-linejoin="round"/></svg>'; document.body.appendChild(cur); }
+      pintaCur(); avisar('🖱️ Modo mouse: L3 mueve · A hace clic · ZL + ZR para salir'); }
+    else { if (cur) { cur.remove(); cur = null; } avisar('🖱️ Saliste del modo mouse'); } }
+  const pintaCur = () => { if (cur) cur.style.transform = `translate(${mx}px, ${my}px)`; };
+  function evento(tipo, el, extra = {}) { const o = { bubbles: true, cancelable: true, composed: true, clientX: mx, clientY: my, button: 0, buttons: tipo.endsWith('down') ? 1 : 0, view: window, ...extra };
+    el.dispatchEvent(tipo.startsWith('pointer') ? new PointerEvent(tipo, { pointerId: 9, pointerType: 'mouse', isPrimary: true, ...o }) : new MouseEvent(tipo, o)); }
+  const bajo = () => { if (cur) cur.style.display = 'none'; const el = document.elementFromPoint(mx, my); if (cur) cur.style.display = ''; return el; };
+  function moverMouse(x, y, sy) {
+    const m = v => Math.abs(v) < 0.15 ? 0 : Math.sign(v) * Math.pow((Math.abs(v) - 0.15) / 0.85, 1.6);
+    const vx = m(x), vy = m(y); if (vx || vy) { mx = Math.max(0, Math.min(innerWidth - 4, mx + vx * 16)); my = Math.max(0, Math.min(innerHeight - 4, my + vy * 16)); pintaCur();
+      const el = bajo(); if (el) { evento('pointermove', el); evento('mousemove', el); if (el !== sobre) { if (sobre) evento('mouseout', sobre); evento('mouseover', el); sobre = el; } } }
+    const s = m(sy); if (s) { const el = bajo(); let c = el; while (c && c !== document.body && !(c.scrollHeight > c.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(c).overflowY))) c = c.parentElement;
+      (c && c !== document.body ? c : document.scrollingElement || document.documentElement).scrollBy(0, s * 22); }
+  }
+  function clicMouse() { const el = bajo(); if (!el) return; if (cur) { cur.classList.remove('clic'); void cur.offsetWidth; cur.classList.add('clic'); }
+    evento('pointerdown', el); evento('mousedown', el); if (/INPUT|TEXTAREA|SELECT/.test(el.tagName)) el.focus();
+    evento('pointerup', el); evento('mouseup', el); evento('click', el); }
+  const cssM = document.createElement('style');
+  cssM.textContent = `#mandoCur { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); transition: transform .02s linear; }
+  #mandoCur.clic svg { animation: mcClic .25s ease; } @keyframes mcClic { 50% { transform: scale(.8); } }`;
+  document.head.appendChild(cssM);
+
   // ---- leer el mando ----
   let prev = [], stk = { l: '', r: '' }, stkT = { l: 0, r: 0 }, raf = 0, ultimo = null, ver = null;
   const mandos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean);
   function leer() {
     raf = 0; const P = mandos(); if (!P.length) { prev = []; pintaEstado(); return; }
     const g = P[0], ahora = performance.now();
-    g.buttons.forEach((b, i) => { const on = b.pressed || b.value > 0.5;
-      if (on && !prev[i]) { ultimo = i; volverFS();
-        if ((CR || GR) && i >= 12 && i <= 15) moverSel(['^', 'v', '<', '>'][i - 12]);      // en el cronómetro o los grupos, la cruceta elige
-        else if (CFG.on) hacer(CFG.b[i]);
-        if (ver) ver(i); }
-      if (!on && prev[i] && GR && i === grBtn) cerrarGrupos();          // soltaste ZL: se cierran los grupos
-      prev[i] = on; });
+    const on = g.buttons.map(b => b.pressed || b.value > 0.5);
+    if (on[6] && on[7] && !combo) { combo = true; delete pend[6]; delete pend[7]; if (!panelAbierto()) modoMouse(!MM); }   // ZL + ZR juntos: modo mouse
+    if (!on[6] && !on[7]) combo = false;
+    on.forEach((o, i) => {
+      if (o && !prev[i]) { ultimo = i; volverFS(); if (ver) ver(i);
+        if (combo && (i === 6 || i === 7)) {}
+        else if (i === 6 || i === 7) pend[i] = ahora;                   // ZL / ZR esperan un instante: por si apretaste los dos juntos
+        else boton(i); }
+      if (!o && prev[i] && GR && i === grBtn) cerrarGrupos();           // soltaste ZL: se cierran los grupos
+      prev[i] = o; });
+    [6, 7].forEach(i => { if (pend[i] != null && ahora - pend[i] > 160) { delete pend[i]; if (!combo) { ultimo = i; boton(i); if (!on[i] && GR && i === grBtn) cerrarGrupos(); } } });
+    if (MM) { moverMouse(g.axes[0] || 0, g.axes[1] || 0, g.axes[3] || 0); if (ver) ver(null, g); raf = requestAnimationFrame(leer); return; }   // modo mouse: los joysticks mueven la flecha y bajan la página
     if (ZM) { const x = g.axes[0] || 0, y = g.axes[1] || 0; if (Math.abs(x) > 0.15 || Math.abs(y) > 0.15) mirar(x, y); }
     [['l', 0], ['r', 2]].forEach(([k, ax]) => { const x = g.axes[ax] || 0, y = g.axes[ax + 1] || 0;      // la dirección que más se empuja: ← → ↑ ↓
       if (ZM && k === 'l') return;
       const d = Math.max(Math.abs(x), Math.abs(y)) < 0.6 ? '' : Math.abs(x) >= Math.abs(y) ? (x > 0 ? '>' : '<') : (y > 0 ? 'v' : '^');
+      if (k === 'r' && d && videoVisible()) { if (d !== stk[k] || ahora - stkT[k] > 350) { stkT[k] = ahora; if (d === '<' || d === '>') videoSalto(d === '>' ? 10 : -10); else videoVol(d === '^' ? 10 : -10); } stk[k] = d; return; }   // con un video: R3 ← → salta, ↑ ↓ volumen
       if (d && (d !== stk[k] || ahora - stkT[k] > 600)) { stkT[k] = ahora; if (CR || GR) moverSel(d); else if (CFG.on) hacer(CFG.s[k + d]); if (ver) ver('s' + k + d); }
       stk[k] = d; });
     if (ver) ver(null, g);
@@ -282,7 +343,7 @@
   function pintarPanel() {
     P.innerHTML = `<div class="mp" role="dialog" aria-label="Mando de control"><div class="hd"><h2>🎮 Mando de control</h2><button class="x" type="button" aria-label="Cerrar">✕</button></div><p class="est"></p>
       <div class="gr"><div>${padSvg()}<div class="ult">${SEL == null ? '👆 Presiona un botón de tu mando (o tócalo en el dibujo) para elegir qué hace.' : `<span>Botón <b>${esc(NOM[SEL])}</b>:</span> <select data-b="${SEL}">${opciones(acciones(), CFG.b[SEL] || 'nada')}</select>`}</div>
-        <p class="hint">Mientras este panel está abierto, el mando no mueve el aula: sólo se prueba. Ciérralo para usarlo.</p></div>
+        <p class="hint">Mientras este panel está abierto, el mando no mueve el aula: sólo se prueba. Ciérralo para usarlo.<br>🖱️ <b>ZL + ZR juntos</b>: modo mouse (L3 mueve la flecha, A hace clic, R3 baja la página). Otra vez ZL + ZR para salir.</p></div>
       <div class="lst">${lista()}</div></div>
       <div class="ft"><label class="sw"><input type="checkbox" data-on${CFG.on ? ' checked' : ''}> Usar el mando en el aula y en la Biblioteca</label><span style="flex:1"></span><button type="button" data-reset style="background:#334155;color:#fff">↺ Volver a lo de fábrica</button><button type="button" class="x" style="width:auto;height:auto;border-radius:999px;background:#22c55e;color:#052e16">✓ Listo</button></div></div>`;
     pintaEstado(); if (SEL != null) marcarSel();

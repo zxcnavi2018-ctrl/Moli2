@@ -214,7 +214,7 @@
       el.addEventListener('input', ev => { const t = ev.target, p = t.dataset && t.dataset.ed; if (!p || !F.ed) return; setPath(F.ed.s, p, t.type === 'radio' ? +t.value : t.value); });
       el.addEventListener('change', ev => { const t = ev.target, p = t.dataset && t.dataset.ed; if (!p || !F.ed) return; setPath(F.ed.s, p, t.type === 'radio' ? +t.value : t.value); }); };
     F.act2 = async (a, ds, el) => {
-      if (a === 'video') { el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`; return; }
+      if (a === 'video') { el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&enablejsapi=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`; return; }
       if (a === 'tarjetas') return Tarjetas.imprimir(F.u, +ds.n);
       if (a === 'pdf') return Hojas._.abrirFicha(F.u, +ds.n, ds.c, el);
       if (a === 'udoc') return Hojas._.abrirDocU(F.u, ds.k, el);
