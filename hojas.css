@@ -475,7 +475,7 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .cv-pis li { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: .7em; padding: .35em .6em; border-radius: .7em; background: #eff6ff; }
 .cv-pk { font-weight: 900; color: #1d4ed8; font-size: 1.1em; } .cv-pt { font-size: 1.25em; font-weight: 700; line-height: 1.2; }
 .cv-dig { display: inline-flex; gap: .2em; } .cv-dig i { width: 1.45em; height: 1.6em; display: grid; place-items: center; border-radius: .3em; background: #1e3a8a; color: #fff; font: 900 1.5em/1 "Trebuchet MS", system-ui, sans-serif; font-style: normal; }
-.cv-dig.cv-q { vertical-align: middle; margin-left: .4em; } .cv-dig.cv-q i { background: #ea580c; font-size: 1.1em; }
+.cv-dig.cv-qq { vertical-align: middle; margin-left: .4em; } .cv-dig.cv-qq i { background: #ea580c; font-size: 1.1em; }
 
 /* archivos de la unidad: carátula y rúbrica */
 .bk .u-docs { margin-top: .6em; display: grid; gap: .35em; max-width: 20em; font-size: .88em; } .bk .u-docs > b { font-size: .95em; color: #334155; }
