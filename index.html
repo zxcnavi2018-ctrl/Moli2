@@ -2119,7 +2119,9 @@ let baseFov = 55;
 function setFov() { baseFov = portrait() ? 70 : 55; camera.fov = baseFov; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize', () => { setFov(); if (!TOUR.busy) TOUR.pos.copy(fromOf(STOPS[TOUR.i])); if (sheet.style.display === 'block') place(bigRect(SHEETS[sheet.dataset.kind].ar, SHEETS[sheet.dataset.kind].big)); });
 const dotsEl = document.getElementById('dots');
-STOPS.forEach((st, k) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = st.name.replace(/^(\S+)\s+(El |La |Mi |Mis )/, '$1 '); b.title = st.title || st.name;
+STOPS.forEach((st, k) => { const b = document.createElement('button'); b.type = 'button'; const CHIP = { profesor: 'Mis notas', aula: 'Aula', mesa: 'Sesiones', locker: 'Tickets', biblio: 'Juegos', laptop: 'Laptop', corcho: 'Corcho', misiones: 'Misiones', diplomas: 'Mis diplomas', presentaci: 'Presentación' };
+  const ic = (st.name.match(/^\S+/) || [''])[0], low = st.name.toLowerCase(), key = Object.keys(CHIP).find(k => low.includes(k) || (k === 'biblio' && st.kind === 'biblio'));
+  b.textContent = key ? ic + ' ' + CHIP[key] : st.name.replace(/^(\S+)\s+(El |La |Mi |Mis )/, '$1 '); b.title = st.title || st.name;
   b.addEventListener('click', e => { e.stopPropagation(); if (TOUR.busy || k === TOUR.i || document.body.classList.contains('tut')) return; go(k - TOUR.i); }); dotsEl.appendChild(b); });
 const titleEl = document.getElementById('title'); let titleT = 0, titleT2 = 0, titleGate = Promise.resolve(), titleOpen = () => {};
 function showTitle(text, n) {                                       // nombre de la escena: franja, "ESCENA n", título grande con líneas doradas; luego se desvanece

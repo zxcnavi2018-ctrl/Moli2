@@ -363,7 +363,6 @@ function vEnviar() {
     <div class="fld"><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" required placeholder="El mismo título de tu guía"></div>
     <div class="fld"><label>Tipo de trabajo</label><div class="opts" id="eTy">${TIPOS_F.map(t => `<button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}">${t[1]} ${t[2]}</button>`).join('')}</div></div>
     <div class="fld"><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" required placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
-    <div class="fld"><label for="eL">Link de tu guía completa</label><input type="url" id="eL" maxlength="400" ${ME.teacher ? '' : 'required'} placeholder="https://drive.google.com/… · Canva"><small>Súbela a Drive o Canva y compártela como «Cualquier persona con el enlace».</small></div>
     ${ME.teacher ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
     <div class="fld"><label>Foto de tu trabajo <span style="font-weight:700;color:var(--ink2)">(opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" hidden><span id="ePv">📷 Toca aquí para elegir una foto</span></label></div>
     <div><button type="submit" class="btn go" id="eGo">${ME.teacher ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
@@ -396,10 +395,9 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
-  const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = '', f = '', link = $('#eL').value.trim();
+  const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = '', f = '', link = '';
   if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
   if (kw.split(',').filter(x => x.trim()).length < 2) return toast('🔑 Escribe al menos 3 palabras clave separadas por comas.');
-  if (!ME.teacher && !link) return toast('🔗 Pega el link de tu guía completa.');
   if (link && !safeUrl(link)) return toast('🔗 El link debe empezar con https://');
   const b = $('#eGo'); b.disabled = true; b.textContent = '⏳ Enviando…';
   const id = ME.key + '-' + Date.now().toString(36);
