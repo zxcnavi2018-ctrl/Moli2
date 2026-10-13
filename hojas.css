@@ -61,6 +61,7 @@
 .bk .row:active { transform: scale(.98); }
 .bk .row .rt { flex: 1; min-width: 0; } .bk .row .rt b { display: block; } .bk .row .rt small { display: block; color: #64748b; font-size: .78em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bk .row.off { opacity: .55; cursor: default; }
+.bk .row .lk { flex: none; display: grid; place-items: center; width: 1.9em; height: 1.9em; border: 2px dashed #94a3b8; border-radius: .55em; background: #fff; font-size: .95em; cursor: pointer; } .bk .row .lk:hover { border-color: #2563eb; } .bk .row .lk.on { border: 2px solid #dc2626; background: #fee2e2; }
 .bk .lv { display: inline-grid; place-items: center; min-width: 2.2em; height: 1.7em; padding: 0 .4em; border-radius: .5em; font-weight: 900; font-size: .95em; border: .12em solid #2b2547; }
 .bk .moli { width: 4.6em; height: 4.6em; float: right; margin: 0 0 .3em .4em; filter: drop-shadow(0 .3em .3em rgba(0,0,0,.15)); }
 .bk .opt { display: flex; align-items: center; gap: .55em; width: 100%; margin: .38em 0; padding: .5em .6em; border: .15em solid #2b2547; border-radius: .8em; background: #fff; font: 700 .98em "Trebuchet MS", system-ui; color: #1e293b; text-align: left; cursor: pointer; box-shadow: 0 .2em 0 #2b2547; }

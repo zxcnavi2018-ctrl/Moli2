@@ -5,6 +5,23 @@
 (function () {
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const L = t => MD.lleno(t);
+  // ---- 🔒 candados de la docente: bloquea una unidad entera o una sesión (cuaderno, Exit tickets y misiones). Se guarda en files/fbloq-0 ----
+  const BQ = { u: {}, s: {} }, BQF = 'fbloq-0', LIBROS = [];
+  const BQURL = () => `https://firestore.googleapis.com/v1/projects/${MD.FB.projectId}/databases/(default)/documents/files/${BQF}?key=${MD.FB.apiKey}`;
+  const bqOn = (k, n) => n == null ? !!BQ.u[k] : !!BQ.s[k + ':' + n];
+  const cerrado = (k, n) => !MD.esDocente() && (!!BQ.u[k] || (n != null && !!BQ.s[k + ':' + n]));     // sólo los estudiantes ven el candado cerrado
+  const lk = (k, n) => MD.esDocente() ? `<span class="lk${bqOn(k, n) ? ' on' : ''}" data-a="candado" data-k="${esc(k)}"${n == null ? '' : ` data-n="${n}"`} title="${bqOn(k, n) ? 'Bloqueado: toca para desbloquear' : 'Abierto: toca para bloquear'}">${bqOn(k, n) ? '🔒' : '🔓'}</span>` : '';
+  const repintar = () => LIBROS.forEach(b => { if (!b.ocupado && document.body.contains(b.el || document.body)) b.pinta(false); });
+  fetch(BQURL(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue; if (!v) return;
+    const x = JSON.parse(decodeURIComponent(escape(atob(v)))); BQ.u = x.u || {}; BQ.s = x.s || {}; repintar(); }).catch(() => {});
+  async function candado(ds) {
+    const key = ds.n == null ? ds.k : ds.k + ':' + ds.n, M = ds.n == null ? BQ.u : BQ.s, antes = !!M[key];
+    if (antes) delete M[key]; else M[key] = true; repintar();
+    try { if (!window.Docente || !await Docente.token()) throw new Error('AUTH');
+      await Docente.commit([{ update: { name: Docente.DOC('files', BQF), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, u: BQ.u, s: BQ.s, at: Date.now() })))), updatedAt: new Date() }) } }]);
+    } catch (e) { if (antes) M[key] = true; else delete M[key]; repintar();
+      alert(e.message === 'AUTH' ? '🔐 Conecta tu cuenta: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No se pudo guardar el candado. Revisa tu internet.'); }
+  }
   const mezcla = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const nom1 = me => String(me && me.name || '').split(' ')[0].toLowerCase().replace(/^./, c => c.toUpperCase());
   const MODOS = { individual: '👤 Individual', group: '👥 En equipo', grupo: '👥 En equipo', pair: '👫 En pareja', pairs: '👫 En pareja', pareja: '👫 En pareja', whole: '🏫 Toda la clase', clase: '🏫 Toda la clase' };
@@ -110,10 +127,11 @@
         return B.pasar(d, () => { B.p += d; flujo.i = B.PH[B.p].log; flujo.alMover && flujo.alMover(); }); }
       if (e.target.closest('.bk-tab')) { e.stopPropagation(); flujo.alTab && flujo.alTab(); return; }
       const a = e.target.closest('[data-a]');
+      if (a && a.dataset.a === 'candado') { e.stopPropagation(); return candado(a.dataset); }
       if (a && !a.disabled) { e.stopPropagation(); flujo.act(a.dataset.a, a.dataset, a); }
     });
     el.addEventListener('submit', e => { e.preventDefault(); const f = e.target; flujo.act(f.dataset.a, f.dataset, f); });
-    flujo.libro = B;
+    flujo.libro = B; B.el = el; LIBROS.push(B);
     pinta(true);
     return B;
   }
@@ -133,7 +151,7 @@
   const hojaUnidades = (titulo, icono, frase, me) => {
     const U = MD.unidades();
     return { l: `<img class="moli w" src="${IMG('feliz')}" alt=""><div class="crumb w">${me ? esc(me.name) + (me.docente ? ' · Docente' : ' · 6° ' + esc(me.section)) : 'Ciencia y Tecnología · 6°'}</div><h1 class="w">${icono} ${esc(titulo)}</h1><p class="hand w">${frase}</p>`,
-      r: `<h2 class="w">📚 Elige tu unidad</h2>${U.length ? U.map(u => `<button class="row w" data-a="unidad" data-k="${esc(u.key)}"><span class="ico" style="font-size:1.6em">${esc(u.icon || '📘')}</span><span class="rt"><b>Unidad ${esc(u.num)}</b><small>${esc(u.title)}</small></span><span>›</span></button>`).join('') : '<p class="hand w">Todavía no hay unidades visibles.</p>'}` };
+      r: `<h2 class="w">📚 Elige tu unidad</h2>${U.length ? U.map(u => { const c = cerrado(u.key); return `<button class="row w${c ? ' off' : ''}" ${c ? 'disabled' : `data-a="unidad" data-k="${esc(u.key)}"`}><span class="ico" style="font-size:1.6em">${esc(u.icon || '📘')}</span><span class="rt"><b>Unidad ${esc(u.num)}</b><small>${c ? '🔒 Bloqueada por tu profe' : esc(u.title)}</small></span>${lk(u.key)}<span>${c ? '🔒' : '›'}</span></button>`; }).join('') : '<p class="hand w">Todavía no hay unidades visibles.</p>'}` };
   };
 
   // ---- el caso del Exit ticket (texto y su tabla), cuando la ficha del colegio lo trae ----
@@ -235,9 +253,9 @@
     F.hojas = () => {
       if (!F.listo) return [{ l: cargando(), r: '' }];
       if (!F.u) return [hojaUnidades('Mis sesiones de unidad', '📗', `¡Hola${F.me ? ' ' + esc(nom1(F.me)) : ''}! Aquí está todo lo que aprendemos en cada clase. Elige tu unidad y pasa las hojas. ✏️`, F.me)];
-      const u = F.u, S = MD.sesionesDe(u);
+      const u = F.u, S0 = MD.sesionesDe(u), S = S0.filter(x => !cerrado(u.key, x.n));
       const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Mi cuaderno de sesiones</p><p class="hand w">${S.length} ${S.length === 1 ? 'sesión' : 'sesiones'} · pasa la hoja ›</p>${docsUnidad(u)}`,
-        r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span></button>`).join('')}` }];
+        r: `<h2 class="w">📑 Índice</h2>${S0.map(({ s, n }) => { const c = cerrado(u.key, n); return `<button class="row w${c ? ' off' : ''}" ${c ? 'disabled' : `data-a="ir" data-i="${S.findIndex(x => x.n === n) + 1}"`}><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${c ? '🔒 Bloqueada por tu profe' : esc(temaDe(s, n))}</small></span>${lk(u.key, n)}${c ? '🔒' : ''}</button>`; }).join('')}` }];
       S.forEach(({ s, n }) => {
         const cr = (s.criteria || []).filter(L), acts = actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length, bb = esBebras(u, s);
         const tareas = [[s.flipped2, '📌 Trae para esta clase:'], [s.flipped, '🏠 Para la casa:']].filter(([f]) => f && f.enabled && (L(f.title) || L(f.desc)));
@@ -272,7 +290,7 @@
   // =================================================================
   function flujoTickets() {
     const F = { i: 0, u: null, listo: false, me: MD.yo(), modo: 'lista', T: null };
-    const pendiente = () => { const S = MD.sesionesDe(F.u).filter(x => MD.preguntas(x.s).length); return S.find(x => !F.T[x.n]); };
+    const pendiente = () => { const S = MD.sesionesDe(F.u).filter(x => MD.preguntas(x.s).length); return S.find(x => !F.T[x.n] && !cerrado(F.u.key, x.n)); };
     F.hojas = () => {
       if (!F.listo) return [{ l: cargando(), r: '' }];
       if (!F.me) return [hojaEntrar('tus Exit tickets')];
@@ -285,8 +303,8 @@
         return [{ l: `<img class="moli w" src="${IMG(pe ? 'decidida' : 'orgullosa')}" alt=""><div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · ${esc(u.title)}</div><h1 class="w">🎟️ Mis Exit tickets</h1>
             <p class="hand w">${hechos.length} de ${S.length} respondidos.</p>${prom ? `<p class="w">Promedio: ${nivelChip(prom)} <b>${prom.score}%</b></p>` : ''}
             <p class="hand w">${pe ? `Te toca el de la <b>Sesión ${pe.n}</b>. Van en orden, uno por uno. 📚` : S.length ? '¡Respondiste todos! 🏆' : 'Tu profe aún no activa los Exit tickets.'}</p>`,
-          r: `<h2 class="w">📋 Sesiones</h2>${S.map(({ s, n }) => { const t = F.T[n], es = pe && pe.n === n;
-              return `<button class="row w${!t && !es ? ' off' : ''}" ${t || es ? `data-a="${t ? 'ver' : 'empezar'}" data-n="${n}"` : 'disabled'}><b class="lv" style="background:#dcfce7;color:#166534">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span>${t ? `${nivelChip(t)}<small>${t.score}/${t.total}</small>` : es ? '<span class="bt or" style="font-size:.75em">Responder ›</span>' : '🔒'}</button>`; }).join('')}` }];
+          r: `<h2 class="w">📋 Sesiones</h2>${S.map(({ s, n }) => { const t = F.T[n], es = pe && pe.n === n, c = cerrado(u.key, n);
+              return `<button class="row w${c || (!t && !es) ? ' off' : ''}" ${!c && (t || es) ? `data-a="${t ? 'ver' : 'empezar'}" data-n="${n}"` : 'disabled'}><b class="lv" style="background:#dcfce7;color:#166534">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${c ? '🔒 Bloqueada por tu profe' : esc(temaDe(s, n))}</small></span>${lk(u.key, n)}${c ? '🔒' : t ? `${nivelChip(t)}<small>${t.score}/${t.total}</small>` : es ? '<span class="bt or" style="font-size:.75em">Responder ›</span>' : '🔒'}</button>`; }).join('')}` }];
       }
       const x = F.x;
       if (F.modo === 'preg') return x.qs.map((q, k) => {             // si trae un caso (texto y tabla), el caso va a la izquierda y la pregunta con sus opciones a la derecha
@@ -458,8 +476,8 @@
       if (F.modo === 'lista') { const hechas = Ms.filter(m => MD.misionCompleta(m, F.P)).length;
         return [{ l: `<img class="moli w" src="${IMG('salta')}" alt=""><div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · ${esc(u.title)}</div><h1 class="w">💪 Mis misiones</h1><p class="hand w">${hechas} de ${Ms.length} misiones completas.</p><div class="bar w"><i style="width:${Ms.length ? hechas / Ms.length * 100 : 0}%"></i></div>
             ${F.me ? '' : '<p class="hand w">💡 Entra con tu DNI en tu portafolio para guardar tu avance en tu cuenta.</p>'}`,
-          r: `<h2 class="w">🗺️ Misiones</h2>${Ms.length ? Ms.map((m, k) => { const n = m.acts.filter(a => F.P[a.id]).length;
-              return `<button class="row w" data-a="mision" data-k="${k}"><b class="lv" style="background:${n === m.acts.length ? '#bbf7d0' : '#fef3c7'};color:#2b2547">${n === m.acts.length ? '✓' : k + 1}</b><span class="rt"><b>${esc(m.t)}</b><small>Sesión ${m.ses.n} · ${n}/${m.acts.length} actividades</small></span>›</button>`; }).join('') : '<p class="hand w">Tu profe aún no crea misiones para esta unidad.</p>'}` }];
+          r: `<h2 class="w">🗺️ Misiones</h2>${Ms.length ? Ms.map((m, k) => { const n = m.acts.filter(a => F.P[a.id]).length, c = cerrado(u.key, m.ses.n);
+              return `<button class="row w${c ? ' off' : ''}" ${c ? 'disabled' : `data-a="mision" data-k="${k}"`}><b class="lv" style="background:${n === m.acts.length ? '#bbf7d0' : '#fef3c7'};color:#2b2547">${n === m.acts.length ? '✓' : k + 1}</b><span class="rt"><b>${esc(m.t)}</b><small>Sesión ${m.ses.n} · ${c ? '🔒 Bloqueada por tu profe' : n + '/' + m.acts.length + ' actividades'}</small></span>${lk(u.key, m.ses.n)}${c ? '🔒' : '›'}</button>`; }).join('') : '<p class="hand w">Tu profe aún no crea misiones para esta unidad.</p>'}` }];
       }
       const m = F.m;
       if (F.modo === 'fin') return [{ l: `<div class="center"><div class="ico w" style="font-size:4em">🏆</div><h1 class="w">¡Misión completa!</h1><p class="hand w">${esc(m.t)}</p></div>`,
@@ -653,7 +671,7 @@ Devuelve JSON:
       const tema = { cuaderno: 'ses', folder: 'exit', docente: 'notas', mision: 'mis' }[kind];
       Libro(host, tema, F); actual = F; F.iniciar && F.iniciar();
     },
-    _: { docsUnidad, abrirDocU, actsDe, fotoHtml, esBebras, Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
+    _: { lk, docsUnidad, abrirDocU, actsDe, fotoHtml, esBebras, Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
     cerrar() { if (actual) { actual.libro && actual.libro.ro && actual.libro.ro.disconnect(); actual.cerrar && actual.cerrar(); actual = null; } }
   };
 })();

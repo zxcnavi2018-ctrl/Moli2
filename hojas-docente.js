@@ -7,7 +7,7 @@
 //   · Laptop                    → avance de cada estudiante en el Laboratorio de Molí
 // ===================================================================
 (function () {
-  const { Libro, esc, L, IMG, cargando, nivelChip, temaDe, MODOS, hojaUnidades, fichaHtml } = Hojas._;
+  const { Libro, esc, L, IMG, cargando, nivelChip, temaDe, MODOS, hojaUnidades, fichaHtml, lk } = Hojas._;
   const SECS = ['A', 'B', 'C', 'D'];
   const LSd = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
   const PAV = ['', '1', '2', '3', '+4'], CONDK = ['', 'C', 'B', 'A', 'AD'];
@@ -107,7 +107,7 @@
     F.paginas = (cab) => {
       const u = F.u, D = F.D, S = MD.sesionesDe(u).filter(x => MD.preguntas(x.s).length);
       const fila = ({ s, n }, k) => { const R = D.est.filter(e => (D.byS[e.key] || {})[n]), pr = MD.promedio(R.map(e => D.byS[e.key][n]));
-        return `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dcfce7;color:#166534">${n}</b><span class="rt"><b>Sesión ${n} · ${R.length}/${D.est.length}</b><small>${esc(temaDe(s, n))}</small></span>${pr ? nivelChip(pr) : ''}</button>`; };
+        return `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dcfce7;color:#166534">${n}</b><span class="rt"><b>Sesión ${n} · ${R.length}/${D.est.length}</b><small>${esc(temaDe(s, n))}</small></span>${pr ? nivelChip(pr) : ''}${lk(u.key, n)}</button>`; };
       const H = [{ l: cab + `<p class="hand w">${D.est.length} estudiantes en 6° ${F.sec}.</p><p class="hand w">Toca una sesión para ver sus preguntas: las que están en rojo hay que <b>reforzarlas</b>. ⚠️</p>`,
         r: `<h2 class="w">📋 Sesiones</h2>${S.length ? S.map(fila).join('') : '<p class="hand w">Esta unidad aún no tiene Exit tickets.</p>'}` }];
       S.forEach(({ s, n }) => {
@@ -171,7 +171,7 @@
       if (F.ed) return paginasEditar();
       const S = MD.sesionesDe(u);
       const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Cuaderno de sesiones · ${S.length} sesiones</p>${Hojas._.docsUnidad(u)}`,
-        r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span></button>`).join('')}` }];
+        r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span>${lk(u.key, n)}</button>`).join('')}` }];
       S.forEach(({ s, n }) => {
         const cr = (s.criteria || []).filter(L), acts = Hojas._.actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)}</div><div class="big w">Sesión ${n}</div>${L(s.title) ? `<h2 class="w">${esc(s.title)}</h2>` : ''}
