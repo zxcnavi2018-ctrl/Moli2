@@ -704,7 +704,7 @@ function panelEditar() {
 }
 if (DOCENTE) { const b = $('#editar'); b.hidden = false; b.onclick = panelEditar; }
 juntar(scene, [atril, atrilHit, ...aranas, ...ESTANTES.flatMap(E => [E.libs, E.halo, E.placa, E.et])]);
-window.BIB = { renderer, atril, ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, camera, scene };
+window.BIB = { renderer, atril, ESTANTES, irEstante, irSala, abrirLibro, get modo() { return modo; }, get actual() { return actual; }, camera, scene };
 const listo = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();

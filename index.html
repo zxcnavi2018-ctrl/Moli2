@@ -2159,7 +2159,8 @@ async function go(dir) {
 function tourFrame(t) {                                             // la cámara "respira" un poquito cuando está quieta
   camera.position.copy(TOUR.pos); camera.position.x += Math.sin(t * 0.5) * 0.01; camera.position.y += Math.sin(t * 0.7) * 0.007; camera.lookAt(TOUR.look);
   if (TOUR.roll) camera.rotateZ(TOUR.roll);
-  const f = baseFov + TOUR.zoom + (TOUR.fa || 0); if (Math.abs(camera.fov - f) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
+  if (TOUR.px || TOUR.py) { camera.rotateY(TOUR.px || 0); camera.rotateX(TOUR.py || 0); }   // 🎮 modo zoom: el joystick mira alrededor
+  const f = baseFov + TOUR.zoom + (TOUR.fa || 0) + (TOUR.uz || 0);   // uz: el zoom del 🎮 mando (− / +) if (Math.abs(camera.fov - f) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
 }
 setFov(); TOUR.pos.copy(fromOf(STOPS[0])); TOUR.look.copy(STOPS[0].look); showStop();
 startEl.style.display = 'none'; TOUR.started = true; document.getElementById('tourBar').style.display = 'flex'; musicBtn.style.display = 'none';   // sin texto de inicio: empieza de una
