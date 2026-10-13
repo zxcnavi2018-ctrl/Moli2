@@ -709,5 +709,6 @@ const listo = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.re
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
+<script src="mando.js"></script>
 </body>
 </html>

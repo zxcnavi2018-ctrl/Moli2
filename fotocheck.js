@@ -45,6 +45,7 @@
     ['preparadas', '📦', 'Sesiones preparadas', 'Unidad 7 lista para publicar'],
     ['escanear', '📷', 'Escanear', 'Exit tickets en papel'],
     ['remoto', '📱', 'Control remoto', 'Maneja la pantalla desde tu celular'],
+    ['mando', '🎮', 'Mando de control', 'Tu mando Bluetooth: elige sus botones'],
     ['equipo', '💻', 'Laptop o celular', 'Qué hace este equipo'],
     ['bandeja', '📥', 'Bandeja de la Revista', 'Trabajos por revisar'],
     ['revisores', '🧐', 'Revisores', 'Estudiantes que aprueban trabajos']

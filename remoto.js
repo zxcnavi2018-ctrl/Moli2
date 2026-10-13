@@ -133,6 +133,7 @@
   }
   function remoto() { if (R.rol === 'phone') return abrirControl(); if (R.rol === 'pc') return equipo(); return esCel() ? comoCelular().catch(() => equipo()) : equipo(); }
   Herramientas.extra.remoto = remoto; Herramientas.extra.equipo = equipo;
+  window.RemotoCmd = ejecutar;                                         // el 🎮 Mando de control usa las mismas animaciones
   // si este equipo ya era la laptop, se vuelve a conectar sola
   addEventListener('load', () => { if (LS.get('moli2:rc:rol', null) === 'pc' && MD.esDocente()) setTimeout(() => comoLaptop().catch(() => {}), 3000); });
 
