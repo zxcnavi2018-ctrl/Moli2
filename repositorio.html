@@ -185,9 +185,10 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .c-2 h4{margin:0 0 4px;font:900 20px var(--serif);color:var(--navy)}.c-d{margin:0 0 10px;font-weight:700;color:var(--ink2)}
 .c-2 blockquote{margin:0;padding:12px 14px;border-radius:12px;background:#fff;font:italic 700 17px/1.5 var(--serif);color:#1e3a5f;border-left:5px solid var(--green)}.c-b blockquote{border-left-color:#7c3aed}
 .c-2 mark{background:#fef08a;padding:0 3px;border-radius:4px;font-style:normal;font-weight:900;color:#0b2e4f}.c-m{margin:10px 0 0;font-weight:800;font-size:14px;color:var(--ink2)}
-.formatos{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin:0 0 20px}.g-doc.pdf .ic{background:#b42318;font-size:15px}.g-doc.pdf:hover{border-color:#b42318}
+.formatos{display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 20px;max-width:760px}.g-doc.pdf .ic{background:#b42318;font-size:15px}.g-doc.pdf:hover{border-color:#b42318}
 .f-h{margin:6px 0 2px;font:900 20px var(--serif);color:var(--navy)}
 @media (max-width:820px){.c-2,.formatos{grid-template-columns:1fr}.c-2 article+article{border-left:0;border-top:1px solid var(--line)}.c-badge{position:static;display:inline-block;margin-bottom:8px}}
+.anx{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}.anx figure{margin:0}.anx img{width:100%;border-radius:10px;border:1px solid var(--line)}.anx figcaption{font-size:12px;font-weight:800;color:var(--ink2);margin-top:3px}.photo img{width:70px;height:50px;margin-right:4px}
 @keyframes bob{50%{transform:translateY(-5px)}}
 @keyframes pop{from{opacity:0;transform:scale(.92) translateY(10px)}}
 @keyframes fade{from{opacity:0}}
@@ -219,8 +220,10 @@ const K_ME = 'moli2:me', K_ME1 = 'ciencia4b:me:' + DOC, K_T = 'moli2:auth', K_T1
 const ls = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } } };
 const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const ME = (m => m && m.key ? m : null)(ls.get(K_ME, null)) || (m => m && m.key && !m.demo ? m : null)(ls.get(K_ME1, null)), QS = new URLSearchParams(location.search);
-const TIPOS = [['opi', '💭', 'Opinión científica'], ['ens', '📝', 'Ensayo'], ['inv', '🔬', 'Investigación'], ['exp', '⚗️', 'Experimento'], ['pro', '🛠️', 'Producto o maqueta'], ['info', '🖼️', 'Infografía o video'], ['maq', '🧩', 'Maqueta'], ['vid', '🎬', 'Video']];
+const TIPOS = [['opi', '💭', 'Opinión científica'], ['ens', '📝', 'Ensayo'], ['inv', '🔬', 'Investigación'], ['dis', '🧪', 'Diseño de investigación'], ['pro', '🛠️', 'Producto o maqueta'], ['info', '🖼️', 'Infografía'], ['exp', '⚗️', 'Experimento'], ['maq', '🧩', 'Maqueta'], ['vid', '🎬', 'Video']];
 const TIPOS_F = TIPOS.slice(0, 6);
+const GUIA_TXT = { opi: 'Tema, tu opinión, 3 razones, lo que otros piensan y tu conclusión.', ens: 'Introducción, 3 párrafos de desarrollo y conclusión.', inv: 'Tu pregunta, lo que sabías, lo que encontraste y tu respuesta.', dis: 'Pregunta, hipótesis, variables, materiales, pasos, seguridad y tabla de datos.', pro: 'Para qué sirve, boceto, materiales, pasos, cómo funciona y mejoras.', info: 'Tema, título llamativo, datos clave, boceto y dato curioso.' };
+const guiaHtml = k => { const t = tipo(k); return `<a class="g-doc" href="docs/guias/${esc(t[0])}.docx" download="Guía ${esc(t[2])}.docx"><span class="ic">W</span><div><b>Descarga la guía de ${t[1]} ${esc(t[2])}</b><small>${esc(GUIA_TXT[t[0]] || '')} Siempre con 3 citas, fuentes y palabras clave.</small></div><em>⬇</em></a>`; };
 const UNITS = [['unit7', '🦠', 'Unidad 7 · Microorganismos'], ['unit8', '🧬', 'Unidad 8 · Sistema reproductor'], ['otra', '🌎', 'Otro tema de Ciencia']];
 const tipo = k => TIPOS.find(t => t[0] === k) || TIPOS[0], unidad = k => UNITS.find(u => u[0] === k) || UNITS[2];
 if (ME && ME.docente) ME.teacher = true;
@@ -348,7 +351,7 @@ document.addEventListener('submit', e => { if (e.target.id !== 'sF') return; e.p
 document.addEventListener('click', e => { const b = e.target.closest('[data-sq]'); if (!b) return; $('#sQ').value = b.dataset.sq; buscar(b.dataset.sq); });
 
 // ---- 📤 Enviar mi trabajo ----
-let FORM = { ty: 'opi', u: 'unit7', img: '', th: '', g: 6 };
+let FORM = { ty: 'opi', u: 'unit7', img: '', th: '', g: 6, txt: '', fotos: [] };
 function vEnviar() {
   const V = $('#view');
   if (!ME) { V.innerHTML = `<div class="empty"><b>Primero entra con tu DNI</b>Toca tu fotocheck en «Mi aula», escribe tu DNI y vuelve aquí para enviar tu trabajo.</div>`; return; }
@@ -356,18 +359,18 @@ function vEnviar() {
   `<section class="citas"><div class="c-top"><span class="c-badge">MÍNIMO 3 CITAS</span><h3>✍️ Citas parafraseadas <small>Normas APA</small></h3><p>Parafrasear es contar lo que dijo un experto <b>con tus propias palabras</b>, sin copiar. Tu trabajo debe tener <b>mínimo 3 citas</b>. Hay dos formas:</p></div>
       <div class="c-2"><article class="c-a"><span class="c-n">A</span><h4>Cita narrativa</h4><p class="c-d">Empiezas con el <b>autor</b> y pones el <b>año</b> entre paréntesis.</p><blockquote>Según <mark>López (2020)</mark>, el desarrollo tecnológico cambió la forma en que aprendemos.</blockquote><p class="c-m">Molde: Según <mark>Apellido (año)</mark>, …</p></article>
       <article class="c-b"><span class="c-n">B</span><h4>Cita parentética</h4><p class="c-d">Escribes la idea con tus palabras y <b>al final</b> pones (Apellido, año).</p><blockquote>El desarrollo tecnológico ha transformado la educación moderna <mark>(Soto, 2019)</mark>.</blockquote><p class="c-m">Molde: … <mark>(Apellido, año)</mark>.</p></article></div></section>
-  <section class="formatos"><a class="g-doc" href="docs/formato-revista-innovadora.docx" download="Formato Revista Innovadora.docx"><span class="ic">W</span><div><b>1. Descarga la guía y complétala</b><small>7 pasos: título, tipo, tu texto libre, 3 citas, fuentes y palabras clave.</small></div><em>⬇</em></a>
-    <a class="g-doc pdf" href="docs/formato-revista-innovadora.pdf" target="_blank" rel="noopener"><span class="ic">PDF</span><div><b>¿Prefieres imprimirla?</b><small>Ábrela en PDF y escríbela a mano.</small></div><em>↗</em></a></section>
+  <div class="fld" style="margin:0 0 10px"><label style="font:900 18px var(--serif);color:var(--navy)">1. Elige el tipo de trabajo</label><div class="opts" id="eTy">${TIPOS_F.map(t => `<button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}">${t[1]} ${t[2]}</button>`).join('')}</div></div>
+  <section class="formatos" id="eGuia">${guiaHtml(FORM.ty)}</section>
   <form class="form" id="fEnv" autocomplete="off">
     <h3 class="f-h">2. Publica tu propuesta</h3>
     <div class="fld"><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" required placeholder="El mismo título de tu guía"></div>
-    <div class="fld"><label>Tipo de trabajo</label><div class="opts" id="eTy">${TIPOS_F.map(t => `<button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}">${t[1]} ${t[2]}</button>`).join('')}</div></div>
     <div class="fld"><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" required placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
     ${ME.teacher ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
-    <div class="fld"><label>Foto de tu trabajo <span style="font-weight:700;color:var(--ink2)">(opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" hidden><span id="ePv">📷 Toca aquí para elegir una foto</span></label></div>
+    <div class="fld"><label>Sube tu guía completada (Word)</label><label class="photo" id="eDocL"><input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="eDoc" hidden><span id="eDocV">📄 Toca aquí para elegir tu guía .docx</span></label><small>Lo que escribiste en tu guía será el contenido de tu libro en la Biblioteca.</small></div>
+    <div class="fld"><label>Anexos: fotos de tu trabajo <span style="font-weight:700;color:var(--ink2)">(hasta 3, opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" multiple hidden><span id="ePv">📷 Toca aquí para elegir tus fotos</span></label><small>Irán al final de tu libro, en la página de Anexos.</small></div>
     <div><button type="submit" class="btn go" id="eGo">${ME.teacher ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
   </form><div class="mine" id="mine"></div>`;
-  FORM.img = FORM.th = ''; drawMine();
+  FORM.img = FORM.th = ''; FORM.txt = ''; FORM.fotos = []; drawMine();
 }
 async function shrinkImg(file, max, q) {
   const url = URL.createObjectURL(file);
@@ -378,31 +381,59 @@ async function shrinkImg(file, max, q) {
     return c.toDataURL('image/jpeg', q);
   } finally { URL.revokeObjectURL(url); }
 }
+let AYUDA = null, LABS = null;
+async function limpiarGuia(raw) {                                      // quita de la guía las instrucciones, ejemplos y casillas vacías: queda sólo lo que escribió el estudiante
+  if (!AYUDA) { try { const j = await (await fetch('docs/guias/ayuda.json')).json(); AYUDA = new Set(j.ayuda); LABS = new Set(j.labs); } catch (e) { AYUDA = new Set(); LABS = new Set(); } }
+  const L = [];
+  String(raw).split(/\n/).map(x => x.replace(/_{3,}/g, ' ').replace(/\s*\(Molde.*$/, '').replace(/[ \t]+/g, ' ').trim()).forEach(x => {
+    if (!x || AYUDA.has(x)) return;
+    if (/^(REVISTA INNOVADORA · GUÍA|Ejemplo:|Orden:|💡|☐|¿Cómo lo publico\?|A\. Cita narrativa:|B\. Cita parentética:)/.test(x)) return;
+    if (/^[\d.\s]+$/.test(x)) return;
+    const paso = /^PASO \d+/.test(x); if (paso) x = x.replace(/^PASO \d+\s*/, 'PASO ');
+    L.push({ x, paso, lab: !paso && LABS.has(x) });
+  });
+  const vacio = i => i >= L.length || L[i].paso || L[i].lab;
+  const A = L.filter((o, i) => !(o.lab && vacio(i + 1)));              // etiquetas sin respuesta
+  const B = A.filter((o, i) => !(o.paso && (i + 1 >= A.length || A[i + 1].paso)));   // pasos sin nada
+  return B.map(o => o.x).join('\n').slice(0, 20000);
+}
 document.addEventListener('change', async e => {
-  if (e.target.id !== 'eImg' || !e.target.files[0]) return;
-  const f = e.target.files[0]; $('#ePv').textContent = '⏳ Preparando tu foto…';
+  if (e.target.id === 'eDoc' && e.target.files[0]) {                 // la guía en Word: se lee su texto aquí mismo (no se sube el archivo)
+    const f = e.target.files[0], v = $('#eDocV'); v.textContent = '⏳ Leyendo tu guía…';
+    try {
+      if (!window.mammoth) await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'vendor/mammoth.browser.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+      const r = await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() });
+      const txt = await limpiarGuia(String(r.value || ''));
+      if (txt.replace(/^PASO.*$/gm, '').replace(/\s+/g, ' ').length < 40) throw new Error('VACIO');
+      FORM.txt = txt.slice(0, 20000); v.innerHTML = `✅ <b>${esc(f.name)}</b> · ${FORM.txt.split(/\s+/).length} palabras leídas. Toca para cambiarla.`;
+    } catch (x) { FORM.txt = ''; v.textContent = x.message === 'VACIO' ? '⚠️ Tu guía parece vacía. Complétala y vuelve a subirla.' : '⚠️ No pude leer ese archivo. Debe ser la guía en Word (.docx).'; }
+    return;
+  }
+  if (e.target.id !== 'eImg' || !e.target.files.length) return;
+  const L = [...e.target.files].slice(0, 3); $('#ePv').textContent = '⏳ Preparando tus fotos…';
   try {
-    let img = await shrinkImg(f, 1280, 0.72); if (img.length > 680000) img = await shrinkImg(f, 960, 0.62);
-    FORM.img = img; FORM.th = await shrinkImg(f, 420, 0.6);
-    $('#ePv').innerHTML = `<img src="${FORM.th}" alt=""> ✅ ¡Foto lista! Toca para cambiarla.`;
-  } catch (x) { FORM.img = FORM.th = ''; $('#ePv').textContent = '⚠️ No pude abrir esa foto. Prueba con otra.'; }
+    FORM.fotos = []; for (const f of L) { let im = await shrinkImg(f, 1000, 0.62); if (im.length > 280000) im = await shrinkImg(f, 760, 0.55); FORM.fotos.push(im); }
+    FORM.th = await shrinkImg(L[0], 420, 0.6);
+    $('#ePv').innerHTML = FORM.fotos.map(x => `<img src="${x}" alt="">`).join('') + ` ✅ ${FORM.fotos.length} foto${FORM.fotos.length > 1 ? 's' : ''} lista${FORM.fotos.length > 1 ? 's' : ''}. Toca para cambiarlas.`;
+  } catch (x) { FORM.fotos = []; FORM.th = ''; $('#ePv').textContent = '⚠️ No pude abrir esas fotos. Prueba con otras.'; }
 });
 document.addEventListener('click', e => {
   const t = e.target.closest('#eTy [data-ty]'), u = e.target.closest('#eU [data-u]');
-  if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); }
+  if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(FORM.ty); }
   if (u) { FORM.u = u.dataset.u; document.querySelectorAll('#eU button').forEach(b => b.classList.toggle('on', b === u)); }
   const gg = e.target.closest('#eG [data-g]'); if (gg) { FORM.g = +gg.dataset.g; document.querySelectorAll('#eG button').forEach(b => b.classList.toggle('on', b === gg)); }
 });
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
-  const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = '', f = '', link = '';
+  const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = FORM.txt, f = '', link = '';
   if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
+  if (!d) return toast('📄 Sube tu guía completada en Word.');
   if (kw.split(',').filter(x => x.trim()).length < 2) return toast('🔑 Escribe al menos 3 palabras clave separadas por comas.');
   if (link && !safeUrl(link)) return toast('🔗 El link debe empezar con https://');
   const b = $('#eGo'); b.disabled = true; b.textContent = '⏳ Enviando…';
   const id = ME.key + '-' + Date.now().toString(36);
-  const w = { k: ME.key, n: String(ME.name || '').slice(0, 60), sec: String(ME.section || '').toUpperCase().slice(-1), u: 'rev', kw: kw.slice(0, 200), ty: FORM.ty, t: t.slice(0, 100), d: d.slice(0, 1500), f: f.slice(0, 600), link, th: FORM.th, img: FORM.img, st: 'pend', at: new Date() };
-  if (!w.link) delete w.link; if (!w.f) delete w.f; if (!w.th) { delete w.th; delete w.img; }
+  const w = { k: ME.key, n: String(ME.name || '').slice(0, 60), sec: String(ME.section || '').toUpperCase().slice(-1), u: 'rev', kw: kw.slice(0, 200), ty: FORM.ty, t: t.slice(0, 100), d: d.slice(0, 20000), f: f.slice(0, 600), link, th: FORM.th, img: FORM.img, st: 'pend', at: new Date() };
+  if (!w.link) delete w.link; if (!w.f) delete w.f; delete w.img; if (FORM.fotos[0]) w.img = FORM.fotos[0]; if (FORM.fotos[1]) w.img2 = FORM.fotos[1]; if (FORM.fotos[2]) w.img3 = FORM.fotos[2]; if (!w.th) delete w.th;
   if (ME.teacher) Object.assign(w, { st: 'ok', rv: 'tu profe', rvAt: new Date(), g: FORM.g, sec: '' });
   try {
     const h = { 'Content-Type': 'application/json' }; if (ME.teacher) { const t = await staffTok(); if (!t) throw new Error('AUTHT'); h.Authorization = 'Bearer ' + t; }
@@ -464,8 +495,7 @@ async function openArt(id) {
   if (!w) { M.hidden = true; return toast('No encontré ese trabajo.'); }
   const staff = (ROLE.t || ROLE.r) && TAB === 'bandeja' && w.st === 'pend', own = ME && w.k === ME.key, link = safeUrl(w.link), t = tipo(w.ty);
   M.innerHTML = `<article class="art" role="dialog" aria-modal="true"><div class="hero"><small>${t[1]} ${t[2]} · ${unidad(w.u)[1]} ${esc(unidad(w.u)[2])}</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
-  ${w.img || w.th ? `<img class="img" src="${esc(w.img || w.th)}" alt="Foto del trabajo">` : ''}
-  <div class="bd"><p>${esc(w.d)}</p>${w.f ? `<h4>📚 Fuentes</h4><p style="font-size:14.5px">${esc(w.f)}</p>` : ''}
+  <div class="bd"><p>${esc(w.d)}</p>${[w.img, w.img2, w.img3].filter(Boolean).length ? `<h4>📎 Anexos</h4><div class="anx">${[w.img, w.img2, w.img3].filter(Boolean).map((x, i) => `<figure><img src="${esc(x)}" alt="Anexo ${i + 1}"><figcaption>Anexo ${i + 1}</figcaption></figure>`).join('')}</div>` : ''}${w.f ? `<h4>📚 Fuentes</h4><p style="font-size:14.5px">${esc(w.f)}</p>` : ''}
   ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
   ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
   ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Consejo para el estudiante (obligatorio si lo devuelves). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>

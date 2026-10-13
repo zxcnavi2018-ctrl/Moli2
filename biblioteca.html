@@ -40,7 +40,8 @@
   #volver { position: fixed; left: max(12px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top)); z-index: 7; border: 2px solid rgba(233,196,106,.8); border-radius: 999px; padding: 8px 14px 8px 10px; background: rgba(43,26,14,.8); color: #f6e2b3; font: 800 14px Nunito, sans-serif; display: flex; align-items: center; gap: 6px; text-decoration: none; backdrop-filter: blur(6px); }
   #volver:hover { background: rgba(70,42,22,.9); }
   #sonido { position: fixed; right: max(12px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top)); z-index: 7; width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(233,196,106,.8); background: rgba(43,26,14,.8); color: #f6e2b3; font-size: 18px; }
-  #editar { position: fixed; right: calc(max(12px, env(safe-area-inset-right)) + 52px); top: max(12px, env(safe-area-inset-top)); z-index: 7; height: 42px; padding: 0 14px; border-radius: 999px; border: 2px solid rgba(233,196,106,.8); background: rgba(43,26,14,.8); color: #f6e2b3; font: 800 14px Nunito, sans-serif; }
+  #pcompleta { position: fixed; right: calc(max(12px, env(safe-area-inset-right)) + 52px); top: max(12px, env(safe-area-inset-top)); z-index: 7; width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(233,196,106,.8); background: rgba(43,26,14,.8); color: #f6e2b3; font-size: 18px; }
+  #editar { position: fixed; right: calc(max(12px, env(safe-area-inset-right)) + 104px); top: max(12px, env(safe-area-inset-top)); z-index: 7; height: 42px; padding: 0 14px; border-radius: 999px; border: 2px solid rgba(233,196,106,.8); background: rgba(43,26,14,.8); color: #f6e2b3; font: 800 14px Nunito, sans-serif; }
   #editar[hidden] { display: none; }
   #edPanel { position: fixed; inset: 0; z-index: 12; display: none; align-items: center; justify-content: center; padding: 14px; background: rgba(10,6,3,.7); }
   #edPanel.on { display: flex; }
@@ -92,6 +93,9 @@
   .pg ol.pasos { margin: 10px 0 0; padding-left: 0; list-style: none; counter-reset: p; } .pg ol.pasos li { counter-increment: p; position: relative; padding: 0 0 14px 46px; font: 600 17px/1.5 Georgia, serif; }
   .pg ol.pasos li::before { content: counter(p, upper-roman) '.'; position: absolute; left: 0; top: -2px; font: 900 22px "Cinzel Decorative", Cinzel, serif; color: #7a2a22; }
   .pg.cen { display: grid; place-items: center; text-align: center; } .pg .marco { padding: 24px 22px; border: 3px double #b8923f; border-radius: 50% / 18%; max-width: 330px; } .pg .marco h2 { font-size: clamp(18px, 2.2vw, 24px); } .pg p.mini { font-size: 14px; color: #5a4028; margin-top: 10px; }
+  .pgnav { position: absolute; left: 50%; bottom: -22px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 999px; background: #3b2414; color: #ffe7a3; font: 800 13px Nunito, sans-serif; box-shadow: 0 6px 16px rgba(0,0,0,.4); z-index: 3; }
+  .pgnav button { border: 0; border-radius: 999px; padding: 6px 12px; background: #f3cf73; color: #3b2414; font: 900 13px Nunito, sans-serif; } .pgnav button[disabled] { opacity: .35; }
+  figure.anx { margin: 0 0 12px; } figure.anx figcaption { font: 800 12px Cinzel, serif; color: #7a5a3a; margin-top: 4px; text-align: center; }
   .pg .sello { position: absolute; right: 18px; bottom: 14px; font: 800 11px Cinzel, serif; letter-spacing: .2em; color: #b8862f; opacity: .8; }
   .ab .cerrar { position: absolute; right: -10px; top: -12px; width: 44px; height: 44px; border-radius: 50%; border: 3px solid #3b2414; background: #f3cf73; color: #3b2414; font: 900 18px system-ui; box-shadow: 0 4px 0 #3b2414; z-index: 2; }
   @media (max-width: 720px) { .ab { grid-template-columns: 1fr; overflow: auto; } .pg { min-height: 0; } .pg.l { border-radius: 6px 6px 0 0; transform-origin: center top; } .pg.r { border-radius: 0 0 6px 6px; } @keyframes abrirL { from { transform: rotateX(80deg); } } }
@@ -111,6 +115,7 @@
 <a id="volver" href="index.html">← Volver al aula</a>
 <button id="sonido" type="button" aria-label="Sonido">🔊</button>
 <button id="editar" type="button" hidden>✏️ Editar</button>
+<button id="pcompleta" type="button" aria-label="Pantalla completa">⛶</button>
 <div id="edPanel"></div>
 <div id="titulo"><small></small><h1>La Biblioteca Educativa</h1><span class="orla"></span></div>
 <div id="escena"><div><small>ESCENA</small><b></b></div></div>
@@ -557,15 +562,21 @@ renderer.domElement.addEventListener('pointerup', e => {
 function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39', ty = TIPOS[t.ty] || TIPOS.inv, d = String(t.d || '').trim();
   const fecha = t.at ? new Date(t.at).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const L = $('#libro'); L.style.setProperty('--c', col);
-  L.innerHTML = `<div class="ab" role="dialog" aria-label="${esc(t.t)}"><button class="cerrar" type="button" aria-label="Cerrar">✕</button>
-    <div class="pg l"><h2>${esc(t.t || 'Trabajo')}</h2><div class="meta"><span>${ty[0]} ${esc(ty[1])}</span><span>📰 Revista Innovadora</span></div>
+  const parr = d.split(/\n+/).map(x => x.trim()).filter(Boolean);
+  const texto = parr.length ? parr.map((x, i) => i === 0 ? `<p><span class="cap">${esc(x[0])}</span>${esc(x.slice(1))}</p>` : /^PASO\b/.test(x) ? `<h3 class="sub">${esc(x.replace(/^PASO\s*\d*\s*/, ''))}</h3>` : `<p>${esc(x)}</p>`).join('') : `<p>${t.kw ? 'Trata sobre: <b>' + esc(t.kw) + '</b>.' : 'Este trabajo no trae texto.'}</p>`;
+  const izq = `<div class="pg l"><h2>${esc(t.t || 'Trabajo')}</h2><div class="meta"><span>${ty[0]} ${esc(ty[1])}</span><span>📰 Revista Innovadora</span></div>
       ${t.th || t.img ? `<img class="foto" src="${esc(t.img || t.th)}" alt="Foto del trabajo">` : `<div style="font-size:90px;text-align:center;margin:20px 0">${ty[0]}</div>`}
-      <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>6.° ${esc(t.sec || '')}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div></div>
-    <div class="pg r">${d ? `<h3 class="sub">📝 De qué trata</h3><span class="cap">${esc(d[0])}</span><p>${esc(d.slice(1))}</p>` : `<h3 class="sub">📖 El trabajo completo</h3><p>${t.kw ? 'Trata sobre: <b>' + esc(t.kw) + '</b>.' : ''} Ábrelo para leerlo con sus citas y fuentes.</p>`}
-      ${t.f ? `<h3 class="sub">📚 Fuentes que usó</h3><p class="fu">${esc(t.f)}</p>` : ''}${safeUrl(t.link) ? `<a class="ver" href="${esc(safeUrl(t.link))}" target="_blank" rel="noopener">🔗 Ver el trabajo completo</a>` : ''}
-      ${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}<span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div></div>`;
-  L.classList.add('on');
-  if (!t.img && t.id && !String(t.id).startsWith('demo')) fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.img && j.fields.img.stringValue; if (v) { t.img = v; const im = L.querySelector('img.foto'); if (im) im.src = v; } }).catch(() => {});
+      ${t.kw ? `<p class="fu">🔑 ${esc(t.kw)}</p>` : ''}
+      <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>${t.sec ? '6.° ' + esc(t.sec) : 'Docente'}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div>${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}</div>`;
+  const der = `<div class="pg r">${texto}${t.f ? `<h3 class="sub">📚 Fuentes</h3><p class="fu">${esc(t.f)}</p>` : ''}<span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div>`;
+  const pintar = () => { const A = [t.img, t.img2, t.img3].filter(Boolean), hojas = [[izq, der]];
+    if (A.length) hojas.push([`<div class="pg l"><h2>📎 Anexos</h2><p class="fu">Fotos y evidencias del trabajo.</p>${A.slice(0, 1).map((x, i) => `<figure class="anx"><img class="foto" src="${esc(x)}" alt=""><figcaption>Anexo ${i + 1}</figcaption></figure>`).join('')}</div>`,
+      `<div class="pg r">${A.slice(1).map((x, i) => `<figure class="anx"><img class="foto" src="${esc(x)}" alt=""><figcaption>Anexo ${i + 2}</figcaption></figure>`).join('') || '<p class="fu" style="margin-top:40%;text-align:center">✦ Fin del libro ✦</p>'}<span class="sello">ANEXOS</span></div>`]);
+    const k = Math.min(L._h || 0, hojas.length - 1);
+    L.innerHTML = `<div class="ab" role="dialog" aria-label="${esc(t.t)}"><button class="cerrar" type="button" aria-label="Cerrar">✕</button>${hojas[k].join('')}
+      ${hojas.length > 1 ? `<div class="pgnav"><button type="button" data-hp="-1" ${k ? '' : 'disabled'}>◀</button><span>${k ? 'Anexos' : 'Trabajo'} · ${k + 1} / ${hojas.length}</span><button type="button" data-hp="1" ${k < hojas.length - 1 ? '' : 'disabled'}>▶ ${k ? '' : 'Anexos'}</button></div>` : ''}</div>`; };
+  L._h = 0; L._pintar = pintar; pintar(); L.classList.add('on');
+  if (t.id && !String(t.id).startsWith('demo') && !t._full) fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`).then(r => r.ok ? r.json() : null).then(j => { if (!j || !j.fields) return; t._full = 1; ['img', 'img2', 'img3', 'd', 'f'].forEach(k => { const v = j.fields[k] && j.fields[k].stringValue; if (v) t[k] = v; }); if (L._pintar === pintar && L.classList.contains('on')) abrirLibro(t); }).catch(() => {});
 }
 const safeUrl = u => { try { const x = new URL(String(u || '')); return x.protocol === 'https:' ? x.href : ''; } catch (e) { return ''; } };
 function abrirInstrucciones() { cerrarTapa(); sonar('abrir'); animLibro(true, 1100); const L = $('#libro'); L.style.setProperty('--c', '#4a1f1a');
@@ -574,7 +585,7 @@ function abrirInstrucciones() { cerrarTapa(); sonar('abrir'); animLibro(true, 11
     <div class="pg r cen"><div class="marco"><div style="font-size:64px">📜</div><h2>${esc(TX.pag)}</h2><p class="mini">Los libros de los estantes se crean solos con los trabajos aprobados de la <b>Revista Innovadora</b>.</p></div><span class="sello">${esc(TX.titulo.toUpperCase())}</span></div></div>`;
   L.classList.add('on'); L.dataset.inst = '1'; }
 function cerrarLibro() { const L = $('#libro'); L.classList.remove('on'); sonar('cerrar'); if (L.dataset.inst) { delete L.dataset.inst; animLibro(false, 1300); } }
-$('#libro').addEventListener('click', e => { if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
+$('#libro').addEventListener('click', e => { const hp = e.target.closest('[data-hp]'); if (hp) { const L = $('#libro'); L._h = (L._h || 0) + +hp.dataset.hp; sonar('pasar'); L._pintar && L._pintar(); return; } if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
 
 // ---- avisos y sonidos suaves ----
 let avT = 0; function aviso(txt, s = 3) { const a = $('#aviso'); a.textContent = txt; a.classList.add('on'); clearTimeout(avT); avT = setTimeout(() => a.classList.remove('on'), s * 1000); }
@@ -627,6 +638,11 @@ dispatchEvent(new Event('resize'));
 const FILE = 'fbiblio-0', LSA = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
 const b64e = t => btoa(unescape(encodeURIComponent(t))), b64d = t => decodeURIComponent(escape(atob(t)));
 const EMBED = window.parent !== window;
+let FSK = '0'; try { FSK = sessionStorage.getItem('moli2:fs') || '0'; sessionStorage.removeItem('moli2:fs'); } catch (e) {}
+const pantalla = on => { if (on && !document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); else if (!on && document.fullscreenElement) document.exitFullscreen(); };
+if (FSK === '1') addEventListener('pointerdown', () => pantalla(true), { once: true, capture: true });   // venía en pantalla completa: vuelve al primer toque
+$('#pcompleta').onclick = () => pantalla(!document.fullscreenElement);
+$('#volver').addEventListener('click', () => { try { sessionStorage.setItem('moli2:fs', document.fullscreenElement ? '1' : '0'); } catch (e) {} });
 if (EMBED) $('#volver').addEventListener('click', e => { e.preventDefault(); parent.postMessage({ bibCerrar: 1 }, '*'); });
 const YO = LSA('moli2:me'), DOCENTE = !!(YO && (YO.teacher || YO.docente));
 function aplicarTX(x) {

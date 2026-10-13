@@ -156,7 +156,6 @@
   body.open #bibLink, body.tut #bibLink, body.editando #bibLink { opacity: 0; pointer-events: none; transform: translateY(-20px); }
   @media (hover: none) { #bibLink span { clip-path: inset(0 0 0 0); } }
   @media (max-height: 500px), (max-width: 600px) { #bibLink svg { width: 56px; height: 56px; } #bibLink span { font-size: 14px; padding: 8px 24px 8px 14px; } }
-  #bibWin { position: fixed; inset: 0; z-index: 9000; background: #1e130b; opacity: 0; transition: opacity .45s; } #bibWin.on { opacity: 1; } #bibWin iframe { position: relative; width: 100%; height: 100%; border: 0; display: block; background: transparent; } #bibWin .bw-l { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; color: #f6e2b3; font: 800 17px Georgia, serif; letter-spacing: .14em; } #bibWin .bw-l span { display: block; font-size: 46px; margin-bottom: 10px; animation: bwF 1.4s ease-in-out infinite; } @keyframes bwF { 50% { transform: translateY(-8px); } }
   #bibBar { position: fixed; left: 50%; top: 12px; transform: translateX(-50%) translateY(-20px); z-index: 31; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 22px; background: #fff; border: 3px solid #2b2547; box-shadow: 0 6px 0 rgba(43,37,71,.25), 0 14px 30px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .3s, transform .4s cubic-bezier(.34,1.56,.64,1); }
   #bibBar.on { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
   body.open #bibBar { opacity: 0; pointer-events: none; }
@@ -1767,16 +1766,14 @@ function autoQuality(dt) {
 const afterRender = [];                                              // lo que se dibuja encima del salón (Molí)
 function loop(now) {
   requestAnimationFrame(loop);
-// ---- La Biblioteca Educativa se abre encima del aula (así no se sale de la pantalla completa) ----
+// ---- La Biblioteca Educativa: página propia (el aula se cierra y libera la tarjeta gráfica); la pantalla completa vuelve al primer toque ----
 (function () {
-  const a = document.getElementById('bibLink'); if (!a) return; let win = null;
-  a.addEventListener('click', e => { e.preventDefault(); if (win) return;
-    win = document.createElement('div'); win.id = 'bibWin'; win.innerHTML = '<div class="bw-l"><span>📖</span>Abriendo la biblioteca…</div><iframe title="La Biblioteca Educativa" allow="autoplay; fullscreen"></iframe>'; document.body.appendChild(win);
-    window.BIB_ABIERTA = true; try { callar(); } catch (x) {} setTimeout(() => { if (window.BIB_ABIERTA) renderer.domElement.style.visibility = 'hidden'; }, 500);   // el aula se esconde: la tarjeta gráfica sólo dibuja la biblioteca
-    requestAnimationFrame(() => { win.classList.add('on'); setTimeout(() => { const f = win && win.querySelector('iframe'); if (f) f.src = 'biblioteca.html'; }, 480); }); });   // primero la cortina, luego se arma la biblioteca (sin tirones)
-  addEventListener('message', e => { if (!e.data || !e.data.bibCerrar || !win) return; const w = win; win = null; renderer.domElement.style.visibility = ''; w.classList.remove('on'); window.BIB_ABIERTA = false; setTimeout(() => w.remove(), 450); });
+  const a = document.getElementById('bibLink'); if (!a) return;
+  a.addEventListener('click', () => { try { sessionStorage.setItem('moli2:fs', document.fullscreenElement ? '1' : '0'); } catch (x) {} });
+  let fs = '0'; try { fs = sessionStorage.getItem('moli2:fs') || '0'; sessionStorage.removeItem('moli2:fs'); } catch (x) {}
+  if (fs === '1') addEventListener('pointerdown', () => { if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); }, { once: true, capture: true });
 })();
-  if (window.BIB_ABIERTA) return;                                     // la Biblioteca está encima: el aula descansa
+
   const dt = Math.max(0, (now - last) / 1000); last = now;
   if (P.started && dt < 1) autoQuality(dt);
   if (TOUR.on) tourFrame(now / 1000); else update(P.started && !uiOpen ? dt : 0);
