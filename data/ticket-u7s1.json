@@ -1,0 +1,66 @@
+{
+ "unidad": "7",
+ "sesion": 1,
+ "questions": [
+  {
+   "q": "Un ascensor soporta máximo 10 kg y puede subir 2 veces. Hay perritos de 2, 3, 4, 5 y 6 kg. ¿Cuántos perritos, como máximo, podemos llevar?",
+   "options": [
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   "answer": 2,
+   "why": "Viaje 1: 4 + 6 = 10 kg. Viaje 2: 2 + 3 + 5 = 10 kg. ¡Suben los 5 perritos sin pasarse!",
+   "m": 1
+  },
+  {
+   "q": "Un ascensor soporta máximo 12 kg y puede subir 2 veces. Hay pingüinos de 5, 6, 7, 8 y 9 kg. ¿Cuántos pingüinos, como máximo, podemos llevar?",
+   "options": [
+    "2",
+    "3",
+    "4",
+    "5"
+   ],
+   "answer": 1,
+   "why": "Sólo caben de a dos el 5 con el 6 (11 kg) o el 5 con el 7 (12 kg). Viaje 1: 5 + 6. Viaje 2: uno solo (7, 8 o 9). Máximo 3 pingüinos.",
+   "m": 1
+  },
+  {
+   "q": "Un montacargas soporta máximo 10 toneladas y puede subir 3 veces. Hay elefantes de 4, 4, 5, 5, 6 y 6 toneladas. ¿Cuántos elefantes, como máximo, podemos llevar?",
+   "options": [
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   "answer": 3,
+   "why": "Viaje 1: 4 + 6 = 10. Viaje 2: 4 + 6 = 10. Viaje 3: 5 + 5 = 10. ¡Suben los 6 elefantes!",
+   "m": 1
+  },
+  {
+   "q": "Un ascensor soporta máximo 15 kg y puede subir 2 veces. Hay gatos de 3, 4, 5, 6, 7 y 8 kg. ¿Cuántos gatos, como máximo, podemos llevar?",
+   "options": [
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   "answer": 2,
+   "why": "Los 6 gatos pesan 33 kg y en 2 viajes sólo caben 30. Dejamos el de 8: viaje 1: 3 + 4 + 7 = 14; viaje 2: 5 + 6 = 11. Máximo 5 gatos.",
+   "m": 1
+  },
+  {
+   "q": "Un ascensor soporta máximo 20 kg y puede subir 2 veces. Hay monos de 6, 7, 8, 9 y 10 kg. ¿Cuántos monos, como máximo, podemos llevar?",
+   "options": [
+    "2",
+    "3",
+    "4",
+    "5"
+   ],
+   "answer": 2,
+   "why": "Tres monos juntos ya pesan más de 20 (6 + 7 + 8 = 21), así que van de a dos. Viaje 1: 6 + 7 = 13. Viaje 2: 8 + 9 = 17. Máximo 4 monos.",
+   "m": 1
+  }
+ ]
+}

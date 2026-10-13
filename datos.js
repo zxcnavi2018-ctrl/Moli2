@@ -65,6 +65,8 @@
     const units = [];
     for (let i = 0; i < 24; i++) { const s = c && c['u' + i]; if (!s) continue; try { units.push(JSON.parse(s)); } catch (e) {} }
     let files = {}; try { files = JSON.parse(c.data || '{}').files || {}; } catch (e) {}
+    try { const r = await fetch('data/ticket-u7s1.json', { cache: 'no-cache' }); if (r.ok) { const T = await r.json();      // Exit ticket nuevo de la Sesión 1 (Unidad 7), puesto directo
+      const u = units.find(x => String(x.num) === String(T.unidad)), s = u && u.sessions && u.sessions[T.sesion - 1]; if (s && Array.isArray(T.questions) && T.questions.length) s.ticket = { ...(s.ticket || {}), questions: T.questions }; } } catch (e) {}
     contenido = { units, files };
     LS.set('moli2:content', contenido);
     return contenido;
