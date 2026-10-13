@@ -312,7 +312,7 @@ function drawRevista() {
   const n = $('#nPub'); if (n) n.textContent = A.length;
   if (rc) { if (!A.length) rc.innerHTML = `<div class="empty"><b>Aún no hay publicaciones</b>Los trabajos aprobados aparecerán aquí, empezando por los más recientes.</div>`;
     else { const [f, ...r] = A, t = tipo(f.ty);
-      rc.innerHTML = `<button type="button" class="feat" data-open="${esc(f.id)}">${phHtml(f)}<div class="bd"><span class="kk">Lo más reciente · ${esc(t[2])}</span><h3>${esc(f.t)}</h3><p class="ex">${esc(String(f.d || '').slice(0, 320))}</p><span class="by">${esc(f.n)}${f.sec ? ' · 6.° ' + esc(f.sec) : ''} · ${fecha(f.at)}</span></div></button>${r.length ? `<div class="trio">${r.slice(0, 3).map(w => cardHtml(w)).join('')}</div>` : ''}`; } }
+      rc.innerHTML = `<button type="button" class="feat" data-open="${esc(f.id)}">${phHtml(f)}<div class="bd"><span class="kk">Lo más reciente · ${esc(t[2])}</span><h3>${esc(f.t)}</h3><span class="by">${esc(f.n)}${f.sec ? ' · 6.° ' + esc(f.sec) : ''} · ${fecha(f.at)}</span></div></button>${r.length ? `<div class="trio">${r.slice(0, 3).map(w => cardHtml(w)).join('')}</div>` : ''}`; } }
   const L = A.slice(4);
   el.innerHTML = L.length ? `<div class="grid">${L.map(w => cardHtml(w)).join('')}</div>` : A.length ? `<p class="se-n">Todos los trabajos publicados están arriba. 📰</p>` : '';
 }
@@ -344,7 +344,7 @@ function buscar(q) {
   const R = (W.length ? A.map(w => { const K = norm(kws(w).join(' ')), T = norm(w.t); return { w, s: W.reduce((a, x) => a + (K.includes(x) ? 3 : 0) + (T.includes(x) ? 1 : 0), 0) }; }).filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.w) : A);
   if (!A.length) { el.innerHTML = '<div class="empty"><b>Aún no hay trabajos publicados</b>Cuando se publiquen, podrás encontrarlos aquí por sus palabras clave.</div>'; return; }
   el.innerHTML = `<p class="se-n">${W.length ? `${R.length} resultado${R.length === 1 ? '' : 's'} para «${esc(q.trim())}»` : `Todos los trabajos publicados (${A.length})`}</p>` +
-    (R.length ? R.map(w => { const t = tipo(w.ty); return `<div class="res rv"><div class="u"><span class="fv">${t[1]}</span><div>${esc(t[2])} · ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''}<small>${fecha(w.at)}</small></div></div><a class="t" href="#" data-open="${esc(w.id)}">${esc(w.t)}</a>${w.d ? `<p>${esc(String(w.d).slice(0, 170))}${String(w.d).length > 170 ? '…' : ''}</p>` : ''}${kws(w).length ? `<div class="kws">${kws(w).map(k => `<button type="button" data-sq="${esc(k)}" class="${W.some(x => norm(k).includes(x)) ? 'hit' : ''}">${esc(k)}</button>`).join('')}</div>` : ''}</div>`; }).join('')
+    (R.length ? R.map(w => { const t = tipo(w.ty); return `<div class="res rv"><div class="u"><span class="fv">${t[1]}</span><div>${esc(t[2])} · ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''}<small>${fecha(w.at)}</small></div></div><a class="t" href="#" data-open="${esc(w.id)}">${esc(w.t)}</a>${kws(w).length ? `<div class="kws">${kws(w).map(k => `<button type="button" data-sq="${esc(k)}" class="${W.some(x => norm(k).includes(x)) ? 'hit' : ''}">${esc(k)}</button>`).join('')}</div>` : ''}</div>`; }).join('')
       : `<div class="empty"><b>No encontré trabajos con «${esc(q.trim())}»</b>Prueba con otra palabra clave.</div>`);
 }
 document.addEventListener('submit', e => { if (e.target.id !== 'sF') return; e.preventDefault(); buscar($('#sQ').value); });

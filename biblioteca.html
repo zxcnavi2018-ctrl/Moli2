@@ -97,6 +97,7 @@
   .pgnav button { border: 0; border-radius: 999px; padding: 6px 12px; background: #f3cf73; color: #3b2414; font: 900 13px Nunito, sans-serif; } .pgnav button[disabled] { opacity: .35; }
   figure.anx { margin: 0 0 12px; } figure.anx figcaption { font: 800 12px Cinzel, serif; color: #7a5a3a; margin-top: 4px; text-align: center; }
   .pg p a { color: #1d4ed8; word-break: break-all; }
+  .pg .borrar { display: block; margin-top: 14px; border: 0; border-radius: 999px; padding: 8px 16px; background: #9b2c2c; color: #fff3e0; font: 900 13px Nunito, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #5e1717; } .pg .borrar:hover { background: #b33636; } .pg .borrar[disabled] { opacity: .6; cursor: wait; }
   .pg .sello { position: absolute; right: 18px; bottom: 14px; font: 800 11px Cinzel, serif; letter-spacing: .2em; color: #b8862f; opacity: .8; }
   .ab .cerrar { position: absolute; right: -10px; top: -12px; width: 44px; height: 44px; border-radius: 50%; border: 3px solid #3b2414; background: #f3cf73; color: #3b2414; font: 900 18px system-ui; box-shadow: 0 4px 0 #3b2414; z-index: 2; }
   @media (max-width: 720px) { .ab { grid-template-columns: 1fr; overflow: auto; } .pg { min-height: 0; } .pg.l { border-radius: 6px 6px 0 0; transform-origin: center top; } .pg.r { border-radius: 0 0 6px 6px; } @keyframes abrirL { from { transform: rotateX(80deg); } } }
@@ -441,7 +442,8 @@ function lomoTex(t, i) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()]
     let s = String(t.t || 'Trabajo'); while (g.measureText(s).width > h - 120 && s.length > 4) s = s.slice(0, -2); if (s !== String(t.t || 'Trabajo')) s = s.replace(/\s*\S?$/, '') + '…'; g.fillText(s, 0, 0); g.restore();
     g.fillStyle = '#fff8ea'; g.font = '900 24px Nunito, sans-serif'; g.textAlign = 'center'; g.fillText(String(t.n || '').split(' ').slice(0, 2).map(x => x[0] || '').join(''), w / 2, h - 66); }); }
 function ponerLibros() {
-  ESTANTES.forEach(E => { E.libs.clear(); E.items = []; E.hit = []; });
+  ESTANTES.forEach(E => { E.libs.children.forEach(o => { [].concat(o.material).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); }); if (o.geometry !== lomoGeo) o.geometry.dispose(); });
+    E.libs.clear(); E.items = []; E.hit = []; });
   TRABAJOS.forEach(t => { const g = +t.g || 6; const E = ESTANTES.find(x => x.g === g) || ESTANTES[0]; E.items.push(t); });
   ESTANTES.forEach(E => {
     const sh = E.m.userData.sh, w = E.m.userData.w, d = E.m.userData.d;
@@ -565,11 +567,12 @@ function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[Strin
   const L = $('#libro'); L.style.setProperty('--c', col);
   const parr = d.split(/\n+/).map(x => x.trim()).filter(Boolean);
   const lnk = h => h.replace(/https:\/\/[^\s<]+/g, u => `<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
-  const texto = parr.length ? parr.map((x, i) => i === 0 ? `<p><span class="cap">${esc(x[0])}</span>${esc(x.slice(1))}</p>` : /^PASO\b/.test(x) ? `<h3 class="sub">${esc(x.replace(/^PASO\s*\d*\s*/, ''))}</h3>` : /^Fuente \d/.test(x) ? `<p class="fu"><b>${esc(x)}</b></p>` : `<p>${lnk(esc(x))}</p>`).join('') : `<p>${t.kw ? 'Trata sobre: <b>' + esc(t.kw) + '</b>.' : 'Este trabajo no trae texto.'}</p>`;
+  let cap = 1; const texto = parr.length ? parr.map(x => /^PASO\b/.test(x) ? ((h) => h ? `<h3 class="sub">${esc(h)}</h3>` : '')(x.replace(/^PASO\s*\d*\s*/, '')) : /^Fuente \d/.test(x) ? `<p class="fu"><b>${esc(x)}</b></p>` : cap-- > 0 ? `<p><span class="cap">${esc(x[0])}</span>${lnk(esc(x.slice(1)))}</p>` : `<p>${lnk(esc(x))}</p>`).join('') : `<p>${t.kw ? 'Trata sobre: <b>' + esc(t.kw) + '</b>.' : 'Este trabajo no trae texto.'}</p>`;
   const izq = `<div class="pg l"><h2>${esc(t.t || 'Trabajo')}</h2><div class="meta"><span>${ty[0]} ${esc(ty[1])}</span><span>📰 Revista Innovadora</span></div>
       ${t.th || t.img ? `<img class="foto" src="${esc(t.img || t.th)}" alt="Foto del trabajo">` : `<div style="font-size:90px;text-align:center;margin:20px 0">${ty[0]}</div>`}
       ${t.kw ? `<p class="fu">🔑 ${esc(t.kw)}</p>` : ''}
-      <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>${t.sec ? '6.° ' + esc(t.sec) : 'Docente'}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div>${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}</div>`;
+      <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>${t.sec ? '6.° ' + esc(t.sec) : 'Docente'}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div>${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}
+      ${DOCENTE && t.id && !String(t.id).startsWith('demo') ? '<button type="button" class="borrar" data-del>🗑 Eliminar libro</button>' : ''}</div>`;
   const der = `<div class="pg r">${texto}${t.f ? `<h3 class="sub">📚 Fuentes</h3><p class="fu">${esc(t.f)}</p>` : ''}<span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div>`;
   const pintar = () => { const A = [t.img, t.img2, t.img3].filter(Boolean), hojas = [[izq, der]];
     if (A.length) hojas.push([`<div class="pg l"><h2>📎 Anexos</h2><p class="fu">Fotos y evidencias del trabajo.</p>${A.slice(0, 1).map((x, i) => `<figure class="anx"><img class="foto" src="${esc(x)}" alt=""><figcaption>Anexo ${i + 1}</figcaption></figure>`).join('')}</div>`,
@@ -577,7 +580,7 @@ function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[Strin
     const k = Math.min(L._h || 0, hojas.length - 1);
     L.innerHTML = `<div class="ab" role="dialog" aria-label="${esc(t.t)}"><button class="cerrar" type="button" aria-label="Cerrar">✕</button>${hojas[k].join('')}
       ${hojas.length > 1 ? `<div class="pgnav"><button type="button" data-hp="-1" ${k ? '' : 'disabled'}>◀</button><span>${k ? 'Anexos' : 'Trabajo'} · ${k + 1} / ${hojas.length}</span><button type="button" data-hp="1" ${k < hojas.length - 1 ? '' : 'disabled'}>▶ ${k ? '' : 'Anexos'}</button></div>` : ''}</div>`; };
-  L._h = 0; L._pintar = pintar; pintar(); L.classList.add('on');
+  L._h = 0; L._pintar = pintar; L._t = t; pintar(); L.classList.add('on');
   if (t.id && !String(t.id).startsWith('demo') && !t._full) fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`).then(r => r.ok ? r.json() : null).then(j => { if (!j || !j.fields) return; t._full = 1; ['img', 'img2', 'img3', 'd', 'f'].forEach(k => { const v = j.fields[k] && j.fields[k].stringValue; if (v) t[k] = v; }); if (L._pintar === pintar && L.classList.contains('on')) abrirLibro(t); }).catch(() => {});
 }
 const safeUrl = u => { try { const x = new URL(String(u || '')); return x.protocol === 'https:' ? x.href : ''; } catch (e) { return ''; } };
@@ -587,7 +590,16 @@ function abrirInstrucciones() { cerrarTapa(); sonar('abrir'); animLibro(true, 11
     <div class="pg r cen"><div class="marco"><div style="font-size:64px">📜</div><h2>${esc(TX.pag)}</h2><p class="mini">Los libros de los estantes se crean solos con los trabajos aprobados de la <b>Revista Innovadora</b>.</p></div><span class="sello">${esc(TX.titulo.toUpperCase())}</span></div></div>`;
   L.classList.add('on'); L.dataset.inst = '1'; }
 function cerrarLibro() { const L = $('#libro'); L.classList.remove('on'); sonar('cerrar'); if (L.dataset.inst) { delete L.dataset.inst; animLibro(false, 1300); } }
-$('#libro').addEventListener('click', e => { const hp = e.target.closest('[data-hp]'); if (hp) { const L = $('#libro'); L._h = (L._h || 0) + +hp.dataset.hp; sonar('pasar'); L._pintar && L._pintar(); return; } if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
+async function eliminarLibro(t, btn) {                                       // sólo la docente: borra el trabajo (Biblioteca + Revista)
+  if (!confirm(`¿Eliminar «${t.t || 'este libro'}» de la Biblioteca?\nTambién se borra de la Revista Innovadora y no se puede deshacer.`)) return;
+  btn.disabled = true; btn.textContent = '⏳ Eliminando…';
+  try { const a = await token(); if (!a) throw new Error('AUTH');
+    const r = await fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } });
+    if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? 'AUTH' : 'RED');
+    TRABAJOS = TRABAJOS.filter(x => x.id !== t.id); cerrarLibro(); ponerLibros(); aviso('🗑 Libro eliminado de la Biblioteca y de la Revista.', 3.5);
+  } catch (er) { btn.disabled = false; btn.textContent = '🗑 Eliminar libro'; aviso(er.message === 'AUTH' ? '🔐 Conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo eliminar. Revisa tu internet.', 4.5); }
+}
+$('#libro').addEventListener('click', e => { const dl = e.target.closest('[data-del]'); if (dl) return eliminarLibro($('#libro')._t, dl); const hp = e.target.closest('[data-hp]'); if (hp) { const L = $('#libro'); L._h = (L._h || 0) + +hp.dataset.hp; sonar('pasar'); L._pintar && L._pintar(); return; } if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
 
 // ---- avisos y sonidos suaves ----
 let avT = 0; function aviso(txt, s = 3) { const a = $('#aviso'); a.textContent = txt; a.classList.add('on'); clearTimeout(avT); avT = setTimeout(() => a.classList.remove('on'), s * 1000); }
