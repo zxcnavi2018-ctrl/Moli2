@@ -388,12 +388,15 @@ async function limpiarGuia(raw) {                                      // quita 
   String(raw).split(/\n/).map(x => x.replace(/_{3,}/g, ' ').replace(/\s*\(Molde.*$/, '').replace(/[ \t]+/g, ' ').trim()).forEach(x => {
     if (!x || AYUDA.has(x)) return;
     if (/^(REVISTA INNOVADORA · GUÍA|Ejemplo:|Orden:|💡|☐|¿Cómo lo publico\?|A\. Cita narrativa:|B\. Cita parentética:)/.test(x)) return;
-    if (/^[\d.\s]+$/.test(x)) return;
+    if (/^\d+\.?$/.test(x) && !/^(19|20)\d\d$/.test(x)) return;      // números de los pasos «1.» (no los años)
     const paso = /^PASO \d+/.test(x); if (paso) x = x.replace(/^PASO \d+\s*/, 'PASO ');
     L.push({ x, paso, lab: !paso && LABS.has(x) });
   });
   const vacio = i => i >= L.length || L[i].paso || L[i].lab;
-  const A = L.filter((o, i) => !(o.lab && vacio(i + 1)));              // etiquetas sin respuesta
+  const conAlgo = i => { for (let j = i + 1; j < L.length && !L[j].paso && !/^Fuente \d/.test(L[j].x); j++) if (!L[j].lab) return true; return false; };
+  const A = L.filter((o, i) => !(o.lab && (/^Fuente \d/.test(o.x) ? !conAlgo(i) : vacio(i + 1))));   // etiquetas sin respuesta
+  for (let i = 0; i < A.length - 1; i++) { const o = A[i], n = A[i + 1];                    // «Año» + «2025» → «Año: 2025»
+    if (o.lab && !n.lab && !n.paso && !/^Fuente \d/.test(o.x) && o.x.length <= 20 && !/[?…:]$/.test(o.x)) { o.x = o.x + ': ' + n.x; o.lab = false; A.splice(i + 1, 1); } }
   const B = A.filter((o, i) => !(o.paso && (i + 1 >= A.length || A[i + 1].paso)));   // pasos sin nada
   return B.map(o => o.x).join('\n').slice(0, 20000);
 }
