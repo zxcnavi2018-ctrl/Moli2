@@ -180,6 +180,13 @@
     return P.join('');
   };
 
+  // ---- archivos de la unidad (página izquierda del cuaderno): carátula y rúbrica de la competencia ----
+  const DOCS_U = { unit7: [['data/unidad/u7-caratula.pdf', '🎨', 'Carátula de unidad', 'U7 Carátula.pdf'], ['data/unidad/rubrica-indaga.pdf', '📏', 'Rúbrica · Competencia Indaga', 'Rúbrica Indaga 5.° y 6.°.pdf']],
+    unit8: [['data/unidad/u8-caratula.pdf', '🎨', 'Carátula de unidad', 'U8 Carátula.pdf'], ['data/unidad/rubrica-explica.pdf', '📏', 'Rúbrica · Competencia Explica', 'Rúbrica Explica 5.° y 6.°.pdf']] };
+  const docsUnidad = u => { const D = DOCS_U[u && u.key]; return D ? `<div class="u-docs w"><b>📎 Archivos de la unidad</b>${D.map(([url, ic, t, nm], k) => `<button class="u-doc" data-a="udoc" data-k="${k}"><i>${ic}</i><span><b>${t}</b><small>PDF · ver o descargar</small></span><em>›</em></button>`).join('')}</div>` : ''; };
+  const abrirDocU = (u, k, el) => { const d = (DOCS_U[u && u.key] || [])[+k]; if (!d) return; const t = el && el.innerHTML; if (el) { el.disabled = true; el.querySelector('small').textContent = '⏳ Abriendo…'; }
+    MD.abrirPdf(d[0], null, d[3]).catch(() => alert('No pude abrir el archivo. Revisa tu internet.')).finally(() => { if (el) { el.disabled = false; el.innerHTML = t; } }); };
+
   // ---- Sesión 01 de la Unidad 7 (Retos Bebras): 3 desafíos en foto, sin respuestas ----
   const BEBRAS = [
     { mode: 'individual', title: 'Desafío 1 · El camino más barato', desc: 'Leemos el reto con calma y buscamos el recorrido que le cueste al castor la menor cantidad de monedas.', img: 'img/bebras/reto1.jpg',
@@ -229,7 +236,7 @@
       if (!F.listo) return [{ l: cargando(), r: '' }];
       if (!F.u) return [hojaUnidades('Mis sesiones de unidad', '📗', `¡Hola${F.me ? ' ' + esc(nom1(F.me)) : ''}! Aquí está todo lo que aprendemos en cada clase. Elige tu unidad y pasa las hojas. ✏️`, F.me)];
       const u = F.u, S = MD.sesionesDe(u);
-      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Mi cuaderno de sesiones</p><p class="hand w">${S.length} ${S.length === 1 ? 'sesión' : 'sesiones'} · pasa la hoja ›</p>`,
+      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Mi cuaderno de sesiones</p><p class="hand w">${S.length} ${S.length === 1 ? 'sesión' : 'sesiones'} · pasa la hoja ›</p>${docsUnidad(u)}`,
         r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span></button>`).join('')}` }];
       S.forEach(({ s, n }) => {
         const cr = (s.criteria || []).filter(L), acts = actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length, bb = esBebras(u, s);
@@ -250,6 +257,7 @@
       if (a === 'unidad') F.libro.pasar(1, () => { F.u = MD.unidades().find(u => u.key === ds.k); F.i = 0; F.pestana = '📚 Unidades'; });
       if (a === 'ir') F.libro.pasar(1, () => { F.i = +ds.i; });
       if (a === 'pdf') return abrirFicha(F.u, +ds.n, ds.c, el);
+      if (a === 'udoc') return abrirDocU(F.u, ds.k, el);
       if (a === 'irexit') return irA('Mis Exit tickets', F.u, +ds.n, 'exit');
       if (a === 'irref') return irA('Mis misiones de refuerzo', F.u, +ds.n, 'ref');
       if (a === 'video') el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`;
@@ -633,7 +641,7 @@ Devuelve JSON:
       const tema = { cuaderno: 'ses', folder: 'exit', docente: 'notas', mision: 'mis' }[kind];
       Libro(host, tema, F); actual = F; F.iniciar && F.iniciar();
     },
-    _: { actsDe, fotoHtml, esBebras, Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
+    _: { docsUnidad, abrirDocU, actsDe, fotoHtml, esBebras, Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
     cerrar() { if (actual) { actual.libro && actual.libro.ro && actual.libro.ro.disconnect(); actual.cerrar && actual.cerrar(); actual = null; } }
   };
 })();

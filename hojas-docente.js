@@ -170,7 +170,7 @@
       const u = F.u;
       if (F.ed) return paginasEditar();
       const S = MD.sesionesDe(u);
-      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Cuaderno de sesiones · ${S.length} sesiones</p>`,
+      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Cuaderno de sesiones · ${S.length} sesiones</p>${Hojas._.docsUnidad(u)}`,
         r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span></button>`).join('')}` }];
       S.forEach(({ s, n }) => {
         const cr = (s.criteria || []).filter(L), acts = Hojas._.actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
@@ -217,6 +217,7 @@
       if (a === 'video') { el.outerHTML = `<div class="vid on"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ds.y)}?autoplay=1&rel=0&start=${+ds.t || 0}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`; return; }
       if (a === 'tarjetas') return Tarjetas.imprimir(F.u, +ds.n);
       if (a === 'pdf') return Hojas._.abrirFicha(F.u, +ds.n, ds.c, el);
+      if (a === 'udoc') return Hojas._.abrirDocU(F.u, ds.k, el);
       if (a === 'impficha') return Tarjetas.imprimirFicha(F.u, +ds.n);   // la ficha con su cierre y la tarjeta del Exit ticket   // tarjetas del Exit ticket para escanear
       if (a === 'editar') { const n = +ds.n; F.ed = { n, s: {}, estado: 'cargando' }; F.libro.pasar(1, () => { F.i = 0; });
         try { const s = await MD.sesionCruda(F.u.key, n); F.ed = { n, s: s || {}, estado: '' }; } catch (x) { F.ed = null; alert(errTxt(x)); }
