@@ -603,14 +603,18 @@ function sonar(k) { if (mudo) return; try { AC = AC || new (window.AudioContext 
 //  BUCLE
 // ===================================================================
 const clock = new THREE.Clock(); let par = V(0, 0, 0), zoomS = 0; const _dir = V(0, 0, 0), LIBRO_POS = V(0, 2.5, 0);
-let qT = 0, qN = 0, qAcc = 0;
+let qT = 0, qN = 0, qAcc = 0, nF = 0, toque = 0;
+['pointermove', 'pointerdown', 'keydown', 'wheel'].forEach(ev => addEventListener(ev, () => { toque = performance.now(); }, { passive: true }));
 function calidad(dt) {                                                // si el equipo va lento, baja la resolución; si va sobrado, la sube
   qAcc += dt; qN++; qT += dt; if (qT < 1.2) return; const ms = qAcc / qN * 1000; qT = qAcc = qN = 0;
   let n = PR; if (ms > 30) n = Math.max(0.55, PR - 0.15); else if (ms < 17 && PR < PR_MAX) n = Math.min(PR_MAX, PR + 0.1);
   if (Math.abs(n - PR) > 0.01) { PR = n; renderer.setPixelRatio(PR); renderer.setSize(innerWidth, innerHeight); }
 }
 function frame() {
-  const dtR = clock.getDelta(), dt = Math.min(0.05, dtR), now = performance.now(), T = clock.elapsedTime; if (!document.hidden) calidad(Math.min(dtR, 0.2));
+  const ahora = performance.now(), tapado = $('#libro').classList.contains('on') || $('#edPanel').classList.contains('on');
+  const quieto = !tween && modo !== 'intro' && ahora - toque > 1500;
+  if ((tapado && nF++ % 6) || (!tapado && quieto && nF++ % 2)) { requestAnimationFrame(frame); return; }   // sin tocar nada: la mitad de cuadros (tapado por el libro: casi nada)
+  const dtR = clock.getDelta(), dt = Math.min(0.05, dtR), now = performance.now(), T = clock.elapsedTime; if (!document.hidden && !quieto && !tapado) calidad(Math.min(dtR, 0.2)); else qT = qAcc = qN = 0;   // (sólo mide cuando dibuja todos los cuadros)
   if (tween) { const k = Math.min(1, (now - tween.t0) / tween.ms), e = ease(k);
     cam.pos.lerpVectors(tween.p0, tween.p1, e); cam.pos.y += Math.sin(Math.PI * e) * tween.alto; cam.look.lerpVectors(tween.l0, tween.l1, e);
     if (k >= 1) { const r = tween.res; tween = null; r(); } }
