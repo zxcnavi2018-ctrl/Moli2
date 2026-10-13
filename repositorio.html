@@ -345,8 +345,8 @@ async function vTrabajos() {
   V.innerHTML = '<div class="load">Cargando a tus estudiantes…</div>';
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const FL = ['k', 'n', 'sec', 't', 'ty', 'st', 'at'];
-    const [est, w1, w2, w3] = await Promise.all([estudiantesRepo(a), query('ok', a, FL), query('pend', a, FL), query('no', a, FL)]);
-    TR.est = est; TR.w = [...w1, ...w2, ...w3]; pintaTrabajos();
+    const [est, w1, w2] = await Promise.all([estudiantesRepo(a), query('ok', a, FL), query('pend', a, FL)]);   // los devueltos no ocupan espacio
+    TR.est = est; TR.w = [...w1, ...w2]; pintaTrabajos();
   } catch (e) { V.innerHTML = `<div class="empty"><b>${e.message === 'AUTH' ? '🔐 Conecta tu cuenta de docente' : '📶 No se pudo cargar'}</b>${e.message === 'AUTH' ? 'En el aula: toca tu fotocheck → «Conectar mi cuenta».' : 'Revisa tu internet e intenta otra vez.'}</div>`; }
 }
 const TR_E = { ok: ['ok', '✅', 'Completado'], no: ['mj', '✏️', 'Mejorando'], pend: ['rv', '📨', 'Por revisar'], '': ['pe', '⏳', 'Pendiente'] };
@@ -360,7 +360,7 @@ function pintaTrabajos() {
   const todos = E.filter(s => ok(s.key) >= TR_N).length, nada = E.filter(s => !W(s.key).length).length, fal = E.length - todos;
   V.innerHTML = `<div class="tr-top"><h2>👥 Trabajos de estudiantes</h2><div class="tr-sec">${['A', 'B', 'C', 'D'].map(x => `<button type="button" data-trs="${x}" class="${x === TR.sec ? 'on' : ''}">6.° ${x}</button>`).join('')}</div></div>
     <div class="tr-res"><span>👥 ${E.length} estudiantes</span><span class="ok">🏆 ${todos} con sus ${TR_N} trabajos</span><span class="mj">📝 ${fal} les faltan trabajos</span><span class="pe">⏳ ${nada} aún no envían nada</span></div>
-    <p class="tr-msg">Cada estudiante tiene <b>${TR_N} espacios</b>. Se llenan solos en orden cuando envían: ✅ aprobado, ✏️ devuelto para mejorar, 📨 por revisar y ⏳ pendiente.</p>
+    <p class="tr-msg">Cada estudiante tiene <b>${TR_N} espacios</b>. Se llenan solos en orden cuando envían: ✅ aprobado, 📨 por revisar y ⏳ pendiente. Lo que devuelves se borra y no ocupa espacio.</p>
     <div class="tr-l">${E.map((s, i) => { const L = W(s.key), n = ok(s.key), slots = Array.from({ length: Math.max(TR_N, L.length) }, (_, j) => L[j]);
       return `<div class="tr-r ${n >= TR_N ? 'ok' : L.length ? 'rv' : ''}"><span class="nn">${i + 1}</span><div class="nm">${esc(s.name)}<small>6.° ${esc(s.section)}</small></div>
         <div class="tr-slots">${slots.map((w, j) => { if (!w) return `<div class="sl pe"><b>Trabajo ${j + 1}</b><span>⏳ Pendiente</span></div>`; const e = ST[w.st] || ST.pend;
@@ -544,7 +544,7 @@ document.addEventListener('submit', async e => {
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
     if (FORM.doc) fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf({ n: FORM.doc.n, b64: FORM.doc.b64, at: new Date() }) }) }).catch(() => {});
     if (ME.teacher) CACHE.ok = null;
-    const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40));
+    const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40)); ls.set('moli2:revtit', { ...ls.get('moli2:revtit', {}), [id]: t.slice(0, 100) });
     try { parent !== window && parent.postMessage({ revistaSent: 1 }, '*'); } catch (x) {}
     vEnviar(); toast(ME.teacher ? '📰 ¡Publicado en la revista y en la Biblioteca!' : '🎉 ¡Enviado! Un Revisor o tu profe lo revisará pronto.', 4500);
   } catch (x) { b.disabled = false; b.textContent = ME.teacher ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'; toast(x.message === 'AUTHT' ? '🔐 Profe: conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : x.message === 'AUTH' ? '🔐 Tu cuenta todavía no puede enviar. Avísale a tu profe.' : '📶 No se pudo enviar. Revisa tu internet e intenta otra vez.', 5000); }
@@ -553,9 +553,10 @@ async function drawMine() {
   const el = $('#mine'), ids = ls.get(K_MY, []); if (!el) return;
   if (!ids.length) { el.innerHTML = ''; return; }
   el.innerHTML = '<h3>📬 Mis envíos</h3><div class="load">Buscando…</div>';
-  const L = (await Promise.all(ids.slice(0, 15).map(id => getDoc(id).catch(() => null)))).filter(Boolean);
+  const TT = ls.get('moli2:revtit', {});
+  const L = (await Promise.all(ids.slice(0, 15).map(id => getDoc(id).then(w => w || (TT[id] ? { id, t: TT[id], ty: 'inv', st: 'dev' } : null)).catch(() => null)))).filter(Boolean);
   if (!$('#mine')) return;
-  el.innerHTML = '<h3>📬 Mis envíos</h3>' + (L.map(w => `<div class="row"><span style="font-size:28px">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>Enviado el ${fecha(w.at)}</span>${w.st === 'no' && w.fb ? `<div class="fb">💬 ${esc(w.fb)}</div>` : ''}</div><span class="st ${esc(w.st)}">${w.st === 'ok' ? '✅ ¡Publicado!' : w.st === 'no' ? '✏️ Por mejorar' : '⏳ En revisión'}</span></div>`).join('') || '<p class="load">Todavía no hay envíos.</p>');
+  el.innerHTML = '<h3>📬 Mis envíos</h3>' + (L.map(w => `<div class="row"><span style="font-size:28px">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>${w.st === 'dev' ? 'Tu profe lo devolvió: mejóralo y vuelve a enviarlo.' : 'Enviado el ' + fecha(w.at)}</span>${w.st === 'no' && w.fb ? `<div class="fb">💬 ${esc(w.fb)}</div>` : ''}</div><span class="st ${esc(w.st)}">${w.st === 'ok' ? '✅ ¡Publicado!' : w.st === 'no' || w.st === 'dev' ? '✏️ Por mejorar' : '⏳ En revisión'}</span></div>`).join('') || '<p class="load">Todavía no hay envíos.</p>');
 }
 
 // ---- 📥 Bandeja: la docente y los revisores aprueban o devuelven ----
@@ -616,7 +617,7 @@ async function openArt(id) {
   ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
   ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
   ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Consejo para el estudiante (obligatorio si lo devuelves). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
-    <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver para mejorar</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
+    <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ ${ROLE.t ? 'Devolver (se borra)' : 'Devolver para mejorar'}</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
   ${ROLE.t && w.st === 'ok' && TAB === 'revista' ? '<div class="acts"><button type="button" class="btn soft" data-rv="pend">↩️ Quitar de la revista</button><button type="button" class="btn red" data-rv="del">🗑 Borrar</button></div>' : ''}
   </div></article>`;
   M.dataset.id = id;
@@ -627,21 +628,24 @@ $('#modal').addEventListener('click', async e => {
   if (e.target.closest('[data-word]')) return bajarWord(M.dataset.id, e.target.closest('[data-word]'));
   const b = e.target.closest('[data-rv]'); if (!b) return;
   const id = M.dataset.id, act = b.dataset.rv, fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
-  if (act === 'no' && fb.length < 8) { toast('💬 Escribe un consejo para que el estudiante sepa qué mejorar.'); $('#rvFb').focus(); return; }
+  const borra = act === 'del' || (act === 'no' && ROLE.t);           // la profe al devolver: se borra (con su Word) para que lo envíe corregido
+  if (act === 'no' && !ROLE.t && fb.length < 8) { toast('💬 Escribe un consejo para que el estudiante sepa qué mejorar.'); $('#rvFb').focus(); return; }
+  if (act === 'no' && ROLE.t && !confirm('Se devolverá y se BORRARÁ este trabajo (con su Word) para que el estudiante lo vuelva a enviar corregido. ¿Seguir?')) return;
   if (act === 'del' && !confirm('¿Borrar este trabajo para siempre?')) return;
   const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
   M.querySelectorAll('[data-rv]').forEach(x => x.disabled = true);
   try {
     let r;
-    if (act === 'del') r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } });
-    if (act === 'del') fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }).catch(() => {});
+    const sinWord = () => fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }).catch(() => {});
+    if (borra) { r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }); sinWord(); }
     else {
       const up = { st: act, rv: ROLE.t ? 'tu profe' : String(ROLE.rn || ME.name || 'Revisor').slice(0, 60), rvAt: new Date(), fb: act === 'no' ? fb.slice(0, 500) : fb.slice(0, 500) };
       r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&` + Object.keys(up).map(k => 'updateMask.fieldPaths=' + k).join('&') + '&currentDocument.exists=true', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });
     }
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
+    if (act === 'ok') sinWord();                                       // aprobado: queda el librito con su información; el Word ya no hace falta
     M.hidden = true; M.innerHTML = '';
-    toast(act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
+    toast(act === 'no' && ROLE.t ? '✏️ Devuelto: se borró para que lo envíe corregido.' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
     CACHE.ok = null; if (CACHE.pend) CACHE.pend = CACHE.pend.filter(x => x.id !== id);
     if (TAB === 'bandeja') drawBandeja(); else vRevista();
   } catch (x) { M.querySelectorAll('[data-rv]').forEach(y => y.disabled = false); toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
