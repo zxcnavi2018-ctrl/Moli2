@@ -160,6 +160,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .res{margin:0 0 22px;max-width:640px}.res .u{display:flex;align-items:center;gap:8px;font-size:13px;color:#3c4f62;font-weight:700}.res .u .fv{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--sky);font-size:15px}
 .res .u small{display:block;color:#7b8fa3;font-weight:600}.res a.t{display:inline-block;margin:6px 0 2px;font:800 20px/1.25 var(--sans);color:#1a4fbf;text-decoration:none}.res a.t:hover{text-decoration:underline}
 .res p{margin:0;font-weight:600;color:#4b5b6b;line-height:1.5;font-size:14.5px}.res .ok{display:inline-block;margin-top:5px;font-size:12px;font-weight:900;color:var(--green2)}
+.se-res{max-width:760px;margin:6px auto 0}.res .kws{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.res .kws button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 10px;font-weight:800;font-size:12px;color:var(--blue)}.res .kws button.hit{background:#fef08a;border-color:#facc15;color:#0b2e4f}
 .res.web{padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:#f8fbfe}.res.rv a.t{color:var(--navy)}
 .aside{display:grid;gap:14px;align-content:start}.aside .bx{padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff}.aside h4{margin:0 0 10px;font:900 13px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--navy)}
 .aside ul{margin:0;padding-left:18px;font-weight:700;font-size:13.5px;color:var(--ink2);line-height:1.5}.aside code{display:block;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--sky);font-family:inherit;font-weight:700;font-size:13px}
@@ -175,6 +176,18 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .g-doc .ic{flex:none;display:grid;place-items:center;width:48px;height:56px;border-radius:8px;background:#2b579a;color:#fff;font:900 24px var(--serif)}.g-doc b{display:block;color:var(--navy)}.g-doc small{display:block;color:var(--ink2);font-weight:700;font-size:12.5px;line-height:1.35;margin-top:2px}.g-doc em{font-style:normal;font-weight:900;color:#2b579a;font-size:20px}
 .res p.kw{margin-top:3px;font-size:12.5px;color:#6b7c8f}
 @media (max-width:820px){.guia>a.g-pdf{grid-column:1}.guia{grid-template-columns:1fr}.g-2{grid-template-columns:1fr}}
+/* citas protagonistas */
+.citas{margin:0 0 16px;border-radius:18px;overflow:hidden;border:1px solid #cfe7a8;background:#fff;box-shadow:0 14px 34px -24px rgba(11,46,79,.6)}
+.c-top{position:relative;padding:18px 22px 14px;background:linear-gradient(120deg,var(--navy),var(--blue));color:#fff}.c-top h3{margin:0 0 6px;font:900 clamp(22px,3vw,30px)/1.1 var(--serif)}.c-top h3 small{font:800 13px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#cfe8a7;margin-left:6px}
+.c-top p{margin:0;max-width:760px;font-weight:700;opacity:.95;line-height:1.5}.c-badge{position:absolute;right:18px;top:16px;padding:6px 12px;border-radius:999px;background:var(--gold);color:#3b2a00;font-weight:900;font-size:12px;letter-spacing:.12em}
+.c-2{display:grid;grid-template-columns:1fr 1fr;gap:0}.c-2 article{position:relative;padding:18px 22px 20px}.c-2 article+article{border-left:1px solid var(--line)}
+.c-n{position:absolute;right:18px;top:14px;font:900 46px/1 var(--serif);opacity:.12}.c-a{background:#f6fbef}.c-b{background:#f3f0ff}
+.c-2 h4{margin:0 0 4px;font:900 20px var(--serif);color:var(--navy)}.c-d{margin:0 0 10px;font-weight:700;color:var(--ink2)}
+.c-2 blockquote{margin:0;padding:12px 14px;border-radius:12px;background:#fff;font:italic 700 17px/1.5 var(--serif);color:#1e3a5f;border-left:5px solid var(--green)}.c-b blockquote{border-left-color:#7c3aed}
+.c-2 mark{background:#fef08a;padding:0 3px;border-radius:4px;font-style:normal;font-weight:900;color:#0b2e4f}.c-m{margin:10px 0 0;font-weight:800;font-size:14px;color:var(--ink2)}
+.formatos{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin:0 0 20px}.g-doc.pdf .ic{background:#b42318;font-size:15px}.g-doc.pdf:hover{border-color:#b42318}
+.f-h{margin:6px 0 2px;font:900 20px var(--serif);color:var(--navy)}
+@media (max-width:820px){.c-2,.formatos{grid-template-columns:1fr}.c-2 article+article{border-left:0;border-top:1px solid var(--line)}.c-badge{position:static;display:inline-block;margin-bottom:8px}}
 @keyframes bob{50%{transform:translateY(-5px)}}
 @keyframes pop{from{opacity:0;transform:scale(.92) translateY(10px)}}
 @keyframes fade{from{opacity:0}}
@@ -185,7 +198,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 <body>
 <header class="top">
   <span class="mark" aria-hidden="true">R<i>E</i></span>
-  <div class="brand"><small>Innova Schools · Ciencia y Tecnología · 6.° grado</small><h1>Repositorio Educativo</h1></div>
+  <div class="brand"><h1>Repositorio Educativo</h1></div>
   <div class="me" id="me" hidden></div>
 </header>
 <nav class="tabs" id="tabs">
@@ -206,7 +219,8 @@ const K_ME = 'moli2:me', K_ME1 = 'ciencia4b:me:' + DOC, K_T = 'moli2:auth', K_T1
 const ls = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } } };
 const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const ME = (m => m && m.key ? m : null)(ls.get(K_ME, null)) || (m => m && m.key && !m.demo ? m : null)(ls.get(K_ME1, null)), QS = new URLSearchParams(location.search);
-const TIPOS = [['inv', '🔬', 'Investigación'], ['pro', '🛠️', 'Producto'], ['maq', '🧩', 'Maqueta'], ['info', '🖼️', 'Infografía'], ['vid', '🎬', 'Video'], ['exp', '⚗️', 'Experimento']];
+const TIPOS = [['opi', '💭', 'Opinión científica'], ['ens', '📝', 'Ensayo'], ['inv', '🔬', 'Investigación'], ['exp', '⚗️', 'Experimento'], ['pro', '🛠️', 'Producto o maqueta'], ['info', '🖼️', 'Infografía o video'], ['maq', '🧩', 'Maqueta'], ['vid', '🎬', 'Video']];
+const TIPOS_F = TIPOS.slice(0, 6);
 const UNITS = [['unit7', '🦠', 'Unidad 7 · Microorganismos'], ['unit8', '🧬', 'Unidad 8 · Sistema reproductor'], ['otra', '🌎', 'Otro tema de Ciencia']];
 const tipo = k => TIPOS.find(t => t[0] === k) || TIPOS[0], unidad = k => UNITS.find(u => u[0] === k) || UNITS[2];
 if (ME && ME.docente) ME.teacher = true;
@@ -283,7 +297,7 @@ $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-ta
 let FIL = { ty: '', sec: '' };
 async function vRevista() {
   const V = $('#view');
-  V.innerHTML = `<section class="mast"><div><span class="kick">Edición ${new Date().getFullYear()} · Ciencia y Tecnología · Innova Schools</span><h2>Revista <em>Innovadora</em></h2><p>Investigaciones y productos de nuestros estudiantes, revisados antes de publicarse.</p></div><div class="mast-r"><b id="nPub">—</b><span>publicados</span></div></section>
+  V.innerHTML = `<section class="mast"><div><span class="kick">Edición ${new Date().getFullYear()}</span><h2>Revista <em>Innovadora</em></h2><p>Investigaciones y productos de nuestros estudiantes, revisados antes de publicarse.</p></div><div class="mast-r"><b id="nPub">—</b><span>publicados</span></div></section>
   <div class="sech"><h3>Publicados recientemente</h3></div><div id="recent"><div class="load">Cargando…</div></div>
   <div class="sech"><h3>Todos los trabajos</h3></div>
   <div id="list"></div>`;
@@ -306,69 +320,52 @@ $('#view').addEventListener('click', e => {
   const o = e.target.closest('[data-open]'); if (o) { e.preventDefault(); openArt(o.dataset.open); }
 });
 
-// ---- 🔍 Buscador de fuentes confiables ----
-const FUENTES = [
-  ['🇵🇪', 'PerúEduca', 'Recursos del Ministerio de Educación del Perú para estudiantes: lecturas, videos y actividades.', 'https://www.perueduca.pe', 'Ministerio de Educación', 'educacion estudiar tareas ciencia peru recursos'],
-  ['🎓', 'Khan Academy en español', 'Videos y lecturas de ciencias explicados paso a paso.', 'https://es.khanacademy.org', 'Organización educativa', 'ciencia biologia fisica quimica celulas energia videos'],
-  ['📖', 'Vikidia', 'Enciclopedia escrita para chicos de 8 a 13 años.', 'https://es.vikidia.org', 'Enciclopedia para niños', 'enciclopedia definicion animales plantas historia ciencia'],
-  ['🚀', 'NASA Space Place', 'El espacio, la Tierra y el clima, en español y para niños.', 'https://spaceplace.nasa.gov/sp/', 'Agencia espacial de EE. UU.', 'espacio planetas sol luna tierra clima estrellas'],
-  ['🏥', 'Ministerio de Salud (MINSA)', 'Información oficial sobre enfermedades y cómo prevenirlas.', 'https://www.gob.pe/minsa', 'Gobierno del Perú', 'salud enfermedades dengue vacunas prevencion microorganismos virus bacterias higiene'],
-  ['🌍', 'Organización Mundial de la Salud', 'Datos confiables sobre virus, bacterias y vacunas.', 'https://www.who.int/es', 'Organización mundial', 'salud virus bacterias vacunas enfermedades microorganismos pandemia'],
-  ['🧒', 'KidsHealth en español', 'Salud, cuerpo humano y cambios al crecer, explicado para niños.', 'https://kidshealth.org/es/kids/', 'Médicos pediatras', 'cuerpo humano pubertad crecimiento salud sistemas higiene germenes'],
-  ['💙', 'UNICEF Perú', 'Derechos, salud y bienestar de niñas y niños.', 'https://www.unicef.org/peru/', 'Naciones Unidas', 'derechos salud bienestar niños crecimiento'],
-  ['🧬', 'Khan Academy: biología', 'Células, microorganismos, órganos y sistemas del cuerpo.', 'https://es.khanacademy.org/science/biology', 'Organización educativa', 'biologia celulas microorganismos bacterias hongos levadura sistema reproductor cuerpo'],
-  ['🌎', 'Instituto Geofísico del Perú', 'Sismos, volcanes y la Tierra en nuestro país.', 'https://www.gob.pe/igp', 'Gobierno del Perú', 'sismos terremotos volcanes tierra placas tectonicas'],
-  ['🦺', 'INDECI', 'Cómo prepararnos ante sismos y emergencias.', 'https://www.gob.pe/indeci', 'Gobierno del Perú', 'sismos emergencias desastres prevencion'],
-  ['🌦️', 'SENAMHI', 'Clima, lluvias y temperatura en todo el Perú.', 'https://www.gob.pe/senamhi', 'Gobierno del Perú', 'clima lluvias temperatura tiempo agua'],
-  ['🔬', 'CDC en español', 'Gérmenes, enfermedades y cómo protegernos (Centros para el Control de Enfermedades).', 'https://www.cdc.gov/spanish/', 'Gobierno de EE. UU.', 'germenes bacterias virus higiene lavado de manos enfermedades'],
-  ['🌿', 'National Geographic en español', 'Naturaleza, animales, ciencia y medio ambiente.', 'https://www.nationalgeographicla.com', 'Revista científica', 'animales naturaleza ecosistemas medio ambiente ciencia']];
-const SITIOS = ['gob.pe', 'who.int', 'unicef.org', 'kidshealth.org', 'khanacademy.org', 'nasa.gov', 'cdc.gov', 'vikidia.org', 'perueduca.pe'];
+// ---- 🔍 Buscador Revista Innovadora: sólo trabajos publicados, por sus palabras clave ----
 const norm = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const kws = w => String(w.kw || '').split(',').map(x => x.trim()).filter(Boolean);
 let SQ = '';
 function vFuentes() {
-  $('#view').innerHTML = `<section class="se"><div class="se-logo"><span>🔍</span>Buscador<small>de fuentes confiables</small></div>
-    <form class="se-box" id="sF" role="search"><input id="sQ" type="search" placeholder="¿Qué quieres investigar? Ej.: bacterias, dengue, volcanes…" autocomplete="off" value="${esc(SQ)}"><button type="submit">Buscar</button></form>
-    <div class="se-sug">Prueba: ${['bacterias', 'vacunas', 'levadura', 'pubertad', 'sismos', 'clima'].map(w => `<button type="button" data-sq="${w}">${w}</button>`).join('')}</div></section>
-    <div class="se-cols"><div id="sR"></div><aside class="aside"><div class="bx"><h4>¿Es confiable?</h4><ul><li>¿Quién lo escribió? Mejor una institución o un científico.</li><li>¿Tiene fecha? ¿Es reciente?</li><li>¿Dice de dónde saca sus datos?</li><li>¿Otras fuentes dicen lo mismo?</li><li>¿Quiere venderte algo? ¡Cuidado!</li><li>Las páginas <b>.gob.pe</b>, <b>.edu</b> y <b>.org</b> suelen ser más serias.</li></ul></div>
-    <div class="bx"><h4>Cómo citar tu fuente</h4><code>Institución o autor. (Año). Título. Sitio web.</code><code>Ministerio de Salud. (2025). Dengue: síntomas y prevención. gob.pe</code></div></aside></div>`;
-  buscar(SQ);
-  if (!CACHE.ok) query('ok', null, LIST_F).then(L => { CACHE.ok = L; if (TAB === 'fuentes') buscar(SQ); }).catch(() => {});
+  $('#view').innerHTML = `<section class="se"><div class="se-logo"><span>🔍</span>Buscador<small>Revista Innovadora</small></div>
+    <form class="se-box" id="sF" role="search"><input id="sQ" type="search" placeholder="Escribe una palabra clave. Ej.: levadura, bacterias, energía…" autocomplete="off" value="${esc(SQ)}"><button type="submit">Buscar</button></form>
+    <div class="se-sug" id="sSug"></div></section><div class="se-res" id="sR"><div class="load">Cargando la revista…</div></div>`;
+  const listo = () => { pintaSug(); buscar(SQ); };
+  if (CACHE.ok) listo(); else query('ok', null, LIST_F).then(L => { CACHE.ok = L; if (TAB === 'fuentes') listo(); }).catch(() => { const el = $('#sR'); if (el) el.innerHTML = '<div class="empty"><b>No se pudo abrir la revista</b>Revisa tu conexión e intenta otra vez.</div>'; });
+}
+function pintaSug() {
+  const C = {}; (CACHE.ok || []).forEach(w => kws(w).forEach(k => { const n = norm(k); C[n] = C[n] || [k, 0]; C[n][1]++; }));
+  const top = Object.values(C).sort((a, b) => b[1] - a[1]).slice(0, 10), el = $('#sSug'); if (!el) return;
+  el.innerHTML = top.length ? 'Palabras clave: ' + top.map(([k]) => `<button type="button" data-sq="${esc(k)}">${esc(k)}</button>`).join('') : '';
 }
 function buscar(q) {
-  SQ = q; const el = $('#sR'); if (!el) return; const W = norm(q).split(/[^a-z0-9ñ]+/).filter(w => w.length > 1);
-  const pts = (txt, w) => norm(txt).includes(w) ? 1 : 0;
-  const F = FUENTES.map(f => ({ f, s: W.length ? W.reduce((a, w) => a + pts(f[1], w) * 3 + pts(f[5], w) * 2 + pts(f[2], w), 0) : 1 })).filter(x => x.s > 0).sort((a, b) => b.s - a.s);
-  const RV = W.length ? (CACHE.ok || []).filter(w => W.some(x => norm(w.t + ' ' + (w.kw || '') + ' ' + w.d).includes(x))).slice(0, 6) : [];
-  const dom = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } };
-  const web = q.trim() ? `https://www.google.com/search?q=${encodeURIComponent(q.trim() + ' (' + SITIOS.map(x => 'site:' + x).join(' OR ') + ')')}` : '';
-  el.innerHTML = `<p class="se-n">${q.trim() ? `${F.length + RV.length} resultado${F.length + RV.length === 1 ? '' : 's'} confiable${F.length + RV.length === 1 ? '' : 's'} para «${esc(q.trim())}»` : 'Fuentes recomendadas para investigar'}</p>` +
-    (web ? `<div class="res web"><div class="u"><span class="fv">🌐</span><div>Buscar en internet<small>solo en sitios confiables</small></div></div><a class="t" href="${web}" target="_blank" rel="noopener">Buscar «${esc(q.trim())}» en ${SITIOS.length} sitios confiables ↗</a><p>Abre una búsqueda que solo muestra páginas de gobiernos, organizaciones de salud y sitios educativos.</p></div>` : '') +
-    RV.map(w => `<div class="res rv"><div class="u"><span class="fv">📰</span><div>Revista Innovadora<small>Trabajo de ${esc(w.n)}</small></div></div><a class="t" href="#" data-open="${esc(w.id)}">${esc(w.t)}</a><p>${esc(String(w.d || '').slice(0, 160))}…</p>${w.kw ? `<p class="kw">🔑 ${esc(w.kw)}</p>` : ''}<span class="ok">✔ Revisado y publicado</span></div>`).join('') +
-    (F.length ? F.map(({ f: [ic, n, d, u, w] }) => `<div class="res"><div class="u"><span class="fv">${ic}</span><div>${esc(w)}<small>${esc(dom(u))}</small></div></div><a class="t" href="${u}" target="_blank" rel="noopener">${esc(n)}</a><p>${esc(d)}</p><span class="ok">✔ Fuente confiable</span></div>`).join('')
-      : `<p class="se-n">No tengo esa palabra en mis fuentes. Usa el primer resultado para buscar en internet solo en sitios confiables.</p>`);
+  SQ = q; const el = $('#sR'); if (!el || !CACHE.ok) return; const A = CACHE.ok, W = norm(q).split(/[^a-z0-9ñ]+/).filter(w => w.length > 1);
+  const R = (W.length ? A.map(w => { const K = norm(kws(w).join(' ')), T = norm(w.t); return { w, s: W.reduce((a, x) => a + (K.includes(x) ? 3 : 0) + (T.includes(x) ? 1 : 0), 0) }; }).filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.w) : A);
+  if (!A.length) { el.innerHTML = '<div class="empty"><b>Aún no hay trabajos publicados</b>Cuando se publiquen, podrás encontrarlos aquí por sus palabras clave.</div>'; return; }
+  el.innerHTML = `<p class="se-n">${W.length ? `${R.length} resultado${R.length === 1 ? '' : 's'} para «${esc(q.trim())}»` : `Todos los trabajos publicados (${A.length})`}</p>` +
+    (R.length ? R.map(w => { const t = tipo(w.ty); return `<div class="res rv"><div class="u"><span class="fv">${t[1]}</span><div>${esc(t[2])} · ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''}<small>${fecha(w.at)}</small></div></div><a class="t" href="#" data-open="${esc(w.id)}">${esc(w.t)}</a>${w.d ? `<p>${esc(String(w.d).slice(0, 170))}${String(w.d).length > 170 ? '…' : ''}</p>` : ''}${kws(w).length ? `<div class="kws">${kws(w).map(k => `<button type="button" data-sq="${esc(k)}" class="${W.some(x => norm(k).includes(x)) ? 'hit' : ''}">${esc(k)}</button>`).join('')}</div>` : ''}</div>`; }).join('')
+      : `<div class="empty"><b>No encontré trabajos con «${esc(q.trim())}»</b>Prueba con otra palabra clave.</div>`);
 }
 document.addEventListener('submit', e => { if (e.target.id !== 'sF') return; e.preventDefault(); buscar($('#sQ').value); });
 document.addEventListener('click', e => { const b = e.target.closest('[data-sq]'); if (!b) return; $('#sQ').value = b.dataset.sq; buscar(b.dataset.sq); });
 
 // ---- 📤 Enviar mi trabajo ----
-let FORM = { ty: 'inv', u: 'unit7', img: '', th: '', g: 6 };
+let FORM = { ty: 'opi', u: 'unit7', img: '', th: '', g: 6 };
 function vEnviar() {
   const V = $('#view');
   if (!ME) { V.innerHTML = `<div class="empty"><b>Primero entra con tu DNI</b>Toca tu fotocheck en «Mi aula», escribe tu DNI y vuelve aquí para enviar tu trabajo.</div>`; return; }
   V.innerHTML = (ME.teacher ? `<div class="teach">👩‍🏫 Profe: tu publicación sale <b>directo</b> en la Revista Innovadora y en la Biblioteca (no pasa por revisión).</div>` : tip(`¡Hola, ${esc(firstName(ME.name))}! Comparte tu investigación o tu producto. Un <b>Revisor</b> o tu profe lo leerá y, si está listo, ¡saldrá en la <b>Revista Innovadora</b>! 📰`, 'emocionada')) +
-  `<section class="guia"><div class="g-cit"><h4>✍️ Citas parafraseadas (Normas APA) · <span>tu trabajo debe tener mínimo 3</span></h4>
-      <div class="g-2"><div><b>Narrativa</b><small>El autor va en la oración y el año entre paréntesis.</small><q>Según López (2020), el desarrollo tecnológico…</q></div>
-      <div><b>Parentética</b><small>Tu idea con tus palabras y al final (Apellido, año).</small><q>El desarrollo tecnológico ha transformado la educación moderna (Soto, 2019).</q></div></div></div>
-    <a class="g-doc" href="docs/formato-revista-innovadora.docx" download="Formato Revista Innovadora.docx"><span class="ic">W</span><div><b>Descarga la guía en Word</b><small>7 pasos: título, tipo de trabajo, tu texto libre (opinión, ensayo o investigación), 3 citas, fuentes y palabras clave.</small></div><em>⬇</em></a><a class="g-pdf" href="docs/formato-revista-innovadora.pdf" target="_blank" rel="noopener">📄 Verlo o imprimirlo en PDF</a></section>
+  `<section class="citas"><div class="c-top"><span class="c-badge">MÍNIMO 3 CITAS</span><h3>✍️ Citas parafraseadas <small>Normas APA</small></h3><p>Parafrasear es contar lo que dijo un experto <b>con tus propias palabras</b>, sin copiar. Tu trabajo debe tener <b>mínimo 3 citas</b>. Hay dos formas:</p></div>
+      <div class="c-2"><article class="c-a"><span class="c-n">A</span><h4>Cita narrativa</h4><p class="c-d">Empiezas con el <b>autor</b> y pones el <b>año</b> entre paréntesis.</p><blockquote>Según <mark>López (2020)</mark>, el desarrollo tecnológico cambió la forma en que aprendemos.</blockquote><p class="c-m">Molde: Según <mark>Apellido (año)</mark>, …</p></article>
+      <article class="c-b"><span class="c-n">B</span><h4>Cita parentética</h4><p class="c-d">Escribes la idea con tus palabras y <b>al final</b> pones (Apellido, año).</p><blockquote>El desarrollo tecnológico ha transformado la educación moderna <mark>(Soto, 2019)</mark>.</blockquote><p class="c-m">Molde: … <mark>(Apellido, año)</mark>.</p></article></div></section>
+  <section class="formatos"><a class="g-doc" href="docs/formato-revista-innovadora.docx" download="Formato Revista Innovadora.docx"><span class="ic">W</span><div><b>1. Descarga la guía y complétala</b><small>7 pasos: título, tipo, tu texto libre, 3 citas, fuentes y palabras clave.</small></div><em>⬇</em></a>
+    <a class="g-doc pdf" href="docs/formato-revista-innovadora.pdf" target="_blank" rel="noopener"><span class="ic">PDF</span><div><b>¿Prefieres imprimirla?</b><small>Ábrela en PDF y escríbela a mano.</small></div><em>↗</em></a></section>
   <form class="form" id="fEnv" autocomplete="off">
-    <div class="fld"><label for="eT">1. ¿Cómo se llama tu trabajo?</label><input type="text" id="eT" maxlength="100" required placeholder="Ej.: ¿Cómo influye la temperatura en la levadura?"></div>
-    <div class="fld"><label>2. ¿Qué es?</label><div class="opts" id="eTy">${TIPOS.map(t => `<button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}">${t[1]} ${t[2]}</button>`).join('')}</div></div>
-    <div class="fld"><label for="eK">3. Palabras clave</label><input type="text" id="eK" maxlength="200" required placeholder="Ej.: levadura, temperatura, fermentación"><small>De 3 a 5 palabras separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
-    <div class="fld"><label for="eD">4. Resumen de tu trabajo</label><textarea id="eD" maxlength="1500" required placeholder="¿Qué querías averiguar? ¿Qué hiciste? ¿Qué descubriste?"></textarea><small>Escribe con tus palabras: qué hiciste y qué aprendiste.</small></div>
-    <div class="fld"><label for="eF">5. Referencias (Normas APA)</label><textarea id="eF" maxlength="600" style="min-height:70px" placeholder="Ej.: Ministerio de Salud. (2025). Dengue: síntomas y prevención. gob.pe"></textarea><small>Las fuentes de tus 3 citas. Búscalas en la pestaña 🔍 Buscador.</small></div>
-    <div class="fld"><label for="eL">6. Link de tu formato completo (Drive)</label><input type="url" id="eL" maxlength="400" placeholder="https://drive.google.com/… · Canva · YouTube"><small>Si está en Drive o Canva, compártelo como «Cualquier persona con el enlace».</small></div>
+    <h3 class="f-h">2. Publica tu propuesta</h3>
+    <div class="fld"><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" required placeholder="El mismo título de tu guía"></div>
+    <div class="fld"><label>Tipo de trabajo</label><div class="opts" id="eTy">${TIPOS_F.map(t => `<button type="button" data-ty="${t[0]}" class="${FORM.ty === t[0] ? 'on' : ''}">${t[1]} ${t[2]}</button>`).join('')}</div></div>
+    <div class="fld"><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" required placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
+    <div class="fld"><label for="eL">Link de tu guía completa</label><input type="url" id="eL" maxlength="400" ${ME.teacher ? '' : 'required'} placeholder="https://drive.google.com/… · Canva"><small>Súbela a Drive o Canva y compártela como «Cualquier persona con el enlace».</small></div>
     ${ME.teacher ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
-    <div class="fld"><label>7. Una foto de tu trabajo (opcional)</label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" hidden><span id="ePv">📷 Toca aquí para elegir una foto</span></label></div>
+    <div class="fld"><label>Foto de tu trabajo <span style="font-weight:700;color:var(--ink2)">(opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" hidden><span id="ePv">📷 Toca aquí para elegir una foto</span></label></div>
     <div><button type="submit" class="btn go" id="eGo">${ME.teacher ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
   </form><div class="mine" id="mine"></div>`;
   FORM.img = FORM.th = ''; drawMine();
@@ -399,10 +396,10 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
-  const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = $('#eD').value.trim(), f = $('#eF').value.trim(), link = $('#eL').value.trim();
+  const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = '', f = '', link = $('#eL').value.trim();
   if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
   if (kw.split(',').filter(x => x.trim()).length < 2) return toast('🔑 Escribe al menos 3 palabras clave separadas por comas.');
-  if (d.length < 20) return toast('✏️ Cuéntanos un poco más de tu trabajo.');
+  if (!ME.teacher && !link) return toast('🔗 Pega el link de tu guía completa.');
   if (link && !safeUrl(link)) return toast('🔗 El link debe empezar con https://');
   const b = $('#eGo'); b.disabled = true; b.textContent = '⏳ Enviando…';
   const id = ME.key + '-' + Date.now().toString(36);

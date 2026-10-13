@@ -112,7 +112,7 @@
 <button id="sonido" type="button" aria-label="Sonido">🔊</button>
 <button id="editar" type="button" hidden>✏️ Editar</button>
 <div id="edPanel"></div>
-<div id="titulo"><small>INNOVA SCHOOLS · CIENCIA Y TECNOLOGÍA</small><h1>La Biblioteca Educativa</h1><span class="orla"></span></div>
+<div id="titulo"><small></small><h1>La Biblioteca Educativa</h1><span class="orla"></span></div>
 <div id="escena"><div><small>ESCENA</small><b></b></div></div>
 <div id="bar"><button class="nav" type="button" data-nav="-1" aria-label="Estante anterior">◀</button><div class="g"></div><button class="nav" type="button" data-nav="1" aria-label="Estante siguiente">▶</button><button class="todo" type="button" data-todo="1">🏛️ Toda</button></div>
 <button id="saltar" type="button">Saltar ⏭</button>
@@ -139,7 +139,7 @@ const LOW = isTouch || /[?&]low/.test(location.search);
 
 // ---- textos que la docente puede editar (✏️ Editar) · se guardan en Firebase (files/fbiblio-0) ----
 const TX = {
-  sup: 'INNOVA SCHOOLS · CIENCIA Y TECNOLOGÍA', titulo: 'La Biblioteca Educativa', atril: ['BIBLIOTECA', 'EDUCATIVA'], tapa: ['La Biblioteca', 'Educativa'],
+  sup: '', titulo: 'La Biblioteca Educativa', atril: ['BIBLIOTECA', 'EDUCATIVA'], tapa: ['La Biblioteca', 'Educativa'],
   instT: '¡Bienvenidos a la Biblioteca!',
   inst: ['Envía tu investigación o tu producto en la Revista Innovadora (la laptop del aula).', 'Tu profe o un Revisor lo lee con cuidado.', 'Si lo aprueban, ¡se convierte en un libro! Aparece solito en el estante de tu grado.', 'Toca un estante, pasa el cursor por un libro y ábrelo para leerlo.'],
   pag: 'Aquí aparecerá tu trabajo académico aprobado',
@@ -153,7 +153,7 @@ const GRADOS = [
   { g: 10, n: 'DÉCIMO', t: 'Décimo grado', x: -5.0, y: 4.66, z: -15.35, ry: 0, c: 0x9a5b22 },
   { g: 11, n: 'UNDÉCIMO', t: 'Undécimo grado', x: 5.0, y: 4.66, z: -15.35, ry: 0, c: 0x1f6f78 }];
 const COL_SEC = { A: '#6b2a2f', B: '#2c4a6e', C: '#35603f', D: '#7d4d22', E: '#55406e', F: '#235a60' };
-const TIPOS = { inv: ['🔬', 'Investigación'], pro: ['🛠️', 'Producto'], maq: ['🧩', 'Maqueta'], info: ['🖼️', 'Infografía'], vid: ['🎬', 'Video'], exp: ['⚗️', 'Experimento'] };
+const TIPOS = { opi: ['💭', 'Opinión científica'], ens: ['📝', 'Ensayo'], inv: ['🔬', 'Investigación'], pro: ['🛠️', 'Producto'], maq: ['🧩', 'Maqueta'], info: ['🖼️', 'Infografía'], vid: ['🎬', 'Video'], exp: ['⚗️', 'Experimento'] };
 
 // ===================================================================
 //  ESCENA
@@ -548,7 +548,7 @@ function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[Strin
     <div class="pg l"><h2>${esc(t.t || 'Trabajo')}</h2><div class="meta"><span>${ty[0]} ${esc(ty[1])}</span><span>📰 Revista Innovadora</span></div>
       ${t.th || t.img ? `<img class="foto" src="${esc(t.img || t.th)}" alt="Foto del trabajo">` : `<div style="font-size:90px;text-align:center;margin:20px 0">${ty[0]}</div>`}
       <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>6.° ${esc(t.sec || '')}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div></div>
-    <div class="pg r"><h3 class="sub">📝 De qué trata</h3>${d ? `<span class="cap">${esc(d[0])}</span><p>${esc(d.slice(1))}</p>` : '<p>Este trabajo no trae descripción.</p>'}
+    <div class="pg r">${d ? `<h3 class="sub">📝 De qué trata</h3><span class="cap">${esc(d[0])}</span><p>${esc(d.slice(1))}</p>` : `<h3 class="sub">📖 El trabajo completo</h3><p>${t.kw ? 'Trata sobre: <b>' + esc(t.kw) + '</b>.' : ''} Ábrelo para leerlo con sus citas y fuentes.</p>`}
       ${t.f ? `<h3 class="sub">📚 Fuentes que usó</h3><p class="fu">${esc(t.f)}</p>` : ''}${safeUrl(t.link) ? `<a class="ver" href="${esc(safeUrl(t.link))}" target="_blank" rel="noopener">🔗 Ver el trabajo completo</a>` : ''}
       ${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}<span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div></div>`;
   L.classList.add('on');
@@ -611,12 +611,13 @@ const EMBED = window.parent !== window;
 if (EMBED) $('#volver').addEventListener('click', e => { e.preventDefault(); parent.postMessage({ bibCerrar: 1 }, '*'); });
 const YO = LSA('moli2:me'), DOCENTE = !!(YO && (YO.teacher || YO.docente));
 function aplicarTX(x) {
-  if (x && typeof x === 'object') ['sup', 'titulo', 'instT', 'pag'].forEach(k => { if (typeof x[k] === 'string' && x[k].trim()) TX[k] = x[k].slice(0, 160); });
+  if (x && typeof x === 'object' && typeof x.sup === 'string') TX.sup = x.sup.slice(0, 160);
+  if (x && typeof x === 'object') ['titulo', 'instT', 'pag'].forEach(k => { if (typeof x[k] === 'string' && x[k].trim()) TX[k] = x[k].slice(0, 160); });
   if (x && Array.isArray(x.atril)) TX.atril = [0, 1].map(i => String(x.atril[i] || '').slice(0, 30));
   if (x && Array.isArray(x.tapa)) TX.tapa = [0, 1].map(i => String(x.tapa[i] || '').slice(0, 30));
   if (x && Array.isArray(x.inst)) TX.inst = x.inst.map(t => String(t).slice(0, 220)).filter(t => t.trim()).slice(0, 6);
   if (x && x.g) Object.keys(TX.g).forEach(k => { const v = x.g[k]; if (Array.isArray(v) && String(v[0] || '').trim()) TX.g[k] = [String(v[0]).slice(0, 16), String(v[1] || '').slice(0, 20)]; });
-  $('#titulo small').textContent = TX.sup; $('#titulo h1').textContent = TX.titulo; document.title = TX.titulo + ' · Molí';
+  $('#titulo small').textContent = TX.sup; $('#titulo small').hidden = !TX.sup; $('#titulo h1').textContent = TX.titulo; document.title = TX.titulo + ' · Molí';
   ESTANTES.forEach(E => { [E.n, E.s] = TX.g[E.g]; E.placa.material.map = placaTex(E.n, E.s, E.c); E.placa.material.needsUpdate = true; E.et.material.map = etiquetaTex(E.n, E.s); E.et.material.needsUpdate = true; });
   atrilPlaca.material.map = atrilTex(); pagIzq.material.map = pagIzqTex(); pagDer.material.map = pagDerTex(); tapaDeco.material.map = tapaTex(); [atrilPlaca, pagIzq, pagDer, tapaDeco].forEach(m => m.material.needsUpdate = true);
   pintarBarra();
