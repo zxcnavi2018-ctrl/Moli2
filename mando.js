@@ -219,31 +219,51 @@
     if (on) { if (!cur) { cur = document.createElement('div'); cur.id = 'mandoCur'; cur.innerHTML = '<i class="halo"></i><i class="onda"></i><svg viewBox="0 0 32 32" width="72" height="72"><defs><linearGradient id="mcG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#facc15"/><stop offset=".45" stop-color="#fb923c"/><stop offset=".75" stop-color="#ec4899"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><path d="M2 2 L2 25 L8 19.5 L12.8 29.5 L17.6 27.4 L12.9 17.6 L21.5 17.6 Z" fill="none" stroke="#1e1b4b" stroke-width="4.2" stroke-linejoin="round"/><path d="M2 2 L2 25 L8 19.5 L12.8 29.5 L17.6 27.4 L12.9 17.6 L21.5 17.6 Z" fill="url(#mcG)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M4.6 7 L4.6 15" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/></svg>'; document.body.appendChild(cur); }
       pintaCur(); avisar('🖱️ Modo mouse: L3 mueve · A hace clic · mantén ZR para dibujar · ZL + ZR para salir'); }
     else { if (cur) { cur.remove(); cur = null; } borrarTinta(); avisar('🖱️ Saliste del modo mouse (se borró lo dibujado)'); } }
-  // ✏️ dibujar en modo mouse: mantener ZR y mover la flecha deja una línea de colores; al salir del modo mouse se borra todo
-  let tinta = null, tctx = null, tUlt = null, tHue = 0;
+  // ✏️ dibujar en modo mouse: mantener ZR y mover la flecha dibuja a mano libre; si el trazo salió casi recto, al soltar ZR se endereza solo.
+  //    Al salir del modo mouse se borra todo.
+  let tinta = null, tctx = null, tHue = 0, trazos = [], tAct = null;
+  const HUE_PX = 0.35, ANCHO = 9;
   function lienzo() {
     if (tinta) return; tinta = document.createElement('canvas'); tinta.id = 'mandoTinta'; document.body.appendChild(tinta);
     const dpr = Math.min(2, devicePixelRatio || 1); tinta.width = innerWidth * dpr; tinta.height = innerHeight * dpr; tctx = tinta.getContext('2d'); tctx.scale(dpr, dpr);
-    tctx.lineCap = 'round'; tctx.lineJoin = 'round';
+    tctx.lineCap = 'round'; tctx.lineJoin = 'round'; tctx.lineWidth = ANCHO;
+  }
+  const largoDe = P => P.reduce((s, p, i) => i ? s + Math.hypot(p[0] - P[i - 1][0], p[1] - P[i - 1][1]) : 0, 0);
+  function pintaTrazo(t) {
+    const P = t.p, c = h => `hsl(${h % 360},95%,55%)`;
+    if (P.length === 1) { tctx.fillStyle = c(t.h0); tctx.beginPath(); tctx.arc(P[0][0], P[0][1], ANCHO / 2, 0, 7); tctx.fill(); return; }
+    if (t.recta) { const [a, b] = [P[0], P[P.length - 1]], g = tctx.createLinearGradient(a[0], a[1], b[0], b[1]), L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      for (let k = 0; k <= 4; k++) g.addColorStop(k / 4, c(t.h0 + L * HUE_PX * k / 4));
+      tctx.strokeStyle = g; tctx.beginPath(); tctx.moveTo(a[0], a[1]); tctx.lineTo(b[0], b[1]); tctx.stroke(); return; }
+    let h = t.h0; for (let i = 1; i < P.length; i++) { const d = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]);
+      tctx.strokeStyle = c(h); tctx.beginPath(); tctx.moveTo(P[i - 1][0], P[i - 1][1]); tctx.lineTo(P[i][0], P[i][1]); tctx.stroke(); h += d * HUE_PX; }
+  }
+  function redibujar() { if (!tctx) return; tctx.clearRect(0, 0, innerWidth, innerHeight); trazos.forEach(pintaTrazo); }
+  function cerrarTrazo(t) {                                           // ¿lo quiso recto? casi sin desviarse de la línea entre el inicio y el final
+    const P = t.p; if (P.length < 3) return; const a = P[0], b = P[P.length - 1], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L < 50) return;
+    let dev = 0; for (const p of P) dev = Math.max(dev, Math.abs((b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])) / L);
+    if (dev <= Math.max(8, L * 0.1) && largoDe(P) <= L * 1.25) { t.recta = true; redibujar(); }
   }
   function trazo(abajo) {
     if (cur) cur.classList.toggle('pinta', !!abajo);
-    if (!abajo) { tUlt = null; return; }
+    if (!abajo) { if (tAct) { cerrarTrazo(tAct); tHue = (tAct.h0 + tAct.len * HUE_PX) % 360; tAct = null; } return; }
     lienzo(); const x = mx, y = my;
-    if (!tUlt) { tctx.fillStyle = `hsl(${tHue},95%,55%)`; tctx.beginPath(); tctx.arc(x, y, 4.5, 0, 7); tctx.fill(); tUlt = [x, y]; return; }   // un puntito al empezar
-    const d = Math.hypot(x - tUlt[0], y - tUlt[1]); if (d < 1) return;
-    tctx.strokeStyle = `hsl(${tHue},95%,55%)`; tctx.lineWidth = 9; tctx.beginPath(); tctx.moveTo(tUlt[0], tUlt[1]); tctx.lineTo(x, y); tctx.stroke();
-    tHue = (tHue + d * 0.35) % 360; tUlt = [x, y];
+    if (!tAct) { tAct = { p: [[x, y]], h0: tHue, len: 0 }; trazos.push(tAct); pintaTrazo(tAct); return; }
+    const u = tAct.p[tAct.p.length - 1], d = Math.hypot(x - u[0], y - u[1]); if (d < 1.5) return;
+    const h = tAct.h0 + tAct.len * HUE_PX; tAct.len += d;
+    tctx.strokeStyle = `hsl(${h % 360},95%,55%)`; tctx.beginPath(); tctx.moveTo(u[0], u[1]); tctx.lineTo(x, y); tctx.stroke(); tAct.p.push([x, y]);
   }
-  function borrarTinta() { if (tinta) tinta.remove(); tinta = tctx = tUlt = null; }
-  addEventListener('resize', () => { if (tinta) { borrarTinta(); } });
+  function borrarTinta() { if (tinta) tinta.remove(); tinta = tctx = tAct = null; trazos = []; }
+  addEventListener('resize', () => { if (!tinta) return; tinta.remove(); tinta = tctx = null; lienzo(); redibujar(); });   // al cambiar el tamaño de la ventana se conserva lo dibujado
   const pintaCur = () => { if (cur) cur.style.transform = `translate(${mx}px, ${my}px)`; };
   function evento(tipo, el, extra = {}) { const o = { bubbles: true, cancelable: true, composed: true, clientX: mx, clientY: my, button: 0, buttons: tipo.endsWith('down') ? 1 : 0, view: window, ...extra };
     el.dispatchEvent(tipo.startsWith('pointer') ? new PointerEvent(tipo, { pointerId: 9, pointerType: 'mouse', isPrimary: true, ...o }) : new MouseEvent(tipo, o)); }
   const bajo = () => { if (cur) cur.style.display = 'none'; const el = document.elementFromPoint(mx, my); if (cur) cur.style.display = ''; return el; };
   function moverMouse(x, y, sy, k = 1) {
     const m = v => Math.abs(v) < 0.15 ? 0 : Math.sign(v) * Math.pow((Math.abs(v) - 0.15) / 0.85, 1.6);
-    const vx = m(x), vy = m(y); if (vx || vy) { mx = Math.max(0, Math.min(innerWidth - 4, mx + vx * 15 * k)); my = Math.max(0, Math.min(innerHeight - 4, my + vy * 15 * k)); pintaCur();
+    const r = Math.hypot(x, y), f = r < 0.15 ? 0 : Math.pow((Math.min(1, r) - 0.15) / 0.85, 1.6) / r;   // según cuánto empujas (no cada eje por separado): las curvas salen redondas
+    const vel = (tAct ? 9 : 15) * k, vx = x * f, vy = y * f;                // dibujando va más lento: más precisión
+    if (vx || vy) { mx = Math.max(0, Math.min(innerWidth - 4, mx + vx * vel)); my = Math.max(0, Math.min(innerHeight - 4, my + vy * vel)); pintaCur();
       const el = bajo(); if (el) { evento('pointermove', el); evento('mousemove', el); if (el !== sobre) { if (sobre) evento('mouseout', sobre); evento('mouseover', el); sobre = el; } } }
     const s = m(sy); if (s) { const el = bajo(); let c = el; while (c && c !== document.body && !(c.scrollHeight > c.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(c).overflowY))) c = c.parentElement;
       (c && c !== document.body ? c : document.scrollingElement || document.documentElement).scrollBy(0, s * 22 * k); }
