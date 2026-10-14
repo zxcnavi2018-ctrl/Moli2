@@ -104,7 +104,7 @@
     if (a.startsWith('an:') && window.RemotoCmd) return window.RemotoCmd('an', a.slice(3));
   }
 
-  function cerrarAnim() { const an = document.getElementById('anim'); if (an && an.classList.contains('on') && !an.classList.contains('fuera')) { an.click(); return true; } return false; }
+  function cerrarAnim() { if (window.Anuncio && Anuncio.abierto()) { Anuncio.cerrar(); return true; } const an = document.getElementById('anim'); if (an && an.classList.contains('on') && !an.classList.contains('fuera')) { an.click(); return true; } return false; }
   // ---- 🔍 zoom de la cámara (− aleja, + acerca) ----
   let uz = 0, ZM = false, px = 0, py = 0, zmEl = null;
   function zoom(d) { uz = Math.max(-30, Math.min(16, uz + d * 6)); modoZoom(true);
@@ -287,6 +287,7 @@
   #mandoBtn { position: fixed; top: max(22px, calc(env(safe-area-inset-top) + 8px)); z-index: 24; width: 62px; height: 62px; border-radius: 18px; border: 3px solid #2b2547; background: linear-gradient(180deg, #ffffff, #e0e7ff); display: grid; place-items: center; cursor: pointer; box-shadow: 0 5px 0 #2b2547, 0 10px 18px rgba(0,0,0,.25); transition: transform .2s, opacity .3s; padding: 0; }
   #mandoBtn:hover { transform: translateY(-2px) rotate(-4deg); } #mandoBtn svg { width: 44px; height: 44px; } #mandoBtn i { position: absolute; right: 5px; top: 5px; width: 11px; height: 11px; border-radius: 50%; background: #94a3b8; border: 2px solid #fff; } #mandoBtn.on i { background: #22c55e; }
   body.open #mandoBtn, body.tut #mandoBtn, body.editando #mandoBtn { opacity: 0; pointer-events: none; }
+  #mandoBtn[hidden] { display: none !important; }
   @media (max-height: 500px), (max-width: 600px) { #mandoBtn { width: 48px; height: 48px; border-radius: 14px; } #mandoBtn svg { width: 34px; height: 34px; } }
   #mandoP { position: fixed; inset: 0; z-index: 80; display: none; place-items: center; background: rgba(15,23,42,.55); padding: 14px; font-family: "Trebuchet MS", system-ui, sans-serif; }
   #mandoP.on { display: grid; }
