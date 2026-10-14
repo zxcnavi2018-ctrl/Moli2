@@ -211,14 +211,32 @@
   const pend = {};
   function boton(i) {
     if (ENS) return;
-    if (MM) { if (i === 1) return clicMouse(); if (i === 0) return cerrarAnim(); }   // en modo mouse: A = clic (B no hace nada)
+    if (MM) { if (i === 1) return clicMouse(); if (i === 0) return cerrarAnim(); if (i === 6 || i === 7) return; }   // en modo mouse: A = clic · ZR sirve para dibujar (no abre la Revista)
     if ((CR || GR) && i >= 12 && i <= 15) return moverSel(['^', 'v', '<', '>'][i - 12]);      // en el cronómetro o los grupos, la cruceta elige
     if (CFG.on) hacer(CFG.b[i]);
   }
   function modoMouse(on) { MM = on;
     if (on) { if (!cur) { cur = document.createElement('div'); cur.id = 'mandoCur'; cur.innerHTML = '<i class="halo"></i><i class="onda"></i><svg viewBox="0 0 32 32" width="72" height="72"><defs><linearGradient id="mcG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#facc15"/><stop offset=".45" stop-color="#fb923c"/><stop offset=".75" stop-color="#ec4899"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><path d="M2 2 L2 25 L8 19.5 L12.8 29.5 L17.6 27.4 L12.9 17.6 L21.5 17.6 Z" fill="none" stroke="#1e1b4b" stroke-width="4.2" stroke-linejoin="round"/><path d="M2 2 L2 25 L8 19.5 L12.8 29.5 L17.6 27.4 L12.9 17.6 L21.5 17.6 Z" fill="url(#mcG)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M4.6 7 L4.6 15" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/></svg>'; document.body.appendChild(cur); }
-      pintaCur(); avisar('🖱️ Modo mouse: L3 mueve · A hace clic · ZL + ZR para salir'); }
-    else { if (cur) { cur.remove(); cur = null; } avisar('🖱️ Saliste del modo mouse'); } }
+      pintaCur(); avisar('🖱️ Modo mouse: L3 mueve · A hace clic · mantén ZR para dibujar · ZL + ZR para salir'); }
+    else { if (cur) { cur.remove(); cur = null; } borrarTinta(); avisar('🖱️ Saliste del modo mouse (se borró lo dibujado)'); } }
+  // ✏️ dibujar en modo mouse: mantener ZR y mover la flecha deja una línea de colores; al salir del modo mouse se borra todo
+  let tinta = null, tctx = null, tUlt = null, tHue = 0;
+  function lienzo() {
+    if (tinta) return; tinta = document.createElement('canvas'); tinta.id = 'mandoTinta'; document.body.appendChild(tinta);
+    const dpr = Math.min(2, devicePixelRatio || 1); tinta.width = innerWidth * dpr; tinta.height = innerHeight * dpr; tctx = tinta.getContext('2d'); tctx.scale(dpr, dpr);
+    tctx.lineCap = 'round'; tctx.lineJoin = 'round';
+  }
+  function trazo(abajo) {
+    if (cur) cur.classList.toggle('pinta', !!abajo);
+    if (!abajo) { tUlt = null; return; }
+    lienzo(); const x = mx, y = my;
+    if (!tUlt) { tctx.fillStyle = `hsl(${tHue},95%,55%)`; tctx.beginPath(); tctx.arc(x, y, 4.5, 0, 7); tctx.fill(); tUlt = [x, y]; return; }   // un puntito al empezar
+    const d = Math.hypot(x - tUlt[0], y - tUlt[1]); if (d < 1) return;
+    tctx.strokeStyle = `hsl(${tHue},95%,55%)`; tctx.lineWidth = 9; tctx.beginPath(); tctx.moveTo(tUlt[0], tUlt[1]); tctx.lineTo(x, y); tctx.stroke();
+    tHue = (tHue + d * 0.35) % 360; tUlt = [x, y];
+  }
+  function borrarTinta() { if (tinta) tinta.remove(); tinta = tctx = tUlt = null; }
+  addEventListener('resize', () => { if (tinta) { borrarTinta(); } });
   const pintaCur = () => { if (cur) cur.style.transform = `translate(${mx}px, ${my}px)`; };
   function evento(tipo, el, extra = {}) { const o = { bubbles: true, cancelable: true, composed: true, clientX: mx, clientY: my, button: 0, buttons: tipo.endsWith('down') ? 1 : 0, view: window, ...extra };
     el.dispatchEvent(tipo.startsWith('pointer') ? new PointerEvent(tipo, { pointerId: 9, pointerType: 'mouse', isPrimary: true, ...o }) : new MouseEvent(tipo, o)); }
@@ -238,6 +256,8 @@
   #mandoCur svg { position: absolute; left: -4.5px; top: -4.5px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); transform-origin: 4.5px 4.5px; animation: mcBaila 1.6s ease-in-out infinite; }   /* la punta queda justo donde hace clic */
   #mandoCur .halo { position: absolute; left: -26px; top: -26px; width: 52px; height: 52px; border-radius: 50%; background: conic-gradient(#facc15, #fb923c, #ec4899, #8b5cf6, #22d3ee, #4ade80, #facc15); -webkit-mask: radial-gradient(circle, transparent 54%, #000 56%); mask: radial-gradient(circle, transparent 54%, #000 56%); opacity: .85; animation: mcGira 2.4s linear infinite, mcLatido 1.2s ease-in-out infinite; }
   #mandoCur .onda { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; border-radius: 50%; border: 5px solid #facc15; opacity: 0; }
+  #mandoTinta { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 2147483646; pointer-events: none; }
+  #mandoCur.pinta .halo { animation: none; opacity: 1; scale: .7; } #mandoCur.pinta svg { animation: none; }
   #mandoCur.clic svg { animation: mcClic .3s ease; } #mandoCur.clic .onda { animation: mcOnda .5s ease-out; }
   @keyframes mcClic { 50% { transform: scale(.78); } } @keyframes mcBaila { 50% { transform: rotate(-6deg) scale(1.04); } }
   @keyframes mcGira { to { rotate: 360deg; } } @keyframes mcLatido { 50% { scale: 1.18; opacity: .55; } }
@@ -329,7 +349,7 @@
       if (!o && prev[i] && GR && i === grBtn) cerrarGrupos();           // soltaste ZL: se cierran los grupos
       prev[i] = o; });
     [6, 7].forEach(i => { if (pend[i] != null && ahora - pend[i] > 160) { delete pend[i]; if (!combo) { ultimo = i; boton(i); if (!on[i] && GR && i === grBtn) cerrarGrupos(); } } });
-    if (MM) { moverMouse(g.axes[0] || 0, g.axes[1] || 0, g.axes[3] || 0, k60); if (ver) ver(null, g); raf = requestAnimationFrame(leer); return; }   // modo mouse: los joysticks mueven la flecha y bajan la página
+    if (MM) { moverMouse(g.axes[0] || 0, g.axes[1] || 0, g.axes[3] || 0, k60); trazo(on[7] && !on[6] && !combo && !panelAbierto()); if (ver) ver(null, g); raf = requestAnimationFrame(leer); return; }   // modo mouse: los joysticks mueven la flecha y bajan la página
     if (ZM) { const x = g.axes[0] || 0, y = g.axes[1] || 0; if (Math.abs(x) > 0.15 || Math.abs(y) > 0.15) mirar(x * k60, y * k60); }
     [['l', 0], ['r', 2]].forEach(([k, ax]) => { const x = g.axes[ax] || 0, y = g.axes[ax + 1] || 0;      // la dirección que más se empuja: ← → ↑ ↓
       if (ZM && k === 'l') return;
@@ -514,7 +534,7 @@
   function pintarPanel() {
     P.innerHTML = `<div class="mp" role="dialog" aria-label="Mando de control"><div class="hd"><h2>🎮 Mando de control</h2><button class="x" type="button" aria-label="Cerrar">✕</button></div><div class="con"><p class="est"></p><button type="button" data-con>🔌 Conectar mando</button><button type="button" data-ens hidden>🧭 Enseñar mi mando</button></div><div class="ens" hidden></div><div class="ayuda" hidden></div>
       <div class="gr"><div>${padSvg()}<div class="ult">${SEL == null ? '👆 Presiona un botón de tu mando (o tócalo en el dibujo) para elegir qué hace.' : `<span>Botón <b>${esc(NOM[SEL])}</b>:</span> <select data-b="${SEL}">${opciones(acciones(), CFG.b[SEL] || 'nada')}</select>`}</div>
-        <p class="hint">Mientras este panel está abierto, el mando no mueve el aula: sólo se prueba. Ciérralo para usarlo.<br>🖱️ <b>ZL + ZR juntos</b>: modo mouse (L3 mueve la flecha, A hace clic, R3 baja la página). Otra vez ZL + ZR para salir.</p></div>
+        <p class="hint">Mientras este panel está abierto, el mando no mueve el aula: sólo se prueba. Ciérralo para usarlo.<br>🖱️ <b>ZL + ZR juntos</b>: modo mouse (L3 mueve la flecha, A hace clic, R3 baja la página, <b>mantén ZR para dibujar</b>). Otra vez ZL + ZR para salir y se borra lo dibujado.</p></div>
       <div class="lst">${lista()}</div></div>
       <div class="ft"><label class="sw"><input type="checkbox" data-on${CFG.on ? ' checked' : ''}> Usar el mando en el aula y en la Biblioteca</label><span style="flex:1"></span><button type="button" data-reset style="background:#334155;color:#fff">↺ Volver a lo de fábrica</button><button type="button" class="x" style="width:auto;height:auto;border-radius:999px;background:#22c55e;color:#052e16">✓ Listo</button></div></div>`;
     pintaEstado(); if (SEL != null) marcarSel();
