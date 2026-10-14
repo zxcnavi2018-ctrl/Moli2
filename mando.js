@@ -104,7 +104,7 @@
     if (a.startsWith('an:') && window.RemotoCmd) return window.RemotoCmd('an', a.slice(3));
   }
 
-  function cerrarAnim() { if (window.Anuncio && Anuncio.abierto()) { Anuncio.cerrar(); return true; } if (window.Muro && Muro.abierto()) { Muro.cerrar(); return true; } const an = document.getElementById('anim'); if (an && an.classList.contains('on') && !an.classList.contains('fuera')) { an.click(); return true; } return false; }
+  function cerrarAnim() { if (achicarVideo()) return true; if (window.Anuncio && Anuncio.abierto()) { Anuncio.cerrar(); return true; } if (window.Muro && Muro.abierto()) { Muro.cerrar(); return true; } const an = document.getElementById('anim'); if (an && an.classList.contains('on') && !an.classList.contains('fuera')) { an.click(); return true; } return false; }
   // ---- 🔍 zoom de la cámara (− aleja, + acerca) ----
   let uz = 0, ZM = false, px = 0, py = 0, zmEl = null;
   function zoom(d) { uz = Math.max(-30, Math.min(16, uz + d * 6)); modoZoom(true);
@@ -145,24 +145,30 @@
 
   // ---- 🎬 videos de YouTube (en las hojas o la proyección): Captura inicia / pausa, R3 agranda, R3 ← → salta 10 s ----
   const VT = new WeakMap(), VP = new WeakMap(), VV = new WeakMap();
-  const vids = () => [...document.querySelectorAll('.vid')].filter(v => { const r = v.getBoundingClientRect(); return r.width > 40 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth; });
+  const vids = () => [...document.querySelectorAll('.vid, .cv-vbox')].filter(v => { const r = v.getBoundingClientRect(); return r.width > 40 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth; });
   const videoVisible = () => vids().some(v => v.querySelector('iframe'));
   addEventListener('message', e => { if (!/youtube/.test(e.origin)) return; let d = e.data; try { d = typeof d === 'string' ? JSON.parse(d) : d; } catch (er) { return; }
-    const f = [...document.querySelectorAll('.vid iframe')].find(x => x.contentWindow === e.source); if (!f || !d || !d.info) return;
+    const f = [...document.querySelectorAll('.vid iframe, .cv-vbox iframe')].find(x => x.contentWindow === e.source); if (!f || !d || !d.info) return;
     if (typeof d.info.currentTime === 'number') VT.set(f, d.info.currentTime); if (typeof d.info.playerState === 'number') VP.set(f, d.info.playerState); if (typeof d.info.volume === 'number') VV.set(f, d.info.volume); });
   const yt = (f, func, args = []) => f.contentWindow && f.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
   const escuchar = f => { if (f.dataset.esc) return; f.dataset.esc = '1'; const go = () => f.contentWindow && f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1 }), '*'); go(); f.addEventListener('load', go); setTimeout(go, 1500); };
   function videoPlay() { const V = vids(); if (!V.length) return;
     const f = V.map(v => v.querySelector('iframe')).find(Boolean); if (!f) { const b = V.find(v => v.dataset.a === 'video'); if (b) { b.click(); setTimeout(() => { const n = document.querySelector('.vid.on iframe'); if (n) escuchar(n); }, 300); } return; }
     escuchar(f); const st = VP.get(f); yt(f, st === 1 ? 'pauseVideo' : 'playVideo'); VP.set(f, st === 1 ? 2 : 1); }
-  function videoGrande() { const v = vids().find(x => x.querySelector('iframe')) || document.querySelector('.vid.grande'); if (!v) return videoPlay();
+  function achicarVideo() { const v = document.querySelector('.vid.grande, .cv-vbox.grande'); if (!v) return false; v.classList.remove('grande'); return true; }   // B: el video agrandado vuelve a su lugar
+  function videoTocar(f) {                                            // modo mouse: A sobre un video lo inicia o lo pausa
+    if (f.tagName === 'VIDEO') { f.paused ? f.play().catch(() => {}) : f.pause(); return true; }
+    if (f.tagName !== 'IFRAME' || !/youtube/.test(f.src)) return false;
+    escuchar(f); const st = VP.has(f) ? VP.get(f) : /autoplay=1/.test(f.src) ? 1 : -1; yt(f, st === 1 ? 'pauseVideo' : 'playVideo'); VP.set(f, st === 1 ? 2 : 1); return true;
+  }
+  function videoGrande() { const v = vids().find(x => x.querySelector('iframe, video')) || document.querySelector('.vid.grande, .cv-vbox.grande'); if (!v) return videoPlay();
     v.classList.toggle('grande'); }
   function videoSalto(s) { const f = vids().map(v => v.querySelector('iframe')).find(Boolean); if (!f) return; escuchar(f);
     const t = Math.max(0, (VT.get(f) || 0) + s); yt(f, 'seekTo', [t, true]); VT.set(f, t); avisar(s > 0 ? '⏩ +10 s' : '⏪ −10 s'); }
   function videoVol(s) { const f = vids().map(v => v.querySelector('iframe')).find(Boolean); if (!f) return; escuchar(f);
     const v = Math.max(0, Math.min(100, (VV.has(f) ? VV.get(f) : 100) + s)); if (v > 0) yt(f, 'unMute'); yt(f, 'setVolume', [v]); VV.set(f, v); avisar((v ? '🔊 Volumen ' : '🔇 Volumen ') + v + '%'); }
   const cssV = document.createElement('style');
-  cssV.textContent = `.vid.grande { position: fixed !important; inset: 3vh 3vw !important; width: auto !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; margin: 0 !important; z-index: 2147483000 !important; background: #000; box-shadow: 0 0 0 100vmax rgba(0,0,0,.75); border-radius: 14px !important; }`;
+  cssV.textContent = `.vid.grande, .cv-vbox.grande { position: fixed !important; inset: 3vh 3vw !important; width: auto !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; margin: 0 !important; z-index: 2147483000 !important; background: #000; box-shadow: 0 0 0 100vmax rgba(0,0,0,.75); border-radius: 14px !important; }`;
   document.head.appendChild(cssV);
 
   // ---- ⏱️ cronómetro: Y lo abre, las flechas eligen el tiempo, A lo pone, B sale ----
@@ -269,6 +275,7 @@
       (c && c !== document.body ? c : document.scrollingElement || document.documentElement).scrollBy(0, s * 22 * k); }
   }
   function clicMouse() { const el = bajo(); if (!el) return; if (cur) { cur.classList.remove('clic'); void cur.offsetWidth; cur.classList.add('clic'); }
+    if (videoTocar(el)) return;                                       // un video de YouTube no recibe clics de afuera: se le manda «play/pausa»
     evento('pointerdown', el); evento('mousedown', el); if (/INPUT|TEXTAREA|SELECT/.test(el.tagName)) el.focus();
     evento('pointerup', el); evento('mouseup', el); evento('click', el); }
   const cssM = document.createElement('style');
