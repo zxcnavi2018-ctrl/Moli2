@@ -618,8 +618,8 @@ async function openArt(id) {
   ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
   ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
   ${w.st === 'ok' ? '<button type="button" class="btn soft pdfb" data-pdf>📄 Descargar PDF</button>' : ''}
-  ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Consejo para el estudiante (obligatorio si lo devuelves). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
-    <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ ${ROLE.t ? 'Devolver (se borra)' : 'Devolver para mejorar'}</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
+  ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Comentario (opcional). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
+    <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver (se borra)</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
   ${ROLE.t && w.st === 'ok' && TAB === 'revista' ? '<div class="acts"><button type="button" class="btn soft" data-rv="pend">↩️ Quitar de la revista</button><button type="button" class="btn red" data-rv="del">🗑 Borrar</button></div>' : ''}
   </div></article>`;
   M.dataset.id = id; M._w = w;
@@ -631,9 +631,8 @@ $('#modal').addEventListener('click', async e => {
   if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
   const b = e.target.closest('[data-rv]'); if (!b) return;
   const id = M.dataset.id, act = b.dataset.rv, fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
-  const borra = act === 'del' || (act === 'no' && ROLE.t);           // la profe al devolver: se borra (con su Word) para que lo envíe corregido
-  if (act === 'no' && !ROLE.t && fb.length < 8) { toast('💬 Escribe un consejo para que el estudiante sepa qué mejorar.'); $('#rvFb').focus(); return; }
-  if (act === 'no' && ROLE.t && !confirm('Se devolverá y se BORRARÁ este trabajo (con su Word) para que el estudiante lo vuelva a enviar corregido. ¿Seguir?')) return;
+  const borra = act === 'del' || act === 'no';                       // al devolver (profe o Revisor): se borra con su Word para que lo envíe corregido
+  if (act === 'no' && !confirm('Se devolverá y se BORRARÁ este trabajo (con su Word) para que el estudiante lo vuelva a enviar corregido. ¿Seguir?')) return;
   if (act === 'del' && !confirm('¿Borrar este trabajo para siempre?')) return;
   const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
   M.querySelectorAll('[data-rv]').forEach(x => x.disabled = true);
@@ -648,7 +647,7 @@ $('#modal').addEventListener('click', async e => {
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
     if (act === 'ok') sinWord();                                       // aprobado: queda el librito con su información; el Word ya no hace falta
     M.hidden = true; M.innerHTML = '';
-    toast(act === 'no' && ROLE.t ? '✏️ Devuelto: se borró para que lo envíe corregido.' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
+    toast(act === 'no' ? '✏️ Devuelto: se borró para que lo envíe corregido.' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
     CACHE.ok = null; if (CACHE.pend) CACHE.pend = CACHE.pend.filter(x => x.id !== id);
     if (TAB === 'bandeja') drawBandeja(); else vRevista();
   } catch (x) { M.querySelectorAll('[data-rv]').forEach(y => y.disabled = false); toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
