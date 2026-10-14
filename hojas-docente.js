@@ -59,7 +59,7 @@
     };
     const refDe = (D, s, n) => { const o = ((D.rm || {})[s.key] || {})[n]; if (o) return o === 'ok';      // lo que marcó la docente manda
       const ms = D.mis.filter(m => m.ses && m.ses.n === n); if (!ms.length) return null; const p = D.mp[s.key] || {}; return ms.every(m => m.acts.every(a => pBool(p[a.id]))); };
-    const COD = { p: 30, c: 60, w: 80 }, TNOM = { p: '🙋 Participación', c: '🤝 Conducta', w: '🛠️ Trabajo en clase', r: '💪 Refuerzo' }, TCOR = { p: 'Particip.', c: 'Conducta', w: 'Trabajo', r: 'Refuerzo' };   // trabajo en clase (rúbrica): 80 + n
+    const COD = { e: 0, p: 30, c: 60, w: 80 }, TNOM = { e: '🎟️ Exit ticket', p: '🙋 Participación', c: '🤝 Conducta', w: '🛠️ Trabajo en clase', r: '💪 Refuerzo' }, TCOR = { p: 'Particip.', c: 'Conducta', w: 'Trabajo', r: 'Refuerzo' };   // trabajo en clase (rúbrica): 80 + n
     const OPS = t => t === 'p' ? [[1, '1'], [2, '2'], [3, '3'], [4, '+4']] : t === 'r' ? [['ok', '✅ Realizado'], ['pe', '⏳ Pendiente']] : [[4, 'AD'], [3, 'A'], [2, 'B'], [1, 'C']];
     const celdaRef = (F, s, n) => { const rf = refDe(F.D, s, n), man = (((F.D.rm || {})[s.key] || {})[n]);
       if (F.guarda === `r|${n}|${s.key}`) return '<span class="rg-c"><span class="rg-b">…</span></span>';
@@ -97,7 +97,7 @@
             const R = D.byS[e.key] || {}, x = R[n], rf = refDe(D, e, n);
             if (F.pick && F.pick.n === n && F.pick.s === e.key) { const t = F.pick.t;
               return `<div class="rg pick w"><span class="rg-n">${TNOM[t].split(' ')[0]} ${esc(nomCorto(e.name))}</span>${OPS(t).map(([v, tx]) => `<button class="rg-b" data-a="pon" data-v="${v}">${tx}</button>`).join('')}<button class="rg-b x" data-a="pon" data-v="0" title="${t === 'r' ? 'Quitar tu marca (vuelve a lo automático)' : 'Borrar la nota'}">✕</button></div>`; }
-            return `<div class="rg w"><span class="rg-n">${esc(nomCorto(e.name))}</span><span class="rg-c">${x ? nivelChip(x) : '<small>—</small>'}</span>${celda(F, e, n, 'w')}${celda(F, e, n, 'p')}${celda(F, e, n, 'c')}${celdaRef(F, e, n)}</div>`; }).join('') });
+            return `<div class="rg w"><span class="rg-n">${esc(nomCorto(e.name))}</span>${celda(F, e, n, 'e')}${celda(F, e, n, 'w')}${celda(F, e, n, 'p')}${celda(F, e, n, 'c')}${celdaRef(F, e, n)}</div>`; }).join('') });
       });
       return H;
     };
@@ -122,6 +122,7 @@
         const { t, n, s } = F.pick; F.pick = null;
         if (t === 'r') { F.guarda = `r|${n}|${s}`; F.libro.pinta(false); await guardarRef(F, [[s, n, ds.v === '0' ? '' : ds.v]]); F.guarda = null; return F.libro.pinta(false); }
         const v = +ds.v, code = COD[t] + n, e = F.D.est.find(x => x.key === s);
+        if (t === 'e' && !v && !confirm(`¿Borrar el Exit ticket de ${e ? e.name : 'este estudiante'} en la sesión ${n}?`)) return F.libro.pinta(false);
         F.guarda = `${t}|${n}|${s}`; F.libro.pinta(false);
         try { const r = await Docente.guardarNota(F.u, code, e, v); const R = F.D.byS[s] = F.D.byS[s] || {}; if (r) R[code] = r; else delete R[code]; }
         catch (x) { alert(errTxt(x)); }
