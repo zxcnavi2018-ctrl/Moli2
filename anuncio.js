@@ -3,7 +3,7 @@
 //  Si se cierra, se cierra; si no, el video sigue hasta el final y se cierra solo. Una vez por visita.
 // ===================================================================
 (function () {
-  const AN = { id: 'rc-2026-10', video: 'video/revisores-confiables.mp4', poster: 'video/revisores-confiables.jpg', titulo: 'Estudiantes RC · Revisores Confiables', hasta: '2026-11-15', espera: 15 };
+  const AN = { id: 'rc-2026-10', video: 'video/revisores-confiables.mp4', poster: 'video/revisores-confiables.jpg', titulo: 'Estudiantes RC · Revisores Confiables', hasta: '2026-10-18', espera: 15 };
   if (window.parent !== window) return;                                  // dentro de otra página (iframe) no sale
   if (new Date() > new Date(AN.hasta + 'T23:59:59')) return;            // pasada la fecha, ya no se muestra
   const KEY = 'moli2:anuncio:' + AN.id;
