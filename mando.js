@@ -282,12 +282,19 @@
     if (activo) gid = activo.index;
     return P.find(g => g.index === gid) || P.reduce((a, g) => (g.timestamp || 0) > (a.timestamp || 0) ? g : a, P[0]);
   }
-  function cruceta(g, on) {                                           // mandos «no estándar» (genéricos en PC): la cruceta llega como un eje (hat) y no como botones 12-15
+  const HAT = {};                                                       // ejes que sólo valen -1, 0 o 1 (cruceta como 2 ejes, típico en Firefox/Linux)
+  function cruceta(g, on) {                                           // mandos «no estándar» (genéricos en PC): la cruceta llega como eje(s) y no como botones 12-15
     if (g.mapping === 'standard') return;
     for (let i = on.length; i < 16; i++) on[i] = false;
-    const v = g.axes.length > 9 ? g.axes[9] : null; if (v == null || v > 1.05 || v < -1.05) return;
-    const k = Math.round((v + 1) / (2 / 7)) % 8;                     // 0 ↑ · 1 ↗ · 2 → · 3 ↘ · 4 ↓ · 5 ↙ · 6 ← · 7 ↖
-    on[12] = on[12] || [7, 0, 1].includes(k); on[13] = on[13] || [3, 4, 5].includes(k); on[14] = on[14] || [5, 6, 7].includes(k); on[15] = on[15] || [1, 2, 3].includes(k);
+    const A = g.axes, v = A.length > 9 ? A[9] : null;
+    if (v != null && v >= -1.05 && v <= 1.05 && !(A.length > 10)) {    // Chrome: la cruceta es un solo eje (hat) en el 9
+      const k = Math.round((v + 1) / (2 / 7)) % 8;                   // 0 ↑ · 1 ↗ · 2 → · 3 ↘ · 4 ↓ · 5 ↙ · 6 ← · 7 ↖
+      on[12] = on[12] || [7, 0, 1].includes(k); on[13] = on[13] || [3, 4, 5].includes(k); on[14] = on[14] || [5, 6, 7].includes(k); on[15] = on[15] || [1, 2, 3].includes(k); return;
+    }
+    const H = HAT[g.index] || (HAT[g.index] = A.map(x => x === 0 ? 1 : 0));   // 1 = puede ser cruceta (empezó en 0); si alguna vez da un valor intermedio, no lo es
+    for (let i = 4; i < A.length; i++) if (H[i] && A[i] !== 0 && A[i] !== 1 && A[i] !== -1) H[i] = 0;
+    for (let i = 4; i + 1 < A.length; i += 2) if (H[i] && H[i + 1]) {
+      const x = A[i], y = A[i + 1]; on[14] = on[14] || x < 0; on[15] = on[15] || x > 0; on[12] = on[12] || y < 0; on[13] = on[13] || y > 0; return; }
   }
   function leer() {
     raf = 0; const P = mandos(); if (!P.length) { prev = []; pintaEstado(); return; }
@@ -403,7 +410,7 @@
       2️⃣ Apaga el mando. Préndelo manteniendo <b>Home + X</b> unos 3 segundos, hasta que las luces parpadeen (si no cambia nada, prueba <b>Home + A</b> y luego <b>Home + B</b>).<br>
       3️⃣ Vuelve a buscarlo en Bluetooth: ahora debe salir con <b>otro nombre</b> (por ejemplo «Xbox Wireless Controller», «Gamepad» o «Wireless Controller»). Conéctalo.<br>
       4️⃣ Vuelve aquí, toca <b>🔌 Conectar mando</b> y aprieta un botón.<br>
-      🔁 Otra opción: un <b>cable USB-C de datos</b> (enchúfalo manteniendo <b>Home + X</b>).<br>
+      🔁 Otra opción: un <b>cable USB-C de datos</b> (enchúfalo manteniendo <b>Home + X</b>).<br>` + (linux && !/Firefox/.test(navigator.userAgent) ? `🦊 <b>Sin cambiar nada del mando:</b> abre Molí 2 en <b>Firefox</b> (ya viene en Ubuntu). En Linux, Firefox suele reconocer el Pro Controller aunque Chrome no.<br>` : '') + `
       🔎 Para comprobar si Chrome ya lo ve: <a href="https://hardwaretester.com/gamepad" target="_blank" rel="noopener">hardwaretester.com/gamepad</a>.` + tecnico;
   }
   function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const M = mandos(), g = M.length ? elegirMando(M) : null; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : ' · (mapa no estándar: prueba cada botón)') : '⚪ Conecta tu mando (Bluetooth o cable USB) y, con esta página abierta, presiona cualquier botón para que aparezca.'; } }
