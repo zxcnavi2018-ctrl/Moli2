@@ -28,7 +28,7 @@
   const temaDe = (s, n) => L(s.title) ? s.title : (() => { const m = String(s.meta || '').trim().replace(/\.$/, ''); return m ? (m.length > 80 ? m.slice(0, 78).replace(/\s+\S*$/, '') + '…' : m) : 'Sesión ' + n; })();
   const temaCorto = (u, s, n) => {                                     // el tema: el título de la sesión, o el que Molí le puso en «Mi presentación» (sin repetir la meta)
     if (L(s.title)) return s.title;
-    const S = MD.sesionesDe(u), k = S.findIndex(z => z.n === n), C = MD.LS.get(hashQ({ u, s, n, prev: k > 0 ? S[k - 1] : null }), null);
+    const S = MD.sesionesDe(u), k = S.findIndex(z => z.n === n), C = cacheIA(hashQ({ u, s, n, prev: k > 0 ? S[k - 1] : null }));
     return C && L(C.t) ? C.t : '';
   };
   const nivelChip = r => { const v = MD.nivel(r); return `<span class="lv" style="background:${v.color};color:${v.ink}">${v.k}</span>`; };
@@ -536,6 +536,19 @@
   const CV_PAL = [['#7c3aed', '#06b6d4'], ['#0ea5e9', '#22c55e'], ['#f97316', '#ec4899'], ['#2563eb', '#8b5cf6'], ['#14b8a6', '#6366f1'], ['#e11d48', '#f59e0b']];
   const CV_ROL = [['🎤', 'SPEAKER', 'Presenta y habla por el equipo'], ['🧰', 'HELPER', 'Trae y organiza los materiales'], ['⏱️', 'TIMER', 'Cuida el tiempo del equipo'], ['🎨', 'DESIGNER', 'Hace que el trabajo se vea bonito y ordenado']];
   const CV_ACU = [['✋', 'Levantar la mano para participar'], ['🤫', 'No conversamos en clase'], ['🪑', 'Nos quedamos en nuestro sitio']];
+  // ---- lo que devuelve la IA de Molí se revisa antes de mostrarlo: nada de «borradores», inglés o textos pegados ----
+  const RARO = /\b(let'?s|json|string|valid|wait|standard|make it|output|field|error|->)\b|[{}<>\[\]|\\]|\b[pdesw]\s*:/i;
+  const limpio = (t, max) => { t = String(t == null ? '' : t).replace(/\s+/g, ' ').trim(); return t && t.length <= max && !RARO.test(t) ? t : ''; };
+  const palabraOk = p => { p = limpio(p, 32); return p && /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ\- ]*$/.test(p) && p.split(' ').length <= 3 && !/[a-záéíóúñ][A-ZÁÉÍÓÚÑ]/.test(p) ? p : ''; };
+  function limpiarIA(R) {
+    if (!R || typeof R !== 'object' || R._fallo) return R;
+    const o = { ...R }, Q = a => (Array.isArray(a) ? a : []).map(x => limpio(x, 160)).filter(x => x && /\?\s*$/.test(x)).slice(0, 3);
+    o.t = limpio(R.t, 60); o.s = limpio(R.s, 260); ['r', 'a1', 'a2', 'a3'].forEach(k => { o[k] = Q(R[k]); });
+    const w = R.w || {}, p = palabraOk(w.p), d = limpio(w.d, 220);
+    o.w = p && d ? { p, d, e: limpio(w.e, 180) } : null;                 // si la palabra nueva salió rara, esa diapositiva no se muestra
+    return o;
+  }
+  const cacheIA = k => { const C = MD.LS.get(k, null); return C ? limpiarIA(C) : null; };
   const hashQ = it => { const t = JSON.stringify([it.u.title, it.s.title, it.s.meta, actsDe(it.u, it.s).slice(0, 3).map(x => x && [x.title, x.desc]), it.prev && [it.prev.s.title, it.prev.s.meta]]); let h = 5381; for (let i = 0; i < t.length; i++) h = (h * 33 ^ t.charCodeAt(i)) >>> 0; return 'moli2:cv:' + h.toString(36); };
   function flujoPresentacion(host) {
     const P = { L: [], i: 0, ia: {}, pide: new Set() };
@@ -546,7 +559,7 @@
         const ss = MD.sesionesDe(u).filter(({ s }) => L(s.title) || L(s.meta) || (s.activities || []).some(actOk));
         Lst.push({ k: 'uni', u, ss });
         ss.forEach(({ s, n }, q) => {
-          const b = { u, s, n, prev: q ? ss[q - 1] : null }, C = MD.LS.get(hashQ(b), null) || {};
+          const b = { u, s, n, prev: q ? ss[q - 1] : null }, C = cacheIA(hashQ(b)) || {};
           Lst.push({ ...b, k: 'ses' }, { ...b, k: 'meta' }, { ...b, k: 'mq' });
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
@@ -581,11 +594,11 @@ Devuelve JSON:
 - "a1", "a2", "a3": 2 preguntas cada una para DESPUÉS de esa actividad, sobre lo que hicieron, observaron o descubrieron en ella (si la actividad no existe, lista vacía).`;
       try {
         const R = await MD.pensar(pr, { type: 'OBJECT', properties: { t: { type: 'STRING' }, w: { type: 'OBJECT', properties: { p: { type: 'STRING' }, d: { type: 'STRING' }, e: { type: 'STRING' } } }, s: { type: 'STRING' }, c: { type: 'ARRAY', items: { type: 'INTEGER' } }, r: A, a1: A, a2: A, a3: A }, required: ['t', 'r', 'a1', 'a2', 'a3'] });
-        MD.LS.set(k, R); const cur = P.L[P.i]; armar(); if (cur) P.i = Math.max(0, P.L.findIndex(z => z.k === cur.k && z.u === cur.u && z.n === cur.n && z.j === cur.j)); pinta(false);
+        MD.LS.set(k, limpiarIA(R)); const cur = P.L[P.i]; armar(); if (cur) P.i = Math.max(0, P.L.findIndex(z => z.k === cur.k && z.u === cur.u && z.n === cur.n && z.j === cur.j)); pinta(false);
       } catch (e) { MD.LS.set(k, { _fallo: Date.now() }); pinta(false); }
     }
-    const preguntasDe = it => { const C = MD.LS.get(hashQ(it), null), key = it.k === 'aq' ? 'a' + it.j : 'r'; if (C && Array.isArray(C[key]) && C[key].length) return { q: C[key] }; pedirIA(it); return { q: plantilla(it), wait: P.pide.has(hashQ(it)) && !C }; };
-    const tema = it => { if (L(it.s.title)) return it.s.title; const C = MD.LS.get(hashQ(it), null); return C && L(C.t) ? C.t : temaDe(it.s, it.n); };
+    const preguntasDe = it => { const C = cacheIA(hashQ(it)), key = it.k === 'aq' ? 'a' + it.j : 'r'; if (C && Array.isArray(C[key]) && C[key].length) return { q: C[key] }; pedirIA(it); return { q: plantilla(it), wait: P.pide.has(hashQ(it)) && !C }; };
+    const tema = it => { if (L(it.s.title)) return it.s.title; const C = cacheIA(hashQ(it)); return C && L(C.t) ? C.t : temaDe(it.s, it.n); };
     const color = u => CV_PAL[(parseInt(u.num, 10) || 1) % CV_PAL.length];
     const crumb = it => `<div class="cv-crumb">${esc(it.u.icon || '📘')} Unidad ${esc(it.u.num)} · ${esc(it.u.title)} <b>Sesión ${it.n}</b></div>`;
     function slide(it) {
@@ -598,7 +611,7 @@ Devuelve JSON:
       if (it.k === 'acu') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">🤝 Acuerdos de convivencia</h2><ul class="cv-cards cv-c3">${CV_ACU.map(([i, t]) => `<li class="cv-role"><span>${i}</span><b>${t}</b></li>`).join('')}</ul></div>`;
       if (it.k === 'mq' || it.k === 'aq') { const Q = preguntasDe(it), tt = it.k === 'aq' ? `Sobre la actividad ${it.j}${L(it.x.title) ? ': ' + esc(it.x.title) : ''}` : it.prev ? `Recordamos la sesión ${it.prev.n}` : '¡Empezamos la unidad!';
         return mol(it.k === 'aq' ? 'curiosa' : it.prev ? 'pensativa' : 'hola', `<p class="cv-mqt">${tt}</p><ol>${Q.q.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${Q.wait ? '<p class="cv-think">✨ Molí está leyendo la sesión…</p>' : ''}`); }
-      if (it.k === 'voc' || it.k === 'sab') { const C = MD.LS.get(hashQ(it), null) || {}, w = C.w || {};
+      if (it.k === 'voc' || it.k === 'sab') { const C = cacheIA(hashQ(it)) || {}, w = C.w || {};
         return it.k === 'voc' ? mol('idea', `<p class="cv-mqt">📖 Palabra nueva</p><p class="cv-vw">${esc(w.p)}</p><p class="cv-vd">${esc(w.d)}</p>${L(w.e) ? `<p class="cv-ve">✏️ Ejemplo: ${esc(w.e)}</p>` : ''}`)
           : mol('estrellas', `<p class="cv-mqt">💡 ¿Sabías que…?</p><p class="cv-sb">${esc(C.s)}</p>`); }
       if (it.k === 'ref') return mol('pensativa', '<p class="cv-mqt">🪞 Nuestra última reflexión de la sesión</p><ol><li>¿Qué aprendí el día de hoy?</li><li>¿Qué necesité para alcanzar la meta?</li><li>¿Cómo o dónde aplicaría lo que aprendí?</li></ol>');
@@ -607,7 +620,7 @@ Devuelve JSON:
         if (it.p === 'en') return `<div class="cv-sl cv-reto" ${st}>${top}<div class="cv-rcard"><div class="cv-ren">${x.en.map(t => `<p>${esc(t)}</p>`).join('')}${L(x.ej) ? `<p class="cv-rej">💬 ${esc(x.ej)}</p>` : ''}</div><p class="cv-rpr">🦫 ${esc(x.pr)}</p></div></div>`;
         if (it.p === 'pis') return `<div class="cv-sl cv-reto" ${st}>${top}<div class="cv-rcard"><ul class="cv-pis">${x.pistas.map(([n, t], k) => `<li><span class="cv-pk">Pista ${k + 1}</span><span class="cv-dig">${[...n].map(c => `<i>${c}</i>`).join('')}</span><span class="cv-pt">${esc(t)}</span></li>`).join('')}</ul><p class="cv-rpr">🔐 ${esc(x.pr)} <span class="cv-dig cv-qq"><i>?</i><i>?</i><i>?</i></span></p></div></div>`;
         return `<div class="cv-sl cv-reto" ${st}>${top}<div class="cv-rfig">${fotoHtml({ img: x.fig, title: x.title }, 'cv-fimg cv-big')}</div><p class="cv-rpr cv-rbar">🦫 ${esc(x.pr)}</p></div>`; }
-      if (it.k === 'act') { const x = it.x, m = MODOS[String(x.mode || '').toLowerCase()], C = (s.criteria || []).filter(L), Q = MD.LS.get(hashQ(it), null) || {}, ai = Q.c && +Q.c[it.j - 1], c = C[(ai >= 1 && ai <= C.length ? ai : Math.min(it.j, C.length)) - 1];
+      if (it.k === 'act') { const x = it.x, m = MODOS[String(x.mode || '').toLowerCase()], C = (s.criteria || []).filter(L), Q = cacheIA(hashQ(it)) || {}, ai = Q.c && +Q.c[it.j - 1], c = C[(ai >= 1 && ai <= C.length ? ai : Math.min(it.j, C.length)) - 1];
         if (L(x.img)) return `<div class="cv-sl cv-foto" ${st}>${crumb(it)}<div class="cv-fw"><div class="cv-ftx"><div class="cv-acth"><span class="cv-num">${it.j}</span><h2 class="cv-h2" style="margin:0">Actividad ${it.j}</h2></div>${m ? `<span class="cv-pill">${m}</span>` : ''}${L(x.title) ? `<h3 class="cv-at">${esc(x.title)}</h3>` : ''}${L(x.desc) ? `<p class="cv-box">${esc(x.desc)}</p>` : ''}${c ? `<div class="cv-crb"><b>✅ Criterio de éxito</b>${esc(c)}</div>` : ''}</div>${fotoHtml(x, 'cv-fimg')}</div></div>`;
         return `<div class="cv-sl" ${st}>${crumb(it)}<div class="cv-acth"><span class="cv-num">${it.j}</span><h2 class="cv-h2" style="margin:0">Actividad ${it.j}</h2>${m ? `<span class="cv-pill">${m}</span>` : ''}</div>${c ? `<div class="cv-crb"><b>✅ Criterio de éxito</b>${esc(c)}</div>` : ''}${L(x.title) ? `<h3 class="cv-at">${esc(x.title)}</h3>` : ''}${L(x.desc) ? `<p class="cv-lead cv-box">${esc(x.desc)}</p>` : ''}${L(x.ficha) ? `<span class="cv-pill">📄 ${esc(x.ficha)}</span>` : ''}</div>`; }
       const qs = ((s.ticket && s.ticket.questions) || []).filter(x => x && L(x.q));
