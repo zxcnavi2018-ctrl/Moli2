@@ -2441,6 +2441,17 @@ animHooks.push((t, dt) => {
     talkEl.style.translate = B.x.toFixed(1) + 'px ' + B.y.toFixed(1) + 'px';
     talkEl.style.setProperty('--tail', B.t.toFixed(1) + 'px'); talkEl.style.setProperty('--ox', (w - B.t - 10).toFixed(0) + 'px');
   }
+  const tm = document.getElementById('tmx');                          // ⏱️ el cronómetro va al lado de Molí, a la altura de su pancita, y lo sigue
+  if (tm && tm.classList.contains('on')) {
+    moli.root.updateMatrixWorld(); camera.updateMatrixWorld();
+    headV.set(0, 2.02, 0).applyMatrix4(moli.root.matrixWorld).project(camera); const hy = (1 - headV.y) / 2 * innerHeight;
+    headV.set(0, 0.95, 0).applyMatrix4(moli.root.matrixWorld).project(camera);
+    const x = (headV.x + 1) / 2 * innerWidth, y = (1 - headV.y) / 2 * innerHeight, w = tm.offsetWidth, h = tm.offsetHeight, alto = Math.max(40, (y - hy) * 2);
+    const left = Math.max(8, Math.min(innerWidth - w - 8, x < innerWidth * 0.5 ? x + alto * 0.42 + 10 : x - alto * 0.42 - w - 10)),   // hacia el centro de la pantalla
+          top = Math.max(8, Math.min(innerHeight - h - 76, y - h / 2));
+    const T = MO.tm && tm.classList.contains('pegado') ? MO.tm : (MO.tm = { x: left, y: top }), k = 1 - Math.exp(-12 * dt);
+    T.x += (left - T.x) * k; T.y += (top - T.y) * k; tm.classList.add('pegado'); tm.style.translate = T.x.toFixed(1) + 'px ' + T.y.toFixed(1) + 'px';
+  } else if (tm && tm.style.translate) { tm.classList.remove('pegado'); tm.style.translate = ''; }
 });
 afterRender.push(() => { renderer.autoClear = false; renderer.render(moliScene, camera); renderer.autoClear = true; });
 const mrc = new THREE.Raycaster(), mndc = new THREE.Vector2();

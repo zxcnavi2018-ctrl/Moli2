@@ -372,6 +372,9 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
   box-shadow: 0 5px 0 rgba(43,37,71,.25); font: 900 26px system-ui; color: #1d4ed8; transition: transform .5s cubic-bezier(.3,1.5,.5,1); }
 #tmx.on { transform: translate(-50%, 0); } #tmx img { width: 46px; height: 46px; } #tmx.warn { color: #dc2626; animation: tmLat 1s ease-in-out infinite; } #tmx.end { background: #fee2e2; }
 @keyframes tmLat { 50% { transform: translate(-50%, 0) scale(1.06); } }
+#tmx.on.pegado { left: 0; top: 0; transform: none; transition: none; animation: tmIn .45s cubic-bezier(.3,1.5,.5,1); }   /* en el aula: al lado de Molí, lo sigue */
+#tmx.on.pegado.warn { animation: tmLat2 1s ease-in-out infinite; }
+@keyframes tmIn { from { scale: .2; opacity: 0; } } @keyframes tmLat2 { 50% { scale: 1.08; } }
 /* animaciones de clase */
 #anim { position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: center; overflow: hidden; font-family: "Trebuchet MS", system-ui, sans-serif; color: #fff; cursor: pointer; }
 #anim.on { display: flex; animation: anIn .45s ease both; } #anim.fuera { animation: anOut .45s ease both; }
