@@ -371,7 +371,7 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
 #herr .rc-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } #herr .rc-eq button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px; border: 2.5px solid #2b2547; border-radius: 18px; background: #f8fafc; box-shadow: 0 4px 0 #2b2547; cursor: pointer; }
 #herr .rc-eq i { font-style: normal; font-size: 40px; } #herr .rc-eq b { font-size: 15px; } #herr .rc-eq small { color: #64748b; font-size: 12px; }
 /* temporizador */
-#tmx { position: fixed; top: 10px; left: 50%; transform: translate(-50%, -150%); z-index: 70; display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 6px; border: 3px solid #2b2547; border-radius: 999px; background: #fff;
+#tmx { position: fixed; top: 10px; left: 50%; transform: translate(-50%, -150%); z-index: 2147483050; display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 6px; border: 3px solid #2b2547; border-radius: 999px; background: #fff;
   box-shadow: 0 5px 0 rgba(43,37,71,.25); font: 900 26px system-ui; color: #1d4ed8; transition: transform .5s cubic-bezier(.3,1.5,.5,1); }
 #tmx.on { transform: translate(-50%, 0); } #tmx img { width: 46px; height: 46px; } #tmx.warn { color: #dc2626; animation: tmLat 1s ease-in-out infinite; } #tmx.end { background: #fee2e2; }
 @keyframes tmLat { 50% { transform: translate(-50%, 0) scale(1.06); } }
@@ -379,7 +379,7 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
 #tmx.on.pegado.warn { animation: tmLat2 1s ease-in-out infinite; }
 @keyframes tmIn { from { scale: .2; opacity: 0; } } @keyframes tmLat2 { 50% { scale: 1.08; } }
 /* animaciones de clase */
-#anim { position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: center; overflow: hidden; font-family: "Trebuchet MS", system-ui, sans-serif; color: #fff; cursor: pointer; }
+#anim { position: fixed; inset: 0; z-index: 2147483100;   /* animaciones: siempre encima de todo (imagen o video agrandado, proyección, cuaderno) */ display: none; align-items: center; justify-content: center; overflow: hidden; font-family: "Trebuchet MS", system-ui, sans-serif; color: #fff; cursor: pointer; }
 #anim.on { display: flex; animation: anIn .45s ease both; } #anim.fuera { animation: anOut .45s ease both; }
 #anim.azul { background: radial-gradient(70% 80% at 50% 45%, rgba(30,64,175,.92), rgba(11,23,54,.97)); } #anim.naranja { background: radial-gradient(70% 80% at 50% 45%, rgba(249,115,22,.92), rgba(124,45,18,.97)); }
 #anim.rojo { background: radial-gradient(70% 80% at 50% 45%, rgba(220,38,38,.9), rgba(69,10,10,.97)); } #anim.claro { background: radial-gradient(70% 80% at 50% 45%, rgba(255,255,255,.96), rgba(219,234,254,.97)); color: #1e293b; }

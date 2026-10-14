@@ -116,7 +116,7 @@
     if (!on && zmEl) { zmEl.remove(); zmEl = null; } }
   function mirar(x, y) { if (!(window.G && G.TOUR)) return; px = Math.max(-0.7, Math.min(0.7, px - x * 0.015)); py = Math.max(-0.45, Math.min(0.45, py - y * 0.012)); G.TOUR.px = px; G.TOUR.py = py; }
   const cssZ = document.createElement('style');
-  cssZ.textContent = `#zoomM { position: fixed; left: 50%; top: 14px; transform: translateX(-50%); z-index: 70; padding: 10px 18px; border-radius: 999px; background: rgba(15,23,42,.85); color: #fff; font: 700 16px "Trebuchet MS", system-ui, sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,.3); pointer-events: none; } #zoomM b { color: #facc15; }`;
+  cssZ.textContent = `#zoomM { position: fixed; left: 50%; top: 14px; transform: translateX(-50%); z-index: 2147483060; padding: 10px 18px; border-radius: 999px; background: rgba(15,23,42,.85); color: #fff; font: 700 16px "Trebuchet MS", system-ui, sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,.3); pointer-events: none; } #zoomM b { color: #facc15; }`;
   document.head.appendChild(cssZ);
   // ---- 📰 en la Revista: L / R cambian de pestaña, la cruceta baja o sube, B vuelve al aula ----
   function enRevista(a) {
@@ -185,7 +185,7 @@
     crI = (crI + m + TIEMPOS.length) % TIEMPOS.length; pintaCrono();
   }
   const cssC = document.createElement('style');
-  cssC.textContent = `#cronoM { position: fixed; inset: 0; z-index: 85; display: grid; place-items: center; background: rgba(15,23,42,.5); font-family: "Trebuchet MS", system-ui, sans-serif; }
+  cssC.textContent = `#cronoM { position: fixed; inset: 0; z-index: 2147483080; display: grid; place-items: center; background: rgba(15,23,42,.5); font-family: "Trebuchet MS", system-ui, sans-serif; }
   #cronoM .cm { background: #fff; border: 4px solid #2b2547; border-radius: 24px; padding: 20px 24px; text-align: center; box-shadow: 0 8px 0 #2b2547, 0 30px 60px rgba(0,0,0,.4); }
   #cronoM h3 { margin: 0; font: 900 30px "Trebuchet MS", sans-serif; color: #1e3a8a; } #cronoM p { margin: 6px 0 14px; font-weight: 700; color: #475569; }
   #cronoM .cg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; } #cronoM button { border: 3px solid #cbd5e1; border-radius: 16px; padding: 14px 18px; background: #f8fafc; font: 900 22px "Trebuchet MS", sans-serif; color: #1e293b; cursor: pointer; }
@@ -196,7 +196,7 @@
     if (GR) { grI = (grI + m + 6) % 6; return pintaGrupos(); }
     if (CR) { crI = (crI + m + TIEMPOS.length) % TIEMPOS.length; pintaCrono(); } }
   const cssG = document.createElement('style');
-  cssG.textContent = `#gruposM { position: fixed; inset: 0; z-index: 85; display: grid; place-items: center; background: rgba(15,23,42,.45); font-family: "Trebuchet MS", system-ui, sans-serif; }
+  cssG.textContent = `#gruposM { position: fixed; inset: 0; z-index: 2147483080; display: grid; place-items: center; background: rgba(15,23,42,.45); font-family: "Trebuchet MS", system-ui, sans-serif; }
   #gruposM .gm { background: #fff; border: 4px solid #2b2547; border-radius: 24px; padding: 20px 24px; text-align: center; box-shadow: 0 8px 0 #2b2547, 0 30px 60px rgba(0,0,0,.4); }
   #gruposM h3 { margin: 0; font: 900 30px "Trebuchet MS", sans-serif; color: #1e3a8a; } #gruposM p { margin: 6px 0 14px; font-weight: 700; color: #475569; }
   #gruposM .gg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; } #gruposM button { min-width: 170px; border: 4px solid var(--c); border-radius: 18px; padding: 16px 18px; background: #fff; font: 900 26px "Trebuchet MS", sans-serif; color: var(--c); cursor: pointer; }
