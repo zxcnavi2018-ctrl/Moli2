@@ -12,6 +12,7 @@
   const visto = a => { try { return !!sessionStorage.getItem('moli2:anuncio:' + a.id); } catch (e) { return false; } };
   const COLA = ANS.filter(a => new Date() <= new Date(a.hasta + 'T23:59:59') && !visto(a));   // pasada la fecha o ya visto, no sale
   let abierto = false;
+  const esDocente = () => { try { if (window.MD && MD.esDocente) return MD.esDocente(); const m = JSON.parse(localStorage.getItem('moli2:me') || 'null'); return !!(m && (m.docente || m.teacher)); } catch (e) { return false; } };   // al profe no le salen estos videos
 
   const css = document.createElement('style');
   css.textContent = `
@@ -28,7 +29,7 @@
   document.head.appendChild(css);
 
   // otros videos (p. ej. el tutorial de la laptop) entran a la misma cola: una vez por visita
-  window.AnuncioVer = a => { if (visto(a) || COLA.some(x => x.id === a.id)) return; COLA.push(a); if (!abierto) mostrar(COLA.length - 1); };
+  window.AnuncioVer = a => { if (esDocente() || visto(a) || COLA.some(x => x.id === a.id)) return; COLA.push(a); if (!abierto) mostrar(COLA.length - 1); };
   function mostrar(i) {
     const AN = COLA[i], KEY = 'moli2:anuncio:' + AN.id; abierto = true;
     const el = document.createElement('div'); el.id = 'anuncio'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', AN.titulo);
@@ -37,7 +38,7 @@
     try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
     const v = el.querySelector('video'), cu = el.querySelector('.cuenta'), x = el.querySelector('.ax'), so = el.querySelector('.son'), bar = el.querySelector('.bar');
     let falta = AN.espera, cerrado = false;
-    const cerrar = () => { if (cerrado) return; cerrado = true; clearInterval(T); v.pause(); el.classList.remove('on'); setTimeout(() => { el.remove(); abierto = false; if (COLA[i + 1]) mostrar(i + 1); }, 380); };   // y luego el siguiente anuncio
+    const cerrar = () => { if (cerrado) return; cerrado = true; clearInterval(T); v.pause(); el.classList.remove('on'); setTimeout(() => { el.remove(); abierto = false; if (COLA[i + 1] && !esDocente()) mostrar(i + 1); }, 380); };   // y luego el siguiente anuncio
     const T = setInterval(() => { falta--; if (falta > 0) cu.textContent = falta; else { clearInterval(T); cu.remove(); x.hidden = false; } }, 1000);
     v.play().catch(() => { v.muted = true; so.hidden = false; v.play().catch(() => {}); });     // el navegador a veces no deja sonido sin un toque: va en silencio con el botón 🔊
     const sonido = () => { if (!v.muted) return; v.muted = false; so.hidden = true; v.play().catch(() => {}); };
@@ -49,6 +50,6 @@
     const esc = e => { if (cerrado) return removeEventListener('keydown', esc); if (e.key === 'Escape' && !x.hidden) cerrar(); }; addEventListener('keydown', esc);
     window.Anuncio = { cerrar: () => { if (!x.hidden) cerrar(); }, abierto: () => !cerrado };
   }
-  const ir = () => setTimeout(() => { if (COLA.length && !abierto) mostrar(0); }, 900);
+  const ir = () => setTimeout(() => { if (COLA.length && !abierto && !esDocente()) mostrar(0); }, 900);
   if (document.readyState === 'complete') ir(); else addEventListener('load', ir, { once: true });
 })();
