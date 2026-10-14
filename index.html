@@ -2120,7 +2120,8 @@ const STOPS = [
   { name: '💻 La laptop', title: 'Repositorio Educativo', ...FOCUS.laptop,
     async enter() { const sc = this.obj.userData.screen.material.color, c0 = new THREE.Color(0x0b1220), c1 = new THREE.Color(0x3b82f6), c2 = new THREE.Color(0xf8fbff), h = this.obj.userData.hinge;
       await tween(1000, k => { h.rotation.x = LID_CLOSED + (LID_OPEN - LID_CLOSED) * k; }, outBack);   // se abre la tapa con rebote
-      await tween(300, k => sc.copy(c0).lerp(c1, k)); await wait(250); const sm = this.obj.userData.screen.material; sm.map = REPO_TEX || (REPO_TEX = repoScreenTex()); sm.needsUpdate = true; await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen); },
+      await tween(300, k => sc.copy(c0).lerp(c1, k)); await wait(250); const sm = this.obj.userData.screen.material; sm.map = REPO_TEX || (REPO_TEX = repoScreenTex()); sm.needsUpdate = true; await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen);
+      if (window.AnuncioVer) AnuncioVer({ id: 'tut-citar', video: 'video/tutorial-citar.mp4', poster: 'video/tutorial-citar.jpg', titulo: 'Tutorial · ¿Cómo citar a un autor?', espera: 30 }); },   // tutorial al llegar a la laptop (una vez por visita)
     async leave() { const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k)); const sm = this.obj.userData.screen.material; sm.map = null; sm.needsUpdate = true;
       const h = this.obj.userData.hinge; await tween(650, k => { h.rotation.x = LID_OPEN + (LID_CLOSED - LID_OPEN) * k; }, inCubic); } },   // se apaga y se cierra
   { name: '📌 El corcho', title: 'Mi corcho de unidad', ...FOCUS.corcho },
