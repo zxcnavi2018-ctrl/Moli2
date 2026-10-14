@@ -232,6 +232,9 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
 .bk .rg small { color: #64748b; min-width: 1.8em; text-align: center; font-size: .82em; } .bk .rg .lv { font-size: .8em; }
 .bk .rg-b { min-width: 1.9em; padding: .05em .2em; border: 2px solid #94a3b8; border-radius: .5em; background: #fff; font: 800 .9em system-ui; color: #94a3b8; cursor: pointer; }
 .bk .rg-b.on { border-color: #2b2547; color: #1e293b; background: #e0f2fe; } .bk .rg-b.cAD { background: #dcfce7; } .bk .rg-b.cA { background: #e0f2fe; } .bk .rg-b.cB { background: #fef9c3; } .bk .rg-b.cC { background: #fee2e2; }
+.bk .rg .rg-n { min-width: 6.5em; } .bk .rg .rg-c { width: 2.75em; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1.1; }
+.bk .rg.rg-h .rg-c { font-size: .95em; } .bk .rg.rg-h .rg-c i { font-style: normal; font-size: .56em; letter-spacing: -.01em; font-weight: 900; color: #334155; white-space: nowrap; }
+.bk .rg-q { margin-top: .15em; border: 0; border-radius: 999px; padding: .1em .35em; background: #fde68a; color: #92400e; font: 900 .58em system-ui; cursor: pointer; white-space: nowrap; } .bk .rg-q:hover { background: #facc15; }
 .bk .rg.pick { background: #fff7ed; border-radius: .5em; } .bk .rg.pick .rg-b { color: #1e293b; border-color: #2b2547; } .bk .rg.pick .rg-b.x { color: #dc2626; }
 .bk .dist { display: flex; height: 1.6em; border: 2px solid #2b2547; border-radius: .6em; overflow: hidden; margin: .3em 0; font: 800 .75em system-ui; }
 .bk .dist i { display: grid; place-items: center; font-style: normal; } .bk .dist .dAD { background: #12224a; color: #fff; } .bk .dist .dA { background: #2f6fed; color: #fff; } .bk .dist .dB { background: #8fb2f5; } .bk .dist .dC { background: #c9dafb; } .bk .dist .d0 { background: #f1f5f9; color: #64748b; }

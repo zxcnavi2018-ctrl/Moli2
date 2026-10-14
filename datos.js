@@ -8,7 +8,7 @@
   const DOC = (col, id) => `projects/${FB.projectId}/databases/(default)/documents/${col}/${id}`;
   const GRADE = '6to';
   // códigos de Molí para las otras notas que registra la docente (en la misma colección de Exit tickets)
-  const PART = 30, PROD = 50, CUAD = 51, COND = 60;
+  const PART = 30, PROD = 50, CUAD = 51, COND = 60, TRAB = 80;            // TRAB + n: trabajo en clase de la sesión n (rúbrica)
 
   // ---- formato de Firestore ----
   const toV = v => typeof v === 'number' ? (Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v })
@@ -123,9 +123,15 @@
     if (!r.ok) { const e = await r.json().catch(() => ({})), st = e.error && e.error.status; if (st === 'ALREADY_EXISTS' || st === 'FAILED_PRECONDITION') return ticket(u.key, n, me); throw new Error(st || 'HTTP ' + r.status); }
     return { ...res, createdAt: Date.now() };
   }
+  // 💪 refuerzo marcado a mano por la docente (Realizado / Pendiente), por unidad: files/frf<unidad>-0 → { s: { claveEstudiante: { n: 'ok' | 'pe' } } }
+  const RFF = k => 'frf' + String(k).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20) + '-0';
+  async function refuerzoManual(uKey) {
+    try { const r = await fetch(`${BASE}/files/${RFF(uKey)}?key=${FB.apiKey}`, { cache: 'no-store' }); if (!r.ok) return {};
+      const j = await r.json(), v = j.fields && j.fields.b64 && j.fields.b64.stringValue; return v ? (JSON.parse(decodeURIComponent(escape(atob(v)))).s || {}) : {}; } catch (e) { return {}; }
+  }
   async function ticketsDe(u, me) {                                      // los Exit tickets de la unidad (y las notas que registra la docente)
     if (me.demo) { const o = {}; sesionesDe(u).forEach(({ n }) => { const t = LS.get('moli2:demo:' + ticketId(u.key, n, me.key), null); if (t) o[n] = t; }); return o; }
-    const ns = []; sesionesDe(u).forEach(({ n }) => ns.push(n, PART + n, COND + n)); ns.push(PROD, CUAD);
+    const ns = []; sesionesDe(u).forEach(({ n }) => ns.push(n, PART + n, COND + n, TRAB + n)); ns.push(PROD, CUAD);
     const o = {};
     for (let i = 0; i < ns.length; i += 12) await Promise.all(ns.slice(i, i + 12).map(async n => { try { const t = await ticket(u.key, n, me); if (t) o[n] = t; } catch (e) {} }));
     return o;
@@ -219,5 +225,5 @@
   }
 
   window.MD = { abrirPdf, pensarCon, _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
-    PART, PROD, CUAD, COND, cargarMisiones, misionesDe, avance, marcarActividad, misionCompleta, pensar, LS, lleno, contenido: () => contenido };
+    PART, PROD, CUAD, COND, TRAB, RFF, refuerzoManual, cargarMisiones, misionesDe, avance, marcarActividad, misionCompleta, pensar, LS, lleno, contenido: () => contenido };
 })();

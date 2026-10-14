@@ -53,42 +53,75 @@
   function registro() {
     const F = base('Registro', '📂', 'Elige la unidad: verás el registro de 6° A, B, C y D. Se llena solo con los Exit tickets; tú pones participación y conducta. ✏️');
     F.datos = async (u, sec) => {
-      const [est, T, M] = await Promise.all([estDe(sec), Docente.ticketsUnidad(u.key, sec), Docente.misionesTodos().catch(() => [])]);
+      const [est, T, M, rm] = await Promise.all([estDe(sec), Docente.ticketsUnidad(u.key, sec), Docente.misionesTodos().catch(() => []), MD.refuerzoManual(u.key)]);
       const mp = {}; M.forEach(m => { mp[m.key] = m.p; });
-      return { est, byS: porEst(T), mp, mis: MD.misionesDe(u.key) };
+      return { est, byS: porEst(T), mp, mis: MD.misionesDe(u.key), rm };
     };
-    const refDe = (D, s, n) => { const ms = D.mis.filter(m => m.ses && m.ses.n === n); if (!ms.length) return null; const p = D.mp[s.key] || {}; return ms.every(m => m.acts.every(a => pBool(p[a.id]))); };
+    const refDe = (D, s, n) => { const o = ((D.rm || {})[s.key] || {})[n]; if (o) return o === 'ok';      // lo que marcó la docente manda
+      const ms = D.mis.filter(m => m.ses && m.ses.n === n); if (!ms.length) return null; const p = D.mp[s.key] || {}; return ms.every(m => m.acts.every(a => pBool(p[a.id]))); };
+    const COD = { p: 30, c: 60, w: 80 }, TNOM = { p: '🙋 Participación', c: '🤝 Conducta', w: '🛠️ Trabajo en clase', r: '💪 Refuerzo' }, TCOR = { p: 'Particip.', c: 'Conducta', w: 'Trabajo', r: 'Refuerzo' };   // trabajo en clase (rúbrica): 80 + n
+    const OPS = t => t === 'p' ? [[1, '1'], [2, '2'], [3, '3'], [4, '+4']] : t === 'r' ? [['ok', '✅ Realizado'], ['pe', '⏳ Pendiente']] : [[4, 'AD'], [3, 'A'], [2, 'B'], [1, 'C']];
+    const celdaRef = (F, s, n) => { const rf = refDe(F.D, s, n), man = (((F.D.rm || {})[s.key] || {})[n]);
+      if (F.guarda === `r|${n}|${s.key}`) return '<span class="rg-c"><span class="rg-b">…</span></span>';
+      return `<span class="rg-c"><button class="rg-b${rf === null ? '' : ' on'}${rf ? ' cAD' : rf === false ? ' cB' : ''}" data-a="nota" data-t="r" data-n="${n}" data-s="${s.key}" title="${man ? 'Marcado por ti' : 'Automático (misiones)'}">${rf === null ? '·' : rf ? '✅' : '⏳'}</button></span>`; };
+    async function guardarRef(F, cambios) {                             // guarda las marcas de refuerzo de la unidad (un solo archivo)
+      const rm = F.D.rm = F.D.rm || {}, antes = JSON.stringify(rm);
+      cambios.forEach(([k, n, v]) => { const o = rm[k] = rm[k] || {}; if (v) o[n] = v; else { delete o[n]; if (!Object.keys(o).length) delete rm[k]; } });
+      try { const todo = { ...(await MD.refuerzoManual(F.u.key)) }; Object.keys(todo).forEach(k => { if (F.D.est.some(e => e.key === k)) delete todo[k]; }); Object.assign(todo, rm);   // no pisa a las otras secciones
+        await Docente.commit([{ update: { name: Docente.DOC('files', MD.RFF(F.u.key)), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, s: todo, at: Date.now() })))), updatedAt: new Date() }) } }]); }
+      catch (x) { F.D.rm = JSON.parse(antes); alert(errTxt(x)); }
+    }
     const celda = (F, s, n, t) => {
-      const D = F.D, r = (D.byS[s.key] || {})[t === 'p' ? 30 + n : 60 + n], k = `${t}|${n}|${s.key}`;
-      if (F.guarda === k) return '<span class="rg-b">…</span>';
+      const D = F.D, r = (D.byS[s.key] || {})[COD[t] + n], k = `${t}|${n}|${s.key}`;
+      if (F.guarda === k) return '<span class="rg-c"><span class="rg-b">…</span></span>';
       const v = r ? (t === 'p' ? PAV[MD.partic(r)] : MD.nivel(r).k) : '·';
-      return `<button class="rg-b${r ? ' on' : ''}${t === 'c' && r ? ' c' + MD.nivel(r).k : ''}" data-a="nota" data-t="${t}" data-n="${n}" data-s="${s.key}">${v}</button>`;
+      return `<span class="rg-c"><button class="rg-b${r ? ' on' : ''}${t !== 'p' && r ? ' c' + MD.nivel(r).k : ''}" data-a="nota" data-t="${t}" data-n="${n}" data-s="${s.key}">${v}</button></span>`;
     };
     F.paginas = (cab) => {
       const u = F.u, D = F.D, S = MD.sesionesDe(u);
       if (!D.est.length) return [{ l: cab + '<p class="hand w">No hay estudiantes en esta sección todavía. Créalos con «Crear cuenta con Molí» (tu fotocheck).</p>', r: '' }];
       const res = D.est.map(s => { const R = D.byS[s.key] || {}, ex = S.map(x => R[x.n]).filter(Boolean), pr = MD.promedio(ex), pa = S.map(x => R[30 + x.n]).filter(Boolean);
         const refs = S.map(x => refDe(D, s, x.n)).filter(v => v !== null);
-        return `<div class="rg w"><span class="rg-n">${esc(nomCorto(s.name))}</span><span>${pr ? nivelChip(pr) : '<small>—</small>'}</span><small>${ex.length}/${S.length}</small><small>🙋${pa.reduce((a, r) => a + MD.partic(r), 0)}</small><small>${refs.length ? '💪' + refs.filter(Boolean).length + '/' + refs.length : ''}</small></div>`; }).join('');
-      const H = [{ l: cab + `<p class="hand w">${D.est.length} estudiantes · ${S.length} sesiones.</p><p class="hand w">Pasa la hoja: en cada sesión tocas 🙋 o 🤝 para poner la nota. Se guarda al toque. ✅</p>
-          <div class="box w"><b>Leyenda</b><br><small>🎟️ Exit ticket · 🙋 Participación (1 a +4) · 🤝 Conducta (AD/A/B/C) · 💪 Refuerzo</small></div>`,
-        r: `<h2 class="w">🏁 Resumen de la unidad</h2><div class="rg rg-h w"><span class="rg-n">Estudiante</span><span>🎟️</span><small>hechos</small><small>🙋</small><small>💪</small></div>${res}` }];
+        const tw = MD.promedio(S.map(x => R[80 + x.n]).filter(Boolean));
+        return `<div class="rg w"><span class="rg-n">${esc(nomCorto(s.name))}</span><span class="rg-c">${pr ? nivelChip(pr) : '<small>—</small>'}</span><span class="rg-c"><small>${ex.length}/${S.length}</small></span><span class="rg-c">${tw ? nivelChip(tw) : '<small>—</small>'}</span><span class="rg-c"><small>${pa.reduce((a, r) => a + MD.partic(r), 0)}</small></span><span class="rg-c"><small>${refs.length ? refs.filter(Boolean).length + '/' + refs.length : ''}</small></span></div>`; }).join('');
+      const H = [{ l: cab + `<p class="hand w">${D.est.length} estudiantes · ${S.length} sesiones.</p><p class="hand w">Pasa la hoja: en cada sesión tocas la casilla de cada estudiante para poner su nota, o usas <b>⚡ Llenar</b> para poner la misma nota a todos los que faltan. Se guarda al toque. ✅</p>
+          <div class="box w"><b>Leyenda</b><br><small>🎟️ Exit ticket (sumativa) · 🛠️ Trabajo en clase: rúbrica AD/A/B/C (sumativa) · 🙋 Participación 1 a +4 · 🤝 Conducta AD/A/B/C · 💪 Refuerzo</small></div>`,
+        r: `<h2 class="w">🏁 Resumen de la unidad</h2><div class="rg rg-h w"><span class="rg-n">Estudiante</span><span class="rg-c">🎟️<i>Exit</i></span><span class="rg-c">✔<i>hechos</i></span><span class="rg-c">🛠️<i>Trabajo</i></span><span class="rg-c">🙋<i>Particip.</i></span><span class="rg-c">💪<i>Refuerzo</i></span></div>${res}` }];
       S.forEach(({ s, n }) => {
         const resp = D.est.filter(e => (D.byS[e.key] || {})[n]), pr = MD.promedio(resp.map(e => D.byS[e.key][n]));
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · 6° ${F.sec}</div><div class="big w">Sesión ${n}</div><h2 class="w">${esc(temaDe(s, n))}</h2>${secBar(F)}
-            <p class="hand w">🎟️ Exit ticket: <b>${resp.length} de ${D.est.length}</b> respondieron${pr ? ' · promedio ' + nivelChip(pr) : ''}.</p><p class="hand w">Toca 🙋 o 🤝 en cada estudiante para poner su nota.</p>`,
-          r: `<div class="rg rg-h w"><span class="rg-n">Sesión ${n}</span><span>🎟️</span><span>🙋</span><span>🤝</span><span>💪</span></div>` + D.est.map(e => {
+            <p class="hand w">🎟️ Exit ticket: <b>${resp.length} de ${D.est.length}</b> respondieron${pr ? ' · promedio ' + nivelChip(pr) : ''}.</p><p class="hand w">Toca la casilla de cada estudiante para poner su nota, o <b>⚡ Llenar</b> para ponerla a todos los que faltan.</p>${F.llenando ? `<p class="hand w" style="color:#b45309">⏳ ${esc(F.llenando)}</p>` : ''}`,
+          r: `<div class="rg rg-h w"><span class="rg-n">Sesión ${n}</span><span class="rg-c">🎟️<i>Exit</i></span>${['w', 'p', 'c', 'r'].map(t => `<span class="rg-c">${TNOM[t].split(' ')[0]}<i>${TCOR[t]}</i><button class="rg-q" data-a="llenar" data-t="${t}" data-n="${n}" title="Llenado rápido: lo mismo a todos los que faltan">⚡ Llenar</button></span>`).join('')}</div>`
+            + (F.fill && F.fill.n === n ? `<div class="rg pick w"><span class="rg-n">⚡ ${TNOM[F.fill.t]}: poner a todos los que faltan</span>${OPS(F.fill.t).map(([v, tx]) => `<button class="rg-b" data-a="llenaTodos" data-v="${v}">${tx}</button>`).join('')}<button class="rg-b x" data-a="llenaTodos" data-v="0">✕</button></div>` : '')
+            + D.est.map(e => {
             const R = D.byS[e.key] || {}, x = R[n], rf = refDe(D, e, n);
-            if (F.pick && F.pick.n === n && F.pick.s === e.key) { const t = F.pick.t, ops = t === 'p' ? [[1, '1'], [2, '2'], [3, '3'], [4, '+4']] : [[4, 'AD'], [3, 'A'], [2, 'B'], [1, 'C']];
-              return `<div class="rg pick w"><span class="rg-n">${t === 'p' ? '🙋' : '🤝'} ${esc(nomCorto(e.name))}</span>${ops.map(([v, tx]) => `<button class="rg-b" data-a="pon" data-v="${v}">${tx}</button>`).join('')}<button class="rg-b x" data-a="pon" data-v="0">✕</button></div>`; }
-            return `<div class="rg w"><span class="rg-n">${esc(nomCorto(e.name))}</span><span>${x ? nivelChip(x) : '<small>—</small>'}</span>${celda(F, e, n, 'p')}${celda(F, e, n, 'c')}<span>${rf === null ? '' : rf ? '✅' : '⏳'}</span></div>`; }).join('') });
+            if (F.pick && F.pick.n === n && F.pick.s === e.key) { const t = F.pick.t;
+              return `<div class="rg pick w"><span class="rg-n">${TNOM[t].split(' ')[0]} ${esc(nomCorto(e.name))}</span>${OPS(t).map(([v, tx]) => `<button class="rg-b" data-a="pon" data-v="${v}">${tx}</button>`).join('')}<button class="rg-b x" data-a="pon" data-v="0" title="${t === 'r' ? 'Quitar tu marca (vuelve a lo automático)' : 'Borrar la nota'}">✕</button></div>`; }
+            return `<div class="rg w"><span class="rg-n">${esc(nomCorto(e.name))}</span><span class="rg-c">${x ? nivelChip(x) : '<small>—</small>'}</span>${celda(F, e, n, 'w')}${celda(F, e, n, 'p')}${celda(F, e, n, 'c')}${celdaRef(F, e, n)}</div>`; }).join('') });
       });
       return H;
     };
     F.act2 = async (a, ds) => {
-      if (a === 'nota') { F.pick = { t: ds.t, n: +ds.n, s: ds.s }; return F.libro.pinta(false); }
+      if (a === 'nota') { F.pick = { t: ds.t, n: +ds.n, s: ds.s }; F.fill = null; return F.libro.pinta(false); }
+      if (a === 'llenar') { F.fill = F.fill && F.fill.t === ds.t && F.fill.n === +ds.n ? null : { t: ds.t, n: +ds.n }; F.pick = null; return F.libro.pinta(false); }
+      if (a === 'llenaTodos') {                                       // ⚡ llenado rápido: la misma nota a todos los que todavía no la tienen
+        const { t, n } = F.fill; F.fill = null;
+        if (t === 'r') { if (!ds.v || ds.v === '0' || F.llenando) return F.libro.pinta(false);       // refuerzo: a todos los que no tienen marca tuya
+          const L = F.D.est.filter(e => !(((F.D.rm || {})[e.key] || {})[n])); if (!L.length) { alert('Ya marcaste el refuerzo de todos. Para cambiar uno, toca su casilla.'); return F.libro.pinta(false); }
+          F.llenando = 'Guardando refuerzos…'; F.libro.pinta(false); await guardarRef(F, L.map(e => [e.key, n, ds.v])); F.llenando = ''; return F.libro.pinta(false); }
+        const v = +ds.v; if (!v || F.llenando) return F.libro.pinta(false);
+        const code = COD[t] + n, L = F.D.est.filter(e => !(F.D.byS[e.key] || {})[code]);
+        if (!L.length) { F.llenando = ''; alert('Todos ya tienen esa nota. Para cambiar una, toca su casilla.'); return F.libro.pinta(false); }
+        let ok = 0, mal = 0; const pinta = () => { F.llenando = `Llenando ${TNOM[t]}: ${ok + mal} de ${L.length}…`; F.libro.pinta(false); }; pinta();
+        for (let i = 0; i < L.length; i += 4) await Promise.all(L.slice(i, i + 4).map(async e => {
+          try { const r = await Docente.guardarNota(F.u, code, e, v); const R = F.D.byS[e.key] = F.D.byS[e.key] || {}; if (r) R[code] = r; ok++; } catch (x) { mal++; if (x.message === 'AUTH') throw x; } finally { pinta(); } })).catch(x => { alert(errTxt(x)); i = L.length; });
+        F.llenando = ''; F.libro.pinta(false); if (mal) alert(`⚠️ ${mal} nota${mal > 1 ? 's' : ''} no se guardaron. Revisa tu internet y vuelve a tocar ⚡ Llenar.`);
+        return;
+      }
       if (a === 'pon') {
-        const { t, n, s } = F.pick; F.pick = null; const v = +ds.v, code = t === 'p' ? 30 + n : 60 + n, e = F.D.est.find(x => x.key === s);
+        const { t, n, s } = F.pick; F.pick = null;
+        if (t === 'r') { F.guarda = `r|${n}|${s}`; F.libro.pinta(false); await guardarRef(F, [[s, n, ds.v === '0' ? '' : ds.v]]); F.guarda = null; return F.libro.pinta(false); }
+        const v = +ds.v, code = COD[t] + n, e = F.D.est.find(x => x.key === s);
         F.guarda = `${t}|${n}|${s}`; F.libro.pinta(false);
         try { const r = await Docente.guardarNota(F.u, code, e, v); const R = F.D.byS[s] = F.D.byS[s] || {}; if (r) R[code] = r; else delete R[code]; }
         catch (x) { alert(errTxt(x)); }

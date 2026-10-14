@@ -375,12 +375,13 @@
       if (!F.u) return [hojaUnidades('Mis notas', '📂', 'Tus notas se registran solas: con tus Exit tickets y lo que tu profe anota en clase. 📝', F.me)];
       if (!F.T) return [{ l: cargando('Revisando tus notas…'), r: '' }];
       const u = F.u, T = F.T, S = MD.sesionesDe(u), Ms = MD.misionesDe(u.key);
-      const pags = S.map(({ s, n }) => { const r = T[n], pa = T[MD.PART + n], co = T[MD.COND + n], m = Ms.find(x => x.ses.n === n), mok = m && MD.misionCompleta(m, F.P || {});
+      const pags = S.map(({ s, n }) => { const r = T[n], pa = T[MD.PART + n], co = T[MD.COND + n], tw = T[MD.TRAB + n], m = Ms.find(x => x.ses.n === n), mok = m && MD.misionCompleta(m, F.P || {});
         return `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · Sesión ${n}</div><h2 class="w">${esc(temaDe(s, n))}</h2>
           ${fila('🎟️', 'Exit ticket', 'Cuánto lograste la meta de hoy.', r ? `${nivelChip(r)}<br><small>${r.score}/${r.total}</small>` : sin)}
+          ${fila('🛠️', 'Trabajo en clase', 'Lo que hiciste con tu equipo en la sesión (rúbrica).', tw ? `${nivelChip(tw)}<br><small>${esc(MD.nivel(tw).name)}</small>` : sin)}
           ${fila('🙋', 'Participación', 'Preguntar, responder, explicar y ayudar (1 a +4).', pa ? `<span class="lv" style="background:#e0f2fe;color:#075985">${MD.partic(pa) === 4 ? '+4' : MD.partic(pa)}</span>` : sin)}
           ${fila('🤝', 'Conducta', 'Cómo viviste las normas del aula.', co ? conducta(co) : sin)}
-          ${m ? fila('💪', 'Refuerzo', 'La misión de esta sesión.', mok ? '<span class="lv" style="background:#bbf7d0;color:#166534">✓</span>' : '<small class="hand">Pendiente</small>') : ''}`; });
+          ${(rv => m || rv ? fila('💪', 'Refuerzo', 'La misión de esta sesión.', (rv ? rv === 'ok' : mok) ? '<span class="lv" style="background:#bbf7d0;color:#166534">✓</span><br><small>Realizado</small>' : '<small class="hand">Pendiente</small>') : '')((F.RM || {})[n])}`; });
       const ex = S.map(({ n }) => T[n]).filter(Boolean), eg = MD.promedio(ex), pq = S.reduce((a, { n }) => a + MD.partic(T[MD.PART + n]), 0), cf = MD.promedio(S.map(({ n }) => T[MD.COND + n]));
       const G = r => r ? `${nivelChip(r)}<br><small>${esc(MD.nivel(r).name)}</small>` : sin;
       pags.push(`<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · ${esc(u.title)}</div><h2 class="w">🏁 Resumen de la unidad</h2>
@@ -388,6 +389,7 @@
         <p class="w"><b>El otro 50% sale de:</b></p>
         ${fila('📓', 'Cuaderno', 'Tus apuntes y tareas.', G(T[MD.CUAD]))}
         ${fila('🎟️', 'Exit tickets', 'El promedio de tus Exit tickets.', eg ? G(eg) : sin)}
+        ${(tg => fila('🛠️', 'Trabajo en clase', 'El promedio de tu trabajo en equipo.', tg ? G(tg) : sin))(MD.promedio(S.map(({ n }) => T[MD.TRAB + n]).filter(Boolean)))}
         ${fila('🙋', 'Participación', 'Todas tus participaciones.', pq ? `<span class="lv" style="background:#e0f2fe;color:#075985">${pq}</span>` : sin)}
         ${cf ? fila('🤝', 'Conducta de la unidad', 'Cómo viviste las normas en la unidad.', conducta(cf)) : ''}`);
       const H = [{ l: `<img class="moli w" src="${IMG('orgullosa')}" alt=""><div class="crumb w">${esc(F.me.name)} · 6° ${esc(F.me.section)}</div><h1 class="w">📂 Mis notas</h1><h2 class="w">${esc(u.icon || '📘')} Unidad ${esc(u.num)}: ${esc(u.title)}</h2>
@@ -401,7 +403,7 @@
     F.act = (a, ds, el) => {
       if (a === 'entrar') return entrarCon(F, el);
       if (a === 'unidad') return F.libro.pasar(1, () => { const u = MD.unidades().find(x => x.key === ds.k); F.u = u; F.T = null; F.i = 0; F.pestana = '📚 Unidades';
-        Promise.all([MD.ticketsDe(u, F.me), MD.cargarMisiones().then(() => MD.avance(F.me))]).then(([T, P]) => { F.T = T; F.P = P; F.libro.pinta(true); }).catch(() => { F.T = {}; F.libro.pinta(true); }); });
+        Promise.all([MD.ticketsDe(u, F.me), MD.cargarMisiones().then(() => MD.avance(F.me)), MD.refuerzoManual(u.key)]).then(([T, P, RM]) => { F.T = T; F.P = P; F.RM = (RM || {})[F.me.key] || {}; F.libro.pinta(true); }).catch(() => { F.T = {}; F.libro.pinta(true); }); });
     };
     F.alEntrar = () => F.libro.pasar(1, () => { F.i = 0; });
     F.iniciar = () => MD.cargar().then(() => { F.listo = true; F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
