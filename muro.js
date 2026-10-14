@@ -1,7 +1,7 @@
 // ===================================================================
 //  MOLÍ 2 · 🖼️ MURO DESTACABLE («Producto» en la barrita)
 //  La docente sube fotos de los mejores trabajos con el nombre del estudiante (o estudiantes).
-//  Cada trabajo se muestra como un collage automático y horizontal (1 foto = una grande; 2, 3 o 4 = lado a lado).
+//  Cada trabajo se muestra como un collage automático y horizontal (1 foto = una grande; 2, 3 o 4 = lado a lado; 5 o 6 = dos filas).
 //  En la pared del aula, el papelógrafo muestra los últimos trabajos pegados con cinta.
 //  Se guarda en Firebase (files/fmuroidx-0 = la lista; files/fm…-0 = las fotos de cada trabajo).
 // ===================================================================
@@ -26,7 +26,7 @@
       c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL_.revokeObjectURL(u); ok(c.toDataURL('image/jpeg', q)); }; im.onerror = () => { URL_.revokeObjectURL(u); no(new Error('IMG')); }; im.src = u; }); }
   const URL_ = window.URL;
   async function prepararFotos(files) {
-    for (const [max, q] of [[1280, 0.74], [1080, 0.68], [900, 0.62], [760, 0.58]]) {      // va bajando hasta que todo entre (≈ 850 KB)
+    for (const [max, q] of [[1280, 0.74], [1080, 0.68], [900, 0.62], [760, 0.58], [640, 0.55], [540, 0.5]]) {      // va bajando hasta que todo entre (≈ 850 KB)
       const imgs = []; for (const f of files) imgs.push(await achicar(f, max, q));
       if (imgs.join('').length < 850000) return imgs; }
     throw new Error('GRANDE');
@@ -73,6 +73,7 @@
   #muro .tr::before { content: ''; position: absolute; left: 50%; top: -10px; width: 90px; height: 22px; transform: translateX(-50%) rotate(-3deg); background: rgba(250,204,21,.8); border-radius: 3px; }
   .col { display: flex; gap: 6px; height: 220px; border-radius: 10px; overflow: hidden; background: #f1f5f9; }
   .col img { flex: 1 1 0; min-width: 0; height: 100%; object-fit: cover; } .col.u1 img { object-fit: contain; background: #0f172a; }
+  .col.u5, .col.u6 { flex-wrap: wrap; } .col.u5 img, .col.u6 img { flex: 1 1 30%; height: calc(50% - 3px); }
   .col .ph { flex: 1; display: grid; place-items: center; color: #94a3b8; font-weight: 800; }
   #muro .nm { margin-top: 8px; font-weight: 900; color: #1e3a8a; font-size: 17px; } #muro .tt { color: #475569; font-weight: 700; font-size: 14px; } #muro .dt { color: #94a3b8; font-size: 12.5px; font-weight: 700; }
   #muro .del { position: absolute; right: 10px; bottom: 10px; border: 0; border-radius: 999px; padding: 5px 10px; background: #fee2e2; color: #b91c1c; font: 900 12px "Trebuchet MS", sans-serif; cursor: pointer; }
@@ -88,7 +89,7 @@
   @media (max-width: 600px) { #muro .gal { grid-template-columns: 1fr; } .col { height: 180px; } }`;
   document.head.appendChild(css);
 
-  const collage = (imgs, cls = '') => `<div class="col u${Math.min(imgs.length, 4)} ${cls}">${imgs.length ? imgs.map(s => `<img src="${s}" alt="" loading="lazy">`).join('') : '<span class="ph">📷</span>'}</div>`;
+  const collage = (imgs, cls = '') => `<div class="col u${Math.min(imgs.length, 6)} ${cls}">${imgs.length ? imgs.map(s => `<img src="${s}" alt="" loading="lazy">`).join('') : '<span class="ph">📷</span>'}</div>`;
   async function pintar(msg) {
     if (!EL) return; const doc = esDoc();
     EL.innerHTML = `<div class="mw" role="dialog" aria-label="Muro Destacable"><div class="hd"><h2>🖼️ Muro Destacable</h2>${doc ? '<button type="button" class="btn" data-nuevo>➕ Subir trabajo</button>' : ''}<button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
@@ -101,15 +102,15 @@
   }
   function mostrarForm(msg) {
     const fm = EL.querySelector('.fm'); if (!fm) return;
-    fm.innerHTML = `<form><label>📷 Fotos del trabajo (1 a 4)</label><div class="fotos"><label class="pick">📁 Elegir fotos<input type="file" accept="image/*" multiple hidden name="f"></label><span class="cnt">Ninguna foto elegida</span></div><div class="prev"></div>
+    fm.innerHTML = `<form><label>📷 Fotos del trabajo (1 a 6)</label><div class="fotos"><label class="pick">📁 Elegir fotos<input type="file" accept="image/*" multiple hidden name="f"></label><span class="cnt">Ninguna foto elegida</span></div><div class="prev"></div>
       <label>✍️ Nombre del estudiante o estudiantes</label><input type="text" name="n" maxlength="120" placeholder="Ej.: Emilio Alarcón, Ana Quispe" required>
       <label>🏷️ Título del trabajo (opcional)</label><input type="text" name="t" maxlength="60" placeholder="Ej.: Maqueta de la célula">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="submit" class="btn">📌 Pegar en el muro</button><button type="button" class="btn" data-cancel style="background:#94a3b8;box-shadow:0 4px 0 #64748b">Cancelar</button><span class="msg">${msg && msg !== true ? msg : ''}</span></div></form>`;
     const f = fm.querySelector('form'), inp = f.elements.f;
-    inp.addEventListener('change', () => { const F = [...inp.files].slice(0, 4); f.querySelector('.cnt').textContent = F.length ? `${F.length} foto${F.length > 1 ? 's' : ''}${inp.files.length > 4 ? ' (sólo se usan 4)' : ''}` : 'Ninguna foto elegida';
+    inp.addEventListener('change', () => { const F = [...inp.files].slice(0, 6); f.querySelector('.cnt').textContent = F.length ? `${F.length} foto${F.length > 1 ? 's' : ''}${inp.files.length > 6 ? ' (sólo se usan 6)' : ''}` : 'Ninguna foto elegida';
       f.querySelector('.prev').innerHTML = F.length ? collage(F.map(x => URL_.createObjectURL(x))) : ''; });
     fm.querySelector('[data-cancel]').onclick = () => { fm.innerHTML = ''; };
-    f.addEventListener('submit', async e => { e.preventDefault(); const m = f.querySelector('.msg'), bt = f.querySelector('[type=submit]'), F = [...inp.files].slice(0, 4), n = f.elements.n.value.replace(/\s+/g, ' ').trim(), t = f.elements.t.value.replace(/\s+/g, ' ').trim();
+    f.addEventListener('submit', async e => { e.preventDefault(); const m = f.querySelector('.msg'), bt = f.querySelector('[type=submit]'), F = [...inp.files].slice(0, 6), n = f.elements.n.value.replace(/\s+/g, ' ').trim(), t = f.elements.t.value.replace(/\s+/g, ' ').trim();
       if (!F.length) { m.textContent = '📷 Elige al menos una foto.'; return; } if (n.length < 3) { m.textContent = '✍️ Escribe el nombre del estudiante o estudiantes.'; return; }
       bt.disabled = true; m.textContent = '⏳ Preparando las fotos…';
       try { const imgs = await prepararFotos(F), th = await achicar(F[0], 360, 0.6), id = 'fm' + Date.now().toString(36) + '-0';
