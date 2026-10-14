@@ -45,6 +45,8 @@ button{cursor:pointer}
 .pc.rc{border-color:#bfdbfe}.pc.rc .av{background:linear-gradient(135deg,#22c55e,#0a6aa1)}.pc.rc .cg{background:#dbeafe;color:#1e3a8a}
 .pc.vac{border-style:dashed;background:#f8fafc;box-shadow:none}.pc.vac .av{background:#e2e8f0;color:#94a3b8;box-shadow:0 0 0 4px #fff,0 0 0 7px #e2e8f0}.pc.vac h4{color:#94a3b8}
 .pc.aut{max-width:640px;border-color:#d4ecb8;background:var(--mint)}.pc.aut .av{background:linear-gradient(135deg,var(--green),var(--green2))}.pc.aut .cg{background:var(--green);color:var(--navy)}
+.pc.mini{padding:10px 8px;gap:3px}.pc.mini .av{width:44px;height:44px;font-size:17px}.pc.mini h4{font-size:15px;margin-top:4px}.pc.mini .cg{font-size:11px}
+.rc-fn{margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:12px 14px;border-radius:18px;background:#eff6ff;border:2px solid #bfdbfe;max-width:900px}.rc-fn b{width:100%;text-align:center;font:900 16px var(--serif);color:var(--navy)}.rc-fn span{padding:5px 11px;border-radius:999px;background:#fff;font-weight:800;font-size:13px;color:#1e3a8a}
 .eq-fn{margin:24px auto 0;max-width:900px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .eq-fn div{padding:14px;border-radius:18px;background:#fff;border:2px solid var(--line);font-weight:700;font-size:14px;color:var(--ink2)}.eq-fn b{display:block;font:900 17px var(--serif);color:var(--navy);margin-bottom:4px}
 @media (max-width:820px){.org .rama{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:0}.org .rama::before,.org .sec::before{display:none}.eq-fn{grid-template-columns:1fr}}
@@ -407,8 +409,8 @@ async function vEquipo() {
   try { if (!CACHE.ok) CACHE.ok = await query('ok', null, LIST_F); } catch (e) {}
   if (TAB !== 'equipo') return;
   const A = CACHE.ok || [], cuenta = n => A.filter(w => w.rv === n).length;
-  const FN_RC = ['📖 Lee con cuidado los trabajos', '✅ Aprueba los que están listos', '✏️ Devuelve con un consejo amable', '❌ Rechaza lo que no es de Ciencia'];
-  const rc = r => { const k = cuenta(r.n); return `<div class="pc rc"><span class="av">${esc(INI(r.n))}</span><h4>${esc(r.n)}</h4><span class="cg">🧐 Revisor Confiable</span><ul>${FN_RC.map(x => `<li>${x}</li>`).join('')}</ul>${k ? `<span class="nr">⭐ ${k} trabajo${k > 1 ? 's' : ''} aprobado${k > 1 ? 's' : ''}</span>` : ''}</div>`; };
+  const FN_RC = ['📖 Leen con cuidado los trabajos', '✅ Aprueban los que están listos', '✏️ Devuelven con un consejo amable', '❌ Rechazan lo que no es de Ciencia'];
+  const rc = (r, chico) => { const k = cuenta(r.n); return `<div class="pc rc${chico ? ' mini' : ''}"><span class="av">${esc(INI(r.n))}</span><h4>${esc(r.n)}</h4><span class="cg">🧐 Revisor Confiable</span>${chico ? '' : `<ul>${FN_RC.map(x => `<li>${x}</li>`).join('')}</ul>`}${k ? `<span class="nr">⭐ ${k} trabajo${k > 1 ? 's' : ''} aprobado${k > 1 ? 's' : ''}</span>` : ''}</div>`; };
   const vac = '<div class="pc vac"><span class="av">?</span><h4>¡Puesto libre!</h4><span class="cg">🧐 Revisor Confiable</span><ul><li>¿Te gusta leer? ¡Postula con tu profe!</li></ul></div>';
   const SEC = ['A', 'B', 'C', 'D'], otros = L.filter(r => !SEC.includes(r.c)), np = A.filter(w => w.sec).length;
   V.innerHTML = `<div class="eq-h"><h2>🧑‍🤝‍🧑 Equipo de la Revista Innovadora</h2><p>Ellos cuidan que cada trabajo publicado sea claro, verdadero y bien hecho. ¡Así funciona nuestra revista!</p></div>
@@ -416,8 +418,9 @@ async function vEquipo() {
     <div class="lvl"><div class="pc doc"><span class="av">CQ</span><h4>Prof. Christian Quispe Llerena</h4><span class="cg">🎓 Docente · Dirección de la Revista</span>
       <ul><li>🎯 Guía al equipo y a todos los autores</li><li>🧐 Nombra a los Revisores Confiables</li><li>✅ Revisa y publica trabajos</li><li>📚 Lleva lo mejor a la Biblioteca</li></ul></div></div>
     <div class="ln"></div>
-    <div class="rama">${SEC.map(x => { const R = L.filter(r => r.c === x); return `<div class="sec"><b>6.° ${x}</b>${R.length ? R.map(rc).join('') : vac}</div>`; }).join('')}</div>
-    ${otros.length ? `<div class="ln"></div><div class="lvl">${otros.map(rc).join('')}</div>` : ''}
+    <div class="rama">${SEC.map(x => { const R = L.filter(r => r.c === x); return `<div class="sec"><b>6.° ${x}</b>${R.length ? R.map(r => rc(r, L.length > 4)).join('') : vac}</div>`; }).join('')}</div>
+    ${L.length > 4 ? `<div class="rc-fn"><b>🧐 Lo que hacen los Revisores Confiables</b>${FN_RC.map(x => `<span>${x}</span>`).join('')}<span>🔄 Revisan los trabajos de las otras secciones</span></div>` : ''}
+    ${otros.length ? `<div class="ln"></div><div class="lvl">${otros.map(r => rc(r, L.length > 4)).join('')}</div>` : ''}
     <div class="ln"></div>
     <div class="lvl"><div class="pc aut"><span class="av">✍️</span><h4>Todos los estudiantes de 6.°</h4><span class="cg">✍️ Autores e investigadores</span>
       <ul><li>🔬 Investigan y crean productos de Ciencia</li><li>📝 Envían su trabajo en «Publicar propuesta»</li><li>✏️ Mejoran su trabajo con los consejos</li></ul>${np ? `<span class="nr">📰 ${np} trabajo${np > 1 ? 's' : ''} publicado${np > 1 ? 's' : ''} hasta hoy</span>` : ''}</div></div>
