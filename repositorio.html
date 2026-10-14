@@ -25,6 +25,29 @@ button{cursor:pointer}
 .me{position:relative;z-index:1;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:rgba(255,255,255,.14);font-weight:800;font-size:13px;white-space:nowrap}
 .me i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--green);color:var(--navy);font-style:normal;font-weight:900}
 .me .rol{padding:2px 8px;border-radius:999px;background:var(--gold);color:#3b2a00;font-size:11px;font-weight:900}
+/* equipo de la revista: organigrama */
+.eq-h{text-align:center;margin:4px 0 18px}.eq-h h2{margin:0;font:900 clamp(26px,4vw,38px)/1.1 var(--serif);color:var(--navy)}.eq-h p{margin:6px auto 0;max-width:620px;font-weight:700;color:var(--ink2)}
+.org{display:flex;flex-direction:column;align-items:center}
+.org .lvl{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;width:100%}
+.org .ln{width:4px;height:28px;background:var(--line);border-radius:4px}
+.org .rama{position:relative;width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding-top:24px}
+.org .rama::before{content:"";position:absolute;top:0;left:12.5%;right:12.5%;height:4px;background:var(--line);border-radius:4px}
+.org .sec{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 10px;border-radius:20px;background:#fff;border:2px solid var(--line)}
+.org .sec::before{content:"";position:absolute;top:-24px;left:50%;width:4px;height:24px;margin-left:-2px;background:var(--line)}
+.org .sec>b{padding:4px 14px;border-radius:999px;background:var(--navy);color:#fff;font-weight:900;font-size:14px}
+.pc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;width:100%;max-width:330px;padding:16px 14px 14px;border-radius:20px;background:#fff;border:3px solid var(--line);box-shadow:0 10px 24px -16px rgba(11,46,79,.5)}
+.pc .av{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font:900 24px var(--serif);color:#fff;background:linear-gradient(135deg,var(--blue),var(--navy));box-shadow:0 0 0 4px #fff,0 0 0 7px var(--gold)}
+.pc h4{margin:6px 0 0;font:900 17px/1.2 var(--serif);color:var(--navy)}
+.pc .cg{padding:3px 12px;border-radius:999px;background:var(--gold);color:#3b2a00;font-weight:900;font-size:12px;letter-spacing:.04em}
+.pc ul{margin:6px 0 0;padding:0;list-style:none;text-align:left;font-size:13px;font-weight:700;color:var(--ink2);display:grid;gap:3px}
+.pc .nr{margin-top:4px;font-size:12px;font-weight:900;color:var(--green2)}
+.pc.doc{max-width:420px;border-color:var(--gold);background:linear-gradient(180deg,#fffbeb,#fff)}.pc.doc .av{width:78px;height:78px;font-size:30px}
+.pc.rc{border-color:#bfdbfe}.pc.rc .av{background:linear-gradient(135deg,#22c55e,#0a6aa1)}.pc.rc .cg{background:#dbeafe;color:#1e3a8a}
+.pc.vac{border-style:dashed;background:#f8fafc;box-shadow:none}.pc.vac .av{background:#e2e8f0;color:#94a3b8;box-shadow:0 0 0 4px #fff,0 0 0 7px #e2e8f0}.pc.vac h4{color:#94a3b8}
+.pc.aut{max-width:640px;border-color:#d4ecb8;background:var(--mint)}.pc.aut .av{background:linear-gradient(135deg,var(--green),var(--green2))}.pc.aut .cg{background:var(--green);color:var(--navy)}
+.eq-fn{margin:24px auto 0;max-width:900px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.eq-fn div{padding:14px;border-radius:18px;background:#fff;border:2px solid var(--line);font-weight:700;font-size:14px;color:var(--ink2)}.eq-fn b{display:block;font:900 17px var(--serif);color:var(--navy);margin-bottom:4px}
+@media (max-width:820px){.org .rama{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:0}.org .rama::before,.org .sec::before{display:none}.eq-fn{grid-template-columns:1fr}}
 /* pestañas */
 .tabs{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -230,6 +253,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 </header>
 <nav class="tabs" id="tabs">
   <button type="button" data-tab="revista" class="on">📰 <span>Revista Innovadora</span></button>
+  <button type="button" data-tab="equipo">🧑‍🤝‍🧑 <span>Equipo de Revista</span></button>
   <button type="button" data-tab="fuentes">🔍 <span>Buscador</span></button>
   <button type="button" data-tab="enviar">📝 <span>Publicar propuesta</span></button>
   <button type="button" data-tab="bandeja" hidden>📥 <span>Bandeja</span><b class="cnt" hidden></b></button>
@@ -327,7 +351,7 @@ const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(u || '') ? u : '';
 let TAB = '', CACHE = { ok: null, pend: null };
 function setTab(t) {
   TAB = t; document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  $('#main').scrollTop = 0; ({ revista: vRevista, fuentes: vFuentes, enviar: vEnviar, bandeja: vBandeja, trabajos: vTrabajos })[t]();
+  $('#main').scrollTop = 0; ({ revista: vRevista, fuentes: vFuentes, enviar: vEnviar, bandeja: vBandeja, trabajos: vTrabajos, equipo: vEquipo })[t]();
 }
 $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
 
@@ -372,6 +396,33 @@ $('#view').addEventListener('click', e => {
   if (TAB !== 'trabajos') return;
   const s = e.target.closest('[data-trs]'); if (s) { TR.sec = s.dataset.trs; ls.set('moli2:trsec', TR.sec); pintaTrabajos(); }
 });
+// ---- 🧑‍🤝‍🧑 Equipo de Revista: organigrama con la docente, los Revisores Confiables (config/site.rev) y los autores ----
+const INI = n => String(n || '').trim().split(/\s+/).slice(0, 2).map(x => x[0] || '').join('').toUpperCase() || '?';
+async function vEquipo() {
+  const V = $('#view'); V.innerHTML = '<div class="load">Reuniendo al equipo…</div>';
+  let L = [];
+  try { const r = await fetch(`${BASE}/config/site?key=${F.apiKey}`, { cache: 'no-store' });
+    if (r.ok) L = Object.values(docOf(await r.json()).rev || {}).map(v => { const [, n, c] = String(v).split('|'); return { n: n || 'Revisor', c: String(c || '').toUpperCase() }; }).sort((a, b) => a.n.localeCompare(b.n, 'es')); } catch (e) {}
+  try { if (!CACHE.ok) CACHE.ok = await query('ok', null, LIST_F); } catch (e) {}
+  if (TAB !== 'equipo') return;
+  const A = CACHE.ok || [], cuenta = n => A.filter(w => w.rv === n).length;
+  const FN_RC = ['📖 Lee con cuidado los trabajos', '✅ Aprueba los que están listos', '✏️ Devuelve con un consejo amable', '❌ Rechaza lo que no es de Ciencia'];
+  const rc = r => { const k = cuenta(r.n); return `<div class="pc rc"><span class="av">${esc(INI(r.n))}</span><h4>${esc(r.n)}</h4><span class="cg">🧐 Revisor Confiable</span><ul>${FN_RC.map(x => `<li>${x}</li>`).join('')}</ul>${k ? `<span class="nr">⭐ ${k} trabajo${k > 1 ? 's' : ''} aprobado${k > 1 ? 's' : ''}</span>` : ''}</div>`; };
+  const vac = '<div class="pc vac"><span class="av">?</span><h4>¡Puesto libre!</h4><span class="cg">🧐 Revisor Confiable</span><ul><li>¿Te gusta leer? ¡Postula con tu profe!</li></ul></div>';
+  const SEC = ['A', 'B', 'C', 'D'], otros = L.filter(r => !SEC.includes(r.c)), np = A.filter(w => w.sec).length;
+  V.innerHTML = `<div class="eq-h"><h2>🧑‍🤝‍🧑 Equipo de la Revista Innovadora</h2><p>Ellos cuidan que cada trabajo publicado sea claro, verdadero y bien hecho. ¡Así funciona nuestra revista!</p></div>
+  <div class="org">
+    <div class="lvl"><div class="pc doc"><span class="av">CQ</span><h4>Prof. Christian Quispe Llerena</h4><span class="cg">🎓 Docente · Dirección de la Revista</span>
+      <ul><li>🎯 Guía al equipo y a todos los autores</li><li>🧐 Nombra a los Revisores Confiables</li><li>✅ Revisa y publica trabajos</li><li>📚 Lleva lo mejor a la Biblioteca</li></ul></div></div>
+    <div class="ln"></div>
+    <div class="rama">${SEC.map(x => { const R = L.filter(r => r.c === x); return `<div class="sec"><b>6.° ${x}</b>${R.length ? R.map(rc).join('') : vac}</div>`; }).join('')}</div>
+    ${otros.length ? `<div class="ln"></div><div class="lvl">${otros.map(rc).join('')}</div>` : ''}
+    <div class="ln"></div>
+    <div class="lvl"><div class="pc aut"><span class="av">✍️</span><h4>Todos los estudiantes de 6.°</h4><span class="cg">✍️ Autores e investigadores</span>
+      <ul><li>🔬 Investigan y crean productos de Ciencia</li><li>📝 Envían su trabajo en «Publicar propuesta»</li><li>✏️ Mejoran su trabajo con los consejos</li></ul>${np ? `<span class="nr">📰 ${np} trabajo${np > 1 ? 's' : ''} publicado${np > 1 ? 's' : ''} hasta hoy</span>` : ''}</div></div>
+  </div>
+  <div class="eq-fn"><div><b>1. ✍️ El autor envía</b>Escribe su investigación y la manda a revisión.</div><div><b>2. 🧐 El equipo revisa</b>Un Revisor Confiable o el profe la lee y decide.</div><div><b>3. 📰 ¡Se publica!</b>Sale en la Revista Innovadora y en la Biblioteca.</div></div>`;
+}
 // ---- 📰 Revista Innovadora: lo aprobado ----
 let FIL = { ty: '', sec: '' };
 async function vRevista() {
