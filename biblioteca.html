@@ -36,6 +36,12 @@
   #bar button.on { background: linear-gradient(180deg, #f3cf73, #b8862f); color: #2b1a0e; } #bar button.on i { background: rgba(43,26,14,.18); color: #2b1a0e; }
   #bar .nav { width: 42px; height: 42px; padding: 0; justify-content: center; font-size: 18px; background: rgba(233,196,106,.18); flex: none; }
   #bar .todo { flex: none; }
+  #bar button.sel:not(.on) { background: rgba(233,196,106,.28); }
+  #pisos { position: fixed; left: 50%; bottom: calc(max(14px, env(safe-area-inset-bottom)) + 70px); transform: translateX(-50%); z-index: 7; display: flex; gap: 10px; padding: 8px; border-radius: 22px; background: rgba(43,26,14,.96); border: 2px solid rgba(233,196,106,.8); box-shadow: 0 12px 30px rgba(0,0,0,.45); animation: pisoIn .25s ease-out; }
+  #pisos[hidden] { display: none; } @keyframes pisoIn { from { opacity: 0; transform: translate(-50%, 10px); } }
+  #pisos button { border: 2px solid rgba(233,196,106,.5); border-radius: 16px; padding: 10px 18px; background: rgba(233,196,106,.12); color: #ffe7a3; font: 800 15px Cinzel, serif; white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  #pisos button:hover { background: rgba(233,196,106,.26); } #pisos button.on { background: linear-gradient(180deg, #f3cf73, #b8862f); color: #2b1a0e; }
+  #pisos button i { font-style: normal; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: rgba(0,0,0,.25); font: 900 12px Nunito, sans-serif; display: grid; place-items: center; }
   /* ---- volver ---- */
   #volver { position: fixed; left: max(12px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top)); z-index: 7; border: 2px solid rgba(233,196,106,.8); border-radius: 999px; padding: 8px 14px 8px 10px; background: rgba(43,26,14,.8); color: #f6e2b3; font: 800 14px Nunito, sans-serif; display: flex; align-items: center; gap: 6px; text-decoration: none; backdrop-filter: blur(6px); }
   #volver:hover { background: rgba(70,42,22,.9); }
@@ -114,7 +120,7 @@
   @media (max-height: 500px) {                                        /* celular acostado: la barra de abajo más delgada */
     #bar { bottom: max(6px, env(safe-area-inset-bottom)); padding: 3px 5px; gap: 4px; border-width: 1.5px; }
     #bar .g { gap: 2px; } #bar button { padding: 4px 9px; font-size: 11px; gap: 4px; } #bar button i { min-width: 17px; height: 17px; font-size: 10px; padding: 0 4px; }
-    #bar .nav { width: 28px; height: 28px; font-size: 13px; } #aviso { bottom: 52px; font-size: 13px; padding: 7px 14px; }
+    #bar .nav { width: 28px; height: 28px; font-size: 13px; } #pisos { bottom: calc(max(6px, env(safe-area-inset-bottom)) + 42px); padding: 4px; } #pisos button { padding: 5px 12px; font-size: 12px; } #aviso { bottom: 52px; font-size: 13px; padding: 7px 14px; }
     #volver { font-size: 13px; padding: 6px 12px; } #editar { height: 34px; font-size: 13px; padding: 0 10px; right: calc(max(10px, env(safe-area-inset-right)) + 84px); }
     #pcompleta, #sonido { width: 34px; height: 34px; } #pcompleta { right: calc(max(10px, env(safe-area-inset-right)) + 42px); } }
   /* 🤖 Molí en la Biblioteca: su globito con el mini buscador */
@@ -136,6 +142,7 @@
 <div id="edPanel"></div>
 <div id="titulo"><small></small><h1>La Biblioteca Educativa</h1><span class="orla"></span></div>
 <div id="escena"><div><small>ESCENA</small><b></b></div></div>
+<div id="pisos" hidden></div>
 <div id="bar"><button class="nav" type="button" data-nav="-1" aria-label="Estante anterior">◀</button><div class="g"></div><button class="nav" type="button" data-nav="1" aria-label="Estante siguiente">▶</button><button class="todo" type="button" data-todo="1">🏛️ Toda</button></div>
 <button id="saltar" type="button">Saltar ⏭</button>
 <div id="tapa"></div>
@@ -177,6 +184,8 @@ const GRADOS = [
   { g: 9, n: 'NOVENO', t: 'Noveno grado', x: 6.35, z: 1.8, z2: -1.5, ry: -Math.PI / 2, c: 0x6b4a8c },
   { g: 10, n: 'DÉCIMO', t: 'Décimo grado', x: -5.4, x2: -2.75, w: 2.6, y: 4.66, z: -15.35, ry: 0, c: 0x9a5b22 },
   { g: 11, n: 'UNDÉCIMO', t: 'Undécimo grado', x: 5.4, x2: 2.75, w: 2.6, y: 4.66, z: -15.35, ry: 0, c: 0x1f6f78 }];
+const PISOS = GRADOS.flatMap(G => [{ ...G, p: 1, y: 0 }, { ...G, p: 2, y: 4.66 }]);   // cada grado: 2 estantes en el 1.er piso y 2 encima, en la galería (2.° piso)
+const PISO_TX = p => p === 2 ? '2.° PISO' : '1.er PISO';
 const COL_SEC = { A: '#6b2a2f', B: '#2c4a6e', C: '#35603f', D: '#7d4d22', E: '#55406e', F: '#235a60' };
 const TIPOS = { opi: ['💭', 'Opinión científica'], ens: ['📝', 'Ensayo'], inv: ['🔬', 'Investigación'], pro: ['🛠️', 'Producto'], maq: ['🧩', 'Maqueta'], info: ['🖼️', 'Infografía'], vid: ['🎬', 'Video'], exp: ['⚗️', 'Experimento'] };
 
@@ -285,7 +294,7 @@ const GZ = GRADOS.filter(q => q.ry !== 0).flatMap(q => [q.z, q.z2]);
   const x = s * (HALL.x - 0.3), ry = -s * Math.PI / 2;
   for (let z = 8.4; z > -14.5; z -= 3.3) {
     if (!GZ.some(gz => Math.abs(gz - z) < 0.5)) colocar(mueble({ w: 3.1, h: 4.1, n: 6 }), x, 0, z, ry);
-    colocar(mueble({ w: 3.1, h: 3.2, n: 5, corona: false }), x, 4.75, z, ry);
+    if (!GZ.some(gz => Math.abs(gz - z) < 0.5)) colocar(mueble({ w: 3.1, h: 3.2, n: 5, corona: false }), x, 4.75, z, ry);   // arriba también van los de grado
     columna(s * (HALL.x - 0.45), z - 1.65, 8.2);
   }
   // galería (balcón) con baranda
@@ -306,7 +315,7 @@ const bal = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.035, 0.05, 0.9,
   const ven = new THREE.Mesh(new THREE.CircleGeometry(1.5, 40), new THREE.MeshBasicMaterial({ map: canvasTex(256, 256, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 10, w / 2, w / 2, w / 2); gr.addColorStop(0, '#e8d3a0'); gr.addColorStop(1, '#9a6a34'); g.fillStyle = gr; g.fillRect(0, 0, w, w); g.strokeStyle = '#8a5530'; g.lineWidth = 10; for (let a = 0; a < 8; a++) { g.beginPath(); g.moveTo(w / 2, w / 2); g.lineTo(w / 2 + Math.cos(a * Math.PI / 4) * w, w / 2 + Math.sin(a * Math.PI / 4) * w); g.stroke(); } g.beginPath(); g.arc(w / 2, w / 2, 40, 0, 7); g.stroke(); }) }));
   ven.position.set(0, 7.4, z + 0.03); scene.add(ven);
   const anillo = new THREE.Mesh(new THREE.TorusGeometry(1.55, 0.12, 8, 40), ORO); anillo.position.set(0, 7.4, z + 0.08); scene.add(anillo);
-  colocar(mueble({ w: 3.2, h: 4.1, n: 6 }), -3.3, 0, HALL.z1 + 0.3, 0); colocar(mueble({ w: 3.2, h: 4.1, n: 6 }), 3.3, 0, HALL.z1 + 0.3, 0);
+  // (abajo, junto a la puerta, van los estantes del 1.er piso de Décimo y Undécimo)
   for (let x = -HALL.x + 1.6; x < HALL.x - 1.5; x += 0.42) { if (Math.abs(x) < 1.6) continue; const b = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 0.9, 6), MAD_CLARA); b.position.set(x, 5.1, HALL.z1 + 1.12); sala.add(b); }   // baranda del segundo piso (fondo)
   [[-HALL.x + 1.5, -1.6], [1.6, HALL.x - 1.5]].forEach(([a, b]) => { box(b - a, 0.1, 0.16, MAD_OSC, (a + b) / 2, 5.6, HALL.z1 + 1.12, sala); });
   box(HALL.x * 2, 0.22, 1.2, MAD_OSC, 0, 4.55, HALL.z1 + 0.6, sala);
@@ -353,8 +362,9 @@ function muebleGrado(G, w, placaMat) {                               // un estan
   [-1, 1].forEach(sx => box(0.07, 3.45, 0.05, ORO, sx * (w / 2 - 0.03), 1.78, 0.3, m, false)); box(w, 0.07, 0.05, ORO, 0, 3.52, 0.3, m, false);
   return { m, placa };
 }
-const ESTANTES = GRADOS.map(G => {
-  const w = G.w || 3.1, placaMat = new THREE.MeshBasicMaterial({ map: placaTex(G.n, 'GRADO', G.c) });
+const subDe = (s, p) => s + ' · ' + PISO_TX(p);
+const ESTANTES = PISOS.map(G => {
+  const w = G.w || 3.1, placaMat = new THREE.MeshBasicMaterial({ map: placaTex(G.n, subDe('GRADO', G.p), G.c) });
   const A = muebleGrado(G, w, placaMat), B = muebleGrado(G, w, null), m = A.m, m2 = B.m;
   const haloMat = new THREE.MeshBasicMaterial({ map: canvasTex(128, 128, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 4, w / 2, w / 2, w / 2); gr.addColorStop(0, 'rgba(255,214,140,.55)'); gr.addColorStop(1, 'rgba(255,214,140,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); }), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
   const halo = new THREE.Mesh(new THREE.PlaneGeometry(w + 0.5, 4.6), haloMat); halo.position.set(0, 1.9, 0.32); m.add(halo);
@@ -470,7 +480,9 @@ function lomoTex(t, i) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()]
 function ponerLibros() {
   ESTANTES.forEach(E => { [E.libs, E.libs2].forEach(G => { G.children.forEach(o => { [].concat(o.material).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); }); if (o.geometry !== lomoGeo) o.geometry.dispose(); }); G.clear(); });
     E.items = []; E.hit = []; });
-  TRABAJOS.forEach(t => { const g = +t.g || 6; const E = ESTANTES.find(x => x.g === g) || ESTANTES[0]; E.items.push(t); });
+  const capDe = E => Math.max(8, Math.floor((E.m.userData.w - 0.34) / (0.105 + 0.03))) * 5 * 2;          // lo que cabe en los 2 estantes de un piso
+  GRADOS.forEach(G => { const [P1, P2] = ESTANTES.filter(E => E.g === G.g), L = TRABAJOS.filter(t => (+t.g || 6) === G.g || (G.g === 6 && !GRADOS.some(x => x.g === +t.g)));
+    P1.items = L.slice(0, capDe(P1)); P2.items = L.slice(capDe(P1), capDe(P1) + capDe(P2)); });          // primero se llena el 1.er piso; luego el 2.°
   ESTANTES.forEach(E => {
     const sh = E.m.userData.sh, w = E.m.userData.w, d = E.m.userData.d;
     const filas = [3, 2, 1, 4, 0];                               // primero a la altura de los ojos
@@ -542,17 +554,22 @@ async function irEstante(i) {
   if (modo === 'intro') return; i = (i + ESTANTES.length) % ESTANTES.length; actual = i; modo = 'estante'; cerrarTapa();
   const E = ESTANTES[i], f = frenteDe(E); ESTANTES.forEach((x, k) => { x.haloT = k === i ? 1 : 0; });
   $('#titulo').classList.remove('on');
-  const ban = $('#escena'); ban.querySelector('b').textContent = 'Estante ' + cap(E.n + ' ' + E.s); ban.classList.add('on'); clearTimeout(banT); banT = setTimeout(() => ban.classList.remove('on'), 1900);
+  const ban = $('#escena'); ban.querySelector('b').textContent = cap(E.n + ' ' + E.s) + ' · ' + cap(PISO_TX(E.p)); ban.classList.add('on'); clearTimeout(banT); banT = setTimeout(() => ban.classList.remove('on'), 1900);
   sonar('pasar'); pintarBarra();
   await volar(f.pos, f.look, 1700, 0.9);
   if (actual === i) aviso(E.items.length ? (isTouch ? `📚 ${E.items.length} trabajo${E.items.length > 1 ? 's' : ''} · toca un libro para ver su portada` : `📚 ${E.items.length} trabajo${E.items.length > 1 ? 's' : ''} · pasa el cursor por un libro y haz clic para abrirlo`) : '✨ Este estante aún espera sus primeros trabajos', 3.5);
 }
-async function irSala() { if (modo === 'intro') return; modo = 'sala'; actual = -1; cerrarTapa(); ESTANTES.forEach(x => x.haloT = 0); $('#titulo').classList.add('on'); pintarBarra(); await volar(VISTA.pos, VISTA.look, 1700, 1); }
+async function irSala() { if (modo === 'intro') return; modo = 'sala'; actual = -1; gSel = 0; cerrarTapa(); ESTANTES.forEach(x => x.haloT = 0); $('#titulo').classList.add('on'); pintarBarra(); await volar(VISTA.pos, VISTA.look, 1700, 1); }
 
 // ---- barra de grados ----
-function pintarBarra() { $('#bar .g').innerHTML = ESTANTES.map((E, i) => `<button type="button" data-i="${i}" class="${i === actual ? 'on' : ''}">${E.n}<i>${E.items.length}</i></button>`).join('');
+let gSel = 0;                                                        // grado elegido en la barra: muestra sus botones 1.er piso / 2.° piso
+function pintarBarra() { const ga = actual >= 0 ? ESTANTES[actual].g : 0, n = g => ESTANTES.filter(E => E.g === g).reduce((a, E) => a + E.items.length, 0);
+  $('#bar .g').innerHTML = GRADOS.map(G => `<button type="button" data-gr="${G.g}" class="${G.g === ga ? 'on' : ''}${G.g === gSel ? ' sel' : ''}">${ESTANTES.find(E => E.g === G.g).n}<i>${n(G.g)}</i></button>`).join('');
+  const P = $('#pisos'); P.hidden = !gSel; if (gSel) $('#aviso').classList.remove('on');
+  if (gSel) P.innerHTML = ESTANTES.map((E, i) => E.g !== gSel ? '' : `<button type="button" data-i="${i}" class="${i === actual ? 'on' : ''}">${E.p === 2 ? '⬆️ 2.° piso' : '⬇️ 1.er piso'}<i>${E.items.length}</i></button>`).join('');
   const on = $('#bar .g .on'); on && on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); }
-$('#bar').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.i != null) return irEstante(+b.dataset.i); if (b.dataset.nav) return irEstante(actual < 0 ? (+b.dataset.nav > 0 ? 0 : ESTANTES.length - 1) : actual + +b.dataset.nav); if (b.dataset.todo) return irSala(); });
+$('#pisos').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) { gSel = 0; irEstante(+b.dataset.i); } });
+$('#bar').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.gr) { const g = +b.dataset.gr; gSel = gSel === g ? 0 : g; return pintarBarra(); } gSel = 0; if (b.dataset.i != null) return irEstante(+b.dataset.i); if (b.dataset.nav) return irEstante(actual < 0 ? (+b.dataset.nav > 0 ? 0 : ESTANTES.length - 1) : actual + +b.dataset.nav); if (b.dataset.todo) return irSala(); });
 addEventListener('keydown', e => { if ($('#libro').classList.contains('on')) { if (e.key === 'Escape') cerrarLibro(); return; } if ($('#edPanel').classList.contains('on')) return;
   if (e.key === 'ArrowRight') irEstante(actual + 1); else if (e.key === 'ArrowLeft') irEstante(actual < 0 ? ESTANTES.length - 1 : actual - 1); else if (e.key === 'Escape') irSala(); });
 
@@ -674,7 +691,7 @@ function frame() {
   _dir.subVectors(LIBRO_POS, cam.pos).multiplyScalar(zoomS * 0.22);
   camera.position.set(cam.pos.x + par.x + _dir.x, cam.pos.y - par.y + _dir.y, cam.pos.z + _dir.z); camera.lookAt(cam.look);
   // libros que salen un poquito al pasar el cursor
-  ESTANTES.forEach(E => { E.halo.material.opacity += ((E.haloT || 0) * 0.8 - E.halo.material.opacity) * (1 - Math.exp(-dt * 4)); const eo = modo === 'sala' ? 1 : 0; E.et.material.opacity += (eo - E.et.material.opacity) * (1 - Math.exp(-dt * 7)); E.et.visible = E.et.material.opacity > 0.02; E.et.position.y = 3.0 + Math.sin(T * 1.3 + E.g) * 0.06;
+  ESTANTES.forEach(E => { E.halo.material.opacity += ((E.haloT || 0) * 0.8 - E.halo.material.opacity) * (1 - Math.exp(-dt * 4)); const eo = modo === 'sala' && E.p === 1 ? 1 : 0;   // en la vista general, un solo letrero flotante por grado E.et.material.opacity += (eo - E.et.material.opacity) * (1 - Math.exp(-dt * 7)); E.et.visible = E.et.material.opacity > 0.02; E.et.position.y = 3.0 + Math.sin(T * 1.3 + E.g) * 0.06;
     E.hit.forEach(b => { const want = (b === hover || b === fijo) ? 0.2 : 0; b.userData.sal += (want - b.userData.sal) * 0.25; b.position.z = b.userData.x0 + b.userData.sal; b.rotation.y = b.userData.sal * -0.3; }); });
   // chispitas del libro mágico
   if (chispear > 0) for (let i = 0; i < NCH; i++) { const c = chVel[i]; if (c.life <= 0 || c.t > c.life) { if (Math.random() < chispear * 0.08) soltarChispa(i); else { chPos[i * 3 + 1] = -99; c.life = 0; } continue; }
@@ -707,7 +724,7 @@ function aplicarTX(x) {
   if (x && Array.isArray(x.inst)) TX.inst = x.inst.map(t => String(t).slice(0, 220)).filter(t => t.trim()).slice(0, 6);
   if (x && x.g) Object.keys(TX.g).forEach(k => { const v = x.g[k]; if (Array.isArray(v) && String(v[0] || '').trim()) TX.g[k] = [String(v[0]).slice(0, 16), String(v[1] || '').slice(0, 20)]; });
   $('#titulo small').textContent = TX.sup; $('#titulo small').hidden = !TX.sup; $('#titulo h1').textContent = TX.titulo; document.title = TX.titulo + ' · Molí';
-  ESTANTES.forEach(E => { [E.n, E.s] = TX.g[E.g]; E.placa.material.map = placaTex(E.n, E.s, E.c); E.placa.material.needsUpdate = true; E.et.material.map = etiquetaTex(E.n, E.s); E.et.material.needsUpdate = true; });
+  ESTANTES.forEach(E => { [E.n, E.s] = TX.g[E.g]; E.placa.material.map = placaTex(E.n, subDe(E.s, E.p), E.c); E.placa.material.needsUpdate = true; E.et.material.map = etiquetaTex(E.n, E.s); E.et.material.needsUpdate = true; });
   atrilPlaca.material.map = atrilTex(); pagIzq.material.map = pagIzqTex(); pagDer.material.map = pagDerTex(); tapaDeco.material.map = tapaTex(); [atrilPlaca, pagIzq, pagDer, tapaDeco].forEach(m => m.material.needsUpdate = true);
   pintarBarra();
 }
@@ -719,7 +736,7 @@ function panelEditar() {
   const P = $('#edPanel');
   P.innerHTML = `<form><h2>✏️ Editar la biblioteca</h2><p class="d">Los cambios los verán todos tus estudiantes. Los libros de los estantes no se editan aquí: salen solos de la Revista Innovadora.</p>
     <fieldset><legend>Título</legend><label>Texto pequeño de arriba</label><input name="sup" maxlength="80" value="${esc(TX.sup)}"><label>Título grande</label><input name="titulo" maxlength="60" value="${esc(TX.titulo)}"></fieldset>
-    <fieldset><legend>Estantes</legend><div class="gr">${ESTANTES.map(E => `<div><b>Estante ${E.g}</b><input name="g${E.g}a" maxlength="16" value="${esc(TX.g[E.g][0])}"><input name="g${E.g}b" maxlength="20" value="${esc(TX.g[E.g][1])}"></div>`).join('')}</div></fieldset>
+    <fieldset><legend>Estantes</legend><div class="gr">${GRADOS.map(E => `<div><b>Estante ${E.g}</b><input name="g${E.g}a" maxlength="16" value="${esc(TX.g[E.g][0])}"><input name="g${E.g}b" maxlength="20" value="${esc(TX.g[E.g][1])}"></div>`).join('')}</div></fieldset>
     <fieldset><legend>El libro del atril</legend><div class="gr"><div><b>Tapa (línea 1)</b><input name="t0" maxlength="30" value="${esc(TX.tapa[0])}"></div><div><b>Tapa (línea 2)</b><input name="t1" maxlength="30" value="${esc(TX.tapa[1])}"></div><div><b>Placa (línea 1)</b><input name="a0" maxlength="30" value="${esc(TX.atril[0])}"></div><div><b>Placa (línea 2)</b><input name="a1" maxlength="30" value="${esc(TX.atril[1])}"></div></div>
       <label>Título de las instrucciones</label><input name="instT" maxlength="80" value="${esc(TX.instT)}">
       <label>Instrucciones (una por línea, máximo 6)</label><textarea name="inst" maxlength="1200">${esc(TX.inst.join('\n'))}</textarea>
@@ -729,7 +746,7 @@ function panelEditar() {
   const f = P.querySelector('form'), msg = P.querySelector('.msg');
   P.querySelector('[data-x]').onclick = () => P.classList.remove('on');
   f.onsubmit = async e => { e.preventDefault(); const v = n => f.elements[n].value.trim();
-    const x = { sup: v('sup'), titulo: v('titulo'), tapa: [v('t0'), v('t1')], atril: [v('a0'), v('a1')], instT: v('instT'), inst: v('inst').split(/\n+/).map(t => t.trim()).filter(Boolean), pag: v('pag'), g: Object.fromEntries(ESTANTES.map(E => [E.g, [v('g' + E.g + 'a'), v('g' + E.g + 'b')]])) };
+    const x = { sup: v('sup'), titulo: v('titulo'), tapa: [v('t0'), v('t1')], atril: [v('a0'), v('a1')], instT: v('instT'), inst: v('inst').split(/\n+/).map(t => t.trim()).filter(Boolean), pag: v('pag'), g: Object.fromEntries(GRADOS.map(E => [E.g, [v('g' + E.g + 'a'), v('g' + E.g + 'b')]])) };
     const btn = f.querySelector('.ok'); btn.disabled = true; msg.textContent = 'Guardando…';
     try { const t = await token(); if (!t) throw new Error('AUTH');
       const r = await fetch(`${BASE}:commit?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
@@ -787,19 +804,18 @@ function buscarMoli(q) {
   if (!P.length) { rs.innerHTML = '<p class="nada">✏️ Escribe una o dos palabras, por ejemplo: <b>levadura</b>.</p>'; return; }
   const R = TRABAJOS.filter(t => { const txt = sinTilde([t.t, t.kw, t.n].join(' ')); return P.every(p => txt.includes(p)); }).slice(0, 8);
   MOLI && MOLI.expr(R.length ? 'estrellas' : 'pensativo'); setTimeout(() => MOLI && MOLI.expr('normal'), 2000);
-  rs.innerHTML = R.length ? R.map(t => `<button type="button" data-id="${esc(t.id)}">📖 ${esc(t.t || 'Trabajo')}<small>${esc(t.n || '')} · ${esc((ESTANTES.find(E => E.g === (+t.g || 6)) || ESTANTES[0]).n)}</small></button>`).join('')
+  rs.innerHTML = R.length ? R.map(t => `<button type="button" data-id="${esc(t.id)}">📖 ${esc(t.t || 'Trabajo')}<small>${esc(t.n || '')} · ${esc(((E => E ? E.n + ' · ' + PISO_TX(E.p) : '')(ESTANTES.find(E => E.items.includes(t)))))}</small></button>`).join('')
     : `<p class="nada">🤔 No encontré trabajos con «${esc(q)}». Prueba con otra palabra.</p>`;
 }
 globo.addEventListener('submit', e => { e.preventDefault(); buscarMoli(e.target.elements.q.value); });
 globo.addEventListener('click', async e => { if (e.target.closest('.x')) return cerrarGlobo();
   const b = e.target.closest('[data-id]'); if (!b) return; const t = TRABAJOS.find(x => x.id === b.dataset.id); if (!t) return;
-  cerrarGlobo(); const i = ESTANTES.findIndex(E => E.g === (+t.g || 6)); if (i >= 0 && i !== actual) { await irEstante(i); await wait(300); } abrirLibro(t); });
+  cerrarGlobo(); const i = ESTANTES.findIndex(E => E.items.includes(t)); if (i >= 0 && i !== actual) { await irEstante(i); await wait(300); } abrirLibro(t); });
 globo.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarGlobo(); return; } if (globo.classList.contains('on')) e.stopPropagation(); });   // al escribir no se mueven los estantes
 const mRay = new THREE.Raycaster(), mNdc = new THREE.Vector2();
 addEventListener('pointerup', e => { if (!MOLI || modo === 'intro' || $('#libro').classList.contains('on') || e.target !== renderer.domElement) return;
   mNdc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); mRay.setFromCamera(mNdc, camera);
   if (mRay.intersectObject(MOLI.root, true).length) { e.stopImmediatePropagation(); globo.classList.contains('on') ? cerrarGlobo() : abrirGlobo(); } }, true);
-setTimeout(() => { if (!globo.classList.contains('on') && modo !== 'intro') { abrirGlobo('¡Tócame si buscas un trabajo! Te ayudo a encontrarlo. 📚'); setTimeout(() => { if (!globo.querySelector('form')) cerrarGlobo(); }, 4500); } }, 9000);
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
