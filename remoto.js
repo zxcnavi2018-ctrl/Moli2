@@ -66,6 +66,7 @@
     if (!R.c) return; try { await poner('c-' + R.c, { cmd: String(cmd).slice(0, 10), arg: String(arg || '').slice(0, 60), seq: Date.now(), at: new Date() }); navigator.vibrate && navigator.vibrate(18); }
     catch (e) { aviso('📶 No se pudo enviar. Revisa tu internet.'); }
   }
+  const escenas = () => { const B = [...document.querySelectorAll('#dots button')]; return B.length ? B.map(b => { const t = b.textContent.trim(), i = t.split(' ')[0]; return [i, t.slice(i.length).trim()]; }) : ESC; };   // las escenas reales del aula (incluye las nuevas)
   const ESC = [['🏫', 'Mi aula'], ['📗', 'Sesiones'], ['🎟️', 'Exit tickets'], ['💻', 'Laboratorio'], ['📌', 'Corcho'], ['📂', 'Notas'], ['💪', 'Misiones'], ['📽️', 'Pizarra']];
   const ANIM = [['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
   const GC = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
@@ -92,7 +93,7 @@
       return;
     }
     box.innerHTML = `<p class="rc-est"><i class="${R.vivo ? 'on' : ''}"></i>${R.vivo ? 'Laptop conectada' : 'Buscando tu laptop… (ábrela y elige «💻 Laptop»)'}</p>
-      <div class="rc-card"><b>🎬 Escenas</b><div class="rc-g8">${ESC.map(([i, t], k) => `<button data-rc="ir" data-v="${k}" class="${st.i === k ? 'on' : ''}"><i>${i}</i>${t}</button>`).join('')}</div></div>
+      <div class="rc-card"><b>🎬 Escenas</b><div class="rc-g8">${escenas().map(([i, t], k) => `<button data-rc="ir" data-v="${k}" class="${st.i === k ? 'on' : ''}"><i>${i}</i>${t}</button>`).join('')}</div></div>
       <div class="rc-card"><b>📽️ Proyección</b><div class="rc-pad"><button data-rc="pv">◀</button><button data-rc="fs">⛶ Pantalla</button><button data-rc="nx">▶</button></div>
         <div class="rc-tm">⏱️ ${[5, 10, 15, 20].map(m => `<button data-rc="tm" data-v="${m}">${m} min</button>`).join('')}<button data-rc="tm" data-v="0">✕</button></div></div>
       <div class="rc-card"><b>🏅 Grupos · +1 punto</b><div class="rc-gp">${GC.map((c, k) => `<button data-rc="g" data-v="${k}" style="--c:${c}">G${k + 1}<small>${p[k] || 0}</small></button>`).join('')}</div></div>

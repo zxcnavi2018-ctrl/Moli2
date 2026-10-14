@@ -104,7 +104,7 @@
     if (a.startsWith('an:') && window.RemotoCmd) return window.RemotoCmd('an', a.slice(3));
   }
 
-  function cerrarAnim() { if (window.Anuncio && Anuncio.abierto()) { Anuncio.cerrar(); return true; } const an = document.getElementById('anim'); if (an && an.classList.contains('on') && !an.classList.contains('fuera')) { an.click(); return true; } return false; }
+  function cerrarAnim() { if (window.Anuncio && Anuncio.abierto()) { Anuncio.cerrar(); return true; } if (window.Muro && Muro.abierto()) { Muro.cerrar(); return true; } const an = document.getElementById('anim'); if (an && an.classList.contains('on') && !an.classList.contains('fuera')) { an.click(); return true; } return false; }
   // ---- 🔍 zoom de la cámara (− aleja, + acerca) ----
   let uz = 0, ZM = false, px = 0, py = 0, zmEl = null;
   function zoom(d) { uz = Math.max(-30, Math.min(16, uz + d * 6)); modoZoom(true);

@@ -407,6 +407,24 @@ function label(text, x, y, z, scale = 2.2, color = '#ffffff', bg = 'rgba(15,23,4
   s.position.set(x, y, z); s.scale.set(scale * (w / h) / 2, scale / 2, 1);
   scene.add(s); return s;
 }
+function letreroCiencia(x, y, z, rotY) {                             // letrero «Área de Ciencia»: madera, degradé verde-azul, átomo y lupa
+  const W = 1024, H = 240, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const rr = (x0, y0, w, h, r) => { g.beginPath(); g.moveTo(x0 + r, y0); g.arcTo(x0 + w, y0, x0 + w, y0 + h, r); g.arcTo(x0 + w, y0 + h, x0, y0 + h, r); g.arcTo(x0, y0 + h, x0, y0, r); g.arcTo(x0, y0, x0 + w, y0, r); g.closePath(); };
+  rr(0, 0, W, H, 40); g.fillStyle = '#8b5a2b'; g.fill();                                  // marco de madera
+  rr(14, 14, W - 28, H - 28, 30); const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, '#0f766e'); gr.addColorStop(.55, '#0e7490'); gr.addColorStop(1, '#1d4ed8'); g.fillStyle = gr; g.fill();
+  g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 4; rr(26, 26, W - 52, H - 52, 24); g.stroke();
+  g.save(); g.translate(110, H / 2); g.scale(.85, .85); g.strokeStyle = '#fde68a'; g.lineWidth = 7;          // átomo
+  for (let k = 0; k < 3; k++) { g.save(); g.rotate(k * Math.PI / 3); g.beginPath(); g.ellipse(0, 0, 70, 26, 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  g.fillStyle = '#facc15'; g.beginPath(); g.arc(0, 0, 13, 0, Math.PI * 2); g.fill(); g.restore();
+  g.save(); g.translate(W - 112, H / 2 - 6); g.scale(.8, .8); g.strokeStyle = '#fde68a'; g.lineWidth = 12; g.beginPath(); g.arc(-8, -8, 40, 0, Math.PI * 2); g.stroke();   // lupa
+  g.lineCap = 'round'; g.lineWidth = 18; g.beginPath(); g.moveTo(22, 22); g.lineTo(60, 60); g.stroke(); g.fillStyle = 'rgba(255,255,255,.25)'; g.beginPath(); g.arc(-8, -8, 34, 0, Math.PI * 2); g.fill(); g.restore();
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = 'rgba(0,0,0,.25)'; g.font = '900 80px "Trebuchet MS", system-ui, sans-serif'; g.fillText('Área de Ciencia', W / 2 + 4, H / 2 + 8);
+  g.fillStyle = '#ffffff'; g.fillText('Área de Ciencia', W / 2, H / 2 + 2);
+  g.fillStyle = '#fde68a'; [[230, 44], [800, 200], [260, 200], [780, 40]].forEach(([sx, sy]) => { g.save(); g.translate(sx, sy); g.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? 6 : 15, a = i * Math.PI / 5 - Math.PI / 2; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill(); g.restore(); });
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 0.46), new THREE.MeshLambertMaterial({ map: t, transparent: true }));
+  m.position.set(x, y, z); m.rotation.y = rotY; m.translateZ(0.01); scene.add(m); return m;
+}
 function plaque(text, x, y, z, rotY, w = 0.62, h = 0.2) {         // cartelito plano (no flota): fondo azul noche y letras blancas
   const c = document.createElement('canvas'); c.width = 320; c.height = 104; const g = c.getContext('2d');
   g.fillStyle = '#0f1d3d'; g.fillRect(0, 0, 320, 104); g.strokeStyle = '#e5e7eb'; g.lineWidth = 6; g.strokeRect(5, 5, 310, 94);
@@ -1208,7 +1226,8 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
       for (let k = 0; k < 6; k++) ops.push({ type: 'window', u: -len / 2 + 0.95 + k * (len - 1.9) / 5, w: 0.9, y0: 2.08 });
       const lx = isX ? sg * (w / 2 - T - 0.012) : 0, lz = isX ? 0 : sg * (d / 2 - T - 0.012), [px, pz] = lw(cx, cz, rot, lx, lz);
       const nx = isX ? -sg : 0, nz = isX ? 0 : -sg, nwx = nx * Math.cos(rot) + nz * Math.sin(rot), nwz = -nx * Math.sin(rot) + nz * Math.cos(rot);
-      plaque('Área de Ciencia', px, y0 + 1.72, pz, Math.atan2(nwx, nwz), 1.7, 0.4);
+      letreroCiencia(px, y0 + 1.74, pz, Math.atan2(nwx, nwz));                 // letrero «Área de Ciencia» (bonito)
+      window.MURO_POS = { x: px, z: pz, y0, rot: Math.atan2(nwx, nwz), nx: nwx, nz: nwz };   // aquí abajo va el 🖼️ Muro Destacable
     }
     (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
     // los muros de extremo van lisos (solo muro, sin ventanas)
@@ -2072,6 +2091,18 @@ async function closeBook(o) {
   const lv = o.userData.leaves || [];
   await Promise.all([...lv.map((l, i) => wait((lv.length - 1 - i) * 90).then(() => { const a0 = l.rotation.z; return tween(420, k => { l.rotation.z = a0 * (1 - k); }, inCubic); })), wait(160).then(() => hingeTo(o, 0, 520, outBack))]);
 }
+// ---- 🖼️ MURO DESTACABLE: papelógrafo grande en la pared del fondo (debajo del letrero «Área de Ciencia»); muro.js le pone los trabajos ----
+const FOCUS_MURO = (() => { const M = window.MURO_POS; if (!M) return null;
+  const c = document.createElement('canvas'); c.width = 1300; c.height = 500; const g = c.getContext('2d'); g.fillStyle = '#f5e6c8'; g.fillRect(0, 0, 1300, 500);
+  g.fillStyle = '#7c2d12'; g.font = '900 64px "Trebuchet MS", sans-serif'; g.textAlign = 'center'; g.fillText('MURO DESTACABLE', 650, 90);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.0), new THREE.MeshLambertMaterial({ map: t }));
+  mesh.position.set(M.x + M.nx * 0.03, M.y0 + 0.98, M.z + M.nz * 0.03); mesh.rotation.y = M.rot; scene.add(mesh);
+  const marco = new THREE.Mesh(new THREE.BoxGeometry(2.7, 1.1, 0.03), new THREE.MeshLambertMaterial({ color: 0x8b5a2b })); marco.position.set(M.x + M.nx * 0.012, M.y0 + 0.98, M.z + M.nz * 0.012); marco.rotation.y = M.rot; scene.add(marco);
+  window.MURO_MESH = mesh;
+  const look = new THREE.Vector3(mesh.position.x, M.y0 + 1.05, mesh.position.z);
+  return { obj: mesh, look, from: new THREE.Vector3(look.x + M.nx * 2.5, M.y0 + 1.45, look.z + M.nz * 2.5) };
+})();
 const STOPS = [
   { name: '🏫 Mi aula', title: 'Mi aula', pf: 1, look: FOCUS.pizarra.look.clone().add(new THREE.Vector3(0, -0.45, 0)), from: FOCUS.corcho.look.clone().lerp(FOCUS.corcho.from, 0.3).setY(FOCUS.corcho.look.y - 0.55) },   // desde el fondo (junto a los lockers), debajo de los cohetes
   { name: '📗 Mi mesa', title: 'Mis sesiones de unidad', ...FOCUS.mesa,
@@ -2093,6 +2124,8 @@ const STOPS = [
     async leave() { const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k)); const sm = this.obj.userData.screen.material; sm.map = null; sm.needsUpdate = true;
       const h = this.obj.userData.hinge; await tween(650, k => { h.rotation.x = LID_OPEN + (LID_CLOSED - LID_OPEN) * k; }, inCubic); } },   // se apaga y se cierra
   { name: '📌 El corcho', title: 'Mi corcho de unidad', ...FOCUS.corcho },
+  ...(FOCUS_MURO ? [{ name: '🖼️ Muro destacable', title: 'Muro Destacable', ...FOCUS_MURO,
+    async enter() { if (window.Muro) Muro.abrir(); }, async leave() { if (window.Muro) Muro.cerrar(); } }] : []),
   { name: '📂 Mesa del profesor', title: 'Mis notas', ...FOCUS.docente,
     async enter() { await openBook(this.obj); await expand('docente', this.obj); },
     async leave() { await shrink(this.obj); await closeBook(this.obj); } },
@@ -2119,7 +2152,7 @@ let baseFov = 55;
 function setFov() { baseFov = portrait() ? 70 : 55; camera.fov = baseFov; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize', () => { setFov(); if (!TOUR.busy) TOUR.pos.copy(fromOf(STOPS[TOUR.i])); if (sheet.style.display === 'block') place(bigRect(SHEETS[sheet.dataset.kind].ar, SHEETS[sheet.dataset.kind].big)); });
 const dotsEl = document.getElementById('dots');
-STOPS.forEach((st, k) => { const b = document.createElement('button'); b.type = 'button'; const CHIP = { profesor: 'Mis notas', aula: 'Aula', mesa: 'Sesiones', locker: 'Tickets', biblio: 'Juegos', laptop: 'Laptop', corcho: 'Corcho', misiones: 'Misiones', diplomas: 'Mis diplomas', presentaci: 'Presentación' };
+STOPS.forEach((st, k) => { const b = document.createElement('button'); b.type = 'button'; const CHIP = { profesor: 'Mis notas', aula: 'Aula', mesa: 'Sesiones', locker: 'Tickets', biblio: 'Juegos', laptop: 'Laptop', corcho: 'Corcho', muro: 'Producto', misiones: 'Misiones', diplomas: 'Mis diplomas', presentaci: 'Presentación' };
   const ic = (st.name.match(/^\S+/) || [''])[0], low = st.name.toLowerCase(), key = Object.keys(CHIP).find(k => low.includes(k) || (k === 'biblio' && st.kind === 'biblio'));
   b.textContent = key ? ic + ' ' + CHIP[key] : st.name.replace(/^(\S+)\s+(El |La |Mi |Mis )/, '$1 '); b.title = st.title || st.name;
   b.addEventListener('click', e => { e.stopPropagation(); if (document.body.classList.contains('tut')) return; if (TOUR.busy) { TOUR.q = k - TOUR.i; PRISA = true; if (MO.talking) MO.talking.skip(); return; } if (k !== TOUR.i) go(k - TOUR.i); }); dotsEl.appendChild(b); });
@@ -2296,6 +2329,7 @@ const GUIA = [
   'Este es el mueble de la <b>Biblioteca de Temas</b> 📚: cada <b>disco</b> es un juego de ciencia. Elige uno con las flechitas y toca <b>🎮 Jugar</b>. ¡Y abre las <b>puertitas</b> para conocer a <b>Plantancio</b>! 🌱',
   'En esta <b>laptop</b> está el <b>Repositorio Educativo</b> 💻: <b>fuentes confiables</b> para investigar y la <b>Revista Innovadora</b>, donde subes tus investigaciones y productos. 📰',
   'Este es el <b>corcho de la unidad</b>: aquí ves qué unidad estamos trabajando y su propósito. 📌',
+  ...(FOCUS_MURO ? ['Este es el <b>Muro Destacable</b> 🖼️: aquí tu profe pega las fotos de los <b>mejores trabajos y productos</b> de la clase. ¡Quizás aparezca el tuyo!'] : []),
   'Esta es la <b>mesa del profesor</b>. En su folder azul están <b>tus notas</b>. 📂',
   'Y en la mesa del profesor también está este <b>cuaderno verde</b> con <b>tus misiones de refuerzo</b>: para practicar lo que más te cuesta. 💪',
   'Y en la <b>pizarra</b> se proyectan tus <b>Diplomas de felicitaciones</b> 🏅: en cada sesión ganas sellos en tu pasaporte (🎟️ Exit ticket AD, 🙋 +4 en participación, 🤝 buena conducta y 💪 tu refuerzo). ¡Si juntas todos, recibes tu diploma y lo puedes <b>descargar</b>! Ya conoces tu aula. Si me necesitas, <b>tócame</b>. 🤖'
@@ -2439,7 +2473,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js"></script><script src="corcho.js"></script><script src="mando.js"></script><script src="anuncio.js"></script>
+<script src="revista.js"></script><script src="corcho.js"></script><script src="mando.js"></script><script src="anuncio.js"></script><script src="muro.js"></script>
 <script src="editor.js"></script>
 </body>
 </html>
