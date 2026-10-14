@@ -242,7 +242,7 @@
   let prev = [], stk = { l: '', r: '' }, stkT = { l: 0, r: 0 }, raf = 0, ultimo = null, ver = null;
   const mandos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(g => g && g.connected !== false);
   let gid = null;
-  function elegir(P) {                                                // en PC a veces aparecen 2 «mandos» (uno fantasma): se usa el último que tocaste
+  function elegirMando(P) {                                           // en PC a veces aparecen 2 «mandos» (uno fantasma): se usa el último que tocaste
     const activo = P.find(g => g.buttons.some(b => b.pressed));
     if (activo) gid = activo.index;
     return P.find(g => g.index === gid) || P.reduce((a, g) => (g.timestamp || 0) > (a.timestamp || 0) ? g : a, P[0]);
@@ -256,7 +256,7 @@
   }
   function leer() {
     raf = 0; const P = mandos(); if (!P.length) { prev = []; pintaEstado(); return; }
-    const g = elegir(P), ahora = performance.now(), k60 = Math.min(4, (ahora - (leer.t || ahora - 16.7)) / 16.7); leer.t = ahora;   // cuánto pasó (en cuadros de 60 fps): se mueve igual de parejo aunque la PC vaya lenta
+    const g = elegirMando(P), ahora = performance.now(), k60 = Math.min(4, (ahora - (leer.t || ahora - 16.7)) / 16.7); leer.t = ahora;   // cuánto pasó (en cuadros de 60 fps): se mueve igual de parejo aunque la PC vaya lenta
     const on = g.buttons.map(b => b.pressed || b.value > 0.5); cruceta(g, on);
     if (on[6] && on[7] && !combo) { combo = true; delete pend[6]; delete pend[7]; if (!panelAbierto()) modoMouse(!MM); }   // ZL + ZR juntos: modo mouse
     if (!on[6] && !on[7]) combo = false;
@@ -307,6 +307,11 @@
   #mandoP .mp { width: min(1500px, 100%); max-height: calc(100vh - 28px); overflow: auto; background: #0f172a; color: #e2e8f0; border-radius: 22px; border: 3px solid #334155; box-shadow: 0 30px 70px rgba(0,0,0,.5); padding: 18px 20px 20px; }
   #mandoP .hd { display: flex; align-items: center; gap: 12px; } #mandoP h2 { margin: 0; font: 900 26px "Trebuchet MS", sans-serif; color: #fff; flex: 1; } #mandoP .x { width: 42px; height: 42px; border-radius: 50%; border: 0; background: #334155; color: #fff; font-size: 20px; cursor: pointer; }
   #mandoP .est { margin: 6px 0 10px; font-weight: 800; color: #94a3b8; } #mandoP .est.ok { color: #4ade80; }
+  #mandoP .con { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; } #mandoP .con .est { flex: 1; min-width: 220px; }
+  #mandoP [data-con] { border: 0; border-radius: 12px; padding: 10px 18px; background: #22c55e; color: #052e16; font: 900 15px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #15803d; }
+  #mandoP [data-con]:disabled { opacity: .7; cursor: wait; }
+  #mandoP .ayuda { margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; font: 600 14px/1.5 system-ui, sans-serif; }
+  #mandoP .ayuda[hidden] { display: none; } #mandoP .ayuda b { color: #fde68a; } #mandoP .ayuda code { background: #0f172a; padding: 2px 6px; border-radius: 6px; color: #7dd3fc; user-select: all; } #mandoP .ayuda a { color: #7dd3fc; }
   #mandoP .gr { display: grid; grid-template-columns: minmax(380px, .9fr) 1.4fr; gap: 20px; align-items: start; } @media (max-width: 1000px) { #mandoP .gr { grid-template-columns: 1fr; } }
   #mandoP svg.pad { width: 100%; height: auto; } #mandoP svg.pad .k { fill: #1e293b; stroke: #cbd5e1; stroke-width: 3; cursor: pointer; transition: fill .08s; } #mandoP svg.pad .k:hover { stroke: #facc15; }
   #mandoP svg.pad .k.on { fill: #facc15; stroke: #fde047; } #mandoP svg.pad .k.sel { stroke: #38bdf8; stroke-width: 5; } #mandoP svg.pad .ar text { font-size: 13px; fill: #38bdf8; } #mandoP svg.pad .dot { pointer-events: none; transition: cx .05s, cy .05s; } #mandoP svg.pad text { fill: #e2e8f0; font: 900 18px "Trebuchet MS", sans-serif; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
@@ -325,7 +330,28 @@
   const mostrar = () => { btn.hidden = !esDocente(); if (!btn.hidden) lugar(); };
   addEventListener('resize', lugar); addEventListener('moli2:me', mostrar); setTimeout(mostrar, 300); setTimeout(mostrar, 2500);
   btn.addEventListener('click', e => { e.stopPropagation(); abrirPanel(); });
-  function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const M = mandos(), g = M.length ? elegir(M) : null; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : ' · (mapa no estándar: prueba cada botón)') : '⚪ Conecta tu mando (Bluetooth o cable USB) y, con esta página abierta, presiona cualquier botón para que aparezca.'; } }
+  // 🔌 «Conectar mando»: el navegador sólo «ve» el mando cuando le aprietas un botón con la página abierta. Se busca 10 s; si no aparece, se explica qué revisar.
+  let buscando = 0;
+  function conectar() {
+    const b = P && P.querySelector('[data-con]'), A = P && P.querySelector('.ayuda'); if (!b || buscando) return;
+    if (!navigator.getGamepads) { A.hidden = false; A.innerHTML = 'Este navegador no puede usar mandos. Abre Molí 2 en <b>Google Chrome</b> o <b>Microsoft Edge</b>.'; return; }
+    A.hidden = true; b.disabled = true; let s = 10; const t0 = Date.now();
+    const paso = () => { const M = mandos();
+      if (M.length) { buscando = 0; b.disabled = false; b.textContent = '✅ ¡Conectado!'; arrancar(); pintaEstado(); setTimeout(() => { if (b.isConnected) b.textContent = '🔌 Conectar mando'; }, 2500); return; }
+      const q = 10 - Math.floor((Date.now() - t0) / 1000);
+      if (q <= 0) { buscando = 0; b.disabled = false; b.textContent = '🔌 Intentar otra vez'; A.hidden = false; A.innerHTML = ayudaTexto(); return; }
+      if (q !== s) s = q; b.textContent = `🎮 Aprieta A o B en tu mando… ${s}`; buscando = requestAnimationFrame(paso); };
+    paso();
+  }
+  function ayudaTexto() {
+    const linux = /Linux/.test(navigator.userAgent) && !/Android|CrOS/.test(navigator.userAgent);
+    return `<b>El navegador todavía no recibe tu mando.</b> Revisa en este orden:<br>
+      1️⃣ Mantén apretados <b>L + R</b> a la vez unos segundos (en algunos sistemas así se «activa» el Pro Controller).<br>
+      2️⃣ Prueba si el navegador lo ve en <a href="https://hardwaretester.com/gamepad" target="_blank" rel="noopener">hardwaretester.com/gamepad</a>. Si ahí tampoco aparece, el problema es del sistema, no de Molí 2.<br>
+      3️⃣ Si tu mando tiene <b>modos</b>, apágalo y préndelo en modo <b>PC / X-input</b> (en muchos genéricos: mantener <b>Home + X</b>); así se conecta como un mando de Xbox, que funciona mejor.<br>
+      4️⃣ Prueba con un <b>cable USB-C de datos</b>.` + (linux ? `<br>🐧 <b>En Ubuntu / Linux:</b> si usas Chromium instalado como «snap», abre la Terminal y escribe <code>sudo snap connect chromium:joystick</code>, luego reinicia el navegador. Para ver si el sistema recibe los botones: <code>sudo apt install joystick</code> y luego <code>jstest /dev/input/js0</code>.` : '');
+  }
+  function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const M = mandos(), g = M.length ? elegirMando(M) : null; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : ' · (mapa no estándar: prueba cada botón)') : '⚪ Conecta tu mando (Bluetooth o cable USB) y, con esta página abierta, presiona cualquier botón para que aparezca.'; } }
 
   // ---- el panel: el dibujo del mando y la lista de botones ----
   function padSvg() {
@@ -354,6 +380,7 @@
     if (!P) { P = document.createElement('div'); P.id = 'mandoP'; document.body.appendChild(P);
       P.addEventListener('click', e => { if (e.target === P || e.target.closest('.x')) return cerrarPanel();
         const g = e.target.closest('[data-k]'); if (g) return elegir(+g.dataset.k);
+        if (e.target.closest('[data-con]')) return conectar();
         if (e.target.closest('[data-reset]')) { CFG = JSON.parse(JSON.stringify(DEF)); guardar(); pintarPanel(); } });
       P.addEventListener('change', e => { const s = e.target;
         if (s.dataset.b != null) { CFG.b[s.dataset.b] = s.value; guardar(); const o = P.querySelector(`.ult select`); if (o && +o.dataset.b === +s.dataset.b) o.value = s.value; const r = P.querySelector(`.lst select[data-b="${s.dataset.b}"]`); if (r) r.value = s.value; }
@@ -364,7 +391,7 @@
       if (g && P) [['l', 182, 150, 0], ['r', 390, 252, 2]].forEach(([k, cx, cy, ax]) => { const d = P.querySelector(`.dot[data-st="${k}"]`); if (d) { d.setAttribute('cx', cx + (g.axes[ax] || 0) * 26); d.setAttribute('cy', cy + (g.axes[ax + 1] || 0) * 26); } }); if (g && P) { const on = g.buttons.map(b => b.pressed || b.value > 0.5); P.querySelectorAll('[data-k]').forEach(x => x.querySelector('.k').classList.toggle('on', !!on[+x.dataset.k])); P.querySelectorAll('.row[data-r]').forEach(x => x.classList.toggle('on', !!on[+x.dataset.r])); } };
   }
   function pintarPanel() {
-    P.innerHTML = `<div class="mp" role="dialog" aria-label="Mando de control"><div class="hd"><h2>🎮 Mando de control</h2><button class="x" type="button" aria-label="Cerrar">✕</button></div><p class="est"></p>
+    P.innerHTML = `<div class="mp" role="dialog" aria-label="Mando de control"><div class="hd"><h2>🎮 Mando de control</h2><button class="x" type="button" aria-label="Cerrar">✕</button></div><div class="con"><p class="est"></p><button type="button" data-con>🔌 Conectar mando</button></div><div class="ayuda" hidden></div>
       <div class="gr"><div>${padSvg()}<div class="ult">${SEL == null ? '👆 Presiona un botón de tu mando (o tócalo en el dibujo) para elegir qué hace.' : `<span>Botón <b>${esc(NOM[SEL])}</b>:</span> <select data-b="${SEL}">${opciones(acciones(), CFG.b[SEL] || 'nada')}</select>`}</div>
         <p class="hint">Mientras este panel está abierto, el mando no mueve el aula: sólo se prueba. Ciérralo para usarlo.<br>🖱️ <b>ZL + ZR juntos</b>: modo mouse (L3 mueve la flecha, A hace clic, R3 baja la página). Otra vez ZL + ZR para salir.</p></div>
       <div class="lst">${lista()}</div></div>
