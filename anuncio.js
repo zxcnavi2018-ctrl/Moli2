@@ -1,13 +1,17 @@
 // ===================================================================
 //  MOLÍ 2 · 📺 ANUNCIO AL ENTRAR: un video con cuenta regresiva de 15 s; recién entonces sale la ✕.
 //  Si se cierra, se cierra; si no, el video sigue hasta el final y se cierra solo. Una vez por visita.
+//  Si hay varios, salen uno tras otro (al cerrarse uno, aparece el siguiente).
 // ===================================================================
 (function () {
-  const AN = { id: 'rc-2026-10', video: 'video/revisores-confiables.mp4', poster: 'video/revisores-confiables.jpg', titulo: 'Estudiantes RC · Revisores Confiables', hasta: '2026-10-18', espera: 15 };
+  const ANS = [
+    { id: 'rc-2026-10', video: 'video/revisores-confiables.mp4', poster: 'video/revisores-confiables.jpg', titulo: 'Estudiantes RC · Revisores Confiables', hasta: '2026-10-18', espera: 15 },
+    { id: 'rc-reglas-2026-10', video: 'video/revisores-reglas.mp4', poster: 'video/revisores-reglas.jpg', titulo: 'Revisores Confiables · ¿Cómo revisan?', hasta: '2026-10-18', espera: 10 },
+  ];
   if (window.parent !== window) return;                                  // dentro de otra página (iframe) no sale
-  if (new Date() > new Date(AN.hasta + 'T23:59:59')) return;            // pasada la fecha, ya no se muestra
-  const KEY = 'moli2:anuncio:' + AN.id;
-  try { if (sessionStorage.getItem(KEY)) return; } catch (e) {}
+  const visto = a => { try { return !!sessionStorage.getItem('moli2:anuncio:' + a.id); } catch (e) { return false; } };
+  const COLA = ANS.filter(a => new Date() <= new Date(a.hasta + 'T23:59:59') && !visto(a));   // pasada la fecha o ya visto, no sale
+  if (!COLA.length) return;
 
   const css = document.createElement('style');
   css.textContent = `
@@ -23,14 +27,15 @@
   #anuncio .bar { position: absolute; left: 0; bottom: 0; height: 5px; background: #facc15; width: 0; }`;
   document.head.appendChild(css);
 
-  function mostrar() {
+  function mostrar(i) {
+    const AN = COLA[i], KEY = 'moli2:anuncio:' + AN.id;
     const el = document.createElement('div'); el.id = 'anuncio'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', AN.titulo);
     el.innerHTML = `<div class="ac"><video playsinline preload="auto" poster="${AN.poster}"><source src="${AN.video}" type="video/mp4"><source src="${AN.video.replace(/\.mp4$/, '.webm')}" type="video/webm"></video><span class="tag">📺 ${AN.titulo}</span><span class="cuenta">${AN.espera}</span><button type="button" class="ax" aria-label="Cerrar" hidden>✕</button><button type="button" class="son" hidden>🔊 Toca para escuchar</button><i class="bar"></i></div>`;
     document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('on'));
     try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
     const v = el.querySelector('video'), cu = el.querySelector('.cuenta'), x = el.querySelector('.ax'), so = el.querySelector('.son'), bar = el.querySelector('.bar');
     let falta = AN.espera, cerrado = false;
-    const cerrar = () => { if (cerrado) return; cerrado = true; clearInterval(T); v.pause(); el.classList.remove('on'); setTimeout(() => el.remove(), 380); };
+    const cerrar = () => { if (cerrado) return; cerrado = true; clearInterval(T); v.pause(); el.classList.remove('on'); setTimeout(() => { el.remove(); if (COLA[i + 1]) mostrar(i + 1); }, 380); };   // y luego el siguiente anuncio
     const T = setInterval(() => { falta--; if (falta > 0) cu.textContent = falta; else { clearInterval(T); cu.remove(); x.hidden = false; } }, 1000);
     v.play().catch(() => { v.muted = true; so.hidden = false; v.play().catch(() => {}); });     // el navegador a veces no deja sonido sin un toque: va en silencio con el botón 🔊
     const sonido = () => { if (!v.muted) return; v.muted = false; so.hidden = true; v.play().catch(() => {}); };
@@ -39,9 +44,9 @@
     x.addEventListener('click', e => { e.stopPropagation(); cerrar(); });
     v.addEventListener('timeupdate', () => { if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%'; });
     v.addEventListener('ended', cerrar);                                 // si lo dejan, el video sigue y al terminar se cierra solo
-    addEventListener('keydown', e => { if (e.key === 'Escape' && !x.hidden) cerrar(); });
+    const esc = e => { if (cerrado) return removeEventListener('keydown', esc); if (e.key === 'Escape' && !x.hidden) cerrar(); }; addEventListener('keydown', esc);
     window.Anuncio = { cerrar: () => { if (!x.hidden) cerrar(); }, abierto: () => !cerrado };
   }
-  const ir = () => setTimeout(mostrar, 900);
+  const ir = () => setTimeout(() => mostrar(0), 900);
   if (document.readyState === 'complete') ir(); else addEventListener('load', ir, { once: true });
 })();
