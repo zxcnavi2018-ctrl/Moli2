@@ -240,11 +240,24 @@
   // ---- leer el mando ----
   const rep = {}, stkN = { l: 0, r: 0 };
   let prev = [], stk = { l: '', r: '' }, stkT = { l: 0, r: 0 }, raf = 0, ultimo = null, ver = null;
-  const mandos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean);
+  const mandos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(g => g && g.connected !== false);
+  let gid = null;
+  function elegir(P) {                                                // en PC a veces aparecen 2 «mandos» (uno fantasma): se usa el último que tocaste
+    const activo = P.find(g => g.buttons.some(b => b.pressed));
+    if (activo) gid = activo.index;
+    return P.find(g => g.index === gid) || P.reduce((a, g) => (g.timestamp || 0) > (a.timestamp || 0) ? g : a, P[0]);
+  }
+  function cruceta(g, on) {                                           // mandos «no estándar» (genéricos en PC): la cruceta llega como un eje (hat) y no como botones 12-15
+    if (g.mapping === 'standard') return;
+    for (let i = on.length; i < 16; i++) on[i] = false;
+    const v = g.axes.length > 9 ? g.axes[9] : null; if (v == null || v > 1.05 || v < -1.05) return;
+    const k = Math.round((v + 1) / (2 / 7)) % 8;                     // 0 ↑ · 1 ↗ · 2 → · 3 ↘ · 4 ↓ · 5 ↙ · 6 ← · 7 ↖
+    on[12] = on[12] || [7, 0, 1].includes(k); on[13] = on[13] || [3, 4, 5].includes(k); on[14] = on[14] || [5, 6, 7].includes(k); on[15] = on[15] || [1, 2, 3].includes(k);
+  }
   function leer() {
     raf = 0; const P = mandos(); if (!P.length) { prev = []; pintaEstado(); return; }
-    const g = P[0], ahora = performance.now(), k60 = Math.min(4, (ahora - (leer.t || ahora - 16.7)) / 16.7); leer.t = ahora;   // cuánto pasó (en cuadros de 60 fps): se mueve igual de parejo aunque la PC vaya lenta
-    const on = g.buttons.map(b => b.pressed || b.value > 0.5);
+    const g = elegir(P), ahora = performance.now(), k60 = Math.min(4, (ahora - (leer.t || ahora - 16.7)) / 16.7); leer.t = ahora;   // cuánto pasó (en cuadros de 60 fps): se mueve igual de parejo aunque la PC vaya lenta
+    const on = g.buttons.map(b => b.pressed || b.value > 0.5); cruceta(g, on);
     if (on[6] && on[7] && !combo) { combo = true; delete pend[6]; delete pend[7]; if (!panelAbierto()) modoMouse(!MM); }   // ZL + ZR juntos: modo mouse
     if (!on[6] && !on[7]) combo = false;
     on.forEach((o, i) => {
@@ -312,7 +325,7 @@
   const mostrar = () => { btn.hidden = !esDocente(); if (!btn.hidden) lugar(); };
   addEventListener('resize', lugar); addEventListener('moli2:me', mostrar); setTimeout(mostrar, 300); setTimeout(mostrar, 2500);
   btn.addEventListener('click', e => { e.stopPropagation(); abrirPanel(); });
-  function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const g = mandos()[0]; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : ' · (mapa no estándar: prueba cada botón)') : '⚪ Conecta tu mando por Bluetooth y presiona cualquier botón para que aparezca.'; } }
+  function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const M = mandos(), g = M.length ? elegir(M) : null; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : ' · (mapa no estándar: prueba cada botón)') : '⚪ Conecta tu mando (Bluetooth o cable USB) y, con esta página abierta, presiona cualquier botón para que aparezca.'; } }
 
   // ---- el panel: el dibujo del mando y la lista de botones ----
   function padSvg() {
