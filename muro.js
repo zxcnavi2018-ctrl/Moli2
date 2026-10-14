@@ -34,24 +34,25 @@
 
   // ---- el papelógrafo de la pared: los últimos trabajos pegados con cinta ----
   const cargarImg = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
-  async function pintarMural() {
+  async function pintarMural() {                                     // minimalista: sin tablero; sólo papelotes pegados con cinta masking en la pared
     const M = window.MURO_MESH; if (!M) return;
     const W = 1300, H = 500, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-    const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#f8ecd2'); gr.addColorStop(1, '#ecd9b3'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
-    g.fillStyle = 'rgba(124,45,18,.06)'; for (let i = 0; i < 260; i++) g.fillRect(Math.random() * W, Math.random() * H, 2, 2);
-    g.fillStyle = '#b91c1c'; g.beginPath(); g.moveTo(330, 18); g.lineTo(970, 18); g.lineTo(940, 52); g.lineTo(970, 86); g.lineTo(330, 86); g.lineTo(360, 52); g.closePath(); g.fill();   // cinta con el título
-    g.fillStyle = '#fff'; g.font = '900 50px "Trebuchet MS", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('⭐ MURO DESTACABLE ⭐', 650, 54);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = '#334155'; g.font = '700 30px "Trebuchet MS", sans-serif'; if ('letterSpacing' in g) g.letterSpacing = '6px'; g.fillText('TRABAJOS DESTACADOS', W / 2, 30); if ('letterSpacing' in g) g.letterSpacing = '0px';
+    g.fillStyle = '#f59e0b'; g.fillRect(W / 2 - 40, 52, 80, 4);                                  // título pequeño y una rayita
+    const cinta = (x, y, a) => { g.save(); g.translate(x, y); g.rotate(a); g.fillStyle = 'rgba(232,220,192,.92)'; g.fillRect(-34, -11, 68, 22); g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(-34, -11, 68, 5); g.restore(); };
+    const papel = (cw, ch) => { g.fillStyle = 'rgba(15,23,42,.13)'; g.fillRect(-cw / 2 + 5, -ch / 2 + 7, cw, ch); g.fillStyle = '#fdfdfb'; g.fillRect(-cw / 2, -ch / 2, cw, ch); cinta(-cw / 2 + 14, -ch / 2 + 4, -0.6); cinta(cw / 2 - 14, -ch / 2 + 4, 0.6); };
     const L = (LISTA || []).slice(0, 5);
-    if (!L.length) { g.fillStyle = '#7c2d12'; g.font = '800 40px "Trebuchet MS", sans-serif'; g.fillText('Pronto aquí los mejores trabajos de la clase', 650, 280); }
-    const n = Math.max(1, L.length), cw = Math.min(250, (W - 80) / n - 20);
+    if (!L.length) { g.save(); g.translate(W / 2, 285); g.rotate(-0.015); papel(420, 260); g.fillStyle = '#94a3b8'; g.font = '700 30px "Trebuchet MS", sans-serif'; g.fillText('Pronto, aquí', 0, -18); g.fillText('los mejores trabajos', 0, 22); g.restore(); }
+    const n = Math.max(1, L.length), cw = Math.min(250, (W - 80) / n - 26), ch = 380;
     for (let k = 0; k < L.length; k++) {
-      const it = L[k], x = 40 + (W - 80) / n * (k + 0.5), y = 290, ang = ((k * 37) % 7 - 3) * 0.02, im = it.th ? await cargarImg(it.th) : null;
-      g.save(); g.translate(x, y); g.rotate(ang);
-      g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(-cw / 2 + 6, -150 + 8, cw, 320);
-      g.fillStyle = '#ffffff'; g.fillRect(-cw / 2, -150, cw, 320);                              // papelito
-      if (im) { const iw = cw - 20, ih = 220, r = Math.max(iw / im.width, ih / im.height), sw = iw / r, sh = ih / r; g.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, -iw / 2, -140, iw, ih); }
-      g.fillStyle = '#1e3a8a'; const nom = String(it.n || ''); let fs = 22; do { g.font = '800 ' + fs + 'px "Trebuchet MS", sans-serif'; fs--; } while (g.measureText(nom).width > cw - 14 && fs > 12); g.fillText(nom.length > 40 ? nom.slice(0, 38) + '…' : nom, 0, 112); g.fillStyle = '#64748b'; g.font = '700 17px "Trebuchet MS", sans-serif'; g.fillText(String(it.t || '').slice(0, 26), 0, 142);
-      g.fillStyle = 'rgba(250,204,21,.75)'; g.save(); g.translate(0, -152); g.rotate(-0.06); g.fillRect(-45, -14, 90, 28); g.restore();   // cinta
+      const it = L[k], x = 40 + (W - 80) / n * (k + 0.5), y = 285, ang = ((k * 37) % 7 - 3) * 0.012, im = it.th ? await cargarImg(it.th) : null;
+      g.save(); g.translate(x, y); g.rotate(ang); papel(cw, ch);
+      const iw = cw - 24, ih = 250;
+      if (im) { const r = Math.max(iw / im.width, ih / im.height), sw = iw / r, sh = ih / r; g.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, -iw / 2, -ch / 2 + 14, iw, ih); }
+      else { g.fillStyle = '#f1f5f9'; g.fillRect(-iw / 2, -ch / 2 + 14, iw, ih); }
+      g.fillStyle = '#1e293b'; const nom = String(it.n || ''); let fs = 22; do { g.font = '800 ' + fs + 'px "Trebuchet MS", sans-serif'; fs--; } while (g.measureText(nom).width > cw - 16 && fs > 12); g.fillText(nom.length > 40 ? nom.slice(0, 38) + '…' : nom, 0, ch / 2 - 66);
+      if (it.t) { g.fillStyle = '#64748b'; g.font = '600 17px "Trebuchet MS", sans-serif'; g.fillText(String(it.t).slice(0, 26), 0, ch / 2 - 34); }
       g.restore();
     }
     const t = new THREE.CanvasTexture(c); t.anisotropy = 8; const old = M.material.map; M.material.map = t; M.material.needsUpdate = true; if (old) old.dispose();

@@ -407,22 +407,17 @@ function label(text, x, y, z, scale = 2.2, color = '#ffffff', bg = 'rgba(15,23,4
   s.position.set(x, y, z); s.scale.set(scale * (w / h) / 2, scale / 2, 1);
   scene.add(s); return s;
 }
-function letreroCiencia(x, y, z, rotY) {                             // letrero «Área de Ciencia»: madera, degradé verde-azul, átomo y lupa
+function letreroCiencia(x, y, z, rotY) {                             // letrero «Área de Ciencia» minimalista: letras oscuras sobre la pared y un átomo pequeño
   const W = 1024, H = 240, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-  const rr = (x0, y0, w, h, r) => { g.beginPath(); g.moveTo(x0 + r, y0); g.arcTo(x0 + w, y0, x0 + w, y0 + h, r); g.arcTo(x0 + w, y0 + h, x0, y0 + h, r); g.arcTo(x0, y0 + h, x0, y0, r); g.arcTo(x0, y0, x0 + w, y0, r); g.closePath(); };
-  rr(0, 0, W, H, 40); g.fillStyle = '#8b5a2b'; g.fill();                                  // marco de madera
-  rr(14, 14, W - 28, H - 28, 30); const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, '#0f766e'); gr.addColorStop(.55, '#0e7490'); gr.addColorStop(1, '#1d4ed8'); g.fillStyle = gr; g.fill();
-  g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 4; rr(26, 26, W - 52, H - 52, 24); g.stroke();
-  g.save(); g.translate(110, H / 2); g.scale(.85, .85); g.strokeStyle = '#fde68a'; g.lineWidth = 7;          // átomo
-  for (let k = 0; k < 3; k++) { g.save(); g.rotate(k * Math.PI / 3); g.beginPath(); g.ellipse(0, 0, 70, 26, 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
-  g.fillStyle = '#facc15'; g.beginPath(); g.arc(0, 0, 13, 0, Math.PI * 2); g.fill(); g.restore();
-  g.save(); g.translate(W - 112, H / 2 - 6); g.scale(.8, .8); g.strokeStyle = '#fde68a'; g.lineWidth = 12; g.beginPath(); g.arc(-8, -8, 40, 0, Math.PI * 2); g.stroke();   // lupa
-  g.lineCap = 'round'; g.lineWidth = 18; g.beginPath(); g.moveTo(22, 22); g.lineTo(60, 60); g.stroke(); g.fillStyle = 'rgba(255,255,255,.25)'; g.beginPath(); g.arc(-8, -8, 34, 0, Math.PI * 2); g.fill(); g.restore();
-  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = 'rgba(0,0,0,.25)'; g.font = '900 80px "Trebuchet MS", system-ui, sans-serif'; g.fillText('Área de Ciencia', W / 2 + 4, H / 2 + 8);
-  g.fillStyle = '#ffffff'; g.fillText('Área de Ciencia', W / 2, H / 2 + 2);
-  g.fillStyle = '#fde68a'; [[230, 44], [800, 200], [260, 200], [780, 40]].forEach(([sx, sy]) => { g.save(); g.translate(sx, sy); g.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? 6 : 15, a = i * Math.PI / 5 - Math.PI / 2; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill(); g.restore(); });
+  g.textAlign = 'left'; g.textBaseline = 'middle'; g.font = '800 88px "Trebuchet MS", system-ui, sans-serif';
+  const txt = 'Área de Ciencia', tw = g.measureText(txt).width, ic = 92, gap = 26, x0 = (W - (ic + gap + tw)) / 2;
+  g.save(); g.translate(x0 + ic / 2, H / 2 - 6); g.strokeStyle = '#0d9488'; g.lineWidth = 5;          // átomo de líneas finas
+  for (let k = 0; k < 3; k++) { g.save(); g.rotate(k * Math.PI / 3); g.beginPath(); g.ellipse(0, 0, 44, 16, 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  g.fillStyle = '#f59e0b'; g.beginPath(); g.arc(0, 0, 9, 0, Math.PI * 2); g.fill(); g.restore();
+  g.fillStyle = '#1e293b'; g.fillText(txt, x0 + ic + gap, H / 2 - 6);
+  g.fillStyle = '#0d9488'; g.fillRect(x0 + ic + gap, H / 2 + 46, 120, 6);                       // una rayita de color
   const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 0.46), new THREE.MeshLambertMaterial({ map: t, transparent: true }));
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 0.46), new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.02 }));
   m.position.set(x, y, z); m.rotation.y = rotY; m.translateZ(0.01); scene.add(m); return m;
 }
 function plaque(text, x, y, z, rotY, w = 0.62, h = 0.2) {         // cartelito plano (no flota): fondo azul noche y letras blancas
@@ -2092,13 +2087,11 @@ async function closeBook(o) {
   await Promise.all([...lv.map((l, i) => wait((lv.length - 1 - i) * 90).then(() => { const a0 = l.rotation.z; return tween(420, k => { l.rotation.z = a0 * (1 - k); }, inCubic); })), wait(160).then(() => hingeTo(o, 0, 520, outBack))]);
 }
 // ---- 🖼️ MURO DESTACABLE: papelógrafo grande en la pared del fondo (debajo del letrero «Área de Ciencia»); muro.js le pone los trabajos ----
-const FOCUS_MURO = (() => { const M = window.MURO_POS; if (!M) return null;
-  const c = document.createElement('canvas'); c.width = 1300; c.height = 500; const g = c.getContext('2d'); g.fillStyle = '#f5e6c8'; g.fillRect(0, 0, 1300, 500);
-  g.fillStyle = '#7c2d12'; g.font = '900 64px "Trebuchet MS", sans-serif'; g.textAlign = 'center'; g.fillText('MURO DESTACABLE', 650, 90);
+const FOCUS_MURO = (() => { const M = window.MURO_POS; if (!M) return null;     // Muro Destacable: sin tablero, sólo papelotes pegados en la pared (los dibuja muro.js)
+  const c = document.createElement('canvas'); c.width = 1300; c.height = 500;
   const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.0), new THREE.MeshLambertMaterial({ map: t }));
-  mesh.position.set(M.x + M.nx * 0.03, M.y0 + 0.98, M.z + M.nz * 0.03); mesh.rotation.y = M.rot; scene.add(mesh);
-  const marco = new THREE.Mesh(new THREE.BoxGeometry(2.7, 1.1, 0.03), new THREE.MeshLambertMaterial({ color: 0x8b5a2b })); marco.position.set(M.x + M.nx * 0.012, M.y0 + 0.98, M.z + M.nz * 0.012); marco.rotation.y = M.rot; scene.add(marco);
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.0), new THREE.MeshBasicMaterial({ map: t, color: 0xf3f3f1, transparent: true, alphaTest: 0.02, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));   // papel blanco aunque haya poca luz
+  mesh.position.set(M.x + M.nx * 0.02, M.y0 + 0.98, M.z + M.nz * 0.02); mesh.rotation.y = M.rot; scene.add(mesh);
   window.MURO_MESH = mesh;
   const look = new THREE.Vector3(mesh.position.x, M.y0 + 1.05, mesh.position.z);
   return { obj: mesh, look, from: new THREE.Vector3(look.x + M.nx * 2.5, M.y0 + 1.45, look.z + M.nz * 2.5) };
