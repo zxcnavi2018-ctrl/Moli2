@@ -216,7 +216,7 @@
     if (CFG.on) hacer(CFG.b[i]);
   }
   function modoMouse(on) { MM = on;
-    if (on) { if (!cur) { cur = document.createElement('div'); cur.id = 'mandoCur'; cur.innerHTML = '<svg viewBox="0 0 32 32" width="40" height="40"><path d="M4 2 L4 26 L10 20 L15 30 L19 28 L14 18 L23 18 Z" fill="#fff" stroke="#111827" stroke-width="2.2" stroke-linejoin="round"/></svg>'; document.body.appendChild(cur); }
+    if (on) { if (!cur) { cur = document.createElement('div'); cur.id = 'mandoCur'; cur.innerHTML = '<i class="halo"></i><i class="onda"></i><svg viewBox="0 0 32 32" width="72" height="72"><defs><linearGradient id="mcG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#facc15"/><stop offset=".45" stop-color="#fb923c"/><stop offset=".75" stop-color="#ec4899"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><path d="M2 2 L2 25 L8 19.5 L12.8 29.5 L17.6 27.4 L12.9 17.6 L21.5 17.6 Z" fill="none" stroke="#1e1b4b" stroke-width="4.2" stroke-linejoin="round"/><path d="M2 2 L2 25 L8 19.5 L12.8 29.5 L17.6 27.4 L12.9 17.6 L21.5 17.6 Z" fill="url(#mcG)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M4.6 7 L4.6 15" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/></svg>'; document.body.appendChild(cur); }
       pintaCur(); avisar('🖱️ Modo mouse: L3 mueve · A hace clic · ZL + ZR para salir'); }
     else { if (cur) { cur.remove(); cur = null; } avisar('🖱️ Saliste del modo mouse'); } }
   const pintaCur = () => { if (cur) cur.style.transform = `translate(${mx}px, ${my}px)`; };
@@ -234,8 +234,14 @@
     evento('pointerdown', el); evento('mousedown', el); if (/INPUT|TEXTAREA|SELECT/.test(el.tagName)) el.focus();
     evento('pointerup', el); evento('mouseup', el); evento('click', el); }
   const cssM = document.createElement('style');
-  cssM.textContent = `#mandoCur { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); will-change: transform; }
-  #mandoCur.clic svg { animation: mcClic .25s ease; } @keyframes mcClic { 50% { transform: scale(.8); } }`;
+  cssM.textContent = `#mandoCur { position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none; will-change: transform; }
+  #mandoCur svg { position: absolute; left: -4.5px; top: -4.5px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); transform-origin: 4.5px 4.5px; animation: mcBaila 1.6s ease-in-out infinite; }   /* la punta queda justo donde hace clic */
+  #mandoCur .halo { position: absolute; left: -26px; top: -26px; width: 52px; height: 52px; border-radius: 50%; background: conic-gradient(#facc15, #fb923c, #ec4899, #8b5cf6, #22d3ee, #4ade80, #facc15); -webkit-mask: radial-gradient(circle, transparent 54%, #000 56%); mask: radial-gradient(circle, transparent 54%, #000 56%); opacity: .85; animation: mcGira 2.4s linear infinite, mcLatido 1.2s ease-in-out infinite; }
+  #mandoCur .onda { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; border-radius: 50%; border: 5px solid #facc15; opacity: 0; }
+  #mandoCur.clic svg { animation: mcClic .3s ease; } #mandoCur.clic .onda { animation: mcOnda .5s ease-out; }
+  @keyframes mcClic { 50% { transform: scale(.78); } } @keyframes mcBaila { 50% { transform: rotate(-6deg) scale(1.04); } }
+  @keyframes mcGira { to { rotate: 360deg; } } @keyframes mcLatido { 50% { scale: 1.18; opacity: .55; } }
+  @keyframes mcOnda { from { transform: scale(.3); opacity: 1; border-color: #ec4899; } to { transform: scale(1.9); opacity: 0; border-color: #facc15; } }`;
   document.head.appendChild(cssM);
 
   // ---- leer el mando ----
