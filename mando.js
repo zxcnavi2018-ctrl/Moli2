@@ -240,7 +240,42 @@
   // ---- leer el mando ----
   const rep = {}, stkN = { l: 0, r: 0 };
   let prev = [], stk = { l: '', r: '' }, stkT = { l: 0, r: 0 }, raf = 0, ultimo = null, ver = null;
-  const mandos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(g => g && g.connected !== false);
+  const nativos = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(g => g && g.connected !== false);
+  const mandos = () => { const N = nativos(); return N.length || !HID.pad ? N : [HID.pad]; };   // si el navegador no lo ve, se usa la conexión directa (WebHID)
+
+  // ---- 🔌 conexión directa (WebHID) con el Pro Controller y sus genéricos (057e:2009): en Linux Chrome a veces no lo muestra como mando ----
+  const NIN = 0x057e, HID = { dev: null, pad: null, n: 0 };
+  const padVacio = id => ({ index: 90, id, mapping: 'standard', connected: true, timestamp: 0, axes: [0, 0, 0, 0], buttons: Array.from({ length: 18 }, () => ({ pressed: false, value: 0 })) });
+  const RUIDO0 = [0x00, 0x01, 0x40, 0x40, 0x00, 0x01, 0x40, 0x40];   // «vibración neutra» que va en cada orden
+  async function ordenHID(d, cmd, args) { const b = new Uint8Array(10 + args.length); b[0] = HID.n++ & 0x0f; b.set(RUIDO0, 1); b[9] = cmd; b.set(args, 10); await d.sendReport(0x01, b); }
+  async function abrirHID(d) {
+    if (!d.opened) await d.open();                                     // en Linux falla si Ubuntu no da permiso (ver la ayuda)
+    if (HID.dev && HID.dev !== d) try { HID.dev.removeEventListener('inputreport', leerHID); } catch (e) {}
+    HID.dev = d; HID.pad = padVacio((d.productName || 'Pro Controller') + ' (conexión directa)'); d.addEventListener('inputreport', leerHID);
+    for (const r of [[0x80, [0x02]], [0x80, [0x04]]]) try { await d.sendReport(r[0], new Uint8Array(r[1])); } catch (e) {}   // por cable USB: «saludo» para que empiece a mandar datos
+    try { await ordenHID(d, 0x03, [0x30]); } catch (e) {}              // modo completo (si no responde, igual llegan los reportes simples)
+    try { await ordenHID(d, 0x30, [0x01]); } catch (e) {}              // prende la lucecita 1
+    arrancar(); pintaEstado(); return HID.pad;
+  }
+  function leerHID(e) {
+    const v = e.data, p = HID.pad; if (!p) return;
+    const B = (i, on) => { p.buttons[i].pressed = on; p.buttons[i].value = on ? 1 : 0; };
+    if ((e.reportId === 0x30 || e.reportId === 0x21 || e.reportId === 0x31) && v.byteLength >= 11) {      // reporte completo
+      const r = v.getUint8(2), c = v.getUint8(3), l = v.getUint8(4);
+      B(0, !!(r & 0x04)); B(1, !!(r & 0x08)); B(2, !!(r & 0x01)); B(3, !!(r & 0x02)); B(5, !!(r & 0x40)); B(7, !!(r & 0x80));
+      B(4, !!(l & 0x40)); B(6, !!(l & 0x80)); B(12, !!(l & 0x02)); B(13, !!(l & 0x01)); B(14, !!(l & 0x08)); B(15, !!(l & 0x04));
+      B(8, !!(c & 0x01)); B(9, !!(c & 0x02)); B(10, !!(c & 0x08)); B(11, !!(c & 0x04)); B(16, !!(c & 0x10)); B(17, !!(c & 0x20));
+      const st = o => [v.getUint8(o) | ((v.getUint8(o + 1) & 0x0f) << 8), (v.getUint8(o + 1) >> 4) | (v.getUint8(o + 2) << 4)], n = x => Math.max(-1, Math.min(1, (x - 2048) / 1450));
+      const [lx, ly] = st(5), [rx, ry] = st(8); p.axes = [n(lx), -n(ly), n(rx), -n(ry)];
+    } else if (e.reportId === 0x3f && v.byteLength >= 11) {               // reporte simple (lo que manda al conectarse)
+      const a = v.getUint8(0), b = v.getUint8(1), h = v.getUint8(2), n = x => Math.max(-1, Math.min(1, (x - 32768) / 26000));
+      for (let i = 0; i < 8; i++) B(i, !!(a & (1 << i)));
+      B(8, !!(b & 0x01)); B(9, !!(b & 0x02)); B(10, !!(b & 0x04)); B(11, !!(b & 0x08)); B(16, !!(b & 0x10)); B(17, !!(b & 0x20));
+      B(12, [7, 0, 1].includes(h)); B(15, [1, 2, 3].includes(h)); B(13, [3, 4, 5].includes(h)); B(14, [5, 6, 7].includes(h));
+      p.axes = [n(v.getUint16(3, true)), n(v.getUint16(5, true)), n(v.getUint16(7, true)), n(v.getUint16(9, true))];
+    } else return;
+    p.timestamp = performance.now(); arrancar();
+  }
   let gid = null;
   function elegirMando(P) {                                           // en PC a veces aparecen 2 «mandos» (uno fantasma): se usa el último que tocaste
     const activo = P.find(g => g.buttons.some(b => b.pressed));
@@ -289,6 +324,12 @@
   addEventListener('gamepadconnected', e => { arrancar(); pintaEstado(); if (esDocente()) avisar('🎮 Mando conectado: ' + nombreMando(e.gamepad)); });
   addEventListener('gamepaddisconnected', () => { pintaEstado(); if (esDocente()) avisar('🎮 Se desconectó el mando'); });
   if (mandos().length) arrancar();
+  if (navigator.hid) {                                                  // si ya lo conectaste antes con «🔌 Conectar mando», se vuelve a conectar solo
+    const auto = d => { if (d.vendorId !== NIN || HID.dev === d) return; setTimeout(() => { if (!nativos().length) abrirHID(d).then(() => esDocente() && avisar('🎮 Mando conectado (conexión directa)')).catch(() => {}); }, 1200); };
+    navigator.hid.getDevices().then(L => L.forEach(auto)).catch(() => {});
+    navigator.hid.addEventListener('connect', e => auto(e.device));
+    navigator.hid.addEventListener('disconnect', e => { if (e.device === HID.dev) { HID.dev = null; HID.pad = null; pintaEstado(); if (esDocente()) avisar('🎮 Se desconectó el mando'); } });
+  }
   const nombreMando = g => String(g && g.id || 'mando').replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim().slice(0, 40) || 'mando';
   function avisar(t) { if (typeof window.toast === 'function') return window.toast(t, REPO ? 3000 : 3); if (BIBL && typeof window.aviso === 'function') return window.aviso(t, 3); }
 
@@ -311,7 +352,9 @@
   #mandoP [data-con] { border: 0; border-radius: 12px; padding: 10px 18px; background: #22c55e; color: #052e16; font: 900 15px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #15803d; }
   #mandoP [data-con]:disabled { opacity: .7; cursor: wait; }
   #mandoP .ayuda { margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; font: 600 14px/1.5 system-ui, sans-serif; }
-  #mandoP .ayuda[hidden] { display: none; } #mandoP .ayuda b { color: #fde68a; } #mandoP .ayuda code { background: #0f172a; padding: 2px 6px; border-radius: 6px; color: #7dd3fc; user-select: all; } #mandoP .ayuda a { color: #7dd3fc; }
+  #mandoP .ayuda[hidden] { display: none; } #mandoP .ayuda b { color: #fde68a; } #mandoP .ayuda details { margin-top: 8px; color: #94a3b8; } #mandoP .ayuda summary { cursor: pointer; font-weight: 800; }
+  #mandoP .ayuda .cmd { display: block; margin: 6px 0; padding: 8px 10px; white-space: pre-wrap; word-break: break-all; font: 600 12.5px ui-monospace, monospace; } #mandoP [data-copia] { border: 0; border-radius: 8px; padding: 5px 12px; background: #38bdf8; color: #082f49; font: 800 13px system-ui, sans-serif; cursor: pointer; }
+  #mandoP .ayuda code { background: #0f172a; padding: 2px 6px; border-radius: 6px; color: #7dd3fc; user-select: all; } #mandoP .ayuda a { color: #7dd3fc; }
   #mandoP .gr { display: grid; grid-template-columns: minmax(380px, .9fr) 1.4fr; gap: 20px; align-items: start; } @media (max-width: 1000px) { #mandoP .gr { grid-template-columns: 1fr; } }
   #mandoP svg.pad { width: 100%; height: auto; } #mandoP svg.pad .k { fill: #1e293b; stroke: #cbd5e1; stroke-width: 3; cursor: pointer; transition: fill .08s; } #mandoP svg.pad .k:hover { stroke: #facc15; }
   #mandoP svg.pad .k.on { fill: #facc15; stroke: #fde047; } #mandoP svg.pad .k.sel { stroke: #38bdf8; stroke-width: 5; } #mandoP svg.pad .ar text { font-size: 13px; fill: #38bdf8; } #mandoP svg.pad .dot { pointer-events: none; transition: cx .05s, cy .05s; } #mandoP svg.pad text { fill: #e2e8f0; font: 900 18px "Trebuchet MS", sans-serif; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
@@ -332,10 +375,17 @@
   btn.addEventListener('click', e => { e.stopPropagation(); abrirPanel(); });
   // 🔌 «Conectar mando»: el navegador sólo «ve» el mando cuando le aprietas un botón con la página abierta. Se busca 10 s; si no aparece, se explica qué revisar.
   let buscando = 0;
-  function conectar() {
+  async function conectar() {
     const b = P && P.querySelector('[data-con]'), A = P && P.querySelector('.ayuda'); if (!b || buscando) return;
     if (!navigator.getGamepads) { A.hidden = false; A.innerHTML = 'Este navegador no puede usar mandos. Abre Molí 2 en <b>Google Chrome</b> o <b>Microsoft Edge</b>.'; return; }
-    A.hidden = true; b.disabled = true; let s = 10; const t0 = Date.now();
+    A.hidden = true;
+    if (!mandos().length && navigator.hid) {                             // 1.º la conexión directa: Chrome muestra una ventanita con el «Pro Controller»
+      let d = null; try { [d] = await navigator.hid.requestDevice({ filters: [{ vendorId: NIN }] }); } catch (e) {}
+      if (d) { b.disabled = true; b.textContent = '⏳ Conectando…';
+        try { await abrirHID(d); b.disabled = false; b.textContent = '✅ ¡Conectado!'; pintaEstado(); if (esDocente()) avisar('🎮 Mando conectado'); setTimeout(() => { if (b.isConnected) b.textContent = '🔌 Conectar mando'; }, 2500); return; }
+        catch (e) { b.disabled = false; b.textContent = '🔌 Intentar otra vez'; A.hidden = false; A.innerHTML = ayudaTexto(true); return; } }
+    }
+    b.disabled = true; let s = 10; const t0 = Date.now();
     const paso = () => { const M = mandos();
       if (M.length) { buscando = 0; b.disabled = false; b.textContent = '✅ ¡Conectado!'; arrancar(); pintaEstado(); setTimeout(() => { if (b.isConnected) b.textContent = '🔌 Conectar mando'; }, 2500); return; }
       const q = 10 - Math.floor((Date.now() - t0) / 1000);
@@ -343,13 +393,18 @@
       if (q !== s) s = q; b.textContent = `🎮 Aprieta A o B en tu mando… ${s}`; buscando = requestAnimationFrame(paso); };
     paso();
   }
-  function ayudaTexto() {
+  const REGLA = `printf 'KERNEL=="hidraw*", KERNELS=="*057E:2009*", MODE="0666"\\nKERNEL=="hidraw*", ATTRS{idVendor}=="057e", ATTRS{idProduct}=="2009", MODE="0666"\\n' | sudo tee /etc/udev/rules.d/50-pro-controller.rules && sudo udevadm control --reload-rules && sudo udevadm trigger`;
+  function ayudaTexto(permiso) {
     const linux = /Linux/.test(navigator.userAgent) && !/Android|CrOS/.test(navigator.userAgent);
-    return `<b>El navegador todavía no recibe tu mando.</b> Revisa en este orden:<br>
-      1️⃣ Mantén apretados <b>L + R</b> a la vez unos segundos (en algunos sistemas así se «activa» el Pro Controller).<br>
-      2️⃣ Prueba si el navegador lo ve en <a href="https://hardwaretester.com/gamepad" target="_blank" rel="noopener">hardwaretester.com/gamepad</a>. Si ahí tampoco aparece, el problema es del sistema, no de Molí 2.<br>
-      3️⃣ Si tu mando tiene <b>modos</b>, apágalo y préndelo en modo <b>PC / X-input</b> (en muchos genéricos: mantener <b>Home + X</b>); así se conecta como un mando de Xbox, que funciona mejor.<br>
-      4️⃣ Prueba con un <b>cable USB-C de datos</b>.` + (linux ? `<br>🐧 <b>En Ubuntu / Linux:</b> si usas Chromium instalado como «snap», abre la Terminal y escribe <code>sudo snap connect chromium:joystick</code>, luego reinicia el navegador. Para ver si el sistema recibe los botones: <code>sudo apt install joystick</code> y luego <code>jstest /dev/input/js0</code>.` : '');
+    const tecnico = linux ? `<details><summary>🛠️ Para el técnico del colegio (requiere ser administrador)</summary>En la Terminal: <code class="cmd">${esc(REGLA)}</code> <button type="button" data-copia>📋 Copiar</button></details>` : '';
+    return (permiso ? `<b>Chrome encontró tu mando, pero el sistema no le deja usarlo en el modo «Pro Controller».</b><br>` : `<b>Chrome todavía no recibe tu mando.</b><br>`) +
+      `✅ <b>La forma más fácil (sin comandos): cambia el «modo» del mando</b><br>
+      1️⃣ En la configuración de Bluetooth de la PC, elige <b>Pro Controller → Olvidar / Quitar</b>.<br>
+      2️⃣ Apaga el mando. Préndelo manteniendo <b>Home + X</b> unos 3 segundos, hasta que las luces parpadeen (si no cambia nada, prueba <b>Home + A</b> y luego <b>Home + B</b>).<br>
+      3️⃣ Vuelve a buscarlo en Bluetooth: ahora debe salir con <b>otro nombre</b> (por ejemplo «Xbox Wireless Controller», «Gamepad» o «Wireless Controller»). Conéctalo.<br>
+      4️⃣ Vuelve aquí, toca <b>🔌 Conectar mando</b> y aprieta un botón.<br>
+      🔁 Otra opción: un <b>cable USB-C de datos</b> (enchúfalo manteniendo <b>Home + X</b>).<br>
+      🔎 Para comprobar si Chrome ya lo ve: <a href="https://hardwaretester.com/gamepad" target="_blank" rel="noopener">hardwaretester.com/gamepad</a>.` + tecnico;
   }
   function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const M = mandos(), g = M.length ? elegirMando(M) : null; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : ' · (mapa no estándar: prueba cada botón)') : '⚪ Conecta tu mando (Bluetooth o cable USB) y, con esta página abierta, presiona cualquier botón para que aparezca.'; } }
 
@@ -381,6 +436,7 @@
       P.addEventListener('click', e => { if (e.target === P || e.target.closest('.x')) return cerrarPanel();
         const g = e.target.closest('[data-k]'); if (g) return elegir(+g.dataset.k);
         if (e.target.closest('[data-con]')) return conectar();
+        if (e.target.closest('[data-copia]')) { const c = e.target.closest('[data-copia]'); (navigator.clipboard ? navigator.clipboard.writeText(REGLA) : Promise.reject()).then(() => { c.textContent = '✅ Copiado'; }, () => { const r = document.createRange(); r.selectNodeContents(P.querySelector('.cmd')); getSelection().removeAllRanges(); getSelection().addRange(r); c.textContent = 'Ctrl + C para copiar'; }); return; }
         if (e.target.closest('[data-reset]')) { CFG = JSON.parse(JSON.stringify(DEF)); guardar(); pintarPanel(); } });
       P.addEventListener('change', e => { const s = e.target;
         if (s.dataset.b != null) { CFG.b[s.dataset.b] = s.value; guardar(); const o = P.querySelector(`.ult select`); if (o && +o.dataset.b === +s.dataset.b) o.value = s.value; const r = P.querySelector(`.lst select[data-b="${s.dataset.b}"]`); if (r) r.value = s.value; }
