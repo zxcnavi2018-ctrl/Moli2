@@ -44,6 +44,7 @@
   let selB = 0;
   function hacer(a) {
     if (!a || a === 'nada') return;
+    if (ENS || (panelAbierto() && a !== 'panel')) return;             // con el panel abierto (o enseñando el mando) sólo se prueba: no se mueve nada
     if (CR) return cronoTecla(a);                                      // con el cronómetro abierto: flechas eligen, A acepta, B sale
     if (GR) return grupoTecla(a);
     if (ZM && a === 'salir') return modoZoom(false);
@@ -51,7 +52,6 @@
     if (a === 'revista' && !REPO) { try { sessionStorage.setItem('moli2:fs', document.fullscreenElement ? '1' : '0'); } catch (e) {} location.href = 'repositorio.html'; return; }
     if (a === 'zoomP' || a === 'zoomM') return zoom(a === 'zoomP' ? -1 : 1);
     if (REPO) return enRevista(a);
-    if (panelAbierto() && a !== 'panel') return;                       // con el panel abierto el mando sólo se prueba
     if (a === 'fs') return pantalla();
     if (BIBL) {
       if (a === 'tabS' || a === 'tabA') a = a === 'tabS' ? 'escS' : 'escA';
@@ -210,6 +210,7 @@
   let MM = false, mx = innerWidth / 2, my = innerHeight / 2, cur = null, combo = false, sobre = null;
   const pend = {};
   function boton(i) {
+    if (ENS) return;
     if (MM) { if (i === 1) return clicMouse(); if (i === 0) return cerrarAnim(); }   // en modo mouse: A = clic (B no hace nada)
     if ((CR || GR) && i >= 12 && i <= 15) return moverSel(['^', 'v', '<', '>'][i - 12]);      // en el cronómetro o los grupos, la cruceta elige
     if (CFG.on) hacer(CFG.b[i]);
@@ -296,10 +297,19 @@
     for (let i = 4; i + 1 < A.length; i += 2) if (H[i] && H[i + 1]) {
       const x = A[i], y = A[i + 1]; on[14] = on[14] || x < 0; on[15] = on[15] || x > 0; on[12] = on[12] || y < 0; on[13] = on[13] || y > 0; return; }
   }
+  // 🧭 lo que el profesor le «enseñó» a Molí 2 de su mando (cuando el navegador lo da en otro orden): { id del mando: { botón real: botón estándar } }
+  const MAPA_K = 'moli2:mandoMapa'; let MAPA = LS.get(MAPA_K, {}), ENS = null;
+  function estado(g) {                                                // los botones en el orden de siempre (B A Y X L R ZL ZR − + L3 R3 ↑ ↓ ← → ⌂ ◉)
+    const raw = g.buttons.map(b => b.pressed || b.value > 0.5);
+    if (g.mapping === 'standard') return raw;
+    const m = MAPA[g.id]; let on = raw.slice();
+    if (m) { on = Array(18).fill(false); raw.forEach((x, i) => { const k = m[i]; if (x && k != null) on[k] = true; }); }
+    cruceta(g, on); return on;
+  }
   function leer() {
     raf = 0; const P = mandos(); if (!P.length) { prev = []; pintaEstado(); return; }
     const g = elegirMando(P), ahora = performance.now(), k60 = Math.min(4, (ahora - (leer.t || ahora - 16.7)) / 16.7); leer.t = ahora;   // cuánto pasó (en cuadros de 60 fps): se mueve igual de parejo aunque la PC vaya lenta
-    const on = g.buttons.map(b => b.pressed || b.value > 0.5); cruceta(g, on);
+    const on = estado(g);
     if (on[6] && on[7] && !combo) { combo = true; delete pend[6]; delete pend[7]; if (!panelAbierto()) modoMouse(!MM); }   // ZL + ZR juntos: modo mouse
     if (!on[6] && !on[7]) combo = false;
     on.forEach((o, i) => {
@@ -359,6 +369,11 @@
   #mandoP [data-con] { border: 0; border-radius: 12px; padding: 10px 18px; background: #22c55e; color: #052e16; font: 900 15px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #15803d; }
   #mandoP [data-con]:disabled { opacity: .7; cursor: wait; }
   #mandoP .ayuda { margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; font: 600 14px/1.5 system-ui, sans-serif; }
+  #mandoP [data-ens] { border: 0; border-radius: 12px; padding: 10px 18px; background: #facc15; color: #422006; font: 900 15px system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #a16207; } #mandoP [data-ens][hidden] { display: none; }
+  #mandoP .ens { margin: 0 0 12px; padding: 14px 16px; border-radius: 14px; background: #422006; border: 2px solid #facc15; color: #fef3c7; font: 700 15px/1.45 system-ui, sans-serif; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; } #mandoP .ens[hidden] { display: none; }
+  #mandoP .ens .q { flex: 1; min-width: 240px; } #mandoP .ens .q big { display: block; font: 900 26px system-ui, sans-serif; color: #fff; } #mandoP .ens .q big span { color: #facc15; }
+  #mandoP .ens .bar { height: 6px; border-radius: 6px; background: rgba(250,204,21,.25); margin-top: 8px; overflow: hidden; } #mandoP .ens .bar i { display: block; height: 100%; background: #facc15; }
+  #mandoP .ens button { border: 0; border-radius: 10px; padding: 8px 14px; font: 800 14px system-ui, sans-serif; cursor: pointer; background: #fef3c7; color: #422006; }
   #mandoP .ayuda[hidden] { display: none; } #mandoP .ayuda b { color: #fde68a; } #mandoP .ayuda details { margin-top: 8px; color: #94a3b8; } #mandoP .ayuda summary { cursor: pointer; font-weight: 800; }
   #mandoP .ayuda .cmd { display: block; margin: 6px 0; padding: 8px 10px; white-space: pre-wrap; word-break: break-all; font: 600 12.5px ui-monospace, monospace; } #mandoP [data-copia] { border: 0; border-radius: 8px; padding: 5px 12px; background: #38bdf8; color: #082f49; font: 800 13px system-ui, sans-serif; cursor: pointer; }
   #mandoP .ayuda code { background: #0f172a; padding: 2px 6px; border-radius: 6px; color: #7dd3fc; user-select: all; } #mandoP .ayuda a { color: #7dd3fc; }
@@ -413,7 +428,40 @@
       🔁 Otra opción: un <b>cable USB-C de datos</b> (enchúfalo manteniendo <b>Home + X</b>).<br>` + (linux && !/Firefox/.test(navigator.userAgent) ? `🦊 <b>Sin cambiar nada del mando:</b> abre Molí 2 en <b>Firefox</b> (ya viene en Ubuntu). En Linux, Firefox suele reconocer el Pro Controller aunque Chrome no.<br>` : '') + `
       🔎 Para comprobar si Chrome ya lo ve: <a href="https://hardwaretester.com/gamepad" target="_blank" rel="noopener">hardwaretester.com/gamepad</a>.` + tecnico;
   }
-  function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const M = mandos(), g = M.length ? elegirMando(M) : null; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : ' · (mapa no estándar: prueba cada botón)') : '⚪ Conecta tu mando (Bluetooth o cable USB) y, con esta página abierta, presiona cualquier botón para que aparezca.'; } }
+  const PASOS = [[1, 'A'], [0, 'B'], [3, 'X'], [2, 'Y'], [4, 'L'], [5, 'R'], [6, 'ZL'], [7, 'ZR'], [8, '− (menos)'], [9, '+ (más)'], [16, 'Home ⌂'], [17, 'Captura ◉'],
+    [10, 'el joystick izquierdo (húndelo hacia adentro)'], [11, 'el joystick derecho (húndelo hacia adentro)'], [12, 'la cruceta ↑'], [13, 'la cruceta ↓'], [14, 'la cruceta ←'], [15, 'la cruceta →']];
+  function ensenar() {
+    const M = mandos(); if (!M.length || !P) return; const g = elegirMando(M);
+    ENS = { id: g.id, k: 0, m: {}, prev: g.buttons.map(b => b.pressed || b.value > 0.5) }; const a = P.querySelector('.ayuda'); if (a) a.hidden = true;
+    pasoEns(); requestAnimationFrame(bucleEns);
+  }
+  function pasoEns() {
+    const z = P && P.querySelector('.ens'); if (!z || !ENS) return; const [k, n] = PASOS[ENS.k]; z.hidden = false;
+    z.innerHTML = `<div class="q">🧭 <b>Enseñar mi mando</b> · paso ${ENS.k + 1} de ${PASOS.length}<big>Aprieta <span>${esc(n)}</span></big><div class="bar"><i style="width:${ENS.k / PASOS.length * 100}%"></i></div></div><button type="button" data-omit>Omitir (no lo tiene)</button><button type="button" data-cancel>Cancelar</button>`;
+    P.querySelectorAll('[data-k] .k').forEach(x => x.classList.toggle('sel', +x.parentNode.dataset.k === k));
+  }
+  function sigEns() {
+    ENS.k++; if (ENS.k < PASOS.length) return pasoEns();
+    MAPA[ENS.id] = ENS.m; LS.set(MAPA_K, MAPA); ENS = null; const z = P.querySelector('.ens');
+    if (z) z.innerHTML = `<div class="q">✅ <b>¡Listo! Molí 2 ya conoce tu mando.</b><br>Cierra este panel y pruébalo en el aula. Queda guardado en esta computadora.</div><button type="button" data-cancel>Cerrar</button><button type="button" data-olvida>Borrar lo enseñado</button>`;
+    marcarSel(); pintaEstado();
+  }
+  function bucleEns() {
+    if (!ENS || !P || !P.classList.contains('on')) { ENS = null; return; }
+    const g = mandos().find(x => x.id === ENS.id);
+    if (g) {
+      const raw = g.buttons.map(b => b.pressed || b.value > 0.5), k = PASOS[ENS.k][0];
+      const i = raw.findIndex((x, j) => x && !ENS.prev[j] && !(j in ENS.m));
+      if (i >= 0) { ENS.m[i] = k; ENS.prev = raw; sigEns(); }
+      else {
+        ENS.prev = raw;
+        if (k >= 12 && k <= 15) { const on = []; cruceta(g, on); if (on[12] || on[13] || on[14] || on[15]) { ENS.k = PASOS.length - 1; sigEns(); } }   // la cruceta llega como ejes: ya se lee sola
+      }
+    }
+    if (ENS) requestAnimationFrame(bucleEns);
+  }
+  function pintaEstado() { if (!btn) return; btn.classList.toggle('on', mandos().length > 0); const e = P && P.querySelector('.est'); if (e) { const M = mandos(), g = M.length ? elegirMando(M) : null; e.className = 'est' + (g ? ' ok' : ''); e.textContent = g ? '🟢 Mando conectado: ' + nombreMando(g) + (g.mapping === 'standard' ? '' : MAPA[g.id] ? ' · botones enseñados ✅' : ' · ⚠️ En este navegador los botones llegan en otro orden: toca «🧭 Enseñar mi mando» (1 minuto).') : '⚪ Conecta tu mando (Bluetooth o cable USB) y, con esta página abierta, presiona cualquier botón para que aparezca.';
+    const en = P.querySelector('[data-ens]'); if (en) { en.hidden = !(g && g.mapping !== 'standard'); en.textContent = g && MAPA[g.id] ? '🧭 Volver a enseñar' : '🧭 Enseñar mi mando'; } } }
 
   // ---- el panel: el dibujo del mando y la lista de botones ----
   function padSvg() {
@@ -443,6 +491,10 @@
       P.addEventListener('click', e => { if (e.target === P || e.target.closest('.x')) return cerrarPanel();
         const g = e.target.closest('[data-k]'); if (g) return elegir(+g.dataset.k);
         if (e.target.closest('[data-con]')) return conectar();
+        if (e.target.closest('[data-ens]')) return ensenar();
+        if (e.target.closest('[data-omit]')) return ENS && sigEns();
+        if (e.target.closest('[data-cancel]')) { ENS = null; const z = P.querySelector('.ens'); if (z) z.hidden = true; marcarSel(); return; }
+        if (e.target.closest('[data-olvida]')) { const M = mandos(), g = M.length ? elegirMando(M) : null; if (g) { delete MAPA[g.id]; LS.set(MAPA_K, MAPA); } const z = P.querySelector('.ens'); if (z) z.hidden = true; pintaEstado(); return; }
         if (e.target.closest('[data-copia]')) { const c = e.target.closest('[data-copia]'); (navigator.clipboard ? navigator.clipboard.writeText(REGLA) : Promise.reject()).then(() => { c.textContent = '✅ Copiado'; }, () => { const r = document.createRange(); r.selectNodeContents(P.querySelector('.cmd')); getSelection().removeAllRanges(); getSelection().addRange(r); c.textContent = 'Ctrl + C para copiar'; }); return; }
         if (e.target.closest('[data-reset]')) { CFG = JSON.parse(JSON.stringify(DEF)); guardar(); pintarPanel(); } });
       P.addEventListener('change', e => { const s = e.target;
@@ -450,11 +502,11 @@
         if (s.dataset.s) { CFG.s[s.dataset.s] = s.value; guardar(); P.querySelectorAll(`select[data-s="${s.dataset.s}"]`).forEach(o => { if (o !== s) o.value = s.value; }); }
         if (s.dataset.on != null) { CFG.on = s.checked; guardar(); } }); }
     pintarPanel(); P.classList.add('on'); arrancar();
-    ver = (i, g) => { if (typeof i === 'string') return elegirS(i.slice(1)); if (i != null) elegir(i);
-      if (g && P) [['l', 182, 150, 0], ['r', 390, 252, 2]].forEach(([k, cx, cy, ax]) => { const d = P.querySelector(`.dot[data-st="${k}"]`); if (d) { d.setAttribute('cx', cx + (g.axes[ax] || 0) * 26); d.setAttribute('cy', cy + (g.axes[ax + 1] || 0) * 26); } }); if (g && P) { const on = g.buttons.map(b => b.pressed || b.value > 0.5); P.querySelectorAll('[data-k]').forEach(x => x.querySelector('.k').classList.toggle('on', !!on[+x.dataset.k])); P.querySelectorAll('.row[data-r]').forEach(x => x.classList.toggle('on', !!on[+x.dataset.r])); } };
+    ver = (i, g) => { if (ENS) return; if (typeof i === 'string') return elegirS(i.slice(1)); if (i != null) elegir(i);
+      if (g && P) [['l', 182, 150, 0], ['r', 390, 252, 2]].forEach(([k, cx, cy, ax]) => { const d = P.querySelector(`.dot[data-st="${k}"]`); if (d) { d.setAttribute('cx', cx + (g.axes[ax] || 0) * 26); d.setAttribute('cy', cy + (g.axes[ax + 1] || 0) * 26); } }); if (g && P) { const on = estado(g); P.querySelectorAll('[data-k]').forEach(x => x.querySelector('.k').classList.toggle('on', !!on[+x.dataset.k])); P.querySelectorAll('.row[data-r]').forEach(x => x.classList.toggle('on', !!on[+x.dataset.r])); } };
   }
   function pintarPanel() {
-    P.innerHTML = `<div class="mp" role="dialog" aria-label="Mando de control"><div class="hd"><h2>🎮 Mando de control</h2><button class="x" type="button" aria-label="Cerrar">✕</button></div><div class="con"><p class="est"></p><button type="button" data-con>🔌 Conectar mando</button></div><div class="ayuda" hidden></div>
+    P.innerHTML = `<div class="mp" role="dialog" aria-label="Mando de control"><div class="hd"><h2>🎮 Mando de control</h2><button class="x" type="button" aria-label="Cerrar">✕</button></div><div class="con"><p class="est"></p><button type="button" data-con>🔌 Conectar mando</button><button type="button" data-ens hidden>🧭 Enseñar mi mando</button></div><div class="ens" hidden></div><div class="ayuda" hidden></div>
       <div class="gr"><div>${padSvg()}<div class="ult">${SEL == null ? '👆 Presiona un botón de tu mando (o tócalo en el dibujo) para elegir qué hace.' : `<span>Botón <b>${esc(NOM[SEL])}</b>:</span> <select data-b="${SEL}">${opciones(acciones(), CFG.b[SEL] || 'nada')}</select>`}</div>
         <p class="hint">Mientras este panel está abierto, el mando no mueve el aula: sólo se prueba. Ciérralo para usarlo.<br>🖱️ <b>ZL + ZR juntos</b>: modo mouse (L3 mueve la flecha, A hace clic, R3 baja la página). Otra vez ZL + ZR para salir.</p></div>
       <div class="lst">${lista()}</div></div>
