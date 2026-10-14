@@ -279,7 +279,8 @@ const guiaHtml = k => { const t = tipo(k); return `<a class="g-doc" href="docs/g
 const UNITS = [['unit7', '🦠', 'Unidad 7 · Microorganismos'], ['unit8', '🧬', 'Unidad 8 · Sistema reproductor'], ['otra', '🌎', 'Otro tema de Ciencia']];
 const tipo = k => TIPOS.find(t => t[0] === k) || TIPOS[0], unidad = k => UNITS.find(u => u[0] === k) || UNITS[2];
 if (ME && ME.docente) ME.teacher = true;
-const ROLE = { t: !!(ME && ME.teacher), r: false, rh: '', rx: '', rn: '' };
+const ROLE = { t: !!(ME && ME.teacher), r: false, rh: '', rx: '', rn: '', rs: '' };
+const miSec = w => !!(ROLE.r && !ROLE.t && ROLE.rs && w.sec === ROLE.rs);   // el Revisor ve los trabajos de su propia sección, pero los revisan los de otras secciones
 
 // ---- Firestore (REST) ----
 const enc = v => v === null || v === undefined ? { nullValue: null } : v instanceof Date ? { timestampValue: v.toISOString() } : typeof v === 'number' ? (Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v }) : typeof v === 'boolean' ? { booleanValue: v } : { stringValue: String(v) };
@@ -319,7 +320,7 @@ async function checkRole() {
   try {
     const r = await fetch(`${BASE}/config/site?key=${F.apiKey}`, { cache: 'no-store' }); if (!r.ok) return;
     const rev = docOf(await r.json()).rev || {}, h = await huella(String(ME.dni));
-    if (rev[h]) { const [x, n] = String(rev[h]).split('|'); Object.assign(ROLE, { r: true, rh: h, rx: x, rn: n || ME.name }); }
+    if (rev[h]) { const [x, n, c] = String(rev[h]).split('|'); Object.assign(ROLE, { r: true, rh: h, rx: x, rn: n || ME.name, rs: String(c || ME.section || '').toUpperCase().slice(-1) }); }
     else if (ls.get(K_R, null)) localStorage.removeItem(K_R);          // ya no es revisor
   } catch (e) {}
 }
@@ -629,8 +630,8 @@ async function vBandeja() {
   }
 }
 function drawBandeja() {
-  const el = $('#blist'); if (!el) return; const L = CACHE.pend || []; setCount(L.length);
-  el.innerHTML = L.length ? `<div class="grid">${L.map(w => cardHtml(w, `<span class="st pend" style="align-self:flex-start">⏳ Por revisar · ${fecha(w.at)}</span>`)).join('')}</div>` : `<div class="empty"><b>¡Bandeja al día!</b>No hay trabajos por revisar. 🎉</div>`;
+  const el = $('#blist'); if (!el) return; const L = CACHE.pend || []; setCount(L.filter(w => !miSec(w)).length);
+  el.innerHTML = L.length ? `${ROLE.rs && !ROLE.t ? `<p class="tr-msg">👀 Los trabajos de tu sección (6.° ${esc(ROLE.rs)}) sólo puedes leerlos: los revisan los Revisores de las otras secciones o tu profe.</p>` : ''}<div class="grid">${L.map(w => cardHtml(w, miSec(w) ? `<span class="st" style="align-self:flex-start;background:#f1f5f9;color:#64748b">👀 Sólo lectura · tu sección</span>` : `<span class="st pend" style="align-self:flex-start">⏳ Por revisar · ${fecha(w.at)}</span>`)).join('')}</div>` : `<div class="empty"><b>¡Bandeja al día!</b>No hay trabajos por revisar. 🎉</div>`;
 }
 function setCount(n) {
   const b = $('#tabs [data-tab="bandeja"] .cnt'); if (b) { b.hidden = !n; b.textContent = n; }
@@ -669,7 +670,7 @@ async function openArt(id) {
   ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
   ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
   ${w.st === 'ok' ? '<button type="button" class="btn soft pdfb" data-pdf>📄 Descargar PDF</button>' : ''}
-  ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Comentario (opcional). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
+  ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : miSec(w) ? `<div class="tip">👀 Este trabajo es de tu sección (6.° ${esc(ROLE.rs)}): puedes leerlo, pero lo revisará un Revisor de otra sección o tu profe.</div>` : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Comentario (opcional). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
     <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver (se borra)</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
   ${ROLE.t && w.st === 'ok' && TAB === 'revista' ? '<div class="acts"><button type="button" class="btn soft" data-rv="pend">↩️ Quitar de la revista</button><button type="button" class="btn red" data-rv="del">🗑 Borrar</button></div>' : ''}
   </div></article>`;

@@ -61,8 +61,9 @@
       if (!doc && !ROL.rev) { N = 0; return aviso(); }
       const t = doc ? await Docente.token() : await tokRev(); aviso(); if (!t) return;
       const r = await fetch(`${BASE}:runQuery?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
-        body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'revista' }], where: { fieldFilter: { field: { fieldPath: 'st' }, op: 'EQUAL', value: { stringValue: 'pend' } } }, select: { fields: [{ fieldPath: 'st' }] }, limit: 99 } }) });
-      if (r.ok) { N = (await r.json()).filter(x => x.document).length; aviso(); }
+        body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'revista' }], where: { fieldFilter: { field: { fieldPath: 'st' }, op: 'EQUAL', value: { stringValue: 'pend' } } }, select: { fields: [{ fieldPath: 'st' }, { fieldPath: 'sec' }] }, limit: 99 } }) });
+      const ms = doc ? '' : String(String((REV || {})[ROL.h] || '').split('|')[2] || (MD.yo() || {}).section || '').toUpperCase().slice(-1);   // el Revisor no cuenta los de su propia sección
+      if (r.ok) { N = (await r.json()).filter(x => x.document && !(ms && ((x.document.fields || {}).sec || {}).stringValue === ms)).length; aviso(); }
     } catch (e) {} finally { contando = false; }
   }
   addEventListener('moli2:me', () => { N = 0; REV = null; aviso(); contar(true); });
