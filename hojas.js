@@ -550,6 +550,25 @@
   }
   const cacheIA = k => { const C = MD.LS.get(k, null); return C ? limpiarIA(C) : null; };
   const hashQ = it => { const t = JSON.stringify([it.u.title, it.s.title, it.s.meta, actsDe(it.u, it.s).slice(0, 3).map(x => x && [x.title, x.desc]), it.prev && [it.prev.s.title, it.prev.s.meta]]); let h = 5381; for (let i = 0; i < t.length; i++) h = (h * 33 ^ t.charCodeAt(i)) >>> 0; return 'moli2:cv:' + h.toString(36); };
+  // ---- 🎬 diapositivas de video que la docente añade entre las demás (botón + al pasar el mouse). Se guardan en files/fcvvid-0 ----
+  const CVF = 'fcvvid-0', CVV = { L: [], ok: false };
+  const CVURL = () => `https://firestore.googleapis.com/v1/projects/${MD.FB.projectId}/databases/(default)/documents/files/${CVF}?key=${MD.FB.apiKey}`;
+  const cargarVideos = () => fetch(CVURL(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue;
+    if (v) { const x = JSON.parse(decodeURIComponent(escape(atob(v)))); CVV.L = Array.isArray(x.L) ? x.L : []; } CVV.ok = true; }).catch(() => { CVV.ok = true; });
+  async function guardarVideos(L) {
+    if (!window.Docente || !await Docente.token()) throw new Error('AUTH');
+    await Docente.commit([{ update: { name: Docente.DOC('files', CVF), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, L, at: Date.now() })))), updatedAt: new Date() }) } }]);
+    CVV.L = L;
+  }
+  function medioDe(url) {                                              // YouTube, Google Drive, Vimeo o un archivo .mp4: se ve dentro de la diapositiva
+    const u = String(url || '').trim(), yt = u.match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/|live\/)([\w-]{11})/), t = u.match(/[?&](?:t|start)=(\d+)/);
+    if (yt) return { tipo: 'yt', id: yt[1], src: `https://www.youtube-nocookie.com/embed/${yt[1]}?enablejsapi=1&rel=0&modestbranding=1${t ? '&start=' + t[1] : ''}`, img: `https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg` };
+    const dr = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([\w-]{20,})/); if (dr) return { tipo: 'if', src: `https://drive.google.com/file/d/${dr[1]}/preview` };
+    const vi = u.match(/vimeo\.com\/(?:video\/)?(\d{6,})/); if (vi) return { tipo: 'if', src: `https://player.vimeo.com/video/${vi[1]}` };
+    if (/^https:\/\/\S+\.(mp4|webm|ogg)(\?\S*)?$/i.test(u)) return { tipo: 'mp4', src: u };
+    return /^https?:\/\/\S+$/i.test(u) ? { tipo: 'link', src: u } : null;
+  }
+  const claveSl = it => it.k === 'vid' ? 'v:' + it.id : [it.k, it.u ? it.u.key : '', it.n == null ? '' : it.n, it.j == null ? '' : it.j, it.p || ''].join('|');
   function flujoPresentacion(host) {
     const P = { L: [], i: 0, ia: {}, pide: new Set() };
     const actOk = x => x && (L(x.title) || L(x.desc));
@@ -569,6 +588,13 @@
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
       });
+      let pend = CVV.L.slice();                                         // los videos van justo después de la diapositiva que eligió la docente
+      for (let vuelta = 0; pend.length && vuelta < 8; vuelta++) { const rest = [];
+        pend.forEach(v => { const i = Lst.findIndex(z => claveSl(z) === v.a); if (i < 0) return rest.push(v);
+          let j = i + 1; while (j < Lst.length && Lst[j].k === 'vid' && Lst[j].ancla === v.a) j++;
+          const z = Lst[i]; Lst.splice(j, 0, { k: 'vid', id: v.id, t: v.t, url: v.url, ancla: v.a, u: z.u, s: z.s, n: z.n }); });
+        pend = rest; }
+      pend.forEach(v => { const z = Lst[Lst.length - 1] || {}; Lst.push({ k: 'vid', id: v.id, t: v.t, url: v.url, ancla: v.a, u: z.u, s: z.s, n: z.n }); });   // si su diapositiva ya no existe, va al final
       P.L = Lst;
     }
     const plantilla = it => { const u = it.u.title;
@@ -601,7 +627,16 @@ Devuelve JSON:
     const tema = it => { if (L(it.s.title)) return it.s.title; const C = cacheIA(hashQ(it)); return C && L(C.t) ? C.t : temaDe(it.s, it.n); };
     const color = u => CV_PAL[(parseInt(u.num, 10) || 1) % CV_PAL.length];
     const crumb = it => `<div class="cv-crumb">${esc(it.u.icon || '📘')} Unidad ${esc(it.u.num)} · ${esc(it.u.title)} <b>Sesión ${it.n}</b></div>`;
+    function slideVideo(it) {
+      const m = medioDe(it.url), doc = MD.esDocente();
+      const media = !m ? '<p class="cv-lead">⚠️ El link del video no es válido.</p>'
+        : m.tipo === 'yt' || m.tipo === 'if' ? `<iframe src="${esc(m.src)}" title="${esc(it.t || 'Video')}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>`
+        : m.tipo === 'mp4' ? `<video src="${esc(m.src)}" controls playsinline></video>`
+        : `<a class="cv-vlink" href="${esc(m.src)}" target="_blank" rel="noopener">▶ Abrir el video</a>`;
+      return `<div class="cv-sl cv-vid" style="--c1:#1e1b4b;--c2:#7c3aed">${it.u ? crumb(it) : ''}<h2 class="cv-h2 cv-vt">🎬 ${esc(it.t || 'Video')}</h2><div class="cv-vbox">${media}</div>${doc ? '<div class="cv-ved"><button type="button" data-vid="edit">✏️ Editar</button><button type="button" data-vid="del" title="Quitar esta diapositiva">🗑️ Quitar</button></div>' : ''}</div>`;
+    }
     function slide(it) {
+      if (it.k === 'vid') return slideVideo(it);
       const u = it.u, s = it.s, [c1, c2] = it.k in CV_BG ? CV_BG[it.k] : color(u), st = `style="--c1:${c1};--c2:${c2}"`;
       const mol = (im, inner) => `<div class="cv-sl" ${st}>${crumb(it)}<div class="cv-mqb"><img class="cv-moli" src="${IMG(im)}" alt="Molí"><div class="cv-bub">${inner}</div></div></div>`;
       if (it.k === 'uni') return `<div class="cv-sl cv-c" ${st}><span class="cv-pill">UNIDAD ${esc(u.num)}</span><div class="cv-ico">${esc(u.icon || '📘')}</div><h2 class="cv-h1">${esc(u.title)}</h2><p class="cv-sub">${it.ss.length} ${it.ss.length === 1 ? 'sesión' : 'sesiones'}</p></div>`;
@@ -627,7 +662,7 @@ Devuelve JSON:
       return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">✅ Respuestas del Exit ticket</h2>${qs.length ? `<ol class="cv-cards cv-q">${qs.map(x => `<li><b>${esc(x.q)}</b><ul>${(x.options || []).map((o, k) => L(o) ? `<li class="${k === x.answer ? 'ok' : ''}">${k === x.answer ? '✓ ' : ''}${esc(o)}</li>` : '').join('')}</ul></li>`).join('')}</ol>` : '<p class="cv-lead">Sin preguntas todavía.</p>'}</div>`;
     }
     function ajustar(d) {                                               // la diapositiva usa todo el cuadro: agranda la letra hasta llenarlo sin cortarse
-      if (!d || d.classList.contains('cv-foto') || d.querySelector('.cv-rfig')) return;
+      if (!d || d.classList.contains('cv-foto') || d.classList.contains('cv-vid') || d.querySelector('.cv-rfig')) return;
       const H = d.clientHeight, Wd = d.clientWidth; if (!H || !Wd) return;
       const prev = d.style.justifyContent; d.style.justifyContent = 'flex-start'; d.style.overflow = 'visible';
       const cabe = () => { const kids = [...d.children].filter(c => getComputedStyle(c).position !== 'absolute'); if (!kids.length) return true;
@@ -647,15 +682,47 @@ Devuelve JSON:
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
       el.querySelector('.cv-n').textContent = `${P.i + 1} / ${P.L.length}`;
       el.querySelector('[data-cv="-1"]').disabled = P.i === 0; el.querySelector('[data-cv="1"]').disabled = P.i === P.L.length - 1;
-      const sel = el.querySelector('select'), key = it.k === 'uni' ? 'u:' + it.u.key : 's:' + it.u.key + ':' + it.n; if (sel.value !== key && [...sel.options].some(o => o.value === key)) sel.value = key;
+      const sel = el.querySelector('select'), key = !it.u ? '' : it.k === 'uni' ? 'u:' + it.u.key : 's:' + it.u.key + ':' + it.n; if (key && sel.value !== key && [...sel.options].some(o => o.value === key)) sel.value = key;
+      const ad = el.querySelector('.cv-add'); if (ad) ad.title = `Añadir un video entre la diapositiva ${P.i + 1} y la ${P.i + 2}`;
+    }
+    // ---- el formulario del video (nuevo o editar) ----
+    function formVideo(v) {
+      const f = document.createElement('div'); f.className = 'cv-form';
+      f.innerHTML = `<form><b class="cv-fh">🎬 ${v ? 'Editar' : 'Nueva'} diapositiva de video</b><small>${v ? '' : `Irá entre la diapositiva ${P.i + 1} y la ${P.i + 2}.`}</small>
+        <label>Título de la diapositiva<input name="t" maxlength="80" placeholder="Ej.: Así crecen las levaduras" value="${esc(v ? v.t : '')}"></label>
+        <label>Link del video (YouTube, Drive, Vimeo o .mp4)<input name="url" maxlength="400" inputmode="url" placeholder="https://www.youtube.com/watch?v=…" value="${esc(v ? v.url : '')}" required></label>
+        <div class="cv-fprev"></div><p class="cv-ferr"></p>
+        <div class="cv-fbt"><button type="button" data-vf="no">Cancelar</button><button type="submit">💾 Guardar</button></div></form>`;
+      el.appendChild(f); const F = f.querySelector('form'), pv = f.querySelector('.cv-fprev'), er = f.querySelector('.cv-ferr');
+      const prev = () => { const m = medioDe(F.url.value); pv.innerHTML = !F.url.value.trim() ? '' : !m ? '⚠️ Ese link no parece de un video.' : m.img ? `<img src="${esc(m.img)}" alt=""> ✅ Video de YouTube` : m.tipo === 'link' ? '🔗 Se mostrará un botón para abrir el link.' : '✅ Video listo'; };
+      F.url.addEventListener('input', prev); prev();
+      ['keydown', 'keyup', 'keypress'].forEach(t => f.addEventListener(t, e => { e.stopPropagation(); if (t === 'keydown' && e.key === 'Escape') f.remove(); }));   // al escribir no se mueven las escenas
+      f.addEventListener('pointerdown', e => e.stopPropagation()); f.addEventListener('pointerup', e => e.stopPropagation());
+      f.addEventListener('click', e => { e.stopPropagation(); if (e.target.closest('[data-vf="no"]') || e.target === f) f.remove(); });
+      F.addEventListener('submit', async e => { e.preventDefault();
+        const t = F.t.value.replace(/\s+/g, ' ').trim().slice(0, 80), url = F.url.value.trim();
+        if (!medioDe(url)) { er.textContent = '⚠️ Pega el link completo del video (debe empezar con https://).'; return; }
+        const bt = F.querySelector('[type=submit]'); bt.disabled = true; bt.textContent = '⏳ Guardando…'; er.textContent = '';
+        const cur = P.L[P.i], id = v ? v.id : Date.now().toString(36), L2 = v ? CVV.L.map(x => x.id === v.id ? { ...x, t, url } : x) : [...CVV.L, { id, a: claveSl(cur), t, url }];
+        try { await guardarVideos(L2); f.remove(); armar(); const k = P.L.findIndex(z => z.k === 'vid' && z.id === id); if (k >= 0) P.i = k; pinta(true); }
+        catch (x) { bt.disabled = false; bt.textContent = '💾 Guardar'; er.textContent = x.message === 'AUTH' ? '🔐 Conecta tu cuenta: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No se pudo guardar. Revisa tu internet.'; } });
+      setTimeout(() => (v ? F.t : F.url).focus(), 50);
+    }
+    async function quitarVideo(it) {
+      if (!confirm(`¿Quitar la diapositiva de video «${it.t || 'Video'}»?`)) return;
+      try { await guardarVideos(CVV.L.filter(x => x.id !== it.id)); P.i = Math.max(0, P.i - 1); armar(); pinta(true); }
+      catch (x) { alert(x.message === 'AUTH' ? '🔐 Conecta tu cuenta: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No se pudo quitar. Revisa tu internet.'); }
     }
     function montar() {
       armar();
-      host.innerHTML = `<div class="cv"><div class="cv-stage"></div><div class="cv-bar"><button data-cv="-1" aria-label="Anterior">‹</button><select aria-label="Ir a">${MD.unidades().map(u => `<option value="u:${esc(u.key)}">📘 Unidad ${esc(u.num)} · ${esc(u.title)}</option>${MD.sesionesDe(u).map(({ s, n }) => `<option value="s:${esc(u.key)}:${n}">   🗓️ Sesión ${n} · ${esc(temaDe(s, n)).slice(0, 50)}</option>`).join('')}`).join('')}</select><span class="cv-n"></span><button data-cv="1" aria-label="Siguiente">›</button></div></div>`;
+      host.innerHTML = `<div class="cv"><div class="cv-stage"></div>${MD.esDocente() ? '<button type="button" class="cv-add" aria-label="Añadir una diapositiva de video aquí">+</button>' : ''}<div class="cv-bar"><button data-cv="-1" aria-label="Anterior">‹</button><select aria-label="Ir a">${MD.unidades().map(u => `<option value="u:${esc(u.key)}">📘 Unidad ${esc(u.num)} · ${esc(u.title)}</option>${MD.sesionesDe(u).map(({ s, n }) => `<option value="s:${esc(u.key)}:${n}">   🗓️ Sesión ${n} · ${esc(temaDe(s, n)).slice(0, 50)}</option>`).join('')}`).join('')}</select><span class="cv-n"></span><button data-cv="1" aria-label="Siguiente">›</button></div></div>`;
       el = host.firstChild; const fs = () => { el.style.fontSize = Math.max(8, Math.min(60, el.clientHeight / 32.5, el.clientWidth / 57)) + 'px'; const d = el.querySelector('.cv-stage > .cv-sl'); if (d) { d.style.fontSize = ''; ajustar(d); } }; fs(); P.ro = new ResizeObserver(fs); P.ro.observe(el);
-      el.addEventListener('click', e => { const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); P.i += +b.dataset.cv; pinta(true); });
+      el.addEventListener('click', e => {
+        if (e.target.closest('.cv-add')) { e.stopPropagation(); return formVideo(null); }
+        const vb = e.target.closest('[data-vid]'); if (vb) { e.stopPropagation(); const it = P.L[P.i]; if (it && it.k === 'vid') { if (vb.dataset.vid === 'del') quitarVideo(it); else formVideo(CVV.L.find(x => x.id === it.id) || it); } return; }
+        const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); P.i += +b.dataset.cv; pinta(true); });
       el.querySelector('select').addEventListener('change', e => { const v = e.target.value.split(':'); const k = P.L.findIndex(z => v[0] === 'u' ? z.k === 'uni' && z.u.key === v[1] : z.k === 'ses' && z.u.key === v[1] && z.n === +v[2]); if (k >= 0) { P.i = k; pinta(true); } });
-      let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) { P.i += dx < 0 ? 1 : -1; pinta(true); } });
+      let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar,.cv-add,.cv-ved,.cv-form') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) { P.i += dx < 0 ? 1 : -1; pinta(true); } });
       pinta(true);
     }
     function gate() {
@@ -664,7 +731,7 @@ Devuelve JSON:
       const f = el.querySelector('form'); f.addEventListener('submit', e => { e.preventDefault(); if (f.querySelector('input').value.trim() === '123') { try { sessionStorage.setItem('moli2:cv', '1'); } catch (x) {} el = null; montar(); } else f.querySelector('.err').textContent = 'Contraseña incorrecta.'; });
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
-      MD.cargar().then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
+      Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
     P.cerrar = () => { P.ro && P.ro.disconnect(); };
     return P;
   }

@@ -152,6 +152,26 @@
 .cv-bar button { height: 1.9em; min-width: 1.9em; border-radius: 999px; border: 2px solid #fff; background: rgba(255,255,255,.15); color: #fff; font: 900 .9em system-ui; cursor: pointer; padding: 0 .6em; }
 .cv-bar select { flex: 1; min-width: 0; height: 1.9em; border-radius: .5em; border: 0; font: 700 .8em "Trebuchet MS", system-ui; padding: 0 .4em; }
 .cv-bar span { font-weight: 900; font-size: .85em; white-space: nowrap; }
+.cv-vid { justify-content: flex-start; padding: 2.4em 2em 3.2em; }
+.cv-vt { margin: 0 0 .35em; text-align: center; font-size: 1.6em; text-shadow: 0 .06em 0 rgba(0,0,0,.25); }
+.cv-vbox { flex: 1; min-height: 0; display: grid; place-items: center; }
+.cv-vbox iframe, .cv-vbox video { height: 100%; max-height: 100%; aspect-ratio: 16 / 9; max-width: 100%; border: 0; border-radius: .7em; background: #000; box-shadow: 0 .5em 1.4em rgba(0,0,0,.45); }
+.cv-vlink { display: inline-block; padding: .8em 1.6em; border-radius: 999px; background: #fff; color: #4338ca; font-weight: 900; font-size: 1.4em; text-decoration: none; box-shadow: 0 .3em 0 rgba(0,0,0,.2); }
+.cv-ved { position: absolute; top: .7em; right: .9em; display: flex; gap: .4em; z-index: 3; opacity: .35; transition: opacity .2s; }
+.cv:hover .cv-ved { opacity: 1; }
+.cv-ved button { border: 2px solid #fff; border-radius: 999px; background: rgba(15,23,42,.55); color: #fff; font: 800 .8em system-ui; padding: .25em .8em; cursor: pointer; }
+.cv-add { position: absolute; right: .5em; top: 50%; transform: translateY(-50%) scale(.9); z-index: 4; width: 2.6em; height: 2.6em; border-radius: 50%; border: .18em solid #fff; background: linear-gradient(135deg, #22c55e, #0ea5e9); color: #fff; font: 900 1.8em/1 system-ui; display: grid; place-items: center; padding: 0 0 .1em; cursor: pointer; box-shadow: 0 .25em .8em rgba(0,0,0,.4); opacity: 0; transition: opacity .2s, transform .2s; }
+.cv:hover .cv-add { opacity: .9; transform: translateY(-50%) scale(1); } .cv-add:hover { opacity: 1 !important; transform: translateY(-50%) scale(1.12) !important; }
+@media (hover: none) { .cv-add { opacity: .55; } }
+.cv-form { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; background: rgba(15,23,42,.6); user-select: text; }
+.cv-form form { width: min(92%, 30em); background: #fff; color: #1e293b; border-radius: 1em; border: .2em solid #2b2547; padding: 1em 1.2em; display: grid; gap: .55em; font-size: .95em; box-shadow: 0 1em 2em rgba(0,0,0,.4); }
+.cv-fh { font-size: 1.3em; color: #4338ca; } .cv-form small { color: #64748b; font-weight: 700; margin-top: -.4em; }
+.cv-form label { display: grid; gap: .25em; font-weight: 800; color: #334155; }
+.cv-form input { font: 700 1em system-ui; padding: .5em .7em; border: .12em solid #cbd5e1; border-radius: .6em; } .cv-form input:focus { outline: none; border-color: #7c3aed; }
+.cv-fprev { display: flex; align-items: center; gap: .6em; font-weight: 800; color: #15803d; min-height: 1em; } .cv-fprev img { width: 6em; border-radius: .4em; }
+.cv-ferr { margin: 0; color: #b91c1c; font-weight: 800; min-height: 1em; }
+.cv-fbt { display: flex; justify-content: flex-end; gap: .5em; } .cv-fbt button { font: 900 1em "Trebuchet MS", system-ui; border: .15em solid #2b2547; border-radius: 999px; padding: .4em 1.2em; cursor: pointer; background: #fff; }
+.cv-fbt [type=submit] { background: #22c55e; color: #fff; box-shadow: 0 .2em 0 #2b2547; } .cv-fbt [type=submit]:disabled { opacity: .7; }
 .cv-gate { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(135deg, #4338ca, #0ea5e9); text-align: center; }
 .cv-gate form { background: #fff; color: #1e293b; border-radius: 1em; padding: 1em 1.4em; border: .2em solid #2b2547; width: min(80%, 19em); }
 .cv-gate input { width: 100%; box-sizing: border-box; font: 900 1.4em system-ui; text-align: center; letter-spacing: .3em; padding: .3em; border: .15em solid #2b2547; border-radius: .6em; margin: .5em 0; }
