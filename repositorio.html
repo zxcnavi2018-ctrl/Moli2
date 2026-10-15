@@ -121,6 +121,7 @@ button{cursor:pointer}
 .wd-kw input{font:600 16px Carlito,Calibri,Arial,sans-serif;color:#222}.wd-tt label small{font-weight:600;color:#888}
 .wd-ed .rvm{background:#fde047;border-radius:2px}.wd-ed .rvs{background:#fdba74;border-radius:2px}.wd-ed .rvm.rvs{background:linear-gradient(#fde047 55%,#fdba74 55%)}.wd-ed .rvo{text-decoration:underline wavy #2563eb;text-underline-offset:3px}.wd-ed [data-n]::after{content:attr(data-n);display:inline-grid;place-items:center;min-width:16px;height:16px;margin-left:2px;border-radius:50%;background:#ca8a04;color:#fff;font:800 10px/1 Arial,sans-serif;vertical-align:super}
 .wd-dev{margin:0 0 16px;padding:12px 14px;border-radius:8px;background:#fffbea;border:2px solid #fde047;color:#5b4300;font-size:14.5px}.wd-dev b{display:block;font-size:15.5px}.wd-dev p{margin:6px 0}.wd-dev ol{margin:6px 0;padding-left:20px}.wd-dev q{font-style:italic;color:#854d0e}.wd-dev small{display:block;margin-top:6px;font-weight:700}
+#hoja .rv-gr .wd-sc{padding:24px 12px 40px}#hoja .wd-ed .pulso{outline:3px solid #ca8a04;outline-offset:2px}
 .wd-ck{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:15px;cursor:pointer}.wd-ck input{width:18px;height:18px}
 .wd-st{display:flex;gap:18px;padding:5px 14px;background:#2b579a;color:#e8eefb;font-size:12.5px;flex:none;overflow-x:auto;white-space:nowrap}.wd-st .wd-np{background:rgba(255,255,255,.18);color:#fff}
 .wd-no{animation:wdNo .45s}@keyframes wdNo{25%{transform:translateX(-6px);background:#fde8e6}75%{transform:translateX(6px)}}
@@ -699,6 +700,17 @@ function hojaLanzador(ty) {
   return `<div class="wd-2"><button type="button" class="g-doc wd-go" data-hoja="${ty}"><span class="ic">W</span><div><b>📂 Abrir guía de ${t[1]} ${esc(t[2])}</b><small>${h ? `Sigue tu guía <b>por concluir</b>${n ? ` (${n} palabras)` : ''}. ` : `${esc(GUIA_TXT[ty] || '')} `}Escríbela tú: aquí no se puede pegar (sólo en «Link»).</small></div><em>✏️</em></button>
     <button type="button" class="g-doc wd-go env" data-envsel><span class="ic">📤</span><div><b>Enviar investigación</b><small>${sel && sel.st === 'por' ? `Vas a enviar: <b>«${esc(sel.nom || sel.t || 'Mi investigación')}»</b>. Toca para cambiarla.` : 'Elige tu trabajo de tu carpeta 📁 Mis archivos.'}</small></div><em>📁</em></button></div>`;
 }
+function devSide(dv) {                                                 // al costado (como lo ve el Revisor): el detector, sus comentarios y qué hacer
+  const by = (dv.by || 'Tu Revisor').replace(/^./, c => c.toUpperCase()), tp = dv.p;
+  return `<aside class="rv-side"><section><h4>✏️ ${esc(by)} te devolvió tu trabajo</h4><p class="rv-f">Corrige lo pintado. Cuando cambies un recuadro, se despinta. Luego toca <b>💾 Guardar trabajito</b> y vuelve a enviarlo.</p></section>
+    ${tp != null ? `<section><h4>🔎 Detector de similitud</h4><div class="rv-res"><div class="sm-ring" style="--p:${tp};--c:${tp > SM_MAX ? 'var(--red)' : 'var(--green2)'}"><div><b>${tp}%</b><small>Biblioteca</small></div></div><div>
+      ${(dv.f || []).length ? dv.f.map(f => `<p class="rv-f">📖 «${esc(f[0])}» · ${esc(f[1])} <b>${f[2]}%</b><small>${f[3] ? '✔ lo citaste' : '✘ no lo citaste'}</small></p>`).join('') : '<p class="rv-f">📗 Nada copiado de la Biblioteca.</p>'}
+      ${dv.no ? `<p class="rv-f">🟦 ${dv.no} palabra${dv.no === 1 ? '' : 's'} con error de ortografía</p>` : ''}</div></div>${tp > SM_MAX ? `<p class="sm-lim no" style="margin-top:8px">🔒 Para aprobar debe tener ${SM_MAX}% o menos.</p>` : ''}</section>` : ''}
+    <section><h4>💬 Comentarios del Revisor</h4>${(dv.lista || []).length ? dv.lista.map((x, i) => `<div class="rv-c" data-irn="${i + 1}"><b>${i + 1}</b><div><q>${esc(x.q)}</q><p>${esc(x.c)}</p></div></div>`).join('') : '<p class="rv-f">🟨 Mira las partes pintadas en amarillo.</p>'}</section>
+    ${dv.fb ? `<section><h4>📝 Su consejo</h4><p class="rv-f" style="white-space:pre-line;font-weight:600">${esc(dv.fb)}</p></section>` : ''}
+    <section><p class="rv-f"><span style="background:#fde047;padding:0 4px">🟨</span> Lo que marcó tu Revisor<br><span style="background:#fdba74;padding:0 4px">🟧</span> Igualito a un librito: escríbelo con tus palabras<br><span style="text-decoration:underline wavy #2563eb">🟦 ortografía</span>: corrige la palabra</p></section></aside>`;
+}
+document.addEventListener('click', e => { const c = e.target.closest && e.target.closest('#hoja [data-irn]'); if (!c) return; const el = document.querySelector(`#hoja .wd-ed [data-n="${c.dataset.irn}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('pulso'); setTimeout(() => el.classList.remove('pulso'), 1200); } else toast('✅ Esa parte ya la corregiste.'); });
 function abrirHojaDoc(id) {
   const h = hojaDoc(id); if (!h || !HOJA[h.ty]) return toast('No encontré esa guía.');
   const G = HOJA[h.ty], t = tipo(h.ty), v = h.v || (h.v = {}), ro = h.st === 'env'; let d = document.getElementById('hoja');
@@ -714,8 +726,7 @@ function abrirHojaDoc(id) {
   const inp = (id, ph, ex = '') => `<input data-k="${id}" ${ex} placeholder="${esc(ph || '')}" value="${esc(v[id] || '')}"${dis}>`;
   d.innerHTML = `<div class="wd-bar"><span class="wd-w">W</span><b>${esc(h.t || 'Mi ' + t[2].toLowerCase())} - Word de Molí</b><span class="wd-sv" id="wdSv">${ro ? '📨 Enviado' : '💾 Guardado'}</span>${ro ? '<button type="button" class="wd-ok" data-hcopia>✏️ Hacer una copia para corregir</button>' : '<button type="button" class="wd-ok" data-hok>💾 Guardar trabajito</button>'}<button type="button" class="wd-x" data-hx aria-label="Cerrar">✕</button></div>
   <div class="wd-rib">${ro ? '' : '<button type="button" class="wd-fm" data-fmt="bold" title="Negrita"><b>N</b> Negrita</button><button type="button" class="wd-fm mk" data-fmt="mark" title="Marcador"><span>🖍️</span> Marcador</button><i></i>'}<span class="wd-np">🚫📋 Pegar desactivado · sólo en Link</span></div>
-  <div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
-    ${dv ? `<div class="wd-dev"><b>✏️ ${esc((dv.by || 'Tu Revisor').replace(/^./, c => c.toUpperCase()))} te devolvió tu trabajo para corregirlo</b>${dv.fb ? `<p>${esc(dv.fb).replace(/\n/g, '<br>')}</p>` : ''}${(dv.lista || []).length ? `<ol>${dv.lista.map(x => `<li><q>${esc(x.q)}</q> ${esc(x.c)}</li>`).join('')}</ol>` : ''}<small>🟨 Lo que marcó tu Revisor · 🟧 Igualito a un librito (escríbelo con tus palabras) · 🟦 Ortografía. Cuando corrijas un recuadro, se despinta. Luego guarda y vuelve a enviarlo.</small></div>` : ''}
+  ${dv ? '<div class="rv-gr">' : ''}<div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
     <p class="wd-k">REVISTA INNOVADORA · GUÍA PASO A PASO</p><h1>${t[1]} ${esc(t[2])}</h1><p class="wd-sub">${esc(G.sub)} Usa mínimo 3 citas parafraseadas dentro de tu trabajo y escribe sus fuentes al final.</p>
     <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
     <div class="wd-tt wd-kw"><label>Palabras clave <small>(de 3 a 5, separadas por comas: con ellas te encontrarán en el 🔍 Buscador)</small></label><input data-k="_kw" maxlength="200" value="${esc(h.kw || '')}" placeholder="Ej.: levadura, pan, hongos"${dis}></div>
@@ -724,7 +735,7 @@ function abrirHojaDoc(id) {
       ${p.tb ? `<table class="wd-tb"><tr>${p.tb.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${Array.from({ length: p.tb.rows }, (_, r) => `<tr><th>${r + 1}</th>${p.tb.cols.slice(1).map((_, c) => `<td>${inp(`t${r + 1}${c}`, '', 'maxlength="40"')}</td>`).join('')}</tr>`).join('')}</table>` : ''}
       ${p.fu ? `<div class="wd-fu">${Array.from({ length: p.fu }, (_, n) => `<table><caption>Fuente ${n + 1}</caption>${FU_C.map(([k, lab, ej]) => `<tr><th>${lab}${k === 'l' ? ' <small>📋 aquí sí pegas</small>' : ''}</th><td>${inp(`f${n + 1}${k}`, ej, k === 'l' ? 'data-link inputmode="url" maxlength="300"' : k === 'y' ? 'inputmode="numeric" maxlength="12"' : 'maxlength="160"')}</td></tr>`).join('')}</table>`).join('')}</div>` : ''}
       ${(p.ck || []).map((c, j) => `<label class="wd-ck"><input type="checkbox" data-k="c${j}" ${v['c' + j] ? 'checked' : ''}${dis}> ${esc(c)}</label>`).join('')}</section>`).join('')}
-  </div></div>
+  </div></div>${dv ? devSide(dv) + '</div>' : ''}
   <div class="wd-st"><span>Página 1 de 1</span><span id="wdN">${hojaPal(h)} palabras</span><span>Español (Perú)</span><span class="wd-np">🚫 Escribe con tus palabras</span></div>`;
   d.hidden = false; d.dataset.id = id; document.body.style.overflow = 'hidden';
   d.querySelectorAll('[data-k]').forEach(x => HPREV.set(x, prevDe(x)));
@@ -1080,7 +1091,7 @@ function rmTexto() {                                                  // lo que 
   if (r) capas(RV.w, [], r, null).filter(c => c.t === 'sm').slice(0, 60).forEach(c => sc.push([c.a, c.b]));
   const o = (RV.ort || []).filter(x => !RV.x.some(z => x.a < z.b && x.b > z.a)).slice(0, 40).map(x => [x.a, x.b, String(x.msg || '').slice(0, 40)]);
   if (!m.length && !sc.length && !o.length) return '';
-  let j = { m, s: sc, o, by: ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name) }, t = JSON.stringify(j);
+  let j = { m, s: sc, o, by: ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name), p: r ? r.p : null, f: r ? r.fuentes.slice(0, 3).map(f => [String(f.s.x.t).slice(0, 60), firstName(f.s.x.n) + ' ' + f.ape, f.p, f.cita ? 1 : 0]) : [], no: (RV.ort || []).filter(x => !RV.x.some(z => x.a < z.b && x.b > z.a)).length }, t = JSON.stringify(j);
   while (t.length > 7900 && (j.o.length || j.s.length)) { if (j.o.length) j.o.pop(); else j.s.pop(); t = JSON.stringify(j); } return t;
 }
 function smConsejo(w, r) {                                             // el consejo que verá el estudiante en «Mis envíos», armado con el reporte
@@ -1226,6 +1237,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151240"></script><script src="archivos.js?v=202610151240"></script><script src="mando.js?v=202610151240"></script>
+<script src="pdftrabajo.js?v=202610151243"></script><script src="archivos.js?v=202610151243"></script><script src="mando.js?v=202610151243"></script>
 </body>
 </html>

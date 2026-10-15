@@ -48,7 +48,7 @@
   }
   function devolver(h, j) {                                            // el Revisor lo devolvió: vuelve a la carpeta «Por corregir», pintado con sus subrayados
     const f = j.fields || {}, g = k => f[k] && f[k].stringValue || '', d = g('d'); let rm = {}; try { rm = JSON.parse(g('rm') || '{}'); } catch (e) {}
-    const dev = { fb: g('fb'), by: g('rv') || rm.by || '', m: {}, src: {}, lista: [], rid: h.rid }; let n = 0;
+    const dev = { fb: g('fb'), by: g('rv') || rm.by || '', m: {}, src: {}, lista: [], rid: h.rid, p: rm.p ?? null, f: rm.f || [], no: rm.no || 0 }; let n = 0;
     const pon = (x, t, extra) => (h.mapa || []).forEach(e => { if (x.a < e.b && x.b > e.a) (dev.m[e.k] = dev.m[e.k] || []).push({ a: Math.max(x.a, e.a) - e.a, b: Math.min(x.b, e.b) - e.a, t, ...(extra && x.b > e.a && x.b <= e.b ? extra : {}) }); });
     (rm.m || []).slice().sort((x, y) => x.a - y.a).forEach(x => { const num = x.c ? ++n : 0; if (x.c) dev.lista.push({ q: d.slice(x.a, x.b).slice(0, 70), c: x.c }); pon(x, 'r', num ? { c: x.c, n: num } : null); });
     (rm.s || []).forEach(([a, b]) => pon({ a, b }, 's')); (rm.o || []).forEach(([a, b, msg]) => pon({ a, b }, 'o', { msg }));
