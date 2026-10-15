@@ -82,6 +82,9 @@ button{cursor:pointer}
 .sm-ip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.sm-ip span{padding:8px 12px;border-radius:14px;background:#fff;border:2px solid #fed7aa;font-size:13.5px;font-weight:800;color:var(--ink)}.sm-ip small{display:block;margin-top:2px;font-weight:700;color:#9a3412}
 .sm-ia summary{cursor:pointer;font-weight:900;color:#c2410c;padding:6px 0}.sm-ia .sm-tx{max-height:40vh}
 .sm-tx mark.ci{background:#fed7aa;border-bottom:2px dotted #ea580c}
+.sm-lim{width:100%;margin:2px 0;padding:10px 12px;border-radius:14px;font-weight:800;font-size:14px}.sm-lim.no{background:#fde8e6;color:#9b2c22}.sm-lim.ok{background:var(--mint);color:var(--green2)}
+.sm-met{height:10px;margin:4px 0 8px;border-radius:99px;background:#ffedd5;overflow:hidden}.sm-met i{display:block;height:100%;background:linear-gradient(90deg,#fdba74,#dc2626)}
+.sm-pr{display:grid;gap:6px;margin:8px 0;padding:10px 12px;border-radius:14px;background:#fff;border:2px dashed #fdba74;font-size:14px;font-weight:700}.sm-pr b{color:#9a3412}
 .sm-ley{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-weight:800;color:var(--ink2)}
 @media (max-width:720px){.sm-cmp.dos{grid-template-columns:1fr}.sm-r{flex-wrap:wrap}}
 /* pestañas */
@@ -172,7 +175,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .row .t span{font-size:13px;font-weight:700;color:var(--ink2)}
 .st{padding:5px 10px;border-radius:999px;font-weight:900;font-size:12.5px;white-space:nowrap}
 .st.pend{background:#fff4d6;color:#8a6100}.st.ok{background:var(--mint);color:var(--green2)}.st.no{background:#fde8e6;color:#b23a30}
-.fb{margin-top:6px;padding:8px 10px;border-radius:12px;background:#fff7e0;font-weight:800;font-size:13.5px;color:#5b4300}
+.fb{white-space:pre-line;margin-top:6px;padding:8px 10px;border-radius:12px;background:#fff7e0;font-weight:800;font-size:13.5px;color:#5b4300}
 /* artículo / revisión */
 #modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,26,45,.6);backdrop-filter:blur(3px);animation:fade .2s}
 #modal[hidden]{display:none}
@@ -647,7 +650,7 @@ async function drawMine() {
   const TT = ls.get('moli2:revtit', {});
   const L = (await Promise.all(ids.slice(0, 15).map(id => getDoc(id).then(w => w || (TT[id] ? { id, t: TT[id], ty: 'inv', st: 'dev' } : null)).catch(() => null)))).filter(Boolean);
   if (!$('#mine')) return;
-  el.innerHTML = '<h3>📬 Mis envíos</h3>' + (L.map(w => `<div class="row"><span style="font-size:28px">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>${w.st === 'dev' ? 'Tu profe lo devolvió: mejóralo y vuelve a enviarlo.' : 'Enviado el ' + fecha(w.at)}</span>${w.st === 'no' && w.fb ? `<div class="fb">💬 ${esc(w.fb)}</div>` : ''}</div><span class="st ${esc(w.st)}">${w.st === 'ok' ? '✅ ¡Publicado!' : w.st === 'no' || w.st === 'dev' ? '✏️ Por mejorar' : '⏳ En revisión'}</span></div>`).join('') || '<p class="load">Todavía no hay envíos.</p>');
+  el.innerHTML = '<h3>📬 Mis envíos</h3>' + (L.map(w => `<div class="row"><span style="font-size:28px">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>${w.st === 'dev' ? 'Tu profe lo devolvió: mejóralo y vuelve a enviarlo.' : w.st === 'no' ? 'Devuelto el ' + fecha(w.rvAt || w.at) + ': lee el consejo y mejóralo.' : 'Enviado el ' + fecha(w.at)}</span>${w.st === 'no' && w.fb ? `<div class="fb"><b>💬 Consejo de ${esc(w.rv || 'tu Revisor')}: corrígelo y vuelve a enviarlo</b>\n${esc(w.fb)}</div>` : ''}</div><span class="st ${esc(w.st)}">${w.st === 'ok' ? '✅ ¡Publicado!' : w.st === 'no' || w.st === 'dev' ? '✏️ Por mejorar' : '⏳ En revisión'}</span></div>`).join('') || '<p class="load">Todavía no hay envíos.</p>');
 }
 
 // ---- 📥 Bandeja: la docente y los revisores aprueban o devuelven ----
@@ -694,10 +697,10 @@ function smAceptado(w) { const m = /^🔎 Similitud (\d+)%/.exec(w.fb || ''); re
 async function vSimilitud() {
   const V = $('#view');
   if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
-  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y busca sus frases en <b>internet</b> y revisa <b>indicios de IA</b> (; — palabras rarísimas): verás en colores lo que es <b>igualito</b> (copiar y pegar), de quién lo tomó y el link de la página. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2><button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y busca sus frases en <b>internet</b> y revisa <b>indicios de IA</b> (; — palabras rarísimas): verás en colores lo que es <b>igualito</b> (copiar y pegar), de quién lo tomó y el link de la página. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
-    CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; setCount(p.filter(w => !miSec(w)).length); pintaSim();
+    CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; if (ROLE.t) limpiarDevueltos(a); setCount(p.filter(w => !miSec(w)).length); pintaSim();
   } catch (e) { const el = $('#smL'); if (el) el.innerHTML = `<div class="empty"><b>No pude abrir los trabajos</b>${e.message === 'AUTH' ? 'Profe: toca tu fotocheck → «Conectar mi cuenta» y vuelve aquí.' : 'Revisa tu internet e intenta otra vez.'}</div>`; }
 }
 function pintaSim() {
@@ -708,7 +711,7 @@ function pintaSim() {
     return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}${r && r.ia && r.ia.nv ? `<span class="sm-p ${IA_V[r.ia.nv][0]}">${r.ia.nv === 2 ? '🤖 IA: muchos indicios' : '🤔 IA: algunos indicios'}</span>` : ''}<button type="button" class="btn blue" data-sim="${esc(w.id)}">🔎 Revisar similitud</button></div>`; }).join('')}</div>`
     : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
 }
-$('#view').addEventListener('click', e => { const b = e.target.closest('[data-sim]'); if (b && TAB === 'similitud') revisarSim(b.dataset.sim); });
+$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); });
 function smComparar(w) {                                                // marca cada palabra del trabajo con el librito del que es igualito
   const T = smTok(w.d), S = [...(SIM.src || []).map(x => ({ x, lib: 1 })), ...(SIM.pend || []).filter(x => x.id !== w.id).map(x => ({ x, lib: 0 }))].filter(s => s.x.k !== w.k && String(s.x.d || '').trim());
   const sh = (A, i) => A.slice(i, i + SM_N).map(t => t.w).join(' '), autores = {};
@@ -749,10 +752,10 @@ async function smWeb(w, r) {                                          // 🌐 in
 }
 const smGoogle = q => 'https://www.google.com/search?q=' + encodeURIComponent('"' + q + '"');
 // 🤖 Indicios de IA: signos y palabras que un niño de 6.° casi no usa (son pistas, no una prueba)
-const IA_FR = ['como modelo de lenguaje', 'como inteligencia artificial', 'claro, aqui tienes', 'aqui tienes', 'por supuesto!', 'espero que esto te ayude', 'espero que te sirva', 'chatgpt', 'gemini', 'copilot', 'si necesitas mas'];
+const IA_FR = ['como modelo de lenguaje', 'como inteligencia artificial', 'claro, aqui tienes', 'aqui tienes', 'por supuesto!', 'espero que esto te ayude', 'espero que te sirva', 'chatgpt', 'gemini', 'copilot', 'si necesitas mas', 'here is', 'sure,', 'however', 'in conclusion'];
 const IA_PAL = ['crucial', 'fundamental', 'cabe destacar', 'cabe mencionar', 'es importante destacar', 'es importante senalar', 'en el ambito', 'desempena un papel', 'juega un papel', 'papel crucial', 'fascinante', 'intrincad', 'multifacetic', 'sinergia', 'paradigma', 'asimismo', 'no obstante', 'por consiguiente', 'en definitiva', 'en este sentido', 'en sintesis', 'por ende', 'radica en', 'se erige', 'aspecto clave', 'es esencial', 'profundizar', 'potenciar', 'optimizar', 'integral', 'notablemente', 'significativamente', 'un sinfin', 'abordar', 'sumergirse', 'adentrarnos', 'en la actualidad', 'diversos', 'eficazmente', 'primordial', 'indispensable', 'ademas de ello', 'en conclusion,', 'en resumen,', 'mencionado anteriormente', 'amplia gama', 'variedad de', 'contribuye a', 'promover', 'garantizar', 'versatil', 'innovador', 'exhaustiv', 'meticulos'];
 const IA_OK = new Set(['microorganismos', 'microorganismo', 'investigacion', 'caracteristicas', 'caracteristica', 'fermentacion', 'unicelulares', 'reproduccion', 'enfermedades', 'alimentacion', 'temperaturas', 'experimentos', 'conclusiones', 'informacion', 'descomposicion', 'microscopico', 'microscopicos', 'medicamentos', 'organizacion', 'principalmente', 'universidad', 'nutricionales', 'reproductores', 'fotosintesis', 'antibioticos', 'responsabilidad', 'contaminacion', 'transformacion', 'multicelulares', 'enfermedad', 'respiratorio', 'reproductor', 'desventajas', 'inmunologico', 'inmunitario', 'naturalmente', 'fermentaciones']);
-function smIA(w) {
+function smIA(w, sinPrev) {
   const raw = String(w.d || ''), t = smSinGuia(raw).replace(/https?:\/\/\S+|www\.\S+/g, m => ' '.repeat(m.length)), lo = norm(t), M = [], P = [];   // M: marcas en el texto · P: pistas encontradas
   const pista = (ic, nom, n, pts, ej) => { if (n) P.push({ ic, nom, n, pts: Math.min(pts * n, pts * 3), ej: [...new Set(ej)].slice(0, 6) }); };
   const busca = (re, fn) => { const out = []; let m; re.lastIndex = 0; while ((m = re.exec(t))) { if (!fn || fn(m)) { M.push([m.index, m.index + m[0].length]); out.push(m[0].trim()); } if (!m[0].length) re.lastIndex++; } return out; };
@@ -766,16 +769,34 @@ function smIA(w) {
   pista('🎩', 'Palabras de adulto que suele usar la IA', pl.length, 1, pl);
   const lg = [], seen = new Set(); smTok(t).forEach(x => { if (x.w.length >= 13 && !IA_OK.has(x.w) && !seen.has(x.w)) { seen.add(x.w); lg.push(raw.slice(x.i, x.j)); M.push([x.i, x.j]); } });
   pista('📏', 'Palabras muy largas o complicadas', Math.floor(lg.length / 3), 1, lg);
-  const pts = P.reduce((s, x) => s + x.pts, 0), nv = fr.length || pts >= 8 ? 2 : pts >= 3 ? 1 : 0;
-  return { P, M: M.sort((a, b) => a[0] - b[0]), pts, nv };
+  // ✍️ ortografía perfecta: un niño de 6.° casi siempre olvida alguna tilde o el «¿»
+  const TIL = new Set(['tambien', 'despues', 'segun', 'ademas', 'facil', 'dificil', 'celula', 'celulas', 'energia', 'organico', 'organicos', 'organica', 'numero', 'rapido', 'rapida', 'acido', 'oxigeno', 'metodo', 'cientifico', 'cientificos', 'cientifica', 'biologia', 'quimica', 'quimico', 'quimicos', 'musculo', 'organo', 'organos', 'microscopico', 'microscopio', 'analisis', 'investigacion', 'informacion', 'conclusion', 'alimentacion', 'fermentacion', 'reproduccion', 'nutricion', 'proteina', 'proteinas', 'pequeno', 'pequenos', 'asi', 'aqui', 'tipico', 'ultimo', 'periodo', 'bacterias', 'estomago', 'intestino', 'jabon', 'algun', 'ningun', 'dias', 'paginas', 'pagina', 'facilmente', 'tecnica', 'tecnicas', 'sintomas', 'debiles']);
+  const AC = /[áéíóúñÁÉÍÓÚÑ]/; let tb = 0, tm = 0; smTok(t).forEach(x => { if (TIL.has(x.w) && x.w !== 'bacterias' && x.w !== 'intestino') { AC.test(raw.slice(x.i, x.j)) ? tb++ : tm++; } });
+  const pq = (t.match(/\?/g) || []).length, ab = (t.match(/¿/g) || []).length;
+  pista('✍️', 'Ortografía perfecta (todas las tildes y los ¿ ? en su lugar)', tb >= 5 && !tm && ab >= pq ? 1 : 0, 2, [`${tb} tildes difíciles sin ningún error`]);
+  // 📐 oraciones largas y muy ordenadas (muchas comas bien puestas)
+  const OR = t.split(/[.!?]+\s|\n+/).map(x => x.trim()).filter(x => x.split(/\s+/).length >= 4), nw = OR.reduce((s, x) => s + x.split(/\s+/).length, 0), nc = (t.match(/,/g) || []).length;
+  pista('📐', 'Oraciones largas y muy ordenadas', OR.length >= 3 && nw / OR.length >= 20 && nc / OR.length >= 2 ? 1 : 0, 2, [`${Math.round(nw / OR.length)} palabras por oración`]);
+  // 🔗 conectores de redacción en cadena
+  const CN = ['ademas', 'por otro lado', 'asimismo', 'en conclusion', 'finalmente', 'por lo tanto', 'sin embargo', 'en primer lugar', 'en segundo lugar', 'por ultimo', 'de igual manera', 'del mismo modo', 'es decir', 'en otras palabras', 'por otra parte'].filter(c => new RegExp('(^|[.\\n]\\s*)' + c + '\\b', 'm').test(lo));
+  pista('🔗', 'Muchos conectores de redacción', CN.length >= 4 ? CN.length - 3 : 0, 1, CN);
+  // 🎯 listas de tres («X, Y y Z»), muy típicas de la IA
+  const TR3 = (t.match(/\b[\p{L}]+(?: [\p{L}]+)?, [\p{L}]+(?: [\p{L}]+)? y [\p{L}]+/gu) || []);
+  pista('🎯', 'Listas de tres («esto, eso y aquello»)', TR3.length >= 3 ? TR3.length - 2 : 0, 1, TR3.map(x => x.slice(0, 40)));
+  // 🪞 escribe distinto a sus otros trabajos publicados
+  if (!sinPrev) { const ant = (SIM.src || []).filter(x => x.k === w.k && x.id !== w.id).map(x => smIA(x, 1).pts); if (ant.length && Math.max(...ant) <= 2 && P.reduce((s, x) => s + x.pts, 0) >= 6) pista('🪞', 'Escribe muy distinto a sus otros trabajos', 1, 3, [`en sus ${ant.length} trabajo${ant.length > 1 ? 's' : ''} anterior${ant.length > 1 ? 'es' : ''} no había estas marcas`]); }
+  const pts = P.reduce((s, x) => s + x.pts, 0), nv = fr.length || pts >= 8 || P.length >= 4 ? 2 : pts >= 3 || P.length >= 2 ? 1 : 0;   // varias pistas distintas pesan más que una sola
+  return { P, M: M.sort((a, b) => a[0] - b[0]), pts, nv, lg, pl };
 }
 const IA_V = [['v0', '🙂 Pocos indicios', 'Parece escrito por un niño: signos y palabras normales.'], ['v2', '🤔 Algunos indicios', 'Tiene signos o palabras que un niño de 6.° casi no usa. Pregúntale qué significan.'], ['v3', '🤖 Muchos indicios de IA', 'Tiene muchas marcas típicas de la Inteligencia Artificial. Pídele que lo explique con sus palabras.']];
 function smIAHtml(w, r) {
   const A = r.ia, v = IA_V[A.nv]; let o = '', at = 0; const txt = String(w.d || '');
   A.M.forEach(([i, j]) => { if (i < at) return; o += esc(txt.slice(at, i)) + `<mark class="ci">${esc(txt.slice(i, j))}</mark>`; at = j; }); o += esc(txt.slice(at));
-  return `<div class="sm-ia"><h4>🤖 Indicios de Inteligencia Artificial <span class="sm-p ${v[0]}">${v[1]}</span></h4><p class="sm-wl">${v[2]}</p>
+  const PR = [...A.pl.filter(x => x.length > 6), ...A.lg].slice(0, 3);   // preguntas para comprobar que entiende lo que escribió
+  return `<div class="sm-ia"><h4>🤖 Indicios de Inteligencia Artificial <span class="sm-p ${v[0]}">${v[1]}</span><span class="sm-p">${A.P.length} pista${A.P.length === 1 ? '' : 's'}</span></h4><div class="sm-met"><i style="width:${Math.min(100, A.pts * 8)}%"></i></div><p class="sm-wl">${v[2]}</p>
     ${A.P.length ? `<div class="sm-ip">${A.P.map(x => `<span><b>${x.ic} ${esc(x.nom)}</b>${x.n > 1 ? ` ×${x.n}` : ''}${x.ej.length && x.ej[0].length > 2 ? `<small>${x.ej.map(esc).join(' · ')}</small>` : ''}</span>`).join('')}</div>
-    <details><summary>👁 Ver los indicios en el texto</summary><div class="sm-tx">${o}</div></details>` : ''}
+    <details><summary>👁 Ver los indicios en el texto</summary><div class="sm-tx">${o}</div></details>
+    ${A.nv && PR.length ? `<div class="sm-pr"><b>🗣️ Pregúntale (si lo escribió él, sabrá responder):</b>${PR.map(x => `<span>¿Qué significa «${esc(x)}»? Explícalo con tus palabras.</span>`).join('')}<span>¿Dónde encontraste esta información? Muéstrame la página.</span></div>` : ''}` : ''}
     <p class="sm-wl" style="font-size:12.5px">⚠️ Son pistas, no una prueba: ningún detector sabe con seguridad si lo hizo una IA. Lo mejor es pedirle que te lo explique con sus palabras.</p></div>`;
 }
 function smWebHtml(r) {
@@ -796,6 +817,29 @@ async function revisarSim(id) {
     if (es) es.textContent = x ? `📖 Comparando con «${x.t}» de ${firstName(x.n)}…` : '📖 Comparando…'; if (ba) ba.style.width = (100 * (i + 1) / pasos) + '%'; await new Promise(r => setTimeout(r, ms)); }
   SIM.res[id] = smComparar(w); SIM.res[id].ia = smIA(w); if (M.dataset.id === id && !M.hidden) pintaInforme(); pintaSim(); smWeb(w, SIM.res[id]);
 }
+const SM_MAX = 15;                                                     // para aprobar: 15 % de similitud o menos
+const smTotal = r => Math.min(100, r.p + (r.web && r.web.st === 'ok' ? r.web.p : 0));
+function smConsejo(w, r) {                                             // el consejo que verá el estudiante en «Mis envíos», armado con el reporte
+  const tp = smTotal(r), wp = r.web && r.web.p || 0, L = [], cort = (a, b, libre) => { const T = r.T.filter((t, k) => t.i >= a && t.j <= b && (!libre || r.due[k] < 0)); if (!T.length) return ''; return '«' + w.d.slice(T[0].i, T[Math.min(T.length, 7) - 1].j) + (T.length > 7 ? '…»' : '»'); };
+  L.push(`🔎 Tu trabajo tiene ${tp}% de similitud (📚 Biblioteca ${r.p}%${wp ? ` · 🌐 internet ${wp}%` : ''}). Para aprobar debe tener ${SM_MAX}% o menos.`);
+  const G = []; for (let i = 0; i < r.T.length; i++) { const d = r.due[i]; if (d < 0) continue; let j = i; while (j + 1 < r.T.length && r.due[j + 1] === d) j++; G.push({ d, a: r.T[i].i, b: r.T[j].j, n: j - i + 1 }); i = j; }
+  const cp = G.sort((x, y) => y.n - x.n).slice(0, 2).map(g => { const f = r.fuentes[g.d]; return `${cort(g.a, g.b)} (del librito de ${firstName(f.s.x.n)} ${f.ape})`; });
+  (r.web && r.web.hits || []).slice(0, cp.length ? 1 : 2).forEach(h => { const q = cort(h.i, h.j, 1); if (q) cp.push(`${q} (de internet: ${h.hit.t})`); });
+  if (cp.length) L.push('✂️ Copiaste igualito: ' + cp.join(' · '));
+  const f0 = r.fuentes[0]; if (f0 && f0.p >= 3) L.push(`✏️ Escríbelo con tus palabras y cita así: ${f0.ape} (${smAnio(f0.s.x)}) explica que…`); else if (wp) L.push('✏️ Escríbelo con tus palabras y pon la página de donde lo sacaste con su año.');
+  if (r.ia && r.ia.nv) L.push(`🤖 Ojo: tu texto tiene marcas de IA (${r.ia.P.slice(0, 3).map(x => x.nom.split(' (')[0].toLowerCase()).join(', ')}). Escribe como tú lo explicarías.`);
+  let o = L.join('\n'); while (o.length > 480 && L.length > 1) { L.splice(1, 1); o = L.join('\n'); } return o.slice(0, 480);
+}
+async function revisarTodos(b) {                                      // revisa toda la lista de una vez (sin animación)
+  b.disabled = true; const L = (SIM.pend || []).filter(w => !SIM.res[w.id]);
+  for (let i = 0; i < L.length; i++) { b.textContent = `⏳ Revisando ${i + 1} de ${L.length}…`; const w = L[i]; SIM.res[w.id] = smComparar(w); SIM.res[w.id].ia = smIA(w); pintaSim(); await smWeb(w, SIM.res[w.id]); }
+  b.textContent = '✅ Todos revisados'; b.disabled = false; toast('✅ Listo: ya tienen su % todos los trabajos.'); pintaSim();
+}
+async function limpiarDevueltos(a) {                                   // los devueltos se guardan 21 días para que el estudiante lea su consejo; luego se borran solos
+  try { const L = await query('no', a, ['rvAt', 'at']), lim = Date.now() - 21 * 864e5;
+    L.filter(w => (w.rvAt || w.at || 0) < lim).slice(0, 20).forEach(w => fetch(`${BASE}/revista/${encodeURIComponent(w.id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }).catch(() => {}));
+  } catch (e) {}
+}
 function pintaInforme() {
   const M = $('#modal'), w = SIM.w, r = SIM.res[w.id]; if (!r) return;
   const own = ME && w.k === ME.key && !ROLE.t, ro = own || miSec(w), f0 = r.fuentes[0], wp = r.web && r.web.st === 'ok' ? r.web.p : 0, tp = Math.min(100, r.p + wp);
@@ -812,7 +856,9 @@ function pintaInforme() {
     <div class="sm-cmp${fs ? ' dos' : ''}"><div class="sm-tx"><h5>📝 Trabajo enviado</h5>${smMarcar(w.d, r.T, r.due.map((d, i) => d < 0 && r.web && r.web.hits.some(f => r.T[i].i >= f.i && r.T[i].j <= f.j) ? 'w' : d), SIM.sel)}</div>${fs ? `<div class="sm-tx"><h5>${fs.s.lib ? '📖' : '📥'} «${esc(fs.s.x.t)}» · ${esc(fs.s.x.n)}</h5>${smMarcar(fs.s.x.d, fs.s.T, fs.mk.map(m => m ? SIM.sel : -1), -1)}</div>` : ''}</div>
     ${ro ? `<div class="tip">${own ? '🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.' : `👀 Este trabajo es de tu sección (6.° ${esc(ROLE.rs)}): puedes ver el reporte, pero lo decide un Revisor de otra sección o tu profe.`}</div>`
     : `<div class="acts"><textarea id="rvFb" maxlength="500" data-sug="${esc(sug)}" placeholder="Comentario para el estudiante (opcional)">${esc(fbTxt)}</textarea>
-      <button type="button" class="btn go" data-rv="ok">✅ Aprobar y publicar</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver (se borra)</button><button type="button" class="btn blue" data-smacc>👌 Aceptar reporte</button></div>`}
+      <button type="button" class="btn soft sm-cons" data-smcons>✨ Llenar consejo automático</button>
+      <p class="sm-lim ${tp > SM_MAX ? 'no' : 'ok'}">${tp > SM_MAX ? `🔒 No se puede aprobar todavía: tiene <b>${tp}%</b> de similitud y el máximo es <b>${SM_MAX}%</b>. Devuélvelo con el consejo para que lo corrija.` : `✅ Tiene ${tp}% de similitud: está dentro del máximo (${SM_MAX}% o menos).`}${r.web && r.web.st === 'busca' ? ' (aún buscando en internet…)' : ''}</p>
+      <button type="button" class="btn go" data-rv="ok"${tp > SM_MAX && !ROLE.t ? ' disabled' : ''}>${tp > SM_MAX ? '🔒' : '✅'} Aprobar y publicar</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver con consejo</button><button type="button" class="btn blue" data-smacc>👌 Aceptar reporte</button></div>`}
   </div></article>`;
 }
 async function aceptarSim(b) {                                        // deja anotado en el trabajo que ya se revisó su similitud (sigue en la bandeja)
@@ -861,12 +907,16 @@ $('#modal').addEventListener('click', async e => {
   if (e.target === M || e.target.closest('[data-x]')) { M.hidden = true; M.innerHTML = ''; return; }
   if (e.target.closest('[data-word]')) return bajarWord(M.dataset.id, e.target.closest('[data-word]'));
   if (e.target.closest('[data-smacc]')) return aceptarSim(e.target.closest('[data-smacc]'));
+  if (e.target.closest('[data-smcons]')) { const ta = $('#rvFb'), r = SIM.w && SIM.res[SIM.w.id]; if (ta && r) { ta.value = smConsejo(SIM.w, r); ta.dataset.sug = '_'; ta.focus(); toast('✨ Consejo listo: puedes cambiarlo antes de devolver.'); } return; }
   const sx = e.target.closest('[data-sms]'); if (sx) { SIM.sel = SIM.sel === +sx.dataset.sms ? -1 : +sx.dataset.sms; return pintaInforme(); }
   if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
   const b = e.target.closest('[data-rv]'); if (!b) return;
-  const id = M.dataset.id, act = b.dataset.rv, fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
-  const borra = act === 'del' || act === 'no';                       // al devolver (profe o Revisor): se borra con su Word para que lo envíe corregido
-  if (act === 'no' && !confirm('Se devolverá y se BORRARÁ este trabajo (con su Word) para que el estudiante lo vuelva a enviar corregido. ¿Seguir?')) return;
+  const id = M.dataset.id, act = b.dataset.rv; let fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
+  const borra = act === 'del';                                        // al devolver se queda (sin su Word) para que el estudiante lea el consejo en «Mis envíos»
+  const smr = TAB === 'similitud' && SIM.w && SIM.w.id === M.dataset.id && SIM.res[SIM.w.id];
+  if (act === 'no' && !fb && smr) fb = smConsejo(SIM.w, smr);
+  if (act === 'ok' && smr && smTotal(smr) > SM_MAX) { if (!ROLE.t) return toast(`🔒 Tiene ${smTotal(smr)}% de similitud: sólo se aprueba con ${SM_MAX}% o menos.`, 4500); if (!confirm(`Profe: este trabajo tiene ${smTotal(smr)}% de similitud (el máximo es ${SM_MAX}%). ¿Aprobarlo igual?`)) return; }
+  if (act === 'no' && !confirm('Se devolverá con tu consejo: el estudiante lo verá en «Mis envíos», lo corregirá y lo volverá a enviar. ¿Seguir?')) return;
   if (act === 'del' && !confirm('¿Borrar este trabajo para siempre?')) return;
   const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
   M.querySelectorAll('[data-rv]').forEach(x => x.disabled = true);
@@ -875,13 +925,13 @@ $('#modal').addEventListener('click', async e => {
     const sinWord = () => fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }).catch(() => {});
     if (borra) { r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }); sinWord(); }
     else {
-      const up = { st: act, rv: ROLE.t ? 'tu profe' : String(ROLE.rn || ME.name || 'Revisor').slice(0, 60), rvAt: new Date(), fb: act === 'no' ? fb.slice(0, 500) : fb.slice(0, 500) };
+      const up = { st: act, rv: ROLE.t ? 'tu profe' : String(ROLE.rn || ME.name || 'Revisor').slice(0, 60), rvAt: new Date(), fb: fb.slice(0, 500) };
       r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&` + Object.keys(up).map(k => 'updateMask.fieldPaths=' + k).join('&') + '&currentDocument.exists=true', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });
     }
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
-    if (act === 'ok') sinWord();                                       // aprobado: queda el librito con su información; el Word ya no hace falta
+    if (act === 'ok' || act === 'no') sinWord();                                       // aprobado: queda el librito con su información; el Word ya no hace falta
     M.hidden = true; M.innerHTML = '';
-    toast(act === 'no' ? '✏️ Devuelto: se borró para que lo envíe corregido.' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
+    toast(act === 'no' ? '✏️ Devuelto con el consejo: el estudiante lo verá en «Mis envíos».' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
     CACHE.ok = null; if (CACHE.pend) CACHE.pend = CACHE.pend.filter(x => x.id !== id);
     if (TAB === 'bandeja') drawBandeja(); else if (TAB === 'similitud') pintaSim(); else vRevista();
   } catch (x) { M.querySelectorAll('[data-rv]').forEach(y => y.disabled = false); toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
@@ -899,6 +949,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151130"></script><script src="mando.js?v=202610151130"></script>
+<script src="pdftrabajo.js?v=202610151137"></script><script src="mando.js?v=202610151137"></script>
 </body>
 </html>
