@@ -36,19 +36,35 @@
   const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'maBtn'; btn.innerHTML = '<span class="ic">📁</span>Mis archivos<b hidden></b>'; document.body.appendChild(btn); btn.title = 'Mis archivos';
   const win = document.createElement('div'); win.id = 'maWin'; win.hidden = true; document.body.appendChild(win);
   function pintarBtn() { const m = yo(); btn.hidden = !m || !!(m.teacher || m.docente); const n = lista().filter(h => h.st === 'por').length, b = btn.querySelector('b'); b.hidden = !n; b.textContent = n; }
-  function estado(h) { if (h.st !== 'env') return ['', '⏳ Por concluir']; const e = EST[cache[h.rid]]; return e || ['en', '📨 Enviado']; }
+  function estado(h) { if (h.st !== 'env') return h.dev ? ['mj', '✏️ Por corregir'] : ['', '⏳ Por concluir']; const e = EST[cache[h.rid]]; return e || ['en', '📨 Enviado']; }
   function pintar() {
     pintarBtn(); if (win.hidden) return; const L = lista().sort((a, b) => (b.at || 0) - (a.at || 0));
     win.innerHTML = `<div class="ma-c" role="dialog" aria-modal="true"><div class="ma-h"><span style="display:grid;place-items:center;width:40px;height:40px;border-radius:9px;background:#fff;color:#2b579a;font:900 26px Georgia,serif">W</span><h3>Word Molí <small style="font:800 14px Nunito,sans-serif;opacity:.85">· Mis archivos</small></h3><button type="button" data-max aria-label="Cerrar">✕</button></div><div class="ma-b">
       <button type="button" class="ma-n" data-man>➕ Nueva investigación</button>
-      ${L.length ? L.map(h => { const e = estado(h), t = TIPO[h.ty]; return `<div class="ma-f"><span class="w">W</span><div class="t"><b>${esc(h.nom || h.t || 'Mi investigación (sin nombre)')}</b><small>${t[0]} ${t[1]} · ${h.np ?? palabras(h)} palabras · ${h.st === 'env' ? 'enviada el ' + fecha(h.env) : 'editada el ' + fecha(h.at)}</small></div><span class="ma-s ${e[0]}">${e[1]}</span><button type="button" data-mao="${esc(h.id)}">${h.st === 'env' ? '👀 Ver' : '✏️ Seguir'}</button>${h.st === 'env' ? '' : `<button type="button" class="del" data-mad="${esc(h.id)}" aria-label="Borrar">🗑</button>`}</div>`; }).join('')
+      ${L.length ? L.map(h => { const e = estado(h), t = TIPO[h.ty]; return `<div class="ma-f"><span class="w">W</span><div class="t"><b>${esc(h.nom || h.t || 'Mi investigación (sin nombre)')}</b><small>${t[0]} ${t[1]} · ${h.np ?? palabras(h)} palabras · ${h.st === 'env' ? 'enviada el ' + fecha(h.env) : 'editada el ' + fecha(h.at)}</small></div><span class="ma-s ${e[0]}">${e[1]}</span>${h.dev ? '' : ''}${h.st === 'env' && cache[h.rid] === 'no' ? `<button type="button" data-mar="${esc(h.rid)}">🟨 Ver correcciones</button>` : ''}<button type="button" data-mao="${esc(h.id)}">${h.st === 'env' ? '👀 Ver' : h.dev ? '✏️ Corregir' : '✏️ Seguir'}</button>${h.st === 'env' ? '' : `<button type="button" class="del" data-mad="${esc(h.id)}" aria-label="Borrar">🗑</button>`}</div>`; }).join('')
         : '<div class="ma-e">📂 Tu carpeta está vacía.<br>Toca «Nueva investigación» para empezar tu guía.</div>'}
       <p class="ma-p">💾 Tus guías se guardan solas en este dispositivo. Las «Por concluir» todavía no las envías: termínalas y envíalas desde la Revista.</p></div></div>`;
-    L.filter(h => h.st === 'env' && h.rid && !(h.rid in cache)).forEach(h => { cache[h.rid] = '';
-      fetch(`${BASE}/revista/${encodeURIComponent(h.rid)}?key=${KEY}`).then(r => r.ok ? r.json() : null).then(j => { cache[h.rid] = j && j.fields && j.fields.st ? j.fields.st.stringValue : ''; if (!win.hidden) pintar(); }).catch(() => {}); });
+    revisar();
+  }
+  function devolver(h, j) {                                            // el Revisor lo devolvió: vuelve a la carpeta «Por corregir», pintado con sus subrayados
+    const f = j.fields || {}, g = k => f[k] && f[k].stringValue || '', d = g('d'); let rm = {}; try { rm = JSON.parse(g('rm') || '{}'); } catch (e) {}
+    const dev = { fb: g('fb'), by: g('rv') || rm.by || '', m: {}, src: {}, lista: [], rid: h.rid }; let n = 0;
+    const pon = (x, t, extra) => (h.mapa || []).forEach(e => { if (x.a < e.b && x.b > e.a) (dev.m[e.k] = dev.m[e.k] || []).push({ a: Math.max(x.a, e.a) - e.a, b: Math.min(x.b, e.b) - e.a, t, ...(extra && x.b > e.a && x.b <= e.b ? extra : {}) }); });
+    (rm.m || []).slice().sort((x, y) => x.a - y.a).forEach(x => { const num = x.c ? ++n : 0; if (x.c) dev.lista.push({ q: d.slice(x.a, x.b).slice(0, 70), c: x.c }); pon(x, 'r', num ? { c: x.c, n: num } : null); });
+    (rm.s || []).forEach(([a, b]) => pon({ a, b }, 's')); (rm.o || []).forEach(([a, b, msg]) => pon({ a, b }, 'o', { msg }));
+    Object.keys(dev.m).forEach(k => dev.src[k] = String((h.v || {})[k] || '').replace(/[ \t]+/g, ' ').trim());
+    const m = yo(); if (!m) return; const L = get('moli2:hojas:' + m.key, []), x = L.find(y => y.id === h.id); if (!x) return;
+    Object.assign(x, { st: 'por', dev, at: Date.now() }); try { localStorage.setItem('moli2:hojas:' + m.key, JSON.stringify(L)); } catch (e) {}
+  }
+  let rvAt = 0;
+  function revisar() {                                                 // ¿qué pasó con lo que envió? (devuelto → vuelve pintado a su carpeta)
+    lista().filter(h => h.st === 'env' && h.rid && !(h.rid in cache)).forEach(h => { cache[h.rid] = '';
+      fetch(`${BASE}/revista/${encodeURIComponent(h.rid)}?key=${KEY}`).then(r => r.ok ? r.json() : null).then(j => { const st = j && j.fields && j.fields.st ? j.fields.st.stringValue : ''; cache[h.rid] = st;
+        if (st === 'no') { devolver(h, j); pintarBtn(); } if (!win.hidden) pintar(); }).catch(() => {}); });
   }
   function abrir(q) {                                                  // en la Revista se abre aquí mismo; en el Aula, dentro de la Revista
     win.hidden = true;
+    if (q.rev) { if (REPO && window.verRevision) window.verRevision(q.rev); else if (window.Revista && Revista.abrirBandeja) Revista.abrirBandeja('enviar&rev=' + encodeURIComponent(q.rev)); else location.href = 'repositorio.html?v=enviar&rev=' + encodeURIComponent(q.rev); return; }
     if (REPO && window.abrirHojaDoc) { if (q.nueva) { const f = window.nuevaHoja && window.nuevaHoja(q.nueva); if (f) window.abrirHojaDoc(f); } else window.abrirHojaDoc(q.hoja); return; }
     const v = 'enviar&' + (q.nueva ? 'nueva=' + q.nueva : 'hoja=' + encodeURIComponent(q.hoja));
     if (window.Revista && Revista.abrirBandeja) Revista.abrirBandeja(v); else location.href = 'repositorio.html?v=' + v;
@@ -56,6 +72,7 @@
   btn.addEventListener('click', () => { win.hidden = false; pintar(); });
   win.addEventListener('click', e => {
     if (e.target === win || e.target.closest('[data-max]')) { win.hidden = true; return; }
+    const rv = e.target.closest('[data-mar]'); if (rv) return abrir({ rev: rv.dataset.mar });
     const o = e.target.closest('[data-mao]'); if (o) return abrir({ hoja: o.dataset.mao });
     if (e.target.closest('[data-man]')) return abrir({ nueva: 'inv' });
     const d = e.target.closest('[data-mad]'); if (d && confirm('¿Borrar esta guía que aún no enviaste? No se podrá recuperar.')) { const m = yo(); try { localStorage.setItem('moli2:hojas:' + m.key, JSON.stringify(lista().filter(h => h.id !== d.dataset.mad))); } catch (x) {} pintar(); }
@@ -66,5 +83,5 @@
   const lugar = () => { const m = document.getElementById('mandoBtn'), l = m && !m.hidden && m.offsetWidth ? m : document.getElementById('bibLink'); if (!l) return; const r = l.getBoundingClientRect(); btn.style.right = Math.round(innerWidth - r.left + 12) + 'px'; };
   if (!REPO && document.getElementById('bibLink')) { btn.classList.add('cuadro'); [...btn.childNodes].forEach(n => n.nodeType === 3 && n.remove()); btn.querySelector('.ic').textContent = 'W'; btn.querySelector('.ic').insertAdjacentHTML('afterend', '<span class="lb">WORD MOLÍ</span>'); btn.title = 'Word Molí: mis guías'; lugar(); addEventListener('resize', lugar); setInterval(lugar, 1500); }
   window.MisArchivos = { pintar, abrir: () => btn.click() };
-  pintarBtn();
+  pintarBtn(); setTimeout(revisar, 1500); setInterval(() => { Object.keys(cache).forEach(k => { if (cache[k] === 'pend' || cache[k] === '') delete cache[k]; }); revisar(); }, 120000);
 })();

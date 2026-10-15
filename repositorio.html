@@ -119,11 +119,36 @@ button{cursor:pointer}
 .wd-ed{cursor:text;word-break:break-word;white-space:pre-wrap}.wd-ed:empty:before{content:attr(data-ph);color:#9aa5b1;pointer-events:none}.wd-ed[contenteditable=false]{cursor:default}
 .wd-fm{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #c8c8c8;border-radius:6px;background:#fff;color:#333;font:600 13px Carlito,Calibri,Arial,sans-serif;cursor:pointer}.wd-fm:hover{background:#e8eefb;border-color:#2b579a}.wd-fm b{font:900 15px Georgia,serif}.wd-fm.mk span{display:inline-block;padding:0 3px;border-radius:3px;background:#fff176}
 .wd-kw input{font:600 16px Carlito,Calibri,Arial,sans-serif;color:#222}.wd-tt label small{font-weight:600;color:#888}
+.wd-ed .rvm{background:#fde047;border-radius:2px}.wd-ed .rvs{background:#fdba74;border-radius:2px}.wd-ed .rvm.rvs{background:linear-gradient(#fde047 55%,#fdba74 55%)}.wd-ed .rvo{text-decoration:underline wavy #2563eb;text-underline-offset:3px}.wd-ed [data-n]::after{content:attr(data-n);display:inline-grid;place-items:center;min-width:16px;height:16px;margin-left:2px;border-radius:50%;background:#ca8a04;color:#fff;font:800 10px/1 Arial,sans-serif;vertical-align:super}
+.wd-dev{margin:0 0 16px;padding:12px 14px;border-radius:8px;background:#fffbea;border:2px solid #fde047;color:#5b4300;font-size:14.5px}.wd-dev b{display:block;font-size:15.5px}.wd-dev p{margin:6px 0}.wd-dev ol{margin:6px 0;padding-left:20px}.wd-dev q{font-style:italic;color:#854d0e}.wd-dev small{display:block;margin-top:6px;font-weight:700}
 .wd-ck{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:15px;cursor:pointer}.wd-ck input{width:18px;height:18px}
 .wd-st{display:flex;gap:18px;padding:5px 14px;background:#2b579a;color:#e8eefb;font-size:12.5px;flex:none;overflow-x:auto;white-space:nowrap}.wd-st .wd-np{background:rgba(255,255,255,.18);color:#fff}
 .wd-no{animation:wdNo .45s}@keyframes wdNo{25%{transform:translateX(-6px);background:#fde8e6}75%{transform:translateX(6px)}}
 .wd-go{width:100%;border:2px solid #2b579a;cursor:pointer;text-align:left;font:inherit}.wd-go:hover{background:#f2f6fc}
 @media (max-width:760px){.wd-pg{padding:28px 18px;min-height:0}.wd-fu{grid-template-columns:1fr}.wd-sv{display:none}}
+/* 📝 revisión en el Word de Molí */
+.art.rv-art{width:min(1320px,100%);height:100%;display:flex;flex-direction:column;overflow:hidden;background:#e6e6e6;border-radius:18px;font-family:Carlito,Calibri,"Segoe UI",Arial,sans-serif}
+.rv-art .wd-bar,.rv-art .wd-rib{flex:none}.rv-art .wd-rib{flex-wrap:wrap}
+.rv-gr{flex:1;min-height:0;display:grid;grid-template-columns:1fr 340px}.rv-gr .wd-sc{overflow:auto}
+.rv-pg{min-height:0;padding:44px 56px}.rv-pg h1{margin:4px 0}
+.rv-doc{white-space:pre-wrap;font-size:16px;line-height:1.75;color:#222;user-select:text}
+.rv-doc .hd{display:inline-block;margin-top:14px;font:700 19px Cambria,Georgia,serif;color:#1f3864;border-bottom:1px solid #8eaadb}.rv-doc .lb{font-weight:700;color:#2b579a}
+.rv-doc .sm{background:#fdba74;border-radius:2px}.rv-doc .or{text-decoration:underline wavy #2563eb;text-decoration-skip-ink:none;text-underline-offset:3px;cursor:help}
+.rv-doc .ryl{background:#fde047;border-radius:2px;cursor:pointer}.rv-doc .ryl.sm{background:linear-gradient(#fde047 55%,#fdba74 55%)}.rv-doc [data-n]::after{content:attr(data-n);display:inline-grid;place-items:center;min-width:17px;height:17px;margin-left:2px;border-radius:50%;background:#ca8a04;color:#fff;font:800 11px/1 Arial,sans-serif;vertical-align:super}
+.rv-doc .pulso{outline:3px solid #ca8a04;outline-offset:2px}
+.rv-ay{margin:0 0 10px;padding:8px 10px;border-radius:6px;background:#fffbea;color:#854d0e;font-size:13.5px;font-weight:700}
+.rv-ley{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#444}.rv-ley i{width:14px;height:14px;border-radius:3px;display:inline-block;margin-left:6px}.rv-ley .a{background:#fde047}.rv-ley .n{background:#fdba74}.rv-ley .z{background:#fff;border-bottom:3px solid #2563eb}
+.wd-fm.rvbla span{display:inline-block;width:16px;height:12px;border:1px solid #aaa;border-radius:3px;background:#fff}
+.wd-fm.rvsub span{display:inline-block;padding:0 3px;border-radius:3px;background:#fde047}.wd-fm.det{background:#2b579a;color:#fff;border-color:#2b579a}.wd-fm.det:hover{background:#1e3f7a}.wd-fm[disabled]{opacity:.6;cursor:wait}
+.rv-side{overflow:auto;padding:14px;background:#f8fafc;border-left:1px solid #d4d4d4;display:grid;gap:12px;align-content:start;font-family:var(--sans)}
+.rv-side section{padding:12px;border-radius:14px;background:#fff;border:1px solid #dde4ee}.rv-side h4{margin:0 0 8px;font:900 15px var(--sans);color:var(--navy)}.rv-side h4 small{font-weight:700;color:var(--ink2)}
+.rv-res{display:flex;gap:10px;align-items:flex-start}.rv-res .sm-ring{width:86px;height:86px}.rv-res .sm-ring>div{width:64px;height:64px}.rv-res .sm-ring b{font-size:21px}
+.rv-f{margin:0 0 6px;font-size:13px;font-weight:700;color:var(--ink)}.rv-f small{display:block;color:var(--ink2)}
+.rv-c{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:10px;background:#fffbea;border:1px solid #fde68a;margin-bottom:6px;cursor:pointer}.rv-c>b{flex:none;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#ca8a04;color:#fff;font-size:11px}.rv-c>div{flex:1;min-width:0}
+.rv-c q{display:block;font-size:12px;color:#854d0e;font-style:italic}.rv-c p{margin:2px 0 0;font-size:13.5px;font-weight:700;color:var(--ink)}.rv-c button{border:0;background:none;cursor:pointer}
+.rv-side .acts{display:grid;gap:8px}.rv-side .acts h4{margin:0}.rv-side .acts textarea{min-height:90px;font-size:13.5px}.rv-side .btn{padding:10px 14px;font-size:14px}
+.wd-dc textarea{padding:10px 12px;border:2px solid var(--line);border-radius:12px;font:700 15px var(--sans);resize:vertical}
+@media (max-width:900px){.rv-gr{grid-template-columns:1fr;overflow:auto}.rv-gr .wd-sc{overflow:visible}.rv-side{border-left:0;border-top:1px solid #d4d4d4}.rv-pg{padding:22px 16px}}
 /* pestañas */
 .tabs{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -383,7 +408,7 @@ async function query(st, auth, fields) {
   return (await r.json()).filter(x => x.document).map(x => docOf(x.document)).sort((a, b) => (b.at || 0) - (a.at || 0));
 }
 async function getDoc(id) { const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`); if (r.status === 404) return null; if (!r.ok) throw new Error('NET'); return docOf(await r.json()); }
-const LIST_F = ['k', 'n', 'sec', 'u', 'kw', 'ty', 't', 'd', 'f', 'link', 'th', 'st', 'rv', 'fb', 'at', 'rvAt', 'g'];
+const LIST_F = ['k', 'n', 'sec', 'u', 'kw', 'ty', 't', 'd', 'f', 'link', 'th', 'st', 'rv', 'fb', 'at', 'rvAt', 'g', 'rm'];
 
 // ---- Revisor: la docente le da el título y una clave de 4 números ----
 async function pbkdf(pass, salt, iter, bits) {
@@ -646,15 +671,18 @@ const hojaDoc = id => hojasTodas().find(h => h.id === id);
 function hojaPut(h) { const L = hojasTodas().filter(x => x.id !== h.id); h.at = Date.now(); L.unshift(h); if (!ls.set(HJ_K(), L.slice(0, 40))) toast('⚠️ No pude guardar: tu navegador está lleno.'); }
 const hojaNueva = ty => { const h = { id: 'h' + Date.now().toString(36), ty, t: '', v: {}, at: Date.now(), st: 'por' }; hojaPut(h); return h; };
 const hojaBorr = ty => hojasTodas().find(h => h.ty === ty && h.st === 'por');
-function hojaTexto(h) {                                               // el mismo formato que sale al leer la guía en Word
+function hojaTexto(h, conMapa) {                                     // el mismo formato que sale al leer la guía en Word (y dónde quedó cada recuadro)
   const G = HOJA[h.ty], v = h.v || {}, val = k => String(v[k] || '').replace(/[ \t]+/g, ' ').trim(), L = [];
   G.pasos.forEach(p => { const A = [];
-    (p.c || []).forEach(c => { const x = val(c.id); if (!x) return; A.push(c.pre ? `${c.pre} ${x}` : c.lab ? (/[?…]$/.test(c.lab) ? `${c.lab}\n${x}` : `${c.lab}: ${x}`) : x); });
-    if (p.tb) for (let r = 1; r <= p.tb.rows; r++) { const F = p.tb.cols.slice(1).map((_, c) => val(`t${r}${c}`)); if (F.some(Boolean)) A.push(`${p.tb.cols[0]} ${r}: ${F.map(x => x || '—').join(' · ')}`); }
-    for (let n = 1; n <= (p.fu || 0); n++) { const F = FU_C.map(([k, lab]) => [lab, val(`f${n}${k}`)]).filter(x => x[1]); if (F.length) A.push(`Fuente ${n}`, ...F.map(([lab, x]) => `${lab}: ${x}`)); }
-    (p.ck || []).forEach((c, j) => { if (v['c' + j]) A.push('si ' + c); });
-    if (A.length) L.push('PASO ' + p.t, ...A); });
-  return L.join('\n').slice(0, 20000);
+    (p.c || []).forEach(c => { const x = val(c.id); if (!x) return;
+      if (c.pre) A.push({ s: `${c.pre} ${x}`, k: c.id, o: c.pre.length + 1 }); else if (c.lab && /[?…]$/.test(c.lab)) A.push({ s: c.lab }, { s: x, k: c.id, o: 0 }); else if (c.lab) A.push({ s: `${c.lab}: ${x}`, k: c.id, o: c.lab.length + 2 }); else A.push({ s: x, k: c.id, o: 0 }); });
+    if (p.tb) for (let r = 1; r <= p.tb.rows; r++) { const F = p.tb.cols.slice(1).map((_, c) => val(`t${r}${c}`)); if (F.some(Boolean)) A.push({ s: `${p.tb.cols[0]} ${r}: ${F.map(x => x || '—').join(' · ')}` }); }
+    for (let n = 1; n <= (p.fu || 0); n++) { const F = FU_C.map(([k, lab]) => [k, lab, val(`f${n}${k}`)]).filter(x => x[2]); if (F.length) A.push({ s: `Fuente ${n}` }, ...F.map(([k, lab, x]) => ({ s: `${lab}: ${x}`, k: `f${n}${k}`, o: lab.length + 2 }))); }
+    (p.ck || []).forEach((c, j) => { if (v['c' + j]) A.push({ s: 'si ' + c }); });
+    if (A.length) L.push({ s: 'PASO ' + p.t }, ...A); });
+  const d = L.map(x => x.s).join('\n').slice(0, 20000); if (!conMapa) return d;
+  const mapa = []; let at = 0; L.forEach(x => { if (x.k) mapa.push({ k: x.k, a: at + x.o, b: at + x.s.length }); at += x.s.length + 1; });
+  return { d, mapa };
 }
 function hojaFalta(h) {
   const v = h.v || {}, x = k => String(v[k] || '').trim(), F = [];
@@ -676,11 +704,18 @@ function abrirHojaDoc(id) {
   const G = HOJA[h.ty], t = tipo(h.ty), v = h.v || (h.v = {}), ro = h.st === 'env'; let d = document.getElementById('hoja');
   if (!d) { d = document.createElement('div'); d.id = 'hoja'; document.body.appendChild(d); }
   const dis = ro ? ' disabled' : '';
-  const ta = (id, ph, r = 3) => `<div class="wd-ed" data-k="${id}" data-ed data-ph="${esc(ph || '')}" style="min-height:${(Math.max(1, r) * 1.55 + .8).toFixed(2)}em" contenteditable="${ro ? 'false' : 'true'}" spellcheck="true" lang="es">${v[id + '_h'] ? limpiaH(v[id + '_h']) : esc(v[id] || '').replace(/\n/g, '<br>')}</div>`;
+  const dv = h.dev && h.st === 'por' ? h.dev : null, nrm = x => String(x || '').replace(/[ \t]+/g, ' ').trim();
+  const conMarcas = id => { const M = dv && dv.m && dv.m[id]; if (!M || !M.length || nrm(v[id]) !== dv.src[id]) return null; const t = dv.src[id], cut = new Set([0, t.length]);   // lo pintado por el Revisor (hasta que lo corrija)
+    M.forEach(m => { cut.add(m.a); cut.add(m.b); }); const P = [...cut].sort((a, b) => a - b); let o = '';
+    for (let q = 0; q < P.length - 1; q++) { const a = P[q], b = P[q + 1], H = M.filter(m => m.a <= a && m.b >= b), cl = [...new Set(H.map(m => m.t === 's' ? 'rvs' : m.t === 'o' ? 'rvo' : 'rvm'))], ti = H.map(m => m.c ? '💬 ' + m.c : m.t === 'o' ? 'Ortografía: ' + (m.msg || '') : m.t === 's' ? 'Igualito a un librito de la Biblioteca: escríbelo con tus palabras' : '').filter(Boolean), nn = H.find(m => m.n && m.b === b);
+      o += cl.length ? `<span class="${cl.join(' ')}" title="${esc(ti.join(' · '))}"${nn ? ` data-n="${nn.n}"` : ''}>${esc(t.slice(a, b))}</span>` : esc(t.slice(a, b)); }
+    return o.replace(/\n/g, '<br>'); };
+  const ta = (id, ph, r = 3) => `<div class="wd-ed" data-k="${id}" data-ed data-ph="${esc(ph || '')}" style="min-height:${(Math.max(1, r) * 1.55 + .8).toFixed(2)}em" contenteditable="${ro ? 'false' : 'true'}" spellcheck="true" lang="es">${conMarcas(id) || (v[id + '_h'] ? limpiaH(v[id + '_h']) : esc(v[id] || '').replace(/\n/g, '<br>'))}</div>`;
   const inp = (id, ph, ex = '') => `<input data-k="${id}" ${ex} placeholder="${esc(ph || '')}" value="${esc(v[id] || '')}"${dis}>`;
   d.innerHTML = `<div class="wd-bar"><span class="wd-w">W</span><b>${esc(h.t || 'Mi ' + t[2].toLowerCase())} - Word de Molí</b><span class="wd-sv" id="wdSv">${ro ? '📨 Enviado' : '💾 Guardado'}</span>${ro ? '<button type="button" class="wd-ok" data-hcopia>✏️ Hacer una copia para corregir</button>' : '<button type="button" class="wd-ok" data-hok>💾 Guardar trabajito</button>'}<button type="button" class="wd-x" data-hx aria-label="Cerrar">✕</button></div>
   <div class="wd-rib">${ro ? '' : '<button type="button" class="wd-fm" data-fmt="bold" title="Negrita"><b>N</b> Negrita</button><button type="button" class="wd-fm mk" data-fmt="mark" title="Marcador"><span>🖍️</span> Marcador</button><i></i>'}<span class="wd-np">🚫📋 Pegar desactivado · sólo en Link</span></div>
   <div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
+    ${dv ? `<div class="wd-dev"><b>✏️ ${esc((dv.by || 'Tu Revisor').replace(/^./, c => c.toUpperCase()))} te devolvió tu trabajo para corregirlo</b>${dv.fb ? `<p>${esc(dv.fb).replace(/\n/g, '<br>')}</p>` : ''}${(dv.lista || []).length ? `<ol>${dv.lista.map(x => `<li><q>${esc(x.q)}</q> ${esc(x.c)}</li>`).join('')}</ol>` : ''}<small>🟨 Lo que marcó tu Revisor · 🟧 Igualito a un librito (escríbelo con tus palabras) · 🟦 Ortografía. Cuando corrijas un recuadro, se despinta. Luego guarda y vuelve a enviarlo.</small></div>` : ''}
     <p class="wd-k">REVISTA INNOVADORA · GUÍA PASO A PASO</p><h1>${t[1]} ${esc(t[2])}</h1><p class="wd-sub">${esc(G.sub)} Usa mínimo 3 citas parafraseadas dentro de tu trabajo y escribe sus fuentes al final.</p>
     <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
     <div class="wd-tt wd-kw"><label>Palabras clave <small>(de 3 a 5, separadas por comas: con ellas te encontrarán en el 🔍 Buscador)</small></label><input data-k="_kw" maxlength="200" value="${esc(h.kw || '')}" placeholder="Ej.: levadura, pan, hongos"${dis}></div>
@@ -859,7 +894,7 @@ document.addEventListener('submit', async e => {
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
     if (FORM.doc && !hj) fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf({ n: FORM.doc.n, b64: FORM.doc.b64, at: new Date() }) }) }).catch(() => {});
     if (ME.teacher) CACHE.ok = null;
-    if (hj) { hj.st = 'env'; hj.env = Date.now(); hj.rid = id; if (!hj.t) hj.t = t; hojaPut(hj); FORM.hid = ''; }
+    if (hj) { hj.st = 'env'; hj.env = Date.now(); hj.rid = id; hj.mapa = hojaTexto(hj, 1).mapa; delete hj.dev; if (!hj.t) hj.t = t; hojaPut(hj); FORM.hid = ''; }
     const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40)); ls.set('moli2:revtit', { ...ls.get('moli2:revtit', {}), [id]: t.slice(0, 100) });
     try { parent !== window && parent.postMessage({ revistaSent: 1 }, '*'); } catch (x) {}
     vEnviar(); toast(ME.teacher ? '📰 ¡Publicado en la revista y en la Biblioteca!' : '🎉 ¡Enviado! Un Revisor o tu profe lo revisará pronto.', 4500);
@@ -872,7 +907,7 @@ async function drawMine() {
   const TT = ls.get('moli2:revtit', {});
   const L = (await Promise.all(ids.slice(0, 15).map(id => getDoc(id).then(w => w || (TT[id] ? { id, t: TT[id], ty: 'inv', st: 'dev' } : null)).catch(() => null)))).filter(Boolean);
   if (!$('#mine')) return;
-  el.innerHTML = '<h3>📬 Mis envíos</h3>' + (L.map(w => `<div class="row"><span style="font-size:28px">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>${w.st === 'dev' ? 'Tu profe lo devolvió: mejóralo y vuelve a enviarlo.' : w.st === 'no' ? 'Devuelto el ' + fecha(w.rvAt || w.at) + ': lee el consejo y mejóralo.' : 'Enviado el ' + fecha(w.at)}</span>${w.st === 'no' && w.fb ? `<div class="fb"><b>💬 Consejo de ${esc(w.rv || 'tu Revisor')}: corrígelo y vuelve a enviarlo</b>\n${esc(w.fb)}</div>` : ''}</div><span class="st ${esc(w.st)}">${w.st === 'ok' ? '✅ ¡Publicado!' : w.st === 'no' || w.st === 'dev' ? '✏️ Por mejorar' : '⏳ En revisión'}</span></div>`).join('') || '<p class="load">Todavía no hay envíos.</p>');
+  el.innerHTML = '<h3>📬 Mis envíos</h3>' + (L.map(w => `<div class="row"><span style="font-size:28px">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>${w.st === 'dev' ? 'Tu profe lo devolvió: mejóralo y vuelve a enviarlo.' : w.st === 'no' ? 'Devuelto el ' + fecha(w.rvAt || w.at) + ': lee el consejo y mejóralo.' : 'Enviado el ' + fecha(w.at)}</span>${w.st === 'no' && w.fb ? `<div class="fb"><b>💬 Consejo de ${esc(w.rv || 'tu Revisor')}: corrígelo y vuelve a enviarlo</b>\n${esc(w.fb)}</div>` : ''}${w.st === 'no' && w.d ? `<button type="button" class="btn blue" data-verrev="${esc(w.id)}" style="margin-top:6px;padding:8px 14px;font-size:14px">👀 Ver mi trabajo con las marcas</button>` : ''}</div><span class="st ${esc(w.st)}">${w.st === 'ok' ? '✅ ¡Publicado!' : w.st === 'no' || w.st === 'dev' ? '✏️ Por mejorar' : '⏳ En revisión'}</span></div>`).join('') || '<p class="load">Todavía no hay envíos.</p>');
 }
 
 // ---- 📥 Bandeja: la docente y los revisores aprueban o devuelven ----
@@ -919,7 +954,7 @@ function smAceptado(w) { const m = /^🔎 Similitud (\d+)%/.exec(w.fb || ''); re
 async function vSimilitud() {
   const V = $('#view');
   if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
-  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2><button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y revisa <b>indicios de IA</b> (signos raros como ; — /): verás en colores lo que es <b>igualito</b> (copiar y pegar) y de quién lo tomó. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2><button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>📝 Revisar</b>: el trabajo se abre en el <b>Word Molí</b> y se pinta solo: 🟧 lo igualito a los libritos de la Biblioteca y 🟦 la ortografía. Tú subraya en 🟨 lo extraño y deja 💬 comentarios. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>❌ Rechazar</b>.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
     CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; if (ROLE.t) limpiarDevueltos(a); setCount(p.filter(w => !miSec(w)).length); pintaSim();
@@ -928,9 +963,9 @@ async function vSimilitud() {
 function pintaSim() {
   const el = $('#smL'); if (!el) return; SIM.pend = CACHE.pend || SIM.pend || []; const L = SIM.pend;
   el.innerHTML = L.length ? `<div class="sm-l">${L.map(w => { const r = SIM.res[w.id], ac = smAceptado(w);
-    const tp = r && Math.min(100, r.p + (r.web && r.web.p || 0)), nv = r && Math.max(r.nv, smNivel(tp, Math.max(r.max, r.web && r.web.p || 0)));
+    const tp = r && r.p, nv = r && r.nv;
     const pill = r ? `<span class="sm-p ${SM_V[nv][0]}">${tp}% · ${SM_V[nv][1].split(' ').slice(1).join(' ')}</span>` : ac !== null ? `<span class="sm-p ac">👌 Aceptado · ${ac}%</span>` : '<span class="sm-p">⏳ Sin revisar</span>';
-    return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}${r && r.ia && r.ia.nv ? `<span class="sm-p ${IA_V[r.ia.nv][0]}">${r.ia.nv === 2 ? '🤖 IA: muchos indicios' : '🤔 IA: algunos indicios'}</span>` : ''}<button type="button" class="btn blue" data-sim="${esc(w.id)}">🔎 Revisar similitud</button></div>`; }).join('')}</div>`
+    return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}<button type="button" class="btn blue" data-sim="${esc(w.id)}">📝 Revisar</button></div>`; }).join('')}</div>`
     : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
 }
 $('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); });
@@ -950,66 +985,118 @@ function smComparar(w) {                                                // marca
   const n = due.filter(d => d >= 0).length, p = T.length ? Math.round(100 * n / T.length) : 0, max = fuentes.length ? fuentes[0].p : 0;
   return { T, due, fuentes, p, max, nv: smNivel(p, max), corto: T.length < 25, nLib: S.filter(s => s.lib).length };
 }
-function smMarcar(txt, T, col, sel) {                                  // el texto con las partes iguales pintadas del color de su fuente
-  let o = '', at = 0, i = 0;
-  while (i < T.length) { const c = col[i]; if (c < 0) { i++; continue; } let j = i; while (j + 1 < T.length && col[j + 1] === c && !txt.slice(T[j].j, T[j + 1].i).includes('\n')) j++;
-    o += esc(txt.slice(at, T[i].i)) + `<mark class="${c === 'w' ? 'cw' : 'c' + c}${sel >= 0 && sel !== c ? ' dim' : ''}">${esc(txt.slice(T[i].i, T[j].j))}</mark>`; at = T[j].j; i = j + 1; }
-  return o + esc(txt.slice(at));
-}
-const smSinGuia = t => String(t || '').replace(/^\s*PASO\b.*$|Hallazgo\s*\d+\s*:?/gmi, m => ' '.repeat(m.length));
-// 🤖 Indicios de IA: signos que un niño de 6.° casi no usa (; — / paréntesis, formato de chat) (son pistas, no una prueba)
-const IA_FR = ['como modelo de lenguaje', 'como inteligencia artificial', 'claro, aqui tienes', 'aqui tienes', 'por supuesto!', 'espero que esto te ayude', 'espero que te sirva', 'chatgpt', 'gemini', 'copilot', 'si necesitas mas', 'here is', 'sure,', 'however', 'in conclusion'];
-function smIA(w, sinPrev) {
-  const raw = String(w.d || ''), t = smSinGuia(raw).replace(/https?:\/\/\S+|www\.\S+/g, m => ' '.repeat(m.length)), lo = norm(t), M = [], P = [];   // M: marcas en el texto · P: pistas encontradas
-  const pista = (ic, nom, n, pts, ej) => { if (n) P.push({ ic, nom, n, pts: Math.min(pts * n, pts * 3), ej: [...new Set(ej)].slice(0, 6) }); };
-  const busca = (re, fn) => { const out = []; let m; re.lastIndex = 0; while ((m = re.exec(t))) { if (!fn || fn(m)) { M.push([m.index, m.index + m[0].length]); out.push(m[0].trim()); } if (!m[0].length) re.lastIndex++; } return out; };
-  const pc = busca(/;/g); pista('⁏', 'Punto y coma ( ; )', pc.length, 2, ['; ']);
-  const ra = busca(/\s[—–]\s?|—/g); pista('—', 'Raya larga ( — )', ra.length, 2, ['—']);
-  const pa = busca(/\([^()\n]{2,80}\)/g, m => !/\b(1[89]|20)\d{2}\b|s\.\s?f\./i.test(m[0])); pista('( )', 'Paréntesis que no son citas', pa.length, 1, pa);
-  const md = busca(/\*\*[^*\n]+\*\*|^\s*#{1,4}\s|^\s*[•▪●◦-]\s|^\s*\d+\.\s/gm); pista('✳️', 'Formato de chat (**negritas**, viñetas o listas)', md.length, 2, md.map(x => x.slice(0, 30)));
-  const dp = busca(/[^\n:]{3,30}:(?=\s)/g, m => !/(autor|a[nñ]o|tema|link|enlace|fuente|p[aá]gina|t[ií]tulo|libro|sitio|fecha|nombre|secci[oó]n)\s*(o\s+\S+)?:$/i.test(m[0].trim())); pista(':', 'Muchos dos puntos ( : )', dp.length >= 3 ? dp.length - 2 : 0, 1, dp.map(x => x.trim().slice(-20)));
-  const fr = IA_FR.filter(f => lo.includes(f)); fr.forEach(f => { let i = lo.indexOf(f); while (i >= 0) { M.push([i, i + f.length]); i = lo.indexOf(f, i + 1); } }); pista('🤖', 'Frases que deja el chat de IA', fr.length, 6, fr);
-  const sl = busca(/(?<![\d/:.\w])\/(?![\d/])|\b[\p{L}]+\/[\p{L}]+\b/gu, m => !/^\d/.test(m[0])); pista('/', 'Barra ( / ) como «y/o»', sl.length, 2, sl);
-  const pts = P.reduce((s, x) => s + x.pts, 0), nv = fr.length || pts >= 6 || P.length >= 3 ? 2 : pts >= 2 ? 1 : 0;   // varias pistas distintas pesan más que una sola
-  return { P, M: M.sort((a, b) => a[0] - b[0]), pts, nv, lg: [], pl: [] };
-}
-const IA_V = [['v0', '🙂 Pocos indicios', 'Parece escrito por un niño: no usa signos raros.'], ['v2', '🤔 Algunos indicios', 'Usa signos que un niño de 6.° casi no usa (; — / …). Pregúntale cómo lo escribió.'], ['v3', '🤖 Muchos indicios de IA', 'Tiene muchas marcas típicas de la Inteligencia Artificial. Pídele que lo explique con sus palabras.']];
-function smIAHtml(w, r) {
-  const A = r.ia, v = IA_V[A.nv]; let o = '', at = 0; const txt = String(w.d || '');
-  A.M.forEach(([i, j]) => { if (i < at) return; o += esc(txt.slice(at, i)) + `<mark class="ci">${esc(txt.slice(i, j))}</mark>`; at = j; }); o += esc(txt.slice(at));
-  const PR = [...A.pl.filter(x => x.length > 6), ...A.lg].slice(0, 3);   // preguntas para comprobar que entiende lo que escribió
-  return `<div class="sm-ia"><h4>🤖 Indicios de Inteligencia Artificial <span class="sm-p ${v[0]}">${v[1]}</span><span class="sm-p">${A.P.length} pista${A.P.length === 1 ? '' : 's'}</span></h4><div class="sm-met"><i style="width:${Math.min(100, A.pts * 8)}%"></i></div><p class="sm-wl">${v[2]}</p>
-    ${A.P.length ? `<div class="sm-ip">${A.P.map(x => `<span><b>${x.ic} ${esc(x.nom)}</b>${x.n > 1 ? ` ×${x.n}` : ''}${x.ej.length && x.ej[0].length > 2 ? `<small>${x.ej.map(esc).join(' · ')}</small>` : ''}</span>`).join('')}</div>
-    <details><summary>👁 Ver los indicios en el texto</summary><div class="sm-tx">${o}</div></details>
-    ${A.nv && PR.length ? `<div class="sm-pr"><b>🗣️ Pregúntale (si lo escribió él, sabrá responder):</b>${PR.map(x => `<span>¿Qué significa «${esc(x)}»? Explícalo con tus palabras.</span>`).join('')}<span>¿Dónde encontraste esta información? Muéstrame la página.</span></div>` : ''}` : ''}
-    <p class="sm-wl" style="font-size:12.5px">⚠️ Son pistas, no una prueba: ningún detector sabe con seguridad si lo hizo una IA. Lo mejor es pedirle que te lo explique con sus palabras.</p></div>`;
-}
-async function revisarSim(id) {
-  const w = (SIM.pend || []).find(x => x.id === id); if (!w) return;
-  const M = $('#modal'); M.hidden = false; M.dataset.id = id; M._w = w; SIM.w = w; SIM.sel = -1;
-  const lib = (SIM.src || []).filter(x => x.k !== w.k);
-  M.innerHTML = `<div class="art"><div class="sm-scan"><div class="bk">📚</div><b>Revisando similitudes en la Biblioteca…</b><span id="smEs"></span><div class="sm-bar"><i id="smBa"></i></div></div></div>`;
-  const pasos = Math.max(lib.length, 1), ms = Math.min(140, 2200 / pasos);
-  for (let i = 0; i < pasos; i++) { if (M.dataset.id !== id || M.hidden) return; const x = lib[i], es = $('#smEs'), ba = $('#smBa');
-    if (es) es.textContent = x ? `📖 Comparando con «${x.t}» de ${firstName(x.n)}…` : '📖 Comparando…'; if (ba) ba.style.width = (100 * (i + 1) / pasos) + '%'; await new Promise(r => setTimeout(r, ms)); }
-  SIM.res[id] = smComparar(w); SIM.res[id].ia = smIA(w); if (M.dataset.id === id && !M.hidden) pintaInforme(); pintaSim();
-}
+const smSinGuia = t => String(t || '').replace(/^\s*(PASO\b|Fuente \d|Autor o página:|Año:|Título:|Tema:|Link:|si ).*$|Hallazgo\s*\d+\s*:?|https?:\/\/\S+/gmi, m => ' '.repeat(m.length));   // títulos de la guía, fuentes y links no cuentan como copia
 const SM_MAX = 15;                                                     // para aprobar: 15 % de similitud o menos
-const smTotal = r => Math.min(100, r.p + (r.web && r.web.st === 'ok' ? r.web.p : 0));
+const smTotal = r => r ? r.p : 0;
+// ---- 📝 Revisión en el Word de Molí: el Revisor subraya en 🟨 amarillo y comenta; el detector pinta 🟧 lo copiado de la Biblioteca y 🟦 la ortografía ----
+const RV = { w: null, m: [], x: [], ort: null, busy: 0 };             // x: lo que el Revisor borró con el subrayador blanco                     // m: marcas del Revisor [{a, b, c}] (posiciones en el texto)
+const rmK = id => 'moli2:rm:' + id;
+const rmDe = w => { try { const j = JSON.parse(w.rm || 'null'); if (j && Array.isArray(j.m)) return j.m; } catch (e) {} return []; };
+function capas(w, m, r, ort) {                                         // todas las partes pintadas del texto
+  const C = [], d = String(w.d || '');
+  d.replace(/^(Hallazgo \d+:|Fuente \d+|Autor o página:|Año:|Título:|Tema:|Link:)/gm, (x, _, i) => { C.push({ a: i, b: i + x.length, t: 'lb' }); return x; });
+  (m || []).forEach((x, k) => C.push({ a: x.a, b: x.b, t: 'rv', k, c: x.c }));
+  if (r) for (let i = 0; i < r.T.length; i++) { const s = r.due[i]; if (s < 0) continue; let j = i; while (j + 1 < r.T.length && r.due[j + 1] === s && !d.slice(r.T[j].j, r.T[j + 1].i).includes('\n')) j++; C.push({ a: r.T[i].i, b: r.T[j].j, t: 'sm', s }); i = j; }
+  (ort || []).forEach(o => C.push({ a: o.a, b: o.b, t: 'or', msg: o.msg }));
+  return C;
+}
+function docHtml(w, C, conNum) {                                       // el texto tal cual (para medir posiciones), con cada capa como clase
+  const d = String(w.d || ''), cut = new Set([0, d.length]); C.forEach(c => { cut.add(Math.max(0, Math.min(d.length, c.a))); cut.add(Math.max(0, Math.min(d.length, c.b))); });
+  for (let i = d.indexOf('\n'); i >= 0; i = d.indexOf('\n', i + 1)) { cut.add(i); cut.add(i + 1); }
+  const P = [...cut].sort((a, b) => a - b), num = {}; let n = 0; (C.filter(c => c.t === 'rv' && c.c).sort((x, y) => x.a - y.a)).forEach(c => num[c.k] = ++n);
+  let o = '', ls = 0;
+  for (let q = 0; q < P.length - 1; q++) { const a = P[q], b = P[q + 1], tx = d.slice(a, b); if (!tx) continue;
+    if (tx === '\n') { o += '\n'; ls = b; continue; }
+    const H = C.filter(c => c.a <= a && c.b >= b), cl = [], at = [];
+    if (/^PASO\b/.test(d.slice(ls, d.indexOf('\n', ls) < 0 ? d.length : d.indexOf('\n', ls)))) cl.push('hd');
+    H.forEach(c => { if (c.t === 'lb') cl.push('lb'); if (c.t === 'sm') cl.push('sm'); if (c.t === 'or') { cl.push('or'); at.push(`title="${esc('Ortografía: ' + c.msg)}"`); } if (c.t === 'rv') { cl.push('ryl'); at.push(`data-rvk="${c.k}"`); if (conNum && c.c && c.b === b) at.push(`data-n="${num[c.k]}"`); } });
+    o += cl.length ? `<span class="${[...new Set(cl)].join(' ')}" ${[...new Set(at)].join(' ')}>${esc(tx)}</span>` : esc(tx); }
+  return { html: o, num };
+}
+const offDe = (box, node, off) => { const r = document.createRange(); r.setStart(box, 0); r.setEnd(node, off); return r.toString().length; };
+function selDoc() { const box = $('#rvDoc'), s = getSelection(); if (!box || !s.rangeCount || s.isCollapsed) return null; const g = s.getRangeAt(0); if (!box.contains(g.startContainer) || !box.contains(g.endContainer)) return null;
+  let a = offDe(box, g.startContainer, g.startOffset), b = offDe(box, g.endContainer, g.endOffset); const d = RV.w.d; while (a < b && /\s/.test(d[a])) a++; while (b > a && /\s/.test(d[b - 1])) b--; return b > a ? { a, b } : null; }
+async function revisarSim(id) {                                        // abre el trabajo en el Word de Molí para revisarlo
+  const w = (SIM.pend || []).find(x => x.id === id); if (!w) return;
+  const g = ls.get(rmK(id), null); RV.w = w; RV.ort = null; RV.m = g && g.m ? g.m : Array.isArray(g) ? g : rmDe(w); RV.x = g && g.x ? g.x : []; SIM.w = w; $('#modal').dataset.id = id; $('#modal')._w = w; pintaRev(); detector();   // se pinta solo al abrirlo
+}
+function guardaRM() { if (RV.w) ls.set(rmK(RV.w.id), { m: RV.m, x: RV.x }); }
+function pintaRev() {
+  const M = $('#modal'), w = RV.w; if (!w) return; M.hidden = false;
+  const r = SIM.res[w.id] && blanco(SIM.res[w.id]), own = ME && w.k === ME.key && !ROLE.t, ro = own || miSec(w), tp = smTotal(r), C = capas(w, RV.m, r, RV.ort && RV.ort.filter(o => !RV.x.some(z => o.a < z.b && o.b > z.a))), D = docHtml(w, C, 1);
+  const cm = RV.m.map((x, k) => ({ ...x, k })).filter(x => x.c).sort((x, y) => x.a - y.a), nSub = RV.m.length;
+  const sug = r && tp > SM_MAX ? smConsejo(w, r) : '', ta = $('#rvFb'), fbTxt = ta && ta.value !== ta.dataset.sug ? ta.value : sug;
+  M.innerHTML = `<article class="art rv-art" role="dialog" aria-modal="true"><div class="wd-bar"><span class="wd-w">W</span><b>${esc(w.t)} — ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''}</b><span class="wd-sv">📝 Revisando</span><button type="button" class="wd-x" data-x aria-label="Cerrar">✕</button></div>
+  <div class="wd-rib">${ro ? '' : '<button type="button" class="wd-fm rvsub" data-rvsub><span>🖍️</span> Subrayar</button><button type="button" class="wd-fm" data-rvcom>💬 Comentar</button><button type="button" class="wd-fm rvbla" data-rvbla><span></span> Subrayador blanco</button><i></i>'}<button type="button" class="wd-fm det" data-rvdet${RV.busy ? ' disabled' : ''}>${RV.busy ? '⏳ Revisando…' : '🔎 Detector de similitud'}</button><i></i><span class="rv-ley"><i class="a"></i>Revisor <i class="n"></i>Biblioteca <i class="z"></i>Ortografía</span></div>
+  <div class="rv-gr"><div class="wd-sc"><div class="wd-pg rv-pg"><p class="wd-k">REVISTA INNOVADORA · ${esc(tipo(w.ty)[2].toUpperCase())}</p><h1>${esc(w.t)}</h1><p class="wd-sub">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}${w.kw ? ' · 🔑 ' + esc(w.kw) : ''}</p>
+      ${ro ? `<p class="wd-ro">${own ? '🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.' : `👀 Es de tu sección (6.° ${esc(ROLE.rs)}): puedes leerlo y usar el detector, pero lo revisa un Revisor de otra sección o tu profe.`}</p>` : '<p class="rv-ay">✏️ Selecciona palabras con el mouse y toca <b>🖍️ Subrayar</b> o <b>💬 Comentar</b>. Si el detector se equivocó, pásale el <b>⬜ Subrayador blanco</b> para despintarlo.</p>'}
+      <div id="rvDoc" class="rv-doc">${D.html}</div></div></div>
+    <aside class="rv-side">
+      <section><h4>🔎 Detector de similitud</h4>${r ? `<div class="rv-res"><div class="sm-ring" style="--p:${tp};--c:${tp > SM_MAX ? 'var(--red)' : 'var(--green2)'}"><div><b>${tp}%</b><small>Biblioteca</small></div></div><div>
+        ${r.fuentes.length ? r.fuentes.map(f => `<p class="rv-f">📖 «${esc(f.s.x.t)}» · ${esc(firstName(f.s.x.n))} ${esc(f.ape)} <b>${f.p}%</b><small>${f.cita ? '✔ lo cita' : '✘ no lo cita'}</small></p>`).join('') : '<p class="rv-f">📗 Nada copiado de la Biblioteca.</p>'}
+        <p class="rv-f">🟦 ${RV.ort === null ? 'Ortografía: revisando…' : RV.ort === false ? 'No pude revisar la ortografía ahora (sin internet).' : `${RV.ort.length} palabra${RV.ort.length === 1 ? '' : 's'} con error de ortografía`}</p></div></div>` : '<p class="rv-f">⏳ Revisando en la Biblioteca…</p>'}</section>
+      <section><h4>💬 Comentarios del Revisor <small>${nSub} subrayado${nSub === 1 ? '' : 's'}</small></h4>${cm.length ? cm.map(x => `<div class="rv-c" data-rvk="${x.k}"><b>${D.num[x.k]}</b><div><q>${esc(w.d.slice(x.a, x.b).slice(0, 60))}${x.b - x.a > 60 ? '…' : ''}</q><p>${esc(x.c)}</p></div>${ro ? '' : `<button type="button" data-rvdel="${x.k}" aria-label="Quitar">🗑</button>`}</div>`).join('') : '<p class="rv-f">Aún no hay comentarios.</p>'}</section>
+      ${ro ? '' : `<section class="acts"><h4>✅ Tu decisión</h4><textarea id="rvFb" maxlength="500" data-sug="${esc(sug)}" placeholder="Consejo para el estudiante (opcional)">${esc(fbTxt)}</textarea>
+        <button type="button" class="btn soft sm-cons" data-smcons${r ? '' : ' disabled'}>✨ Llenar consejo automático</button>
+        <p class="sm-lim ${!r ? '' : tp > SM_MAX ? 'no' : 'ok'}">${!r ? '🔎 Primero usa el detector de similitud.' : tp > SM_MAX ? `🔒 Tiene <b>${tp}%</b> de similitud: sólo se aprueba con ${SM_MAX}% o menos.` : `✅ ${tp}% de similitud: dentro del máximo (${SM_MAX}%).`}</p>
+        <button type="button" class="btn go" data-rv="ok"${!r || (tp > SM_MAX && !ROLE.t) ? ' disabled' : ''}>${r && tp <= SM_MAX ? '✅' : '🔒'} Aprobar y publicar</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver con mis marcas</button><button type="button" class="btn red" data-rv="rej">❌ Rechazar</button><small class="rv-f" style="font-weight:600;color:var(--ink2)">❌ Rechazar es para lo que no se puede corregir (no es de Ciencia, está todo copiado…): escribe el motivo en el cuadro.</small></section>`}
+    </aside></div></article>`;
+}
+async function ortografia(d) {                                        // 🟦 LanguageTool (gratis): sólo errores de ortografía, no de estilo
+  const body = new URLSearchParams({ text: String(d).slice(0, 19000), language: 'es', enabledOnly: 'false' });
+  const j = await (await fetch('https://api.languagetool.org/v2/check', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })).json();
+  return (j.matches || []).filter(m => { const c = m.rule && m.rule.category && m.rule.category.id || '', it = m.rule && m.rule.issueType; const pal = String(d).substr(m.offset, m.length);
+    return (it === 'misspelling' || /TYPOS|DIACRITICS|CASING|ORTOGRAF/i.test(c)) && !/^PASO\b/.test(pal) && !/^https?:/.test(pal); })
+    .map(m => ({ a: m.offset, b: m.offset + m.length, msg: (m.replacements || []).length ? '¿' + m.replacements.slice(0, 2).map(x => x.value).join(' o ') + '?' : m.message }));
+}
+async function detector() {
+  const w = RV.w; if (!w || RV.busy) return; RV.busy = 1; pintaRev();
+  await new Promise(r => setTimeout(r, 400)); SIM.res[w.id] = smComparar(w); RV.ort = null; RV.busy = 0; pintaRev(); pintaSim();
+  try { RV.ort = await ortografia(w.d); } catch (e) { RV.ort = false; }
+  if (RV.w === w && !$('#modal').hidden) pintaRev();
+}
+function blanco(r) {                                                   // el % sin lo que el Revisor despintó con el subrayador blanco
+  if (!RV.x.length) return r; const due = r.due.map((d, i) => d >= 0 && RV.x.some(z => r.T[i].i < z.b && r.T[i].j > z.a) ? -1 : d);
+  const fuentes = r.fuentes.map((f, k) => { const n = due.filter(d => d === k).length; return { ...f, n, p: r.T.length ? Math.round(100 * n / r.T.length) : 0 }; });
+  const n = due.filter(d => d >= 0).length, p = r.T.length ? Math.round(100 * n / r.T.length) : 0, max = Math.max(0, ...fuentes.map(f => f.p));
+  return { ...r, due, fuentes: fuentes.filter(f => f.n), p, max, nv: smNivel(p, max) };
+}
+function rvBlanco() {
+  const s = selDoc(); if (!s) return toast('⬜ Selecciona con el mouse lo que quieres despintar.');
+  const M = []; RV.m.forEach(m => { if (m.b <= s.a || m.a >= s.b) return M.push(m); if (m.a < s.a) M.push({ ...m, b: s.a }); if (m.b > s.b) M.push({ ...m, a: s.b }); });   // recorta sus subrayados
+  RV.m = M.filter(m => m.b - m.a > 0); RV.x.push(s); guardaRM(); getSelection().removeAllRanges(); pintaRev(); pintaSim(); toast('⬜ Despintado.');
+}
+function rvMarcar(conCom) {
+  const s = selDoc(); if (!s) return toast('✏️ Primero selecciona con el mouse las palabras del trabajo.');
+  if (!conCom) { RV.m.push(s); guardaRM(); return pintaRev(); }
+  let m = document.getElementById('wdDlg'); if (!m) { m = document.createElement('div'); m.id = 'wdDlg'; document.body.appendChild(m); }
+  m.innerHTML = `<form class="wd-dc"><b>💬 Comentario</b><span>«${esc(RV.w.d.slice(s.a, s.b).slice(0, 80))}»</span><textarea maxlength="200" rows="3" required placeholder="Ej.: Esta parte la copiaste del librito: escríbela con tus palabras."></textarea><div><button type="button" class="btn soft" data-dno>Cancelar</button><button type="submit" class="btn go">💬 Comentar</button></div></form>`;
+  m.hidden = false; const t = m.querySelector('textarea'); setTimeout(() => t.focus(), 50);
+  m.querySelector('[data-dno]').onclick = () => { m.hidden = true; };
+  m.querySelector('form').onsubmit = e => { e.preventDefault(); const c = t.value.replace(/\s+/g, ' ').trim(); if (!c) return; RV.m.push({ ...s, c: c.slice(0, 200) }); guardaRM(); m.hidden = true; pintaRev(); };
+}
+function rmTexto() {                                                  // lo que verá pintado el estudiante: 🟨 lo del Revisor, 🟧 lo copiado y 🟦 la ortografía
+  const m = RV.m.slice(0, 40).map(x => ({ a: x.a, b: x.b, ...(x.c ? { c: x.c } : {}) })), r = RV.w && SIM.res[RV.w.id] && blanco(SIM.res[RV.w.id]), sc = [];
+  if (r) capas(RV.w, [], r, null).filter(c => c.t === 'sm').slice(0, 60).forEach(c => sc.push([c.a, c.b]));
+  const o = (RV.ort || []).filter(x => !RV.x.some(z => x.a < z.b && x.b > z.a)).slice(0, 40).map(x => [x.a, x.b, String(x.msg || '').slice(0, 40)]);
+  if (!m.length && !sc.length && !o.length) return '';
+  let j = { m, s: sc, o, by: ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name) }, t = JSON.stringify(j);
+  while (t.length > 7900 && (j.o.length || j.s.length)) { if (j.o.length) j.o.pop(); else j.s.pop(); t = JSON.stringify(j); } return t;
+}
 function smConsejo(w, r) {                                             // el consejo que verá el estudiante en «Mis envíos», armado con el reporte
-  const tp = smTotal(r), wp = r.web && r.web.p || 0, L = [], cort = (a, b, libre) => { const T = r.T.filter((t, k) => t.i >= a && t.j <= b && (!libre || r.due[k] < 0)); if (!T.length) return ''; return '«' + w.d.slice(T[0].i, T[Math.min(T.length, 7) - 1].j) + (T.length > 7 ? '…»' : '»'); };
-  L.push(`🔎 Tu trabajo tiene ${tp}% de similitud (📚 Biblioteca ${r.p}%${wp ? ` · 🌐 internet ${wp}%` : ''}). Para aprobar debe tener ${SM_MAX}% o menos.`);
+  const tp = smTotal(r), L = [], cort = (a, b) => { const T = r.T.filter(t => t.i >= a && t.j <= b); if (!T.length) return ''; return '«' + w.d.slice(T[0].i, T[Math.min(T.length, 7) - 1].j) + (T.length > 7 ? '…»' : '»'); };
+  L.push(`🔎 Tu trabajo tiene ${tp}% de similitud con la Biblioteca. Para aprobar debe tener ${SM_MAX}% o menos.`);
   const G = []; for (let i = 0; i < r.T.length; i++) { const d = r.due[i]; if (d < 0) continue; let j = i; while (j + 1 < r.T.length && r.due[j + 1] === d) j++; G.push({ d, a: r.T[i].i, b: r.T[j].j, n: j - i + 1 }); i = j; }
   const cp = G.sort((x, y) => y.n - x.n).slice(0, 2).map(g => { const f = r.fuentes[g.d]; return `${cort(g.a, g.b)} (del librito de ${firstName(f.s.x.n)} ${f.ape})`; });
-  (r.web && r.web.hits || []).slice(0, cp.length ? 1 : 2).forEach(h => { const q = cort(h.i, h.j, 1); if (q) cp.push(`${q} (de internet: ${h.hit.t})`); });
   if (cp.length) L.push('✂️ Copiaste igualito: ' + cp.join(' · '));
-  const f0 = r.fuentes[0]; if (f0 && f0.p >= 3) L.push(`✏️ Escríbelo con tus palabras y cita así: ${f0.ape} (${smAnio(f0.s.x)}) explica que…`); else if (wp) L.push('✏️ Escríbelo con tus palabras y pon la página de donde lo sacaste con su año.');
-  if (r.ia && r.ia.nv) L.push(`🤖 Ojo: tu texto tiene marcas de IA (${r.ia.P.slice(0, 3).map(x => x.nom.split(' (')[0].toLowerCase()).join(', ')}). Escribe como tú lo explicarías.`);
+  const f0 = r.fuentes[0]; if (f0 && f0.p >= 3) L.push(`✏️ Escríbelo con tus palabras y cita así: ${f0.ape} (${smAnio(f0.s.x)}) explica que…`);
+  if (RV.ort && RV.ort.length) L.push(`🟦 Corrige ${RV.ort.length} palabra${RV.ort.length === 1 ? '' : 's'} con error de ortografía.`);
+  if (RV.m.length) L.push(`🟨 Mira en tu Word Molí lo que te subrayé${RV.m.some(x => x.c) ? ' y mis comentarios' : ''}.`);
   let o = L.join('\n'); while (o.length > 480 && L.length > 1) { L.splice(1, 1); o = L.join('\n'); } return o.slice(0, 480);
 }
-async function revisarTodos(b) {                                      // revisa toda la lista de una vez (sin animación)
+async function revisarTodos(b) {                                      // calcula el % de todos de una vez
   b.disabled = true; const L = (SIM.pend || []).filter(w => !SIM.res[w.id]);
-  for (let i = 0; i < L.length; i++) { b.textContent = `⏳ Revisando ${i + 1} de ${L.length}…`; const w = L[i]; SIM.res[w.id] = smComparar(w); SIM.res[w.id].ia = smIA(w); pintaSim(); await new Promise(r => setTimeout(r, 30)); }
+  for (let i = 0; i < L.length; i++) { b.textContent = `⏳ Revisando ${i + 1} de ${L.length}…`; SIM.res[L[i].id] = smComparar(L[i]); pintaSim(); await new Promise(r => setTimeout(r, 30)); }
   b.textContent = '✅ Todos revisados'; b.disabled = false; toast('✅ Listo: ya tienen su % todos los trabajos.'); pintaSim();
 }
 async function limpiarDevueltos(a) {                                   // los devueltos se guardan 21 días para que el estudiante lea su consejo; luego se borran solos
@@ -1017,36 +1104,45 @@ async function limpiarDevueltos(a) {                                   // los de
     L.filter(w => (w.rvAt || w.at || 0) < lim).slice(0, 20).forEach(w => fetch(`${BASE}/revista/${encodeURIComponent(w.id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }).catch(() => {}));
   } catch (e) {}
 }
-function pintaInforme() {
-  const M = $('#modal'), w = SIM.w, r = SIM.res[w.id]; if (!r) return;
-  const own = ME && w.k === ME.key && !ROLE.t, ro = own || miSec(w), f0 = r.fuentes[0], wp = r.web && r.web.st === 'ok' ? r.web.p : 0, tp = Math.min(100, r.p + wp);
-  const nv = Math.max(r.nv, smNivel(tp, Math.max(r.max, wp))), v = SM_V[nv], wh = r.web && r.web.hits[0];
-  const txt3 = wp > r.max && nv >= 2 && wh ? `El ${wp}% es igualito a internet (Wikipedia: «${wh.hit.t}»). ${nv === 3 ? '¡Lo copió y pegó de internet!' : 'Debe parafrasear y citar la fuente.'}` : nv === 3 && f0 ? `El ${f0.p}% es igualito al librito «${f0.s.x.t}» de ${f0.s.x.n}${f0.cita ? ' (sí lo cita, pero copió textual: falta parafrasear).' : '. ¡Lo copió y pegó sin citarlo!'}` : v[2];
-  const sug = wp > r.max && nv >= 2 && wh ? `Copiaste partes de internet (Wikipedia: «${wh.hit.t}»). Escríbelo con tus palabras (parafrasea) y pon la fuente con su año.` : nv < 2 && r.ia.nv === 2 ? 'Tu trabajo tiene signos y palabras que suele usar la Inteligencia Artificial (como ; — o palabras muy difíciles). Escríbelo con tus propias palabras, como tú lo explicarías.' : nv >= 2 && f0 ? `Copiaste partes del librito «${f0.s.x.t}» de ${f0.s.x.n}. Escríbelo con tus palabras (parafrasea) y cítalo así: ${f0.ape} (${smAnio(f0.s.x)}) menciona que…` : '';
-  const ta = $('#rvFb'), fbTxt = ta && ta.value !== ta.dataset.sug ? ta.value : sug;   // si ya escribió su comentario, no se lo borro
-  const c = ['var(--green2)', '#ca8a04', '#ea580c', 'var(--red)'][nv], fs = SIM.sel >= 0 ? r.fuentes[SIM.sel] : null;
-  M.innerHTML = `<article class="art" role="dialog" aria-modal="true" style="width:min(1100px,100%)"><div class="hero"><small>🔎 Reporte de similitud · ${r.nLib} libritos revisados</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
-  <div class="bd">
-    <div class="sm-top"><div class="sm-ring" style="--p:${tp};--c:${c}"><div><b>${tp}%</b><small>similitud</small></div></div><div class="sm-v ${v[0]}"><h3>${v[1]}</h3><p>${esc(txt3)}</p><p style="margin-top:6px">📚 ${r.p}% igual a la Biblioteca</p>${r.corto ? '<p style="margin-top:6px">✏️ El texto es muy corto: revísalo con más cuidado.</p>' : ''}</div></div>
-    ${r.fuentes.length ? `<h4>📚 ¿De dónde salen las partes iguales? <small style="font-weight:700;color:var(--ink2)">(toca uno para compararlo lado a lado)</small></h4><div class="sm-src">${r.fuentes.map((f, k) => `<button type="button" class="sm-s${SIM.sel === k ? ' on' : ''}" data-sms="${k}"><span class="cl c${k}"></span><span class="t">${f.s.lib ? '📖' : '📥'} «${esc(f.s.x.t)}» · ${esc(f.s.x.n)}${f.s.x.sec ? ' · 6.° ' + esc(f.s.x.sec) : ''}<small>${f.s.lib ? 'Librito de la Biblioteca' : 'Otro trabajo en la bandeja'} · ${f.cita ? `✔ Lo cita: ${esc(f.ape)} (${smAnio(f.s.x)})` : '✘ No lo cita'}</small></span><em>${f.p}%</em></button>`).join('')}</div>` : '<div class="tip green">📗 No encontré frases iguales en la Biblioteca ni en los otros envíos.</div>'}
-    ${smIAHtml(w, r)}<div class="sm-ley"><span>🟥🟨🟦 Pintado = igualito al librito de ese color</span><span>Sin pintar = escrito con sus palabras</span></div>
-    <div class="sm-cmp${fs ? ' dos' : ''}"><div class="sm-tx"><h5>📝 Trabajo enviado</h5>${smMarcar(w.d, r.T, r.due.map((d, i) => d < 0 && r.web && r.web.hits.some(f => r.T[i].i >= f.i && r.T[i].j <= f.j) ? 'w' : d), SIM.sel)}</div>${fs ? `<div class="sm-tx"><h5>${fs.s.lib ? '📖' : '📥'} «${esc(fs.s.x.t)}» · ${esc(fs.s.x.n)}</h5>${smMarcar(fs.s.x.d, fs.s.T, fs.mk.map(m => m ? SIM.sel : -1), -1)}</div>` : ''}</div>
-    ${ro ? `<div class="tip">${own ? '🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.' : `👀 Este trabajo es de tu sección (6.° ${esc(ROLE.rs)}): puedes ver el reporte, pero lo decide un Revisor de otra sección o tu profe.`}</div>`
-    : `<div class="acts"><textarea id="rvFb" maxlength="500" data-sug="${esc(sug)}" placeholder="Comentario para el estudiante (opcional)">${esc(fbTxt)}</textarea>
-      <button type="button" class="btn soft sm-cons" data-smcons>✨ Llenar consejo automático</button>
-      <p class="sm-lim ${tp > SM_MAX ? 'no' : 'ok'}">${tp > SM_MAX ? `🔒 No se puede aprobar todavía: tiene <b>${tp}%</b> de similitud y el máximo es <b>${SM_MAX}%</b>. Devuélvelo con el consejo para que lo corrija.` : `✅ Tiene ${tp}% de similitud: está dentro del máximo (${SM_MAX}% o menos).`}</p>
-      <button type="button" class="btn go" data-rv="ok"${tp > SM_MAX && !ROLE.t ? ' disabled' : ''}>${tp > SM_MAX ? '🔒' : '✅'} Aprobar y publicar</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver con consejo</button><button type="button" class="btn blue" data-smacc>👌 Aceptar reporte</button></div>`}
-  </div></article>`;
+async function patchRev(id, up, a) {                                   // guarda la decisión; si Firebase aún no tiene las reglas nuevas, guarda sin las marcas
+  const go = u => fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&` + Object.keys(u).map(k => 'updateMask.fieldPaths=' + k).join('&') + '&currentDocument.exists=true', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(u) }) });
+  let r = await go(up); if (r.status === 403 && 'rm' in up) { const { rm, ...sin } = up; r = await go(sin); if (r.ok) toast('⚠️ Se guardó, pero sin tus subrayados: falta pegar las reglas nuevas en Firebase.', 5000); }
+  return r;
 }
-async function aceptarSim(b) {                                        // deja anotado en el trabajo que ya se revisó su similitud (sigue en la bandeja)
-  const w = SIM.w, r = w && SIM.res[w.id]; if (!r) return;
+async function aceptarSim(b) {                                        // deja anotado que ya se revisó (sigue en la bandeja), con sus marcas
+  const w = RV.w, r = w && SIM.res[w.id]; if (!r) return;
   const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
-  b.disabled = true; const up = { fb: `🔎 Similitud ${Math.min(100, r.p + (r.web && r.web.p || 0))}% · IA: ${['pocos', 'algunos', 'muchos'][r.ia.nv]} indicios · revisado por ${ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name)}`.slice(0, 500) };
-  try { const x = await fetch(`${BASE}/revista/${encodeURIComponent(w.id)}?key=${F.apiKey}&updateMask.fieldPaths=fb&currentDocument.exists=true`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });
-    if (!x.ok) throw new Error(x.status === 403 ? 'AUTH' : 'NET');
-    w.fb = up.fb; delete SIM.res[w.id]; $('#modal').hidden = true; $('#modal').innerHTML = ''; pintaSim(); toast('👌 Reporte aceptado: el trabajo sigue en la bandeja, marcado como revisado.');
+  b.disabled = true; const up = { fb: `🔎 Similitud ${smTotal(r)}% · revisado por ${ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name)}`.slice(0, 500) }, rm = rmTexto(); if (rm) up.rm = rm;
+  try { const x = await patchRev(w.id, up, a); if (!x.ok) throw new Error(x.status === 403 ? 'AUTH' : 'NET');
+    w.fb = up.fb; $('#modal').hidden = true; $('#modal').innerHTML = ''; pintaSim(); toast('👌 Reporte aceptado: el trabajo sigue en la bandeja, marcado como revisado.');
   } catch (x) { b.disabled = false; toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
 }
+document.addEventListener('click', e => { const v = e.target.closest && e.target.closest('[data-verrev]'); if (v) verRevision(v.dataset.verrev); });
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('[data-rvsub],[data-rvcom],[data-rvbla]')) e.preventDefault(); }, true);   // que no se pierda lo seleccionado
+document.addEventListener('click', e => {
+  if (!RV.w || $('#modal').hidden || !e.target.closest) return;
+  if (e.target.closest('[data-rvsub]')) return rvMarcar(0);
+  if (e.target.closest('[data-rvcom]')) return rvMarcar(1);
+  if (e.target.closest('[data-rvbla]')) return rvBlanco();
+  if (e.target.closest('[data-rvdet]')) return detector();
+  const dl = e.target.closest('[data-rvdel]'); if (dl) { RV.m.splice(+dl.dataset.rvdel, 1); guardaRM(); return pintaRev(); }
+  const mk = e.target.closest('#rvDoc [data-rvk]'); if (mk && getSelection().isCollapsed && $('[data-rvsub]')) { const k = +mk.dataset.rvk, x = RV.m[k]; if (x && confirm((x.c ? '💬 ' + x.c + '\n\n' : '') + '¿Quitar este subrayado?')) { RV.m.splice(k, 1); guardaRM(); pintaRev(); } return; }
+  const c = e.target.closest('.rv-c[data-rvk]'); if (c) { const el = document.querySelector(`#rvDoc [data-rvk="${c.dataset.rvk}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('pulso'); setTimeout(() => el.classList.remove('pulso'), 1200); } }
+});
+// ---- 👀 El estudiante ve su trabajo con las marcas y comentarios de su Revisor ----
+async function verRevision(id) {
+  const M = $('#modal'); M.hidden = false; M.innerHTML = '<div class="art"><div class="load">📖 Abriendo…</div></div>';
+  let w = null; try { w = await getDoc(id); } catch (e) {} if (!w) { M.hidden = true; return toast('No encontré ese trabajo.'); }
+  const m = rmDe(w), by = (() => { try { return JSON.parse(w.rm).by; } catch (e) { return ''; } })(), C = capas(w, m, null, null), D = docHtml(w, C, 1), cm = m.map((x, k) => ({ ...x, k })).filter(x => x.c).sort((x, y) => x.a - y.a);
+  RV.w = null; M.dataset.id = '';
+  M.innerHTML = `<article class="art rv-art" role="dialog" aria-modal="true"><div class="wd-bar"><span class="wd-w">W</span><b>${esc(w.t)} - Word Molí</b><span class="wd-sv">${w.st === 'no' ? '✏️ Por mejorar' : w.st === 'ok' ? '✅ Publicado' : '📨 En revisión'}</span><button type="button" class="wd-x" data-x aria-label="Cerrar">✕</button></div>
+  <div class="wd-rib"><span class="rv-ley"><i class="a"></i>Lo que marcó tu Revisor</span></div>
+  <div class="rv-gr"><div class="wd-sc"><div class="wd-pg rv-pg"><p class="wd-k">REVISTA INNOVADORA</p><h1>${esc(w.t)}</h1>
+    ${w.fb ? `<div class="fb"><b>💬 Consejo de ${esc(w.rv || by || 'tu Revisor')}:</b>\n${esc(w.fb)}</div>` : ''}<div class="rv-doc">${D.html}</div></div></div>
+    <aside class="rv-side"><section><h4>💬 Comentarios ${by ? 'de ' + esc(by) : ''}</h4>${cm.length ? cm.map(x => `<div class="rv-c"><b>${D.num[x.k]}</b><div><q>${esc(w.d.slice(x.a, x.b).slice(0, 60))}</q><p>${esc(x.c)}</p></div></div>`).join('') : `<p class="rv-f">${m.length ? '🟨 Mira las partes subrayadas en amarillo.' : 'Tu Revisor no dejó marcas.'}</p>`}</section>
+    ${w.st === 'no' ? '<section><p class="rv-f">✏️ Corrige tu guía: en 📁 Word Molí toca «👀 Ver» y luego «Hacer una copia para corregir». Después vuelve a enviarla.</p></section>' : ''}</aside></div></article>`;
+}
+window.verRevision = verRevision;
 
 // ---- ver un trabajo (artículo de la revista o revisión) ----
 async function bajarWord(id, b) {                                     // el Word que subió el estudiante (sólo la profe y los Revisores)
@@ -1084,16 +1180,16 @@ $('#modal').addEventListener('click', async e => {
   if (e.target === M || e.target.closest('[data-x]')) { M.hidden = true; M.innerHTML = ''; return; }
   if (e.target.closest('[data-word]')) return bajarWord(M.dataset.id, e.target.closest('[data-word]'));
   if (e.target.closest('[data-smacc]')) return aceptarSim(e.target.closest('[data-smacc]'));
-  if (e.target.closest('[data-smcons]')) { const ta = $('#rvFb'), r = SIM.w && SIM.res[SIM.w.id]; if (ta && r) { ta.value = smConsejo(SIM.w, r); ta.dataset.sug = '_'; ta.focus(); toast('✨ Consejo listo: puedes cambiarlo antes de devolver.'); } return; }
-  const sx = e.target.closest('[data-sms]'); if (sx) { SIM.sel = SIM.sel === +sx.dataset.sms ? -1 : +sx.dataset.sms; return pintaInforme(); }
-  if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
+  if (e.target.closest('[data-smcons]')) { const ta = $('#rvFb'), r = SIM.w && SIM.res[SIM.w.id]; if (ta && r) { ta.value = smConsejo(SIM.w, blanco(r)); ta.dataset.sug = '_'; ta.focus(); toast('✨ Consejo listo: puedes cambiarlo antes de devolver.'); } return; }
+    if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
   const b = e.target.closest('[data-rv]'); if (!b) return;
-  const id = M.dataset.id, act = b.dataset.rv; let fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
+  const id = M.dataset.id, rej = b.dataset.rv === 'rej', act = rej ? 'no' : b.dataset.rv; let fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
   const borra = act === 'del';                                        // al devolver se queda (sin su Word) para que el estudiante lea el consejo en «Mis envíos»
   const smr = TAB === 'similitud' && SIM.w && SIM.w.id === M.dataset.id && SIM.res[SIM.w.id];
-  if (act === 'no' && !fb && smr) fb = smConsejo(SIM.w, smr);
-  if (act === 'ok' && smr && smTotal(smr) > SM_MAX) { if (!ROLE.t) return toast(`🔒 Tiene ${smTotal(smr)}% de similitud: sólo se aprueba con ${SM_MAX}% o menos.`, 4500); if (!confirm(`Profe: este trabajo tiene ${smTotal(smr)}% de similitud (el máximo es ${SM_MAX}%). ¿Aprobarlo igual?`)) return; }
-  if (act === 'no' && !confirm('Se devolverá con tu consejo: el estudiante lo verá en «Mis envíos», lo corregirá y lo volverá a enviar. ¿Seguir?')) return;
+  if (rej) { if (!fb) return toast('❌ Escribe en el cuadro por qué lo rechazas (ej.: no es un tema de Ciencia).', 4500); if (!confirm('Se RECHAZARÁ este trabajo: no se publicará y el estudiante tendrá que hacer uno nuevo. ¿Seguir?')) return; fb = '❌ RECHAZADO: ' + fb; }
+  if (act === 'no' && !fb && smr) fb = smConsejo(SIM.w, blanco(smr));
+  if (act === 'ok' && smr && smTotal(blanco(smr)) > SM_MAX) { if (!ROLE.t) return toast(`🔒 Tiene ${smTotal(blanco(smr))}% de similitud: sólo se aprueba con ${SM_MAX}% o menos.`, 4500); if (!confirm(`Profe: este trabajo tiene ${smTotal(blanco(smr))}% de similitud (el máximo es ${SM_MAX}%). ¿Aprobarlo igual?`)) return; }
+  if (act === 'no' && !rej && !confirm('Se devolverá con tu consejo: el estudiante lo verá en «Mis envíos», lo corregirá y lo volverá a enviar. ¿Seguir?')) return;
   if (act === 'del' && !confirm('¿Borrar este trabajo para siempre?')) return;
   const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
   M.querySelectorAll('[data-rv]').forEach(x => x.disabled = true);
@@ -1103,12 +1199,14 @@ $('#modal').addEventListener('click', async e => {
     if (borra) { r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: { Authorization: 'Bearer ' + a } }); sinWord(); }
     else {
       const up = { st: act, rv: ROLE.t ? 'tu profe' : String(ROLE.rn || ME.name || 'Revisor').slice(0, 60), rvAt: new Date(), fb: fb.slice(0, 500) };
-      r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&` + Object.keys(up).map(k => 'updateMask.fieldPaths=' + k).join('&') + '&currentDocument.exists=true', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });
+      if (TAB === 'similitud' && RV.w && RV.w.id === id) { const rm = rmTexto(); if (rm) up.rm = rm; }
+      r = await patchRev(id, up, a);
     }
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
     if (act === 'ok' || act === 'no') sinWord();                                       // aprobado: queda el librito con su información; el Word ya no hace falta
     M.hidden = true; M.innerHTML = '';
-    toast(act === 'no' ? '✏️ Devuelto con el consejo: el estudiante lo verá en «Mis envíos».' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
+    if (RV.w && RV.w.id === id) { try { localStorage.removeItem(rmK(id)); } catch (x) {} RV.w = null; }
+    toast(rej ? '❌ Rechazado: el estudiante verá el motivo en «Mis envíos».' : act === 'no' ? '✏️ Devuelto con tus marcas y el consejo: el estudiante lo verá en su Word Molí.' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
     CACHE.ok = null; if (CACHE.pend) CACHE.pend = CACHE.pend.filter(x => x.id !== id);
     if (TAB === 'bandeja') drawBandeja(); else if (TAB === 'similitud') pintaSim(); else vRevista();
   } catch (x) { M.querySelectorAll('[data-rv]').forEach(y => y.disabled = false); toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
@@ -1123,10 +1221,11 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if (ROLE.t || ROLE.r) { $('#tabs [data-tab="bandeja"]').hidden = !ROLE.t; $('#tabs [data-tab="similitud"]').hidden = false; }   // los Revisores revisan sólo desde «Similitud» (su bandeja)
   if (ROLE.t) $('#tabs [data-tab="trabajos"]').hidden = false;
   const want = QS.get('v'); setTab(want === 'bandeja' && ROLE.t ? 'bandeja' : want === 'bandeja' && ROLE.r ? 'similitud' : want === 'enviar' ? 'enviar' : want === 'fuentes' ? 'fuentes' : 'revista');
+  if (QS.get('rev')) setTimeout(() => verRevision(QS.get('rev')), 60);
   if (TAB === 'enviar' && ME && (QS.get('hoja') || QS.get('nueva'))) setTimeout(() => { const id = QS.get('hoja') || window.nuevaHoja(QS.get('nueva')); if (id) abrirHojaDoc(id); }, 60);
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151227"></script><script src="archivos.js?v=202610151227"></script><script src="mando.js?v=202610151227"></script>
+<script src="pdftrabajo.js?v=202610151238"></script><script src="archivos.js?v=202610151238"></script><script src="mando.js?v=202610151238"></script>
 </body>
 </html>
