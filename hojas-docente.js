@@ -50,6 +50,104 @@
   // =================================================================
   //  FOLDER AZUL · REGISTRO
   // =================================================================
+  // ================================================================
+  //  🎤 DICTAR NOTAS: «Chris conducta B», «Ana participación 3», «todos trabajo A»…
+  //  Se escucha (o se escribe), se arma una ventanita con los cambios y sólo se guarda al apretar «✅ Correcto».
+  // ================================================================
+  const sinT = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const CAMPOS = [['w', /trabajo( en clase)?|rubrica|producto/], ['p', /participa\w*/], ['c', /conducta|comportamiento/], ['e', /exit( ticket)?|ticket/], ['r', /refuerzo|mision/]];
+  const CNOM = { w: '🛠️ Trabajo en clase', p: '🙋 Participación', c: '🤝 Conducta', e: '🎟️ Exit ticket', r: '💪 Refuerzo' };
+  const VALS = t => t === 'p' ? [[1, '1'], [2, '2'], [3, '3'], [4, '+4']] : t === 'r' ? [['ok', '✅ Realizado'], ['pe', '⏳ Pendiente']] : [[4, 'AD'], [3, 'A'], [2, 'B'], [1, 'C']];
+  function valorDe(t, r) {
+    const x = ' ' + r.replace(/[^a-z0-9+ ]/g, ' ').replace(/\s+/g, ' ').trim() + ' ', tk = x.trim().split(' '), tiene = w => tk.includes(w);
+    if (t === 'r') return /realiz|hecho|hizo|cumpli|listo|complet/.test(x) && !/no hizo|no cumpli/.test(x) ? 'ok' : /pendiente|falta|no hizo|no cumpli/.test(x) ? 'pe' : null;
+    if (t === 'p') { if (/(\+ ?4|mas cuatro|cuatro|\b4\b)/.test(x)) return 4; if (/\b(3|tres)\b/.test(x)) return 3; if (/\b(2|dos)\b/.test(x)) return 2; if (/\b(1|uno|una)\b/.test(x)) return 1; return null; }
+    if (/logro destacado|destacad|excelente|sobresaliente| a d /.test(x) || tiene('ad')) return 4;
+    if (/por mejorar|en proceso|proceso|regular/.test(x) || tiene('b') || tiene('be') || tiene('ve')) return 2;
+    if (/en inicio|inicio|necesita apoyo/.test(x) || tiene('c') || tiene('ce') || tiene('se')) return 1;
+    if (/logro esperado|logrado|esperado|muy bien|bien/.test(x) || tiene('a')) return 3;
+    return null;
+  }
+  function buscarEst(q, est) {                                         // por el nombre o el apellido; «Chris» sirve para «Christian»
+    const Q = sinT(q).split(/\s+/).filter(w => w.length >= 2 && !/^(a|al|el|la|los|las|de|del|para|nota|ponle|pon|poner)$/.test(w)); if (!Q.length) return [];
+    const sc = est.map(e => { const N = sinT(e.name).split(/\s+/); let s = 0; Q.forEach(w => { let b = 0; N.forEach(n => { b = Math.max(b, n === w ? 3 : n.startsWith(w) && w.length >= 3 ? 2 : w.startsWith(n) && n.length >= 3 ? 1 : 0); }); s += b; }); return { e, s }; }).filter(x => x.s > 0).sort((a, b) => b.s - a.s);
+    return sc.filter(x => x.s === (sc[0] || {}).s).map(x => x.e);
+  }
+  const SECRE = /(?:^| )(?:sexto|6to|6 ?°?|seis)\s*(?:grado\s*)?(?:seccion\s*)?([abcd])(?= |$)/;
+  function leerOrden(txt, est, todos, sec) {                          // todos: estudiantes de 6° A-D; sec: la sección abierta
+    const out = [];
+    sinT(txt).split(/[,.;]| y luego | luego | despues | tambien /).map(x => x.trim()).filter(Boolean).forEach(pz => {
+      let campo = null, idx = -1, len = 0;
+      CAMPOS.forEach(([k, re]) => { const m = pz.match(re); if (m && (idx < 0 || m.index < idx)) { campo = k; idx = m.index; len = m[0].length; } });
+      if (!campo) return out.push({ err: pz });
+      let quien = pz.slice(0, idx).trim(); const v = valorDe(campo, pz.slice(idx + len));
+      if (v == null) return out.push({ err: pz });
+      const ms = quien.match(SECRE), sc = ms ? ms[1].toUpperCase() : sec; if (ms) quien = quien.replace(SECRE, ' ').trim();   // «Christian sexto C …»
+      const grupo = sc === sec ? est : (todos || []).filter(e => e.section === sc);
+      if (/(^| )(todos|todas|toda la clase|todo el salon)( |$)/.test(quien)) return grupo.forEach(e => out.push({ s: e.key, t: campo, v }));
+      const C = buscarEst(quien, grupo); out.push({ s: C[0] ? C[0].key : '', t: campo, v, oido: quien + (ms ? ' (6° ' + sc + ')' : ''), duda: C.length !== 1 });
+    });
+    return out;
+  }
+  const guardarRefVoz = (F, c) => F.guardarRef(c);
+  function ventanaVoz(F, n) {
+    const est = F.D.est, SR = window.SpeechRecognition || window.webkitSpeechRecognition; let todos = est;
+    Docente.estudiantes().then(L => { todos = L.filter(e => /^[A-D]$/.test(e.section)); }).catch(() => {});
+    let V = document.getElementById('vozM'); if (V) V.remove(); V = document.createElement('div'); V.id = 'vozM'; document.body.appendChild(V);
+    let filas = [], rec = null;
+    const opcEst = sel => ['A', 'B', 'C', 'D'].map(x => { const L = (x === F.sec ? est : todos.filter(e => e.section === x)); return L.length ? `<optgroup label="6° ${x}">${L.map(e => `<option value="${e.key}"${e.key === sel ? ' selected' : ''}>${esc(e.name)}${x === F.sec ? '' : ' · 6° ' + x}</option>`).join('')}</optgroup>` : ''; }).join('');
+    const buscaTodos = k => est.find(e => e.key === k) || todos.find(e => e.key === k);
+    const pinta = (txt) => {
+      V.innerHTML = `<div class="vz"><div class="vz-h"><b>🎤 Dictar notas · Sesión ${n} · 6° ${esc(F.sec)}</b><button class="vz-x" data-v="x">✕</button></div>
+        <p class="vz-tip">Di o escribe, por ejemplo: <i>«Chris conducta B»</i>, <i>«Ana participación 3»</i>, <i>«Luis trabajo en clase A»</i>, <i>«todos refuerzo realizado»</i>. Puedes decir varias seguidas, separadas con «luego».</p>
+        <div class="vz-in"><input placeholder="Lo que dijiste aparece aquí…" value="${esc(txt || '')}"><button data-v="leer">Leer</button>${SR ? '<button class="vz-mic" data-v="mic">🎤 Hablar</button>' : ''}</div>
+        ${SR ? '' : '<p class="vz-tip" style="color:#b45309">ℹ️ Este navegador no reconoce la voz (usa Chrome o tu celular). Puedes escribir la orden.</p>'}
+        <div class="vz-l">${filas.length ? filas.map((f, i) => f.err ? `<div class="vz-r vz-err">⚠️ No entendí: «${esc(f.err)}»<button data-v="del" data-i="${i}">✕</button></div>`
+          : `<div class="vz-r${f.duda || !f.s ? ' duda' : ''}"><select data-i="${i}" data-c="s"><option value="">— ¿Quién? —</option>${opcEst(f.s)}</select>
+            <select data-i="${i}" data-c="t">${Object.keys(CNOM).map(k => `<option value="${k}"${k === f.t ? ' selected' : ''}>${CNOM[k]}</option>`).join('')}</select>
+            <select data-i="${i}" data-c="v">${VALS(f.t).map(([v, tx]) => `<option value="${v}"${String(v) === String(f.v) ? ' selected' : ''}>${tx}</option>`).join('')}</select><button data-v="del" data-i="${i}">✕</button>
+            ${f.duda && f.oido ? `<small>Oí «${esc(f.oido)}»: revisa que sea el estudiante correcto</small>` : ''}</div>`).join('') : '<p class="vz-vacio">Aquí aparecerán los cambios antes de guardarlos.</p>'}</div>
+        <div class="vz-f"><span class="vz-msg"></span><button data-v="x">Cancelar</button><button class="vz-ok" data-v="ok"${filas.some(f => !f.err && f.s) ? '' : ' disabled'}>✅ Correcto, guardar</button></div></div>`;
+    };
+    const leer = txt => { if (rec) { rec.onend = null; rec.abort(); rec = null; } filas = filas.filter(f => !f.err).concat(leerOrden(txt, est, todos, F.sec)); pinta(''); };
+    const hablar = () => { if (rec) return rec.stop(); rec = new SR(); rec.lang = 'es-PE'; rec.interimResults = true; rec.continuous = false; let fin = '';
+      const b = V.querySelector('[data-v="mic"]'), inp = V.querySelector('input'); b.textContent = '⏺ Te escucho… (toca para parar)'; b.classList.add('on');
+      rec.onresult = e => { let t = ''; for (const r of e.results) t += r[0].transcript; inp.value = t; if (e.results[e.results.length - 1].isFinal) fin = t; };
+      rec.onerror = e => { const m = V.querySelector('.vz-msg'); if (m) m.textContent = e.error === 'not-allowed' ? '🔒 Permite el micrófono en el navegador.' : '🎤 No te escuché. Intenta otra vez.'; };
+      rec.onend = () => { rec = null; if (fin.trim()) leer(fin); else { const b2 = V.querySelector('[data-v="mic"]'); if (b2) { b2.textContent = '🎤 Hablar'; b2.classList.remove('on'); } } };
+      rec.start(); };
+    V.addEventListener('click', async e => { const b = e.target.closest('[data-v]'); if (!b && e.target === V) return V.remove(); if (!b) return; const a = b.dataset.v;
+      if (a === 'x') { if (rec) rec.abort(); return V.remove(); }
+      if (a === 'mic') return hablar();
+      if (a === 'leer') return leer(V.querySelector('input').value);
+      if (a === 'del') { filas.splice(+b.dataset.i, 1); return pinta(''); }
+      if (a === 'ok') { const ok = filas.filter(f => !f.err && f.s); if (!ok.length) return; b.disabled = true; const m = V.querySelector('.vz-msg');
+        const refs = ok.filter(f => f.t === 'r').map(f => [f.s, n, f.v]), notas = ok.filter(f => f.t !== 'r'); let hechos = 0, mal = 0;
+        try { if (refs.length) { await guardarRefVoz(F, refs); hechos += refs.length; }
+          for (let i = 0; i < notas.length; i += 4) await Promise.all(notas.slice(i, i + 4).map(async f => { const code = { e: 0, p: 30, c: 60, w: 80 }[f.t] + n, e2 = buscaTodos(f.s);
+            try { const r = await Docente.guardarNota(F.u, code, e2, +f.v); const R = F.D.byS[f.s] = F.D.byS[f.s] || {}; if (r) R[code] = r; hechos++; } catch (x) { mal++; if (x.message === 'AUTH') throw x; } finally { m.textContent = `Guardando… ${hechos + mal} de ${ok.length}`; } }));
+          F.libro.pinta(false); if (mal) { m.textContent = `⚠️ ${mal} no se guardaron. Revisa tu internet.`; b.disabled = false; return; } V.remove(); }
+        catch (x) { m.textContent = errTxt(x); b.disabled = false; } }
+    });
+    V.addEventListener('change', e => { const s = e.target.closest('select[data-i]'); if (!s) return; const f = filas[+s.dataset.i]; if (!f) return;
+      if (s.dataset.c === 's') { f.s = s.value; f.duda = false; } if (s.dataset.c === 't') { f.t = s.value; f.v = VALS(f.t)[0][0]; } if (s.dataset.c === 'v') f.v = s.value; pinta(V.querySelector('input').value); });
+    V.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter' && e.target.tagName === 'INPUT') leer(e.target.value); if (e.key === 'Escape') V.remove(); });
+    pinta(''); if (SR) hablar(); else setTimeout(() => V.querySelector('input').focus(), 50);
+  }
+  if (!document.getElementById('vozCss')) { const st = document.createElement('style'); st.id = 'vozCss'; st.textContent = `
+    #vozM { position: fixed; inset: 0; z-index: 2147483200; display: grid; place-items: center; padding: 12px; background: rgba(15,23,42,.55); font-family: "Trebuchet MS", system-ui, sans-serif; }
+    #vozM .vz { width: min(720px, 100%); max-height: calc(100vh - 24px); overflow: auto; background: #fff; color: #1e293b; border-radius: 18px; border: 3px solid #2b2547; padding: 14px 16px; box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+    #vozM .vz-h { display: flex; align-items: center; gap: 8px; font-size: 18px; } #vozM .vz-h b { flex: 1; color: #4338ca; } #vozM .vz-x { border: 0; background: #f1f5f9; border-radius: 50%; width: 34px; height: 34px; font-size: 16px; cursor: pointer; }
+    #vozM .vz-tip { margin: 6px 0; font-size: 13.5px; color: #475569; } #vozM .vz-tip i { color: #1d4ed8; font-style: normal; font-weight: 800; }
+    #vozM .vz-in { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; } #vozM .vz-in input { flex: 1; min-width: 180px; font: 700 15px system-ui; padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 12px; }
+    #vozM button { font: 800 14px system-ui; border: 2px solid #2b2547; border-radius: 999px; padding: 8px 14px; background: #fff; cursor: pointer; }
+    #vozM .vz-mic { background: #ef4444; color: #fff; border-color: #b91c1c; } #vozM .vz-mic.on { animation: vzP 1s ease-in-out infinite; } @keyframes vzP { 50% { box-shadow: 0 0 0 8px rgba(239,68,68,.25); } }
+    #vozM .vz-l { display: grid; gap: 6px; margin: 8px 0; } #vozM .vz-vacio { color: #94a3b8; text-align: center; margin: 14px 0; }
+    #vozM .vz-r { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px; border-radius: 12px; background: #f0fdf4; border: 2px solid #bbf7d0; } #vozM .vz-r.duda { background: #fffbeb; border-color: #fcd34d; } #vozM .vz-r.vz-err { background: #fef2f2; border-color: #fecaca; color: #b91c1c; font-weight: 700; justify-content: space-between; }
+    #vozM .vz-r select { font: 700 14px system-ui; padding: 6px; border-radius: 8px; border: 1.5px solid #cbd5e1; max-width: 100%; } #vozM .vz-r select[data-c="s"] { flex: 1; min-width: 160px; } #vozM .vz-r small { width: 100%; color: #b45309; font-weight: 700; } #vozM .vz-r > button { padding: 4px 10px; }
+    #vozM .vz-f { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } #vozM .vz-msg { flex: 1; font-weight: 800; color: #b45309; font-size: 13px; }
+    #vozM .vz-ok { background: #22c55e; color: #fff; border-color: #15803d; font-size: 16px; padding: 10px 18px; } #vozM .vz-ok:disabled { opacity: .5; }
+    .bk .voz-b { margin: .4em 0; border: .15em solid #2b2547; border-radius: 999px; padding: .3em .9em; background: #ef4444; color: #fff; font: 900 .95em "Trebuchet MS", system-ui; cursor: pointer; box-shadow: 0 .2em 0 #2b2547; }`; document.head.appendChild(st); }
   function registro() {
     const F = base('Registro', '📂', 'Elige la unidad: verás el registro de 6° A, B, C y D. Se llena solo con los Exit tickets; tú pones participación y conducta. ✏️');
     F.datos = async (u, sec) => {
@@ -64,6 +162,7 @@
     const celdaRef = (F, s, n) => { const rf = refDe(F.D, s, n), man = (((F.D.rm || {})[s.key] || {})[n]);
       if (F.guarda === `r|${n}|${s.key}`) return '<span class="rg-c"><span class="rg-b">…</span></span>';
       return `<span class="rg-c"><button class="rg-b${rf === null ? '' : ' on'}${rf ? ' cAD' : rf === false ? ' cB' : ''}" data-a="nota" data-t="r" data-n="${n}" data-s="${s.key}" title="${man ? 'Marcado por ti' : 'Automático (misiones)'}">${rf === null ? '·' : rf ? '✅' : '⏳'}</button></span>`; };
+    F.guardarRef = cambios => guardarRef(F, cambios);
     async function guardarRef(F, cambios) {                             // guarda las marcas de refuerzo de la unidad (un solo archivo)
       const rm = F.D.rm = F.D.rm || {}, antes = JSON.stringify(rm);
       cambios.forEach(([k, n, v]) => { const o = rm[k] = rm[k] || {}; if (v) o[n] = v; else { delete o[n]; if (!Object.keys(o).length) delete rm[k]; } });
@@ -90,7 +189,7 @@
       S.forEach(({ s, n }) => {
         const resp = D.est.filter(e => (D.byS[e.key] || {})[n]), pr = MD.promedio(resp.map(e => D.byS[e.key][n]));
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · 6° ${F.sec}</div><div class="big w">Sesión ${n}</div><h2 class="w">${esc(temaDe(s, n))}</h2>${secBar(F)}
-            <p class="hand w">🎟️ Exit ticket: <b>${resp.length} de ${D.est.length}</b> respondieron${pr ? ' · promedio ' + nivelChip(pr) : ''}.</p><p class="hand w">Toca la casilla de cada estudiante para poner su nota, o <b>⚡ Llenar</b> para ponerla a todos los que faltan.</p>${F.llenando ? `<p class="hand w" style="color:#b45309">⏳ ${esc(F.llenando)}</p>` : ''}`,
+            <p class="hand w">🎟️ Exit ticket: <b>${resp.length} de ${D.est.length}</b> respondieron${pr ? ' · promedio ' + nivelChip(pr) : ''}.</p><p class="hand w">Toca la casilla de cada estudiante para poner su nota, o <b>⚡ Llenar</b> para ponerla a todos los que faltan.</p><button class="voz-b w" data-a="voz" data-n="${n}">🎤 Dictar notas</button>${F.llenando ? `<p class="hand w" style="color:#b45309">⏳ ${esc(F.llenando)}</p>` : ''}`,
           r: `<div class="rg rg-h w"><span class="rg-n">Sesión ${n}</span><span class="rg-c">🎟️<i>Exit</i></span>${['w', 'p', 'c', 'r'].map(t => `<span class="rg-c">${TNOM[t].split(' ')[0]}<i>${TCOR[t]}</i><button class="rg-q" data-a="llenar" data-t="${t}" data-n="${n}" title="Llenado rápido: lo mismo a todos los que faltan">⚡ Llenar</button></span>`).join('')}</div>`
             + (F.fill && F.fill.n === n ? `<div class="rg pick w"><span class="rg-n">⚡ ${TNOM[F.fill.t]}: poner a todos los que faltan</span>${OPS(F.fill.t).map(([v, tx]) => `<button class="rg-b" data-a="llenaTodos" data-v="${v}">${tx}</button>`).join('')}<button class="rg-b x" data-a="llenaTodos" data-v="0">✕</button></div>` : '')
             + D.est.map(e => {
@@ -102,6 +201,7 @@
       return H;
     };
     F.act2 = async (a, ds) => {
+      if (a === 'voz') return ventanaVoz(F, +ds.n);
       if (a === 'nota') { F.pick = { t: ds.t, n: +ds.n, s: ds.s }; F.fill = null; return F.libro.pinta(false); }
       if (a === 'llenar') { F.fill = F.fill && F.fill.t === ds.t && F.fill.n === +ds.n ? null : { t: ds.t, n: +ds.n }; F.pick = null; return F.libro.pinta(false); }
       if (a === 'llenaTodos') {                                       // ⚡ llenado rápido: la misma nota a todos los que todavía no la tienen
