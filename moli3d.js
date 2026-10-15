@@ -171,6 +171,19 @@ function crearMoli(THREE, opt = {}) {
   part(new THREE.TorusGeometry(0.06, 0.013, 10, 48), LED, body, [0, 0.215, 0], [Math.PI / 2, 0, 0]);
   const baseGlow = glow(body, [0, 0.18, 0], 0.34, 0.6);
   [-1, 1].forEach(sx => part(new THREE.SphereGeometry(0.1, 24, 18), NAVY, body, [0.35 * sx, 0.655, 0.01]));
+  // ---- en el pecho: el cuadradito del sodio, como en la tabla periódica (Na · 11 · 22,990) ----
+  const rr = (g, x, y, w, h, r) => { if (g.roundRect) return g.roundRect(x, y, w, h, r); g.rect(x, y, w, h); };   // (navegadores antiguos: esquinas rectas)
+  const naTex = canvasTex(256, 256, (g, w, h) => {
+    const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#ec4899'); gr.addColorStop(1, '#f97316');
+    g.fillStyle = gr; g.beginPath(); rr(g, 4, 4, w - 8, h - 8, 26); g.fill();
+    g.fillStyle = '#fff4e2'; g.beginPath(); rr(g, 26, 26, w - 52, h - 52, 14); g.fill();
+    g.fillStyle = '#1e1b2e'; g.textBaseline = 'alphabetic';
+    g.font = '700 30px Arial, sans-serif'; g.textAlign = 'left'; g.fillText('11', 42, 66);
+    g.font = '800 104px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('Na', w / 2, 158);
+    g.font = '600 24px Arial, sans-serif'; g.fillText('Sodio', w / 2, 192); g.fillText('22,990', w / 2, 220); });
+  { const S = 0.17, geo = new THREE.PlaneGeometry(S, S, 12, 12), q = geo.attributes.position, yc = 0.585;
+    for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = yc + q.getY(i), R = torsoR(y); q.setXYZ(i, x, y, Math.sqrt(Math.max(0, R * R - x * x)) + 0.004); }   // pegadito a la pancita
+    geo.computeVertexNormals(); const na = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: naTex, transparent: true })); na.renderOrder = 2; body.add(na); }
   // ---- bracitos (frijolito blanco) y manitos azul noche: palma, 3 deditos y pulgar ----
   const armGeo = lathe(k => { const y = -0.39 + 0.44 * k; return [0.135 * Math.pow(Math.sin(Math.PI * k), 0.4) * (0.8 + 0.2 * k), y]; }, 28, 36);   // brazo gordito (frijol)
   const arms = [-1, 1].map(sx => {
