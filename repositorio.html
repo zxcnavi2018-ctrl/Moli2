@@ -769,11 +769,17 @@ function smIA(w, sinPrev) {
   pista('🎩', 'Palabras de adulto que suele usar la IA', pl.length, 1, pl);
   const lg = [], seen = new Set(); smTok(t).forEach(x => { if (x.w.length >= 13 && !IA_OK.has(x.w) && !seen.has(x.w)) { seen.add(x.w); lg.push(raw.slice(x.i, x.j)); M.push([x.i, x.j]); } });
   pista('📏', 'Palabras muy largas o complicadas', Math.floor(lg.length / 3), 1, lg);
-  // ✍️ ortografía perfecta: un niño de 6.° casi siempre olvida alguna tilde o el «¿»
-  const TIL = new Set(['tambien', 'despues', 'segun', 'ademas', 'facil', 'dificil', 'celula', 'celulas', 'energia', 'organico', 'organicos', 'organica', 'numero', 'rapido', 'rapida', 'acido', 'oxigeno', 'metodo', 'cientifico', 'cientificos', 'cientifica', 'biologia', 'quimica', 'quimico', 'quimicos', 'musculo', 'organo', 'organos', 'microscopico', 'microscopio', 'analisis', 'investigacion', 'informacion', 'conclusion', 'alimentacion', 'fermentacion', 'reproduccion', 'nutricion', 'proteina', 'proteinas', 'pequeno', 'pequenos', 'asi', 'aqui', 'tipico', 'ultimo', 'periodo', 'bacterias', 'estomago', 'intestino', 'jabon', 'algun', 'ningun', 'dias', 'paginas', 'pagina', 'facilmente', 'tecnica', 'tecnicas', 'sintomas', 'debiles']);
-  const AC = /[áéíóúñÁÉÍÓÚÑ]/; let tb = 0, tm = 0; smTok(t).forEach(x => { if (TIL.has(x.w) && x.w !== 'bacterias' && x.w !== 'intestino') { AC.test(raw.slice(x.i, x.j)) ? tb++ : tm++; } });
-  const pq = (t.match(/\?/g) || []).length, ab = (t.match(/¿/g) || []).length;
-  pista('✍️', 'Ortografía perfecta (todas las tildes y los ¿ ? en su lugar)', tb >= 5 && !tm && ab >= pq ? 1 : 0, 2, [`${tb} tildes difíciles sin ningún error`]);
+  // ✍️ redacción perfecta: las tildes las corrige el celular o Word, pero las REGLAS de escritura no (mayúscula al empezar, punto al terminar,
+  //    coma después de cada conector, nada de oraciones sin fin ni palabras repetidas). Un niño de 6.° casi siempre se salta alguna.
+  const ORS = t.split(/(?<=[.!?])\s+|\n+/).map(x => x.trim()).filter(x => x.split(/\s+/).length >= 4), nPal = smTok(t).length;
+  const mayus = ORS.filter(x => /^[¿¡«"“(]*[\p{Lu}0-9]/u.test(x)).length, punto = ORS.filter(x => /[.!?…:»")]$/.test(x)).length;
+  const CONx = (lo.match(/(^|[.\n]\s*)(sin embargo|por lo tanto|ademas|asimismo|por otro lado|finalmente|es decir|por ejemplo|en conclusion|por ultimo|en cambio|por eso)\b,?/gm) || []), conC = CONx.filter(x => x.endsWith(',')).length;
+  const sinFin = ORS.filter(x => x.split(/\s+/).length > 35 && (x.match(/,/g) || []).length < 2).length, rep = /\b(\p{L}{3,})\s+\1\b/iu.test(t);
+  const reglas = ORS.length >= 4 && nPal >= 60 && mayus === ORS.length && punto >= ORS.length - 1 && CONx.length >= 2 && conC === CONx.length && !sinFin && !rep;
+  pista('✍️', 'Redacción perfecta (cumple todas las reglas de escritura)', reglas ? 1 : 0, 2, ['mayúscula y punto en cada oración, coma después de cada conector, sin oraciones sin fin']);
+  const PAR = raw.split(/\n+/).map(x => smSinGuia(x).trim()).filter(x => x.split(/\s+/).length >= 15).map(x => x.split(/\s+/).length), mP = PAR.reduce((s, x) => s + x, 0) / (PAR.length || 1);
+  const dsv = Math.sqrt(PAR.reduce((s, x) => s + (x - mP) ** 2, 0) / (PAR.length || 1));
+  pista('🧱', 'Párrafos casi del mismo tamaño', PAR.length >= 3 && dsv / mP < .18 ? 1 : 0, 1, [`${PAR.length} párrafos de unas ${Math.round(mP)} palabras`]);
   // 📐 oraciones largas y muy ordenadas (muchas comas bien puestas)
   const OR = t.split(/[.!?]+\s|\n+/).map(x => x.trim()).filter(x => x.split(/\s+/).length >= 4), nw = OR.reduce((s, x) => s + x.split(/\s+/).length, 0), nc = (t.match(/,/g) || []).length;
   pista('📐', 'Oraciones largas y muy ordenadas', OR.length >= 3 && nw / OR.length >= 20 && nc / OR.length >= 2 ? 1 : 0, 2, [`${Math.round(nw / OR.length)} palabras por oración`]);
@@ -949,6 +955,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151137"></script><script src="mando.js?v=202610151137"></script>
+<script src="pdftrabajo.js?v=202610151158"></script><script src="mando.js?v=202610151158"></script>
 </body>
 </html>
