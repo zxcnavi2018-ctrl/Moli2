@@ -78,6 +78,10 @@ button{cursor:pointer}
 .sm-wh{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed #e9d5ff}.sm-wh q{flex:1;min-width:220px;font-size:14px;font-weight:700;color:var(--ink)}.sm-wh .btn{padding:8px 14px;font-size:13px;text-decoration:none}
 .sm-wl{margin:4px 0;font-weight:700;color:var(--ink2);font-size:14px}.sm-web summary{cursor:pointer;font-weight:900;color:#6b21a8;padding:6px 0}
 .sm-tx mark.cw{background:#e9d5ff;text-decoration:underline wavy #9333ea}
+.sm-ia{padding:14px 16px;border-radius:18px;background:#fff7ed;border:2px solid #fed7aa}.sm-ia h4{margin:0 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sm-ip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.sm-ip span{padding:8px 12px;border-radius:14px;background:#fff;border:2px solid #fed7aa;font-size:13.5px;font-weight:800;color:var(--ink)}.sm-ip small{display:block;margin-top:2px;font-weight:700;color:#9a3412}
+.sm-ia summary{cursor:pointer;font-weight:900;color:#c2410c;padding:6px 0}.sm-ia .sm-tx{max-height:40vh}
+.sm-tx mark.ci{background:#fed7aa;border-bottom:2px dotted #ea580c}
 .sm-ley{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-weight:800;color:var(--ink2)}
 @media (max-width:720px){.sm-cmp.dos{grid-template-columns:1fr}.sm-r{flex-wrap:wrap}}
 /* pestañas */
@@ -690,7 +694,7 @@ function smAceptado(w) { const m = /^🔎 Similitud (\d+)%/.exec(w.fb || ''); re
 async function vSimilitud() {
   const V = $('#view');
   if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
-  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y busca sus frases en <b>internet</b>: verás en colores lo que es <b>igualito</b> (copiar y pegar), de quién lo tomó y el link de la página. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y busca sus frases en <b>internet</b> y revisa <b>indicios de IA</b> (; — palabras rarísimas): verás en colores lo que es <b>igualito</b> (copiar y pegar), de quién lo tomó y el link de la página. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
     CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; setCount(p.filter(w => !miSec(w)).length); pintaSim();
@@ -701,7 +705,7 @@ function pintaSim() {
   el.innerHTML = L.length ? `<div class="sm-l">${L.map(w => { const r = SIM.res[w.id], ac = smAceptado(w);
     const tp = r && Math.min(100, r.p + (r.web && r.web.p || 0)), nv = r && Math.max(r.nv, smNivel(tp, Math.max(r.max, r.web && r.web.p || 0)));
     const pill = r ? `<span class="sm-p ${SM_V[nv][0]}">${tp}% · ${SM_V[nv][1].split(' ').slice(1).join(' ')}</span>` : ac !== null ? `<span class="sm-p ac">👌 Aceptado · ${ac}%</span>` : '<span class="sm-p">⏳ Sin revisar</span>';
-    return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}<button type="button" class="btn blue" data-sim="${esc(w.id)}">🔎 Revisar similitud</button></div>`; }).join('')}</div>`
+    return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}${r && r.ia && r.ia.nv ? `<span class="sm-p ${IA_V[r.ia.nv][0]}">${r.ia.nv === 2 ? '🤖 IA: muchos indicios' : '🤔 IA: algunos indicios'}</span>` : ''}<button type="button" class="btn blue" data-sim="${esc(w.id)}">🔎 Revisar similitud</button></div>`; }).join('')}</div>`
     : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
 }
 $('#view').addEventListener('click', e => { const b = e.target.closest('[data-sim]'); if (b && TAB === 'similitud') revisarSim(b.dataset.sim); });
@@ -744,6 +748,36 @@ async function smWeb(w, r) {                                          // 🌐 in
   if (SIM.w === w && !$('#modal').hidden) pintaInforme(); pintaSim();
 }
 const smGoogle = q => 'https://www.google.com/search?q=' + encodeURIComponent('"' + q + '"');
+// 🤖 Indicios de IA: signos y palabras que un niño de 6.° casi no usa (son pistas, no una prueba)
+const IA_FR = ['como modelo de lenguaje', 'como inteligencia artificial', 'claro, aqui tienes', 'aqui tienes', 'por supuesto!', 'espero que esto te ayude', 'espero que te sirva', 'chatgpt', 'gemini', 'copilot', 'si necesitas mas'];
+const IA_PAL = ['crucial', 'fundamental', 'cabe destacar', 'cabe mencionar', 'es importante destacar', 'es importante senalar', 'en el ambito', 'desempena un papel', 'juega un papel', 'papel crucial', 'fascinante', 'intrincad', 'multifacetic', 'sinergia', 'paradigma', 'asimismo', 'no obstante', 'por consiguiente', 'en definitiva', 'en este sentido', 'en sintesis', 'por ende', 'radica en', 'se erige', 'aspecto clave', 'es esencial', 'profundizar', 'potenciar', 'optimizar', 'integral', 'notablemente', 'significativamente', 'un sinfin', 'abordar', 'sumergirse', 'adentrarnos', 'en la actualidad', 'diversos', 'eficazmente', 'primordial', 'indispensable', 'ademas de ello', 'en conclusion,', 'en resumen,', 'mencionado anteriormente', 'amplia gama', 'variedad de', 'contribuye a', 'promover', 'garantizar', 'versatil', 'innovador', 'exhaustiv', 'meticulos'];
+const IA_OK = new Set(['microorganismos', 'microorganismo', 'investigacion', 'caracteristicas', 'caracteristica', 'fermentacion', 'unicelulares', 'reproduccion', 'enfermedades', 'alimentacion', 'temperaturas', 'experimentos', 'conclusiones', 'informacion', 'descomposicion', 'microscopico', 'microscopicos', 'medicamentos', 'organizacion', 'principalmente', 'universidad', 'nutricionales', 'reproductores', 'fotosintesis', 'antibioticos', 'responsabilidad', 'contaminacion', 'transformacion', 'multicelulares', 'enfermedad', 'respiratorio', 'reproductor', 'desventajas', 'inmunologico', 'inmunitario', 'naturalmente', 'fermentaciones']);
+function smIA(w) {
+  const raw = String(w.d || ''), t = smSinGuia(raw).replace(/https?:\/\/\S+|www\.\S+/g, m => ' '.repeat(m.length)), lo = norm(t), M = [], P = [];   // M: marcas en el texto · P: pistas encontradas
+  const pista = (ic, nom, n, pts, ej) => { if (n) P.push({ ic, nom, n, pts: Math.min(pts * n, pts * 3), ej: [...new Set(ej)].slice(0, 6) }); };
+  const busca = (re, fn) => { const out = []; let m; re.lastIndex = 0; while ((m = re.exec(t))) { if (!fn || fn(m)) { M.push([m.index, m.index + m[0].length]); out.push(m[0].trim()); } if (!m[0].length) re.lastIndex++; } return out; };
+  const pc = busca(/;/g); pista('⁏', 'Punto y coma ( ; )', pc.length, 2, ['; ']);
+  const ra = busca(/\s[—–]\s?|—/g); pista('—', 'Raya larga ( — )', ra.length, 2, ['—']);
+  const pa = busca(/\([^()\n]{2,80}\)/g, m => !/\b(1[89]|20)\d{2}\b|s\.\s?f\./i.test(m[0])); pista('( )', 'Paréntesis que no son citas', pa.length, 1, pa);
+  const md = busca(/\*\*[^*\n]+\*\*|^\s*#{1,4}\s|^\s*[•▪●◦-]\s|^\s*\d+\.\s/gm); pista('✳️', 'Formato de chat (**negritas**, viñetas o listas)', md.length, 2, md.map(x => x.slice(0, 30)));
+  const dp = busca(/[^\n:]{3,30}:(?=\s)/g, m => !/(autor|a[nñ]o|tema|link|enlace|fuente|p[aá]gina|t[ií]tulo|libro|sitio|fecha|nombre|secci[oó]n)\s*(o\s+\S+)?:$/i.test(m[0].trim())); pista(':', 'Muchos dos puntos ( : )', dp.length >= 3 ? dp.length - 2 : 0, 1, dp.map(x => x.trim().slice(-20)));
+  const fr = IA_FR.filter(f => lo.includes(f)); fr.forEach(f => { let i = lo.indexOf(f); while (i >= 0) { M.push([i, i + f.length]); i = lo.indexOf(f, i + 1); } }); pista('🤖', 'Frases que deja el chat de IA', fr.length, 6, fr);
+  const pl = IA_PAL.filter(f => new RegExp('\\b' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(lo)); pl.forEach(f => { const re = new RegExp('\\b' + f + '\\w*', 'g'); let m; while ((m = re.exec(lo))) M.push([m.index, m.index + m[0].length]); });
+  pista('🎩', 'Palabras de adulto que suele usar la IA', pl.length, 1, pl);
+  const lg = [], seen = new Set(); smTok(t).forEach(x => { if (x.w.length >= 13 && !IA_OK.has(x.w) && !seen.has(x.w)) { seen.add(x.w); lg.push(raw.slice(x.i, x.j)); M.push([x.i, x.j]); } });
+  pista('📏', 'Palabras muy largas o complicadas', Math.floor(lg.length / 3), 1, lg);
+  const pts = P.reduce((s, x) => s + x.pts, 0), nv = fr.length || pts >= 8 ? 2 : pts >= 3 ? 1 : 0;
+  return { P, M: M.sort((a, b) => a[0] - b[0]), pts, nv };
+}
+const IA_V = [['v0', '🙂 Pocos indicios', 'Parece escrito por un niño: signos y palabras normales.'], ['v2', '🤔 Algunos indicios', 'Tiene signos o palabras que un niño de 6.° casi no usa. Pregúntale qué significan.'], ['v3', '🤖 Muchos indicios de IA', 'Tiene muchas marcas típicas de la Inteligencia Artificial. Pídele que lo explique con sus palabras.']];
+function smIAHtml(w, r) {
+  const A = r.ia, v = IA_V[A.nv]; let o = '', at = 0; const txt = String(w.d || '');
+  A.M.forEach(([i, j]) => { if (i < at) return; o += esc(txt.slice(at, i)) + `<mark class="ci">${esc(txt.slice(i, j))}</mark>`; at = j; }); o += esc(txt.slice(at));
+  return `<div class="sm-ia"><h4>🤖 Indicios de Inteligencia Artificial <span class="sm-p ${v[0]}">${v[1]}</span></h4><p class="sm-wl">${v[2]}</p>
+    ${A.P.length ? `<div class="sm-ip">${A.P.map(x => `<span><b>${x.ic} ${esc(x.nom)}</b>${x.n > 1 ? ` ×${x.n}` : ''}${x.ej.length && x.ej[0].length > 2 ? `<small>${x.ej.map(esc).join(' · ')}</small>` : ''}</span>`).join('')}</div>
+    <details><summary>👁 Ver los indicios en el texto</summary><div class="sm-tx">${o}</div></details>` : ''}
+    <p class="sm-wl" style="font-size:12.5px">⚠️ Son pistas, no una prueba: ningún detector sabe con seguridad si lo hizo una IA. Lo mejor es pedirle que te lo explique con sus palabras.</p></div>`;
+}
 function smWebHtml(r) {
   const W = r.web; if (!W) return '';
   const cab = `<h4>🌐 Similitud en internet ${W.st === 'ok' ? `<span class="sm-p ${W.p >= 25 ? 'v3' : W.p >= 10 ? 'v2' : W.hits.length ? 'v1' : 'v0'}">${W.p}% igual a internet</span>` : ''}</h4>`;
@@ -760,21 +794,21 @@ async function revisarSim(id) {
   const pasos = Math.max(lib.length, 1), ms = Math.min(140, 2200 / pasos);
   for (let i = 0; i < pasos; i++) { if (M.dataset.id !== id || M.hidden) return; const x = lib[i], es = $('#smEs'), ba = $('#smBa');
     if (es) es.textContent = x ? `📖 Comparando con «${x.t}» de ${firstName(x.n)}…` : '📖 Comparando…'; if (ba) ba.style.width = (100 * (i + 1) / pasos) + '%'; await new Promise(r => setTimeout(r, ms)); }
-  SIM.res[id] = smComparar(w); if (M.dataset.id === id && !M.hidden) pintaInforme(); pintaSim(); smWeb(w, SIM.res[id]);
+  SIM.res[id] = smComparar(w); SIM.res[id].ia = smIA(w); if (M.dataset.id === id && !M.hidden) pintaInforme(); pintaSim(); smWeb(w, SIM.res[id]);
 }
 function pintaInforme() {
   const M = $('#modal'), w = SIM.w, r = SIM.res[w.id]; if (!r) return;
   const own = ME && w.k === ME.key && !ROLE.t, ro = own || miSec(w), f0 = r.fuentes[0], wp = r.web && r.web.st === 'ok' ? r.web.p : 0, tp = Math.min(100, r.p + wp);
   const nv = Math.max(r.nv, smNivel(tp, Math.max(r.max, wp))), v = SM_V[nv], wh = r.web && r.web.hits[0];
   const txt3 = wp > r.max && nv >= 2 && wh ? `El ${wp}% es igualito a internet (Wikipedia: «${wh.hit.t}»). ${nv === 3 ? '¡Lo copió y pegó de internet!' : 'Debe parafrasear y citar la fuente.'}` : nv === 3 && f0 ? `El ${f0.p}% es igualito al librito «${f0.s.x.t}» de ${f0.s.x.n}${f0.cita ? ' (sí lo cita, pero copió textual: falta parafrasear).' : '. ¡Lo copió y pegó sin citarlo!'}` : v[2];
-  const sug = wp > r.max && nv >= 2 && wh ? `Copiaste partes de internet (Wikipedia: «${wh.hit.t}»). Escríbelo con tus palabras (parafrasea) y pon la fuente con su año.` : nv >= 2 && f0 ? `Copiaste partes del librito «${f0.s.x.t}» de ${f0.s.x.n}. Escríbelo con tus palabras (parafrasea) y cítalo así: ${f0.ape} (${smAnio(f0.s.x)}) menciona que…` : '';
+  const sug = wp > r.max && nv >= 2 && wh ? `Copiaste partes de internet (Wikipedia: «${wh.hit.t}»). Escríbelo con tus palabras (parafrasea) y pon la fuente con su año.` : nv < 2 && r.ia.nv === 2 ? 'Tu trabajo tiene signos y palabras que suele usar la Inteligencia Artificial (como ; — o palabras muy difíciles). Escríbelo con tus propias palabras, como tú lo explicarías.' : nv >= 2 && f0 ? `Copiaste partes del librito «${f0.s.x.t}» de ${f0.s.x.n}. Escríbelo con tus palabras (parafrasea) y cítalo así: ${f0.ape} (${smAnio(f0.s.x)}) menciona que…` : '';
   const ta = $('#rvFb'), fbTxt = ta && ta.value !== ta.dataset.sug ? ta.value : sug;   // si ya escribió su comentario, no se lo borro
   const c = ['var(--green2)', '#ca8a04', '#ea580c', 'var(--red)'][nv], fs = SIM.sel >= 0 ? r.fuentes[SIM.sel] : null;
   M.innerHTML = `<article class="art" role="dialog" aria-modal="true" style="width:min(1100px,100%)"><div class="hero"><small>🔎 Reporte de similitud · ${r.nLib} libritos revisados</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
   <div class="bd">
     <div class="sm-top"><div class="sm-ring" style="--p:${tp};--c:${c}"><div><b>${tp}%</b><small>similitud</small></div></div><div class="sm-v ${v[0]}"><h3>${v[1]}</h3><p>${esc(txt3)}</p><p style="margin-top:6px">📚 ${r.p}% igual a la Biblioteca · 🌐 ${r.web && r.web.st === 'busca' ? 'buscando…' : wp + '% igual a internet'}</p>${r.corto ? '<p style="margin-top:6px">✏️ El texto es muy corto: revísalo con más cuidado.</p>' : ''}</div></div>
     ${r.fuentes.length ? `<h4>📚 ¿De dónde salen las partes iguales? <small style="font-weight:700;color:var(--ink2)">(toca uno para compararlo lado a lado)</small></h4><div class="sm-src">${r.fuentes.map((f, k) => `<button type="button" class="sm-s${SIM.sel === k ? ' on' : ''}" data-sms="${k}"><span class="cl c${k}"></span><span class="t">${f.s.lib ? '📖' : '📥'} «${esc(f.s.x.t)}» · ${esc(f.s.x.n)}${f.s.x.sec ? ' · 6.° ' + esc(f.s.x.sec) : ''}<small>${f.s.lib ? 'Librito de la Biblioteca' : 'Otro trabajo en la bandeja'} · ${f.cita ? `✔ Lo cita: ${esc(f.ape)} (${smAnio(f.s.x)})` : '✘ No lo cita'}</small></span><em>${f.p}%</em></button>`).join('')}</div>` : '<div class="tip green">📗 No encontré frases iguales en la Biblioteca ni en los otros envíos.</div>'}
-    ${smWebHtml(r)}<div class="sm-ley"><span>🟥🟨🟦 Pintado = igualito al librito de ese color</span><span>🟪 Morado ondulado = igualito a internet</span><span>Sin pintar = escrito con sus palabras</span></div>
+    ${smWebHtml(r)}${smIAHtml(w, r)}<div class="sm-ley"><span>🟥🟨🟦 Pintado = igualito al librito de ese color</span><span>🟪 Morado ondulado = igualito a internet</span><span>Sin pintar = escrito con sus palabras</span></div>
     <div class="sm-cmp${fs ? ' dos' : ''}"><div class="sm-tx"><h5>📝 Trabajo enviado</h5>${smMarcar(w.d, r.T, r.due.map((d, i) => d < 0 && r.web && r.web.hits.some(f => r.T[i].i >= f.i && r.T[i].j <= f.j) ? 'w' : d), SIM.sel)}</div>${fs ? `<div class="sm-tx"><h5>${fs.s.lib ? '📖' : '📥'} «${esc(fs.s.x.t)}» · ${esc(fs.s.x.n)}</h5>${smMarcar(fs.s.x.d, fs.s.T, fs.mk.map(m => m ? SIM.sel : -1), -1)}</div>` : ''}</div>
     ${ro ? `<div class="tip">${own ? '🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.' : `👀 Este trabajo es de tu sección (6.° ${esc(ROLE.rs)}): puedes ver el reporte, pero lo decide un Revisor de otra sección o tu profe.`}</div>`
     : `<div class="acts"><textarea id="rvFb" maxlength="500" data-sug="${esc(sug)}" placeholder="Comentario para el estudiante (opcional)">${esc(fbTxt)}</textarea>
@@ -784,7 +818,7 @@ function pintaInforme() {
 async function aceptarSim(b) {                                        // deja anotado en el trabajo que ya se revisó su similitud (sigue en la bandeja)
   const w = SIM.w, r = w && SIM.res[w.id]; if (!r) return;
   const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
-  b.disabled = true; const up = { fb: `🔎 Similitud ${Math.min(100, r.p + (r.web && r.web.p || 0))}% · revisado por ${ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name)}`.slice(0, 500) };
+  b.disabled = true; const up = { fb: `🔎 Similitud ${Math.min(100, r.p + (r.web && r.web.p || 0))}% · IA: ${['pocos', 'algunos', 'muchos'][r.ia.nv]} indicios · revisado por ${ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name)}`.slice(0, 500) };
   try { const x = await fetch(`${BASE}/revista/${encodeURIComponent(w.id)}?key=${F.apiKey}&updateMask.fieldPaths=fb&currentDocument.exists=true`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });
     if (!x.ok) throw new Error(x.status === 403 ? 'AUTH' : 'NET');
     w.fb = up.fb; delete SIM.res[w.id]; $('#modal').hidden = true; $('#modal').innerHTML = ''; pintaSim(); toast('👌 Reporte aceptado: el trabajo sigue en la bandeja, marcado como revisado.');
@@ -865,6 +899,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151124"></script><script src="mando.js?v=202610151124"></script>
+<script src="pdftrabajo.js?v=202610151130"></script><script src="mando.js?v=202610151130"></script>
 </body>
 </html>
