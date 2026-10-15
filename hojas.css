@@ -372,11 +372,13 @@ body.open #foto { transform: translateY(-130%); pointer-events: none; }
 #herr .rc-eq i { font-style: normal; font-size: 40px; } #herr .rc-eq b { font-size: 15px; } #herr .rc-eq small { color: #64748b; font-size: 12px; }
 /* temporizador */
 #tmx { position: fixed; top: 10px; left: 50%; transform: translate(-50%, -150%); z-index: 2147483050; display: flex; align-items: center; gap: .25em; padding: .1em .45em .1em .12em; border: 4px solid rgba(43,37,71,.5); border-radius: 999px; background: rgba(255,255,255,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 6px 18px rgba(15,23,42,.25); font: 900 clamp(56px, 8.5vw, 104px) system-ui; line-height: 1.1; text-shadow: 0 1px 0 rgba(255,255,255,.7); color: #1d4ed8; transition: transform .5s cubic-bezier(.3,1.5,.5,1); }
-#tmx.on { transform: translate(-50%, 0); } #tmx img { width: 1.5em; height: 1.5em; } #tmx.warn { color: #dc2626; animation: tmLat 1s ease-in-out infinite; } #tmx.end { background: rgba(254,226,226,.8); }
+  box-shadow: 0 6px 18px rgba(15,23,42,.25); font: 900 clamp(56px, 8.5vw, 104px) system-ui; line-height: 1.1; text-shadow: 0 1px 0 rgba(255,255,255,.7); color: rgba(29,78,216,.72); transition: transform .5s cubic-bezier(.3,1.5,.5,1); }
+#tmx.on { transform: translate(-50%, 0); } #tmx img { width: 1.5em; height: 1.5em; opacity: .55; } #tmx b { opacity: .85; } #tmx.warn { color: #dc2626; animation: tmLat 1s ease-in-out infinite; } #tmx.end { background: rgba(254,226,226,.8); }
 @keyframes tmLat { 50% { transform: translate(-50%, 0) scale(1.06); } }
 #tmx.on.pegado { left: 0; top: 0; transform: none; transition: none; animation: tmIn .45s cubic-bezier(.3,1.5,.5,1); }   /* en el aula: al lado de Molí, lo sigue */
 #tmx.on.pegado.warn { animation: tmLat2 1s ease-in-out infinite; }
+#tmx.on.esquina { left: auto; right: 14px; top: 12px; transform: none; font-size: clamp(36px, 4.6vw, 64px); background: rgba(255,255,255,.4); animation: tmIn .45s cubic-bezier(.3,1.5,.5,1); }   /* proyectando: arriba a la derecha, más chico */
+#tmx.on.esquina.warn { animation: tmLat2 1s ease-in-out infinite; }
 @keyframes tmIn { from { scale: .2; opacity: 0; } } @keyframes tmLat2 { 50% { scale: 1.08; } }
 /* animaciones de clase */
 #anim { position: fixed; inset: 0; z-index: 2147483100;   /* animaciones: siempre encima de todo (imagen o video agrandado, proyección, cuaderno) */ display: none; align-items: center; justify-content: center; overflow: hidden; font-family: "Trebuchet MS", system-ui, sans-serif; color: #fff; cursor: pointer; }

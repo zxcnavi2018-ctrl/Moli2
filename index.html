@@ -173,10 +173,10 @@
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hojas.css?v=202610142236">
+<link rel="stylesheet" href="hojas.css?v=202610150150">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610142236"></script><script src="datos.js?v=202610142236"></script><script src="docente.js?v=202610142236"></script>
-<script src="hojas.js?v=202610142236"></script><script src="hojas-docente.js?v=202610142236"></script><script src="diplomas.js?v=202610142236"></script><script src="fotocheck.js?v=202610142236"></script><script src="herramientas.js?v=202610142236"></script><script src="remoto.js?v=202610142236"></script><script src="escaner.js?v=202610142236"></script><script src="tarjetas.js?v=202610142236"></script>
+<script src="moli3d.js?v=202610150150"></script><script src="datos.js?v=202610150150"></script><script src="docente.js?v=202610150150"></script>
+<script src="hojas.js?v=202610150150"></script><script src="hojas-docente.js?v=202610150150"></script><script src="diplomas.js?v=202610150150"></script><script src="fotocheck.js?v=202610150150"></script><script src="herramientas.js?v=202610150150"></script><script src="remoto.js?v=202610150150"></script><script src="escaner.js?v=202610150150"></script><script src="tarjetas.js?v=202610150150"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -2435,7 +2435,11 @@ animHooks.push((t, dt) => {
     talkEl.style.setProperty('--tail', B.t.toFixed(1) + 'px'); talkEl.style.setProperty('--ox', (w - B.t - 10).toFixed(0) + 'px');
   }
   const tm = document.getElementById('tmx');                          // ⏱️ el cronómetro va al lado de Molí, a la altura de su pancita, y lo sigue
-  if (tm && tm.classList.contains('on')) {
+  const sh0 = document.getElementById('sheet'), fv0 = document.getElementById('fotoVer');
+  const proyectando = !!((sh0 && sh0.style.display === 'block') || (fv0 && fv0.classList.contains('on')) || document.querySelector('.vid.grande, .cv-vbox.grande') || moliWin.style.display === 'flex');
+  if (tm) tm.classList.toggle('esquina', proyectando && tm.classList.contains('on'));   // con algo proyectado: a la esquina, para no tapar
+  if (tm && tm.classList.contains('on') && proyectando) { if (tm.style.translate) { tm.classList.remove('pegado'); tm.style.translate = ''; } }
+  else if (tm && tm.classList.contains('on')) {
     moli.root.updateMatrixWorld(); camera.updateMatrixWorld();
     headV.set(0, 2.02, 0).applyMatrix4(moli.root.matrixWorld).project(camera); const hy = (1 - headV.y) / 2 * innerHeight;
     headV.set(0, 0.95, 0).applyMatrix4(moli.root.matrixWorld).project(camera);
@@ -2478,7 +2482,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202610142236"></script><script src="corcho.js?v=202610142236"></script><script src="mando.js?v=202610142236"></script><script src="anuncio.js?v=202610142236"></script><script src="muro.js?v=202610142236"></script>
-<script src="editor.js?v=202610142236"></script>
+<script src="revista.js?v=202610150150"></script><script src="corcho.js?v=202610150150"></script><script src="mando.js?v=202610150150"></script><script src="anuncio.js?v=202610150150"></script><script src="muro.js?v=202610150150"></script>
+<script src="editor.js?v=202610150150"></script>
 </body>
 </html>
