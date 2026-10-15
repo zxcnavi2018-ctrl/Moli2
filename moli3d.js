@@ -173,14 +173,16 @@ function crearMoli(THREE, opt = {}) {
   [-1, 1].forEach(sx => part(new THREE.SphereGeometry(0.1, 24, 18), NAVY, body, [0.35 * sx, 0.655, 0.01]));
   // ---- en el pecho: el cuadradito del sodio, como en la tabla periódica (Na · 11 · 22,990) ----
   const rr = (g, x, y, w, h, r) => { if (g.roundRect) return g.roundRect(x, y, w, h, r); g.rect(x, y, w, h); };   // (navegadores antiguos: esquinas rectas)
-  const naTex = canvasTex(256, 256, (g, w, h) => {
-    const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#ec4899'); gr.addColorStop(1, '#f97316');
-    g.fillStyle = gr; g.beginPath(); rr(g, 4, 4, w - 8, h - 8, 26); g.fill();
-    g.fillStyle = '#fff4e2'; g.beginPath(); rr(g, 26, 26, w - 52, h - 52, 14); g.fill();
-    g.fillStyle = '#1e1b2e'; g.textBaseline = 'alphabetic';
-    g.font = '700 30px Arial, sans-serif'; g.textAlign = 'left'; g.fillText('11', 42, 66);
-    g.font = '800 104px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('Na', w / 2, 158);
-    g.font = '600 24px Arial, sans-serif'; g.fillText('Sodio', w / 2, 192); g.fillText('22,990', w / 2, 220); });
+  const naTex = canvasTex(256, 256, (g, w, h) => {                   // estilo LED: panel azul noche con luz celeste
+    g.fillStyle = '#0d1b3f'; g.beginPath(); rr(g, 6, 6, w - 12, h - 12, 30); g.fill();
+    const led = (fn, blur, col) => { g.save(); g.shadowColor = '#38bdf8'; g.shadowBlur = blur; g.fillStyle = col; g.strokeStyle = col; fn(); g.restore(); };
+    led(() => { g.lineWidth = 9; g.beginPath(); rr(g, 22, 22, w - 44, h - 44, 18); g.stroke(); }, 22, '#7dd3fc');
+    led(() => { g.lineWidth = 3; g.beginPath(); rr(g, 22, 22, w - 44, h - 44, 18); g.stroke(); }, 0, '#e0f7ff');
+    g.textBaseline = 'alphabetic';
+    led(() => { g.font = '700 30px Arial, sans-serif'; g.textAlign = 'left'; g.fillText('11', 44, 70); }, 12, '#a5f3fc');
+    led(() => { g.font = '800 106px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('Na', w / 2, 160); }, 26, '#bae6fd');
+    led(() => { g.font = '800 106px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('Na', w / 2, 160); }, 0, '#f0fbff');
+    led(() => { g.font = '600 24px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('Sodio', w / 2, 194); g.fillText('22,990', w / 2, 222); }, 10, '#7dd3fc'); });
   { const S = 0.17, geo = new THREE.PlaneGeometry(S, S, 12, 12), q = geo.attributes.position, yc = 0.585;
     for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = yc + q.getY(i), R = torsoR(y); q.setXYZ(i, x, y, Math.sqrt(Math.max(0, R * R - x * x)) + 0.004); }   // pegadito a la pancita
     geo.computeVertexNormals(); const na = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: naTex, transparent: true })); na.renderOrder = 2; body.add(na); }
