@@ -118,6 +118,7 @@ button{cursor:pointer}
 .wd-dc .wd-ls{display:grid;justify-content:stretch;gap:8px;max-height:50vh;overflow:auto}.wd-ls button{display:flex;align-items:center;gap:10px;padding:10px;border:2px solid var(--line);border-radius:14px;background:#fff;text-align:left;cursor:pointer}.wd-ls button:hover{border-color:#2b579a}.wd-ls i{display:grid;place-items:center;width:36px;height:42px;border-radius:6px;background:#2b579a;color:#fff;font:900 18px Georgia,serif;font-style:normal}.wd-ls b{display:block;color:var(--navy)}.wd-ls small{font-weight:800;color:var(--ink2)}
 .wd-ed{cursor:text;word-break:break-word;white-space:pre-wrap}.wd-ed:empty:before{content:attr(data-ph);color:#9aa5b1;pointer-events:none}.wd-ed[contenteditable=false]{cursor:default}
 .wd-fm{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #c8c8c8;border-radius:6px;background:#fff;color:#333;font:600 13px Carlito,Calibri,Arial,sans-serif;cursor:pointer}.wd-fm:hover{background:#e8eefb;border-color:#2b579a}.wd-fm b{font:900 15px Georgia,serif}.wd-fm.mk span{display:inline-block;padding:0 3px;border-radius:3px;background:#fff176}
+.wd-kw input{font:600 16px Carlito,Calibri,Arial,sans-serif;color:#222}.wd-tt label small{font-weight:600;color:#888}
 .wd-ck{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:15px;cursor:pointer}.wd-ck input{width:18px;height:18px}
 .wd-st{display:flex;gap:18px;padding:5px 14px;background:#2b579a;color:#e8eefb;font-size:12.5px;flex:none;overflow-x:auto;white-space:nowrap}.wd-st .wd-np{background:rgba(255,255,255,.18);color:#fff}
 .wd-no{animation:wdNo .45s}@keyframes wdNo{25%{transform:translateX(-6px);background:#fde8e6}75%{transform:translateX(6px)}}
@@ -585,11 +586,11 @@ function vEnviar() {
   <section class="formatos" id="eGuia">${guiaHtml(FORM.ty)}</section>
   <form class="form" id="fEnv" autocomplete="off">
     <h3 class="f-h">2. Publica tu propuesta</h3>
-    <div class="fld"><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" required placeholder="El mismo título de tu guía"></div>
-    <div class="fld"><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" required placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
+    <div class="fld" data-nh${HOJA[FORM.ty] ? ' hidden' : ''}><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" placeholder="El mismo título de tu guía"></div>
+    <div class="fld" data-nh${HOJA[FORM.ty] ? ' hidden' : ''}><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
     ${T0 ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
     <div class="fld" id="fDoc"${HOJA[FORM.ty] ? ' hidden' : ''}><label>Sube tu guía completada (Word)</label><label class="photo" id="eDocL"><input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="eDoc" hidden><span id="eDocV">📄 Toca aquí para elegir tu guía .docx</span></label><small>Lo que escribiste en tu guía será el contenido de tu libro en la Biblioteca.</small></div>
-    <div class="fld"><label>Anexos: fotos de tu trabajo <span style="font-weight:700;color:var(--ink2)">(hasta 3, opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" multiple hidden><span id="ePv">📷 Toca aquí para elegir tus fotos</span></label><small>Irán al final de tu libro, en la página de Anexos.</small></div>
+    <div class="fld" data-nh${HOJA[FORM.ty] ? ' hidden' : ''}><label>Anexos: fotos de tu trabajo <span style="font-weight:700;color:var(--ink2)">(hasta 3, opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" multiple hidden><span id="ePv">📷 Toca aquí para elegir tus fotos</span></label><small>Irán al final de tu libro, en la página de Anexos.</small></div>
     <div><button type="submit" class="btn go" id="eGo">${T0 ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
   </form><div class="mine" id="mine"></div>`;
   FORM.img = FORM.th = ''; FORM.txt = ''; FORM.fotos = []; drawMine();
@@ -657,6 +658,8 @@ function hojaTexto(h) {                                               // el mism
 }
 function hojaFalta(h) {
   const v = h.v || {}, x = k => String(v[k] || '').trim(), F = [];
+  if (String(h.t || '').trim().length < 4) F.push('el título de tu trabajo');
+  if (String(h.kw || '').split(',').filter(x => x.trim()).length < 3) F.push('3 palabras clave separadas por comas (debajo del título)');
   HOJA[h.ty].pasos.forEach((p, i) => { if (p.c && !p.c.some(c => x(c.id).length >= 3)) F.push(`el Paso ${i + 1} (${p.t})`);
     if (p.fu && [1, 2, 3].filter(n => x(`f${n}a`) && x(`f${n}y`)).length < 3) F.push(`el autor y el año de tus 3 fuentes (Paso ${i + 1})`); });
   if (!F.length && hojaPal(h) < 60) F.push('escribir un poquito más (mínimo 60 palabras)');
@@ -680,6 +683,7 @@ function abrirHojaDoc(id) {
   <div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
     <p class="wd-k">REVISTA INNOVADORA · GUÍA PASO A PASO</p><h1>${t[1]} ${esc(t[2])}</h1><p class="wd-sub">${esc(G.sub)} Usa mínimo 3 citas parafraseadas dentro de tu trabajo y escribe sus fuentes al final.</p>
     <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
+    <div class="wd-tt wd-kw"><label>Palabras clave <small>(de 3 a 5, separadas por comas: con ellas te encontrarán en el 🔍 Buscador)</small></label><input data-k="_kw" maxlength="200" value="${esc(h.kw || '')}" placeholder="Ej.: levadura, pan, hongos"${dis}></div>
     ${G.pasos.map((p, i) => `<section class="wd-ps"><h2><span>PASO ${i + 1}</span> ${esc(p.t)}</h2><p class="wd-h">${esc(p.h)}</p>
       ${(p.c || []).map(c => c.pre ? `<div class="wd-pre"><b>${esc(c.pre)}</b>${ta(c.id, c.ph || '…', c.r || 1)}</div>` : c.uno ? `<div class="wd-pre"><b>${esc(c.lab)}:</b>${inp(c.id, 'la idea de este párrafo', 'maxlength="160"')}</div>` : `${c.lab ? `<h3>${esc(c.lab)}</h3>` : ''}${ta(c.id, c.ph, c.r)}`).join('')}
       ${p.tb ? `<table class="wd-tb"><tr>${p.tb.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${Array.from({ length: p.tb.rows }, (_, r) => `<tr><th>${r + 1}</th>${p.tb.cols.slice(1).map((_, c) => `<td>${inp(`t${r + 1}${c}`, '', 'maxlength="40"')}</td>`).join('')}</tr>`).join('')}</table>` : ''}
@@ -720,7 +724,7 @@ const HPREV = new WeakMap();
 let hojaT = 0;
 function hojaGuardar() {
   const d = $('#hoja'); if (!d || d.hidden) return; const h = hojaDoc(d.dataset.id); if (!h || h.st === 'env') return;
-  d.querySelectorAll('[data-k]').forEach(x => { const k = x.dataset.k; if (k === '_t') h.t = x.value; else if (x.hasAttribute('data-ed')) { h.v[k] = valDe(x); h.v[k + '_h'] = limpiaH(x.innerHTML); } else h.v[k] = x.type === 'checkbox' ? x.checked : x.value; });
+  d.querySelectorAll('[data-k]').forEach(x => { const k = x.dataset.k; if (k === '_t') h.t = x.value; else if (k === '_kw') h.kw = x.value; else if (x.hasAttribute('data-ed')) { h.v[k] = valDe(x); h.v[k + '_h'] = limpiaH(x.innerHTML); } else h.v[k] = x.type === 'checkbox' ? x.checked : x.value; });
   h.np = hojaPal(h); hojaPut(h); const s = $('#wdSv'), n = $('#wdN'); if (s) s.textContent = '💾 Guardado'; if (n) n.textContent = hojaPal(h) + ' palabras';
 }
 function noPegar(x) { toast('🚫 Aquí no se puede pegar: escríbelo con tus propias palabras. Sólo puedes pegar en «Link».', 3600); if (x) { x.classList.remove('wd-no'); void x.offsetWidth; x.classList.add('wd-no'); } }
@@ -769,8 +773,7 @@ function elegirParaEnviar() {
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-envh]'); if (b) { const h = hojaDoc(b.dataset.envh), F = h ? hojaFalta(h) : []; $('#wdDlg').hidden = true; if (!h) return;
     if (F.length) { toast('✏️ Esa investigación aún está por concluir. Te falta: ' + F.join(', ') + '.', 5200); return abrirHojaDoc(h.id); }
-    FORM.ty = h.ty; FORM.hid = h.id; const ty = $('#eTy'); if (ty) ty.innerHTML = tyHtml(); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(h.ty); const t = $('#eT'); if (t && h.t) t.value = h.t;
-    const f = $('#fEnv'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('📤 ¡Listo! Pon tus palabras clave y toca «Enviar mi trabajo».', 4200); return; }
+    FORM.ty = h.ty; FORM.hid = h.id; const ty = $('#eTy'); if (ty) ty.innerHTML = tyHtml(); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(h.ty); const f = $('#fEnv'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast(`📤 Vas a enviar «${h.nom || h.t}». Toca «Enviar mi trabajo».`, 4200); return; }
   if (e.target.closest('[data-envsel]')) return elegirParaEnviar();
 });
 let dniT = 0;
@@ -830,16 +833,16 @@ document.addEventListener('change', async e => {
 document.addEventListener('click', e => {
   const lk = e.target.closest('#eTy [data-tlk]'); if (lk) { const k = lk.dataset.tlk; TCERR[k] = !TCERR[k]; $('#eTy').innerHTML = tyHtml(); return guardarTipos(); }
   const t = e.target.closest('#eTy [data-ty]'), u = e.target.closest('#eU [data-u]');
-  if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(FORM.ty); const fd = $('#fDoc'); if (fd) fd.hidden = !!HOJA[FORM.ty]; }
+  if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(FORM.ty); const fd = $('#fDoc'); if (fd) fd.hidden = !!HOJA[FORM.ty]; document.querySelectorAll('#fEnv [data-nh]').forEach(x => x.hidden = !!HOJA[FORM.ty]); }
   if (u) { FORM.u = u.dataset.u; document.querySelectorAll('#eU button').forEach(b => b.classList.toggle('on', b === u)); }
   const gg = e.target.closest('#eG [data-g]'); if (gg) { FORM.g = +gg.dataset.g; document.querySelectorAll('#eG button').forEach(b => b.classList.toggle('on', b === gg)); }
 });
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
   if (!ME) return avisoDni();
-  const hj = HOJA[FORM.ty] && FORM.hid && hojaDoc(FORM.hid), kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = hj ? hojaTexto(hj) : FORM.txt, f = '', link = '';
-  if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
+  const hj = HOJA[FORM.ty] && FORM.hid && hojaDoc(FORM.hid), kw = String(hj ? hj.kw || '' : $('#eK').value).replace(/\s+/g, ' ').trim(), t = String(hj ? hj.t || '' : $('#eT').value).replace(/\s+/g, ' ').trim(), d = hj ? hojaTexto(hj) : FORM.txt, f = '', link = '';
   if (HOJA[FORM.ty] && (!hj || hj.st !== 'por')) { toast('📤 Primero elige qué investigación vas a enviar.'); return elegirParaEnviar(); }
+  if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
   if (hj && hj.ty !== FORM.ty) FORM.ty = hj.ty;
   if (hj) { const fa = hojaFalta(hj); if (fa.length) { toast('✍️ En tu guía aún te falta: ' + fa.join(', ') + '.', 5200); return abrirHojaDoc(hj.id); } }
   if (!d) return toast('📄 Sube tu guía completada en Word.');
@@ -1124,6 +1127,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151219"></script><script src="archivos.js?v=202610151219"></script><script src="mando.js?v=202610151219"></script>
+<script src="pdftrabajo.js?v=202610151222"></script><script src="archivos.js?v=202610151222"></script><script src="mando.js?v=202610151222"></script>
 </body>
 </html>
