@@ -146,8 +146,9 @@
       const firma = `${r.code.num}|${r.code.n}|${r.dni.join('')}|${r.marks.join(',')}|${r.grade}|${r.cond}|${r.sec}`;
       if (firma !== st.prev) { st.prev = firma; return msg('Leyendo… no muevas la tarjeta'); }   // se guarda cuando 2 lecturas seguidas coinciden
       st.prev = ''; st.busy = true;
-      const tres = r.dni.join(''), secL = r.sec >= 0 ? Li.sec.k[r.sec] : '', c0 = st.roster.filter(e => String(e.dni || '').endsWith(tres)),
-        cand = secL && c0.some(e => e.section === secL) ? c0.filter(e => e.section === secL) : c0;
+      const tres = r.dni.join(''), secL = r.sec >= 0 ? Li.sec.k[r.sec] : '', busca = () => st.roster.filter(e => String(e.dni || '').replace(/\D/g, '').endsWith(tres));
+      let c0 = busca(); if (!c0.length && !st.fresco) { st.fresco = true; try { st.roster = await Docente.estudiantes(true); } catch (z) {} c0 = busca(); }   // no lo encontró: vuelve a pedir la lista (por si estaba vieja) y busca otra vez
+      const cand = secL && c0.some(e => e.section === secL) ? c0.filter(e => e.section === secL) : c0;
       const e = cand.length > 1 ? await elegir(cand, tres) : cand[0];
       if (S !== st) return;
       const fin = (it, ms = 2200) => { st.ult = it; if (it.kind !== 'warn') st.lista.unshift(it); pintaLista(); try { navigator.vibrate && navigator.vibrate(it.kind === 'ok' ? 90 : [60, 60, 60]); } catch (z) {}

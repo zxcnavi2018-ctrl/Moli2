@@ -106,9 +106,9 @@
   async function estudiantes(forzar) {
     const c = LS.get('moli2:tcache:est', null);
     if (!forzar && est) return est;
-    if (!forzar && c && Date.now() - c.at < 6 * 3600e3) return (est = c.L);
+    if (!forzar && c && Date.now() - c.at < 6 * 3600e3 && Array.isArray(c.L) && c.L.length && c.L.every(e => e.dni)) return (est = c.L);   // (una lista guardada sin DNI no sirve para el escáner)
     const L = (await lista('students')).filter(s => /^[A-D]$/.test(s.section) && (!s.grade || s.grade === '6to'))
-      .map(s => ({ key: s.id, dni: s.dni, name: s.name, section: s.section, area: s.area || '' })).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+      .map(s => ({ key: s.id, dni: String(s.dni == null ? '' : s.dni).replace(/\D/g, ''), name: s.name, section: s.section, area: s.area || '' })).sort((a, b) => a.name.localeCompare(b.name, 'es'));
     LS.set('moli2:tcache:est', { at: Date.now(), L }); return (est = L);
   }
   const ticketsUnidad = (unitKey, sec) => consulta('exitTickets', sec ? [['unit', 'EQUAL', unitKey], ['section', 'EQUAL', sec]] : [['unit', 'EQUAL', unitKey]]);

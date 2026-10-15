@@ -466,7 +466,7 @@ async function estudiantesRepo(a) {
   let L = [], pt = '';
   do { const r = await fetch(`${BASE}/students?pageSize=300${pt ? '&pageToken=' + encodeURIComponent(pt) : ''}&key=${F.apiKey}`, { headers: { Authorization: 'Bearer ' + a } }); if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
     const j = await r.json(); (j.documents || []).forEach(d => L.push(docOf(d))); pt = j.nextPageToken || ''; } while (pt);
-  L = L.filter(s => /^[A-D]$/.test(s.section) && (!s.grade || s.grade === '6to')).map(s => ({ key: s.id, name: s.name, section: s.section })).sort((x, y) => String(x.name).localeCompare(String(y.name), 'es'));
+  L = L.filter(s => /^[A-D]$/.test(s.section) && (!s.grade || s.grade === '6to')).map(s => ({ key: s.id, dni: s.dni, name: s.name, section: s.section, area: s.area || '' })).sort((x, y) => String(x.name).localeCompare(String(y.name), 'es'));
   ls.set('moli2:tcache:est', { at: Date.now(), L }); return L;
 }
 async function vTrabajos() {
@@ -1237,6 +1237,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151243"></script><script src="archivos.js?v=202610151243"></script><script src="mando.js?v=202610151243"></script>
+<script src="pdftrabajo.js?v=202610151758"></script><script src="archivos.js?v=202610151758"></script><script src="mando.js?v=202610151758"></script>
 </body>
 </html>
