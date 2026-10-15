@@ -149,11 +149,11 @@
       const tres = r.dni.join(''), secL = r.sec >= 0 ? Li.sec.k[r.sec] : '', busca = () => st.roster.filter(e => String(e.dni || '').replace(/\D/g, '').endsWith(tres));
       let c0 = busca(); if (!c0.length && !st.fresco) { st.fresco = true; try { st.roster = await Docente.estudiantes(true); } catch (z) {} c0 = busca(); }   // no lo encontró: vuelve a pedir la lista (por si estaba vieja) y busca otra vez
       const cand = secL && c0.some(e => e.section === secL) ? c0.filter(e => e.section === secL) : c0;
-      const e = cand.length > 1 ? await elegir(cand, tres) : cand[0];
+      const e = cand.length > 1 ? await elegir(cand, tres) : cand.length ? cand[0] : await elegirTodos(st.roster, tres, secL);   // nadie con esos 3: la docente elige de la lista
       if (S !== st) return;
       const fin = (it, ms = 2200) => { st.ult = it; if (it.kind !== 'warn') st.lista.unshift(it); pintaLista(); try { navigator.vibrate && navigator.vibrate(it.kind === 'ok' ? 90 : [60, 60, 60]); } catch (z) {}
         msg(it.kind === 'ok' ? '¡Guardado! Pasa la siguiente tarjeta' : it.kind === 'dup' ? 'Ya tenía nota · pasa la siguiente' : 'Revisa la tarjeta'); setTimeout(() => { if (S === st) { st.busy = false; msg('Encaja la tarjeta en el recuadro'); } }, ms); };
-      if (!e) return fin({ kind: 'warn', name: `DNI terminado en ${tres}`, info: cand.length > 1 ? 'No elegiste a nadie.' : `Ningún estudiante tiene un DNI que termine en ${tres}.` }, 3200);
+      if (!e) return fin({ kind: 'warn', name: `DNI terminado en ${tres}`, info: cand.length ? 'No elegiste a nadie.' : `Ningún estudiante tiene un DNI que termine en ${tres}. No se guardó.` }, 3200);
       if (st.lista.some(z => z.key === e.key && z.sk === `${x.u.key}|${x.n}`)) { st.busy = false; return msg('Esta tarjeta ya se guardó ✅ Pasa a la siguiente'); }
       msg('Guardando…');
       const ans = x.qs.map((q, i) => { const m = r.marks[i]; return m >= 0 && !!q.opts[m] && q.opts[m].i === q.answer; }), score = ans.filter(Boolean).length, total = x.qs.length;
@@ -173,6 +173,14 @@
     function elegir(L, tres) { return new Promise(res => { const d = document.createElement('div'); d.className = 'sc-pick';
       d.innerHTML = `<p><b>Hay ${L.length} estudiantes con DNI terminado en ${esc(tres)}.</b> ¿De quién es esta tarjeta?</p>${L.map((e, i) => `<button data-k="${i}">${esc(e.name)} · 6° ${esc(e.section)}</button>`).join('')}<button data-k="-1">Ninguno</button>`;
       d.addEventListener('click', ev => { const k = ev.target.closest('[data-k]'); if (!k) return; ev.stopPropagation(); d.remove(); res(L[+k.dataset.k] || null); });
+      b.querySelector('.sc-ult').before(d); }); }
+    function elegirTodos(T, tres, secL) { return new Promise(res => { const d = document.createElement('div'); d.className = 'sc-pick';
+      const fila = e => `<button data-k="${e.key}">${esc(e.name)} · 6° ${esc(e.section)} <small>DNI ••${esc(String(e.dni || '').slice(-3) || '???')}</small></button>`;
+      const pinta = q => { const n = String(q || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''), L = T.filter(e => (!secL || n || e.section === secL) && (!n || String(e.name).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(n)));
+        d.querySelector('.sc-pl').innerHTML = L.slice(0, 60).map(fila).join('') || '<small>Nadie con ese nombre.</small>'; };
+      d.innerHTML = `<p><b>No encontré un DNI terminado en ${esc(tres)}${secL ? ` (sección ${esc(secL)})` : ''}.</b> Puede que el estudiante pintó mal un número. ¿De quién es esta tarjeta?</p><input class="sc-q" placeholder="🔎 Escribe su nombre…" autocomplete="off"><div class="sc-pl"></div><button data-k="-1">Ninguno (no guardar)</button>`;
+      pinta(''); d.querySelector('.sc-q').addEventListener('input', ev => pinta(ev.target.value));
+      d.addEventListener('click', ev => { const k = ev.target.closest('[data-k]'); if (!k) return; ev.stopPropagation(); d.remove(); res(T.find(e => e.key === k.dataset.k) || null); });
       b.querySelector('.sc-ult').before(d); }); }
     function pintaLista() {
       const u = st.ult; b.querySelector('.sc-ult').innerHTML = u ? `<div class="sc-row ${u.kind}"><span>${u.kind === 'ok' ? '✅' : u.kind === 'dup' ? '📌' : '⚠️'}</span><div><b>${esc(u.name)}</b><small>${esc(u.info)}</small></div>${u.score ? `<strong>${esc(u.score)}</strong>` : ''}</div>` : '';
