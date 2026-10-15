@@ -9,12 +9,16 @@
   const REPO = /repositorio/.test(location.pathname), TIPO = { inv: ['🔬', 'Investigación'] };
   const lista = () => { const m = yo(), L = m ? get('moli2:hojas:' + m.key, []) : []; return Array.isArray(L) ? L.filter(h => TIPO[h.ty]) : []; };
   const fecha = ms => ms ? new Date(ms).toLocaleDateString('es-PE', { day: 'numeric', month: 'long' }) : '';
-  const palabras = h => Object.entries(h.v || {}).filter(([k, v]) => typeof v === 'string' && !/^f\d[yl]$/.test(k)).map(([, v]) => v).join(' ').split(/\s+/).filter(Boolean).length;
+  const palabras = h => Object.entries(h.v || {}).filter(([k, v]) => typeof v === 'string' && !/^f\d[yl]$|_h$/.test(k)).map(([, v]) => v).join(' ').split(/\s+/).filter(Boolean).length;
   const EST = { ok: ['ok', '✅ ¡Publicado!'], pend: ['rv', '📨 En revisión'], no: ['mj', '✏️ Por mejorar: lee el consejo'] }, cache = {};
   const css = document.createElement('style');
   css.textContent = `#maBtn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(170px,calc(env(safe-area-inset-bottom) + 170px));z-index:26;display:flex;align-items:center;gap:8px;padding:9px 14px 9px 10px;border:3px solid #2b2547;border-radius:16px;background:linear-gradient(180deg,#ffd76a,#f5b62a);color:#3b2a00;font:900 14px Nunito,system-ui,sans-serif;box-shadow:0 6px 0 #2b2547,0 12px 24px rgba(0,0,0,.3);cursor:pointer;transition:transform .15s}
   #maBtn:hover{transform:translateY(-2px)}#maBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #2b2547}#maBtn .ic{font-size:24px;line-height:1}#maBtn b{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#e2483d;color:#fff;font-size:12px;display:grid;place-items:center}#maBtn[hidden],#maBtn b[hidden]{display:none}
   body.repo #maBtn{bottom:max(18px,env(safe-area-inset-bottom))}
+  #maBtn.cuadro{left:auto;bottom:auto;top:max(22px,calc(env(safe-area-inset-top) + 8px));width:62px;height:62px;padding:0;justify-content:center;border-radius:18px;background:linear-gradient(180deg,#fff7d6,#ffd76a);box-shadow:0 5px 0 #2b2547,0 10px 18px rgba(0,0,0,.25);font-size:0}
+  #maBtn.cuadro:hover{transform:translateY(-2px) rotate(-4deg)}#maBtn.cuadro .ic{font-size:36px}#maBtn.cuadro b{position:absolute;right:-6px;top:-6px;border:2px solid #fff}
+  body.open #maBtn.cuadro,body.tut #maBtn.cuadro,body.editando #maBtn.cuadro{opacity:0;pointer-events:none}
+  @media (max-height:500px),(max-width:600px){#maBtn.cuadro{width:48px;height:48px;border-radius:14px}#maBtn.cuadro .ic{font-size:27px}}
   #maWin{position:fixed;inset:0;z-index:85;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(8,26,45,.55);backdrop-filter:blur(3px)}#maWin[hidden]{display:none}
   #maWin .ma-c{width:min(640px,100%);max-height:100%;overflow:auto;border-radius:22px;border:4px solid #2b2547;background:#fbfaf6;font-family:Nunito,system-ui,sans-serif;color:#17324d;box-shadow:0 24px 60px rgba(0,0,0,.45)}
   .ma-h{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(115deg,#0b2e4f,#0a6aa1);color:#fff}.ma-h h3{flex:1;margin:0;font:900 22px Fraunces,Georgia,serif}.ma-h button{width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:18px;font-weight:900;cursor:pointer}
@@ -26,7 +30,7 @@
   .ma-e{padding:20px;text-align:center;font-weight:800;color:#4b6075}.ma-p{margin:0;font-size:13px;font-weight:700;color:#4b6075}
   @media (max-width:520px){.ma-f{flex-wrap:wrap}.ma-f .t{flex-basis:calc(100% - 60px)}}`;
   document.head.appendChild(css); if (REPO) document.body.classList.add('repo');
-  const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'maBtn'; btn.innerHTML = '<span class="ic">📁</span>Mis archivos<b hidden></b>'; document.body.appendChild(btn);
+  const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'maBtn'; btn.innerHTML = '<span class="ic">📁</span>Mis archivos<b hidden></b>'; document.body.appendChild(btn); btn.title = 'Mis archivos';
   const win = document.createElement('div'); win.id = 'maWin'; win.hidden = true; document.body.appendChild(win);
   function pintarBtn() { const m = yo(); btn.hidden = !m || !!(m.teacher || m.docente); const n = lista().filter(h => h.st === 'por').length, b = btn.querySelector('b'); b.hidden = !n; b.textContent = n; }
   function estado(h) { if (h.st !== 'env') return ['', '⏳ Por concluir']; const e = EST[cache[h.rid]]; return e || ['en', '📨 Enviado']; }
@@ -55,6 +59,9 @@
   });
   addEventListener('keydown', e => { if (e.key === 'Escape' && !win.hidden) win.hidden = true; });
   addEventListener('moli2:me', pintarBtn); addEventListener('storage', pintarBtn); addEventListener('focus', pintarBtn);
+  // en el Aula: un cuadrito al costado de BIBLIOTECA (donde la profe tiene el 🎮)
+  const lugar = () => { const m = document.getElementById('mandoBtn'), l = m && !m.hidden && m.offsetWidth ? m : document.getElementById('bibLink'); if (!l) return; const r = l.getBoundingClientRect(); btn.style.right = Math.round(innerWidth - r.left + 12) + 'px'; };
+  if (!REPO && document.getElementById('bibLink')) { btn.classList.add('cuadro'); lugar(); addEventListener('resize', lugar); setInterval(lugar, 1500); }
   window.MisArchivos = { pintar, abrir: () => btn.click() };
   pintarBtn();
 })();

@@ -102,12 +102,12 @@ button{cursor:pointer}
 .wd-tt input{width:100%;padding:4px 0;border:0;border-bottom:2px solid #c9d6ea;font:700 22px Cambria,Georgia,serif;color:#1f3864;outline:0}.wd-tt input:focus{border-bottom-color:#2b579a}
 .wd-ps{margin-top:22px}.wd-ps h2{margin:0;padding-bottom:4px;border-bottom:1px solid #8eaadb;font:700 19px Cambria,Georgia,serif;color:#1f3864}.wd-ps h2 span{display:inline-block;margin-right:6px;padding:1px 9px;border-radius:4px;background:#2b579a;color:#fff;font:700 12px/1.6 Calibri,Arial,sans-serif;letter-spacing:.06em;vertical-align:3px}
 .wd-h{margin:6px 0 4px;font-size:13.5px;font-style:italic;color:#777}
-.wd-pg textarea{display:block;width:100%;min-height:52px;padding:6px 8px;border:1px dashed transparent;border-left:3px solid #dbe5f3;border-radius:2px;background:transparent;font:inherit;line-height:1.55;resize:none;overflow:hidden;outline:0}
-.wd-pg textarea:hover{border-color:#dde4ee}.wd-pg textarea:focus{border-color:#9fb6d9;border-left-color:#2b579a;background:#fbfcfe}
+.wd-pg .wd-ed{display:block;width:100%;min-height:52px;padding:6px 8px;border:1px dashed transparent;border-left:3px solid #dbe5f3;border-radius:2px;background:transparent;font:inherit;line-height:1.55;resize:none;overflow:hidden;outline:0}
+.wd-pg .wd-ed:hover{border-color:#dde4ee}.wd-pg .wd-ed:focus{border-color:#9fb6d9;border-left-color:#2b579a;background:#fbfcfe}
 .wd-fu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}.wd-fu table{width:100%;border-collapse:collapse;font-size:13.5px}
 .wd-fu caption{text-align:left;padding:3px 8px;background:#2b579a;color:#fff;font-weight:700}.wd-fu th{width:40%;padding:4px 6px;border:1px solid #b4c6e7;background:#f2f6fc;text-align:left;font-weight:700;color:#1f3864;vertical-align:top}.wd-fu th small{display:block;font-weight:600;color:#2e7d32}
 .wd-fu td{border:1px solid #b4c6e7;padding:0}.wd-fu input{width:100%;padding:5px 6px;border:0;font:inherit;outline:0;background:transparent}.wd-fu input:focus{background:#fbfcfe;box-shadow:inset 0 0 0 2px #9fb6d9}.wd-fu input[data-link]{color:#0563c1;text-decoration:underline}
-.wd-pre{display:flex;align-items:flex-start;gap:8px;margin:4px 0}.wd-pre b{flex:none;padding-top:7px;color:#1f3864}.wd-pre textarea{min-height:36px}.wd-pre input{flex:1;padding:6px 8px;border:0;border-bottom:1px dashed #b4c6e7;font:inherit;outline:0}
+.wd-pre{display:flex;align-items:flex-start;gap:8px;margin:4px 0}.wd-pre b{flex:none;padding-top:7px;color:#1f3864}.wd-pre .wd-ed{flex:1;min-height:36px}.wd-pre input{flex:1;padding:6px 8px;border:0;border-bottom:1px dashed #b4c6e7;font:inherit;outline:0}
 .wd-tb{width:100%;margin-top:6px;border-collapse:collapse;font-size:14px}.wd-tb th{padding:5px 8px;border:1px solid #b4c6e7;background:#f2f6fc;color:#1f3864}.wd-tb td{border:1px solid #b4c6e7;padding:0}.wd-tb input{width:100%;padding:6px;border:0;font:inherit;outline:0;text-align:center}
 .wd-ro{margin:0 0 14px;padding:10px 12px;border-radius:6px;background:#e8f0fb;color:#1f3864;font-weight:700;font-size:14px}
 .g-doc small b{display:inline!important}
@@ -116,6 +116,8 @@ button{cursor:pointer}
 .wd-dc{width:min(460px,100%);display:grid;gap:10px;padding:20px;border-radius:20px;background:#fff;border:3px solid #2b579a;box-shadow:0 24px 60px rgba(0,0,0,.4)}.wd-dc>b{font:900 21px var(--serif);color:var(--navy)}.wd-dc>span{font-weight:700;color:var(--ink2)}
 .wd-dc input{padding:12px 14px;border:2px solid var(--line);border-radius:14px;font-weight:800;font-size:16px}.wd-dc>div{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.wd-e{margin:0;font-weight:800;color:var(--ink2)}
 .wd-dc .wd-ls{display:grid;justify-content:stretch;gap:8px;max-height:50vh;overflow:auto}.wd-ls button{display:flex;align-items:center;gap:10px;padding:10px;border:2px solid var(--line);border-radius:14px;background:#fff;text-align:left;cursor:pointer}.wd-ls button:hover{border-color:#2b579a}.wd-ls i{display:grid;place-items:center;width:36px;height:42px;border-radius:6px;background:#2b579a;color:#fff;font:900 18px Georgia,serif;font-style:normal}.wd-ls b{display:block;color:var(--navy)}.wd-ls small{font-weight:800;color:var(--ink2)}
+.wd-ed{cursor:text;word-break:break-word;white-space:pre-wrap}.wd-ed:empty:before{content:attr(data-ph);color:#9aa5b1;pointer-events:none}.wd-ed[contenteditable=false]{cursor:default}
+.wd-fm{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #c8c8c8;border-radius:6px;background:#fff;color:#333;font:600 13px Carlito,Calibri,Arial,sans-serif;cursor:pointer}.wd-fm:hover{background:#e8eefb;border-color:#2b579a}.wd-fm b{font:900 15px Georgia,serif}.wd-fm.mk span{display:inline-block;padding:0 3px;border-radius:3px;background:#fff176}
 .wd-ck{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:15px;cursor:pointer}.wd-ck input{width:18px;height:18px}
 .wd-st{display:flex;gap:18px;padding:5px 14px;background:#2b579a;color:#e8eefb;font-size:12.5px;flex:none;overflow-x:auto;white-space:nowrap}.wd-st .wd-np{background:rgba(255,255,255,.18);color:#fff}
 .wd-no{animation:wdNo .45s}@keyframes wdNo{25%{transform:translateX(-6px);background:#fde8e6}75%{transform:translateX(6px)}}
@@ -671,10 +673,10 @@ function abrirHojaDoc(id) {
   const G = HOJA[h.ty], t = tipo(h.ty), v = h.v || (h.v = {}), ro = h.st === 'env'; let d = document.getElementById('hoja');
   if (!d) { d = document.createElement('div'); d.id = 'hoja'; document.body.appendChild(d); }
   const dis = ro ? ' disabled' : '';
-  const ta = (id, ph, r = 3) => `<textarea data-k="${id}" rows="${r}" placeholder="${esc(ph || '')}" spellcheck="true" lang="es"${dis}>${esc(v[id] || '')}</textarea>`;
+  const ta = (id, ph, r = 3) => `<div class="wd-ed" data-k="${id}" data-ed data-ph="${esc(ph || '')}" style="min-height:${(Math.max(1, r) * 1.55 + .8).toFixed(2)}em" contenteditable="${ro ? 'false' : 'true'}" spellcheck="true" lang="es">${v[id + '_h'] ? limpiaH(v[id + '_h']) : esc(v[id] || '').replace(/\n/g, '<br>')}</div>`;
   const inp = (id, ph, ex = '') => `<input data-k="${id}" ${ex} placeholder="${esc(ph || '')}" value="${esc(v[id] || '')}"${dis}>`;
   d.innerHTML = `<div class="wd-bar"><span class="wd-w">W</span><b>${esc(h.t || 'Mi ' + t[2].toLowerCase())} - Word de Molí</b><span class="wd-sv" id="wdSv">${ro ? '📨 Enviado' : '💾 Guardado'}</span>${ro ? '<button type="button" class="wd-ok" data-hcopia>✏️ Hacer una copia para corregir</button>' : '<button type="button" class="wd-ok" data-hok>💾 Guardar trabajito</button>'}<button type="button" class="wd-x" data-hx aria-label="Cerrar">✕</button></div>
-  <div class="wd-rib"><span class="on">Inicio</span><span>Insertar</span><span>Diseño</span><span>Revisar</span><i></i><span class="wd-f">Calibri</span><span class="wd-f">11</span><b>N</b><em>K</em><u>S</u><i></i><span class="wd-np">🚫📋 Pegar desactivado · sólo en Link</span></div>
+  <div class="wd-rib">${ro ? '' : '<button type="button" class="wd-fm" data-fmt="bold" title="Negrita"><b>N</b> Negrita</button><button type="button" class="wd-fm mk" data-fmt="mark" title="Marcador"><span>🖍️</span> Marcador</button><i></i>'}<span class="wd-np">🚫📋 Pegar desactivado · sólo en Link</span></div>
   <div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
     <p class="wd-k">REVISTA INNOVADORA · GUÍA PASO A PASO</p><h1>${t[1]} ${esc(t[2])}</h1><p class="wd-sub">${esc(G.sub)} Usa mínimo 3 citas parafraseadas dentro de tu trabajo y escribe sus fuentes al final.</p>
     <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
@@ -686,16 +688,39 @@ function abrirHojaDoc(id) {
   </div></div>
   <div class="wd-st"><span>Página 1 de 1</span><span id="wdN">${hojaPal(h)} palabras</span><span>Español (Perú)</span><span class="wd-np">🚫 Escribe con tus palabras</span></div>`;
   d.hidden = false; d.dataset.id = id; document.body.style.overflow = 'hidden';
-  d.querySelectorAll('textarea').forEach(crecer); d.querySelectorAll('[data-k]').forEach(x => HPREV.set(x, x.value));
+  d.querySelectorAll('[data-k]').forEach(x => HPREV.set(x, prevDe(x)));
 }
 window.abrirHojaDoc = abrirHojaDoc; window.nuevaHoja = ty => ME && HOJA[ty] ? hojaNueva(ty).id : null;
 function abrirHoja(ty) { if (!ME) return avisoDni(); abrirHojaDoc((hojaBorr(ty) || hojaNueva(ty)).id); }
+// el texto de cada recuadro (con negrita y marcador): sólo se guardan <b>, el resaltado amarillo y los saltos de línea
+const valDe = x => x.innerText.replace(/\u00a0/g, ' ').replace(/\n+$/, '');
+const prevDe = x => x.hasAttribute('data-ed') ? { h: x.innerHTML, n: x.innerText.length } : { h: x.value, n: String(x.value || '').length };
+function limpiaH(html) {
+  const t = document.createElement('template'); t.innerHTML = String(html || '');
+  const out = n => { let o = ''; n.childNodes.forEach(c => {
+    if (c.nodeType === 3) { o += esc(c.nodeValue); return; } if (c.nodeType !== 1) return;
+    const tg = c.tagName, inner = out(c), st = c.style || {}, bg = st.backgroundColor || '', fw = st.fontWeight;
+    if (tg === 'BR') o += '<br>';
+    else if (tg === 'DIV' || tg === 'P') o += (o && !o.endsWith('<br>') ? '<br>' : '') + inner;
+    else { let x = inner; if (tg === 'B' || tg === 'STRONG' || fw === 'bold' || +fw >= 600) x = '<b>' + x + '</b>';
+      if (tg === 'MARK' || (bg && !/transparent|rgba\(0, 0, 0, 0\)|initial|inherit/.test(bg))) x = '<span style="background-color:#fff176">' + x + '</span>'; o += x; } });
+    return o; };
+  return out(t.content).slice(0, 40000);
+}
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('[data-fmt]')) e.preventDefault(); }, true);   // que no se pierda lo que tienen seleccionado
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-fmt]'); if (!b) return; const ed = document.activeElement;
+  if (!ed || !ed.hasAttribute || !ed.hasAttribute('data-ed')) return toast('✏️ Primero selecciona con el mouse las palabras de tu guía.');
+  if (b.dataset.fmt === 'bold') document.execCommand('bold');
+  else { document.execCommand('styleWithCSS', false, true); const on = /255,\s*241,\s*118/.test(document.queryCommandValue('backColor') || document.queryCommandValue('hiliteColor') || ''); document.execCommand('hiliteColor', false, on ? 'transparent' : '#fff176'); }
+  ed.dispatchEvent(new Event('input', { bubbles: true }));
+});
 const crecer = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; };
 const HPREV = new WeakMap();
 let hojaT = 0;
 function hojaGuardar() {
   const d = $('#hoja'); if (!d || d.hidden) return; const h = hojaDoc(d.dataset.id); if (!h || h.st === 'env') return;
-  d.querySelectorAll('[data-k]').forEach(x => { const k = x.dataset.k; if (k === '_t') h.t = x.value; else h.v[k] = x.type === 'checkbox' ? x.checked : x.value; });
+  d.querySelectorAll('[data-k]').forEach(x => { const k = x.dataset.k; if (k === '_t') h.t = x.value; else if (x.hasAttribute('data-ed')) { h.v[k] = valDe(x); h.v[k + '_h'] = limpiaH(x.innerHTML); } else h.v[k] = x.type === 'checkbox' ? x.checked : x.value; });
   h.np = hojaPal(h); hojaPut(h); const s = $('#wdSv'), n = $('#wdN'); if (s) s.textContent = '💾 Guardado'; if (n) n.textContent = hojaPal(h) + ' palabras';
 }
 function noPegar(x) { toast('🚫 Aquí no se puede pegar: escríbelo con tus propias palabras. Sólo puedes pegar en «Link».', 3600); if (x) { x.classList.remove('wd-no'); void x.offsetWidth; x.classList.add('wd-no'); } }
@@ -703,9 +728,9 @@ function noPegar(x) { toast('🚫 Aquí no se puede pegar: escríbelo con tus pr
 document.addEventListener('beforeinput', e => { if (!e.target.closest || !e.target.closest('#hoja') || e.target.closest('[data-link]')) return; if (/^insertFrom(Paste|Drop|Yank)/.test(e.inputType || '')) { e.preventDefault(); noPegar(e.target); } }, true);
 document.addEventListener('input', e => {
   const x = e.target; if (!x.closest || !x.closest('#hoja') || !x.dataset.k) return;
-  const prev = HPREV.get(x) ?? '';
-  if (!x.hasAttribute('data-link') && x.type !== 'checkbox' && x.value.length - prev.length > 60) { x.value = prev; noPegar(x); return; }   // el teclado del celular pega de golpe: también se frena
-  HPREV.set(x, x.value); if (x.tagName === 'TEXTAREA') crecer(x);
+  const prev = HPREV.get(x) || { h: '', n: 0 }, ed = x.hasAttribute('data-ed'), now = prevDe(x);
+  if (!x.hasAttribute('data-link') && x.type !== 'checkbox' && now.n - prev.n > 60) { if (ed) x.innerHTML = prev.h; else x.value = prev.h; noPegar(x); return; }   // el teclado del celular pega de golpe: también se frena
+  HPREV.set(x, now);
   const s = $('#wdSv'); if (s) s.textContent = '✏️ Guardando…'; clearTimeout(hojaT); hojaT = setTimeout(hojaGuardar, 500);
 });
 document.addEventListener('change', e => { if (e.target.closest && e.target.closest('#hoja') && e.target.type === 'checkbox') hojaGuardar(); });
@@ -891,7 +916,7 @@ function smAceptado(w) { const m = /^🔎 Similitud (\d+)%/.exec(w.fb || ''); re
 async function vSimilitud() {
   const V = $('#view');
   if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
-  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2><button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y busca sus frases en <b>internet</b> y revisa <b>indicios de IA</b> (; — palabras rarísimas): verás en colores lo que es <b>igualito</b> (copiar y pegar), de quién lo tomó y el link de la página. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2><button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y revisa <b>indicios de IA</b> (signos raros como ; — /): verás en colores lo que es <b>igualito</b> (copiar y pegar) y de quién lo tomó. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
     CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; if (ROLE.t) limpiarDevueltos(a); setCount(p.filter(w => !miSec(w)).length); pintaSim();
@@ -929,26 +954,8 @@ function smMarcar(txt, T, col, sel) {                                  // el tex
   return o + esc(txt.slice(at));
 }
 const smSinGuia = t => String(t || '').replace(/^\s*PASO\b.*$|Hallazgo\s*\d+\s*:?/gmi, m => ' '.repeat(m.length));
-async function smWeb(w, r) {                                          // 🌐 internet: busca sus frases tal cual en Wikipedia (se puede desde la página) y deja enlaces a Google para lo demás
-  const txt = smSinGuia(w.d), F = [];
-  txt.replace(/[^.!?¿¡\n]+/g, (m, i) => { const T = r.T.filter(t => t.i >= i && t.j <= i + m.length); if (T.length >= 8 && T.filter(t => r.due[r.T.indexOf(t)] >= 0).length < T.length / 2) F.push({ i: T[0].i, j: T[T.length - 1].j, T }); return m; });
-  const P = F.sort((a, b) => b.T.length - a.T.length).slice(0, 10).map(f => { const k = Math.max(0, Math.floor((f.T.length - 9) / 2)), Q = f.T.slice(k, k + 9);
-    return { ...f, frase: w.d.slice(f.i, f.j).trim(), q: w.d.slice(Q[0].i, Q[Q.length - 1].j).replace(/["“”«»]/g, '') }; });
-  r.web = { st: 'busca', F: P, hits: [] }; if (SIM.w === w) pintaInforme();
-  try { await Promise.all(P.map(async f => {
-      const u = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent('"' + f.q + '"')}&srlimit=1&srprop=snippet&format=json&origin=*`;
-      const j = await (await fetch(u)).json(), h = j.query && j.query.search && j.query.search[0];
-      if (h) f.hit = { t: h.title, url: 'https://es.wikipedia.org/wiki/' + encodeURIComponent(h.title.replace(/ /g, '_')) }; }));
-    r.web.st = 'ok';
-  } catch (e) { r.web.st = 'err'; }
-  r.web.hits = P.filter(f => f.hit); const n = r.web.hits.reduce((s, f) => s + f.T.length, 0); r.web.p = r.T.length ? Math.round(100 * n / r.T.length) : 0;
-  if (SIM.w === w && !$('#modal').hidden) pintaInforme(); pintaSim();
-}
-const smGoogle = q => 'https://www.google.com/search?q=' + encodeURIComponent('"' + q + '"');
-// 🤖 Indicios de IA: signos y palabras que un niño de 6.° casi no usa (son pistas, no una prueba)
+// 🤖 Indicios de IA: signos que un niño de 6.° casi no usa (; — / paréntesis, formato de chat) (son pistas, no una prueba)
 const IA_FR = ['como modelo de lenguaje', 'como inteligencia artificial', 'claro, aqui tienes', 'aqui tienes', 'por supuesto!', 'espero que esto te ayude', 'espero que te sirva', 'chatgpt', 'gemini', 'copilot', 'si necesitas mas', 'here is', 'sure,', 'however', 'in conclusion'];
-const IA_PAL = ['crucial', 'fundamental', 'cabe destacar', 'cabe mencionar', 'es importante destacar', 'es importante senalar', 'en el ambito', 'desempena un papel', 'juega un papel', 'papel crucial', 'fascinante', 'intrincad', 'multifacetic', 'sinergia', 'paradigma', 'asimismo', 'no obstante', 'por consiguiente', 'en definitiva', 'en este sentido', 'en sintesis', 'por ende', 'radica en', 'se erige', 'aspecto clave', 'es esencial', 'profundizar', 'potenciar', 'optimizar', 'integral', 'notablemente', 'significativamente', 'un sinfin', 'abordar', 'sumergirse', 'adentrarnos', 'en la actualidad', 'diversos', 'eficazmente', 'primordial', 'indispensable', 'ademas de ello', 'en conclusion,', 'en resumen,', 'mencionado anteriormente', 'amplia gama', 'variedad de', 'contribuye a', 'promover', 'garantizar', 'versatil', 'innovador', 'exhaustiv', 'meticulos'];
-const IA_OK = new Set(['microorganismos', 'microorganismo', 'investigacion', 'caracteristicas', 'caracteristica', 'fermentacion', 'unicelulares', 'reproduccion', 'enfermedades', 'alimentacion', 'temperaturas', 'experimentos', 'conclusiones', 'informacion', 'descomposicion', 'microscopico', 'microscopicos', 'medicamentos', 'organizacion', 'principalmente', 'universidad', 'nutricionales', 'reproductores', 'fotosintesis', 'antibioticos', 'responsabilidad', 'contaminacion', 'transformacion', 'multicelulares', 'enfermedad', 'respiratorio', 'reproductor', 'desventajas', 'inmunologico', 'inmunitario', 'naturalmente', 'fermentaciones']);
 function smIA(w, sinPrev) {
   const raw = String(w.d || ''), t = smSinGuia(raw).replace(/https?:\/\/\S+|www\.\S+/g, m => ' '.repeat(m.length)), lo = norm(t), M = [], P = [];   // M: marcas en el texto · P: pistas encontradas
   const pista = (ic, nom, n, pts, ej) => { if (n) P.push({ ic, nom, n, pts: Math.min(pts * n, pts * 3), ej: [...new Set(ej)].slice(0, 6) }); };
@@ -959,36 +966,11 @@ function smIA(w, sinPrev) {
   const md = busca(/\*\*[^*\n]+\*\*|^\s*#{1,4}\s|^\s*[•▪●◦-]\s|^\s*\d+\.\s/gm); pista('✳️', 'Formato de chat (**negritas**, viñetas o listas)', md.length, 2, md.map(x => x.slice(0, 30)));
   const dp = busca(/[^\n:]{3,30}:(?=\s)/g, m => !/(autor|a[nñ]o|tema|link|enlace|fuente|p[aá]gina|t[ií]tulo|libro|sitio|fecha|nombre|secci[oó]n)\s*(o\s+\S+)?:$/i.test(m[0].trim())); pista(':', 'Muchos dos puntos ( : )', dp.length >= 3 ? dp.length - 2 : 0, 1, dp.map(x => x.trim().slice(-20)));
   const fr = IA_FR.filter(f => lo.includes(f)); fr.forEach(f => { let i = lo.indexOf(f); while (i >= 0) { M.push([i, i + f.length]); i = lo.indexOf(f, i + 1); } }); pista('🤖', 'Frases que deja el chat de IA', fr.length, 6, fr);
-  const pl = IA_PAL.filter(f => new RegExp('\\b' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(lo)); pl.forEach(f => { const re = new RegExp('\\b' + f + '\\w*', 'g'); let m; while ((m = re.exec(lo))) M.push([m.index, m.index + m[0].length]); });
-  pista('🎩', 'Palabras de adulto que suele usar la IA', pl.length, 1, pl);
-  const lg = [], seen = new Set(); smTok(t).forEach(x => { if (x.w.length >= 13 && !IA_OK.has(x.w) && !seen.has(x.w)) { seen.add(x.w); lg.push(raw.slice(x.i, x.j)); M.push([x.i, x.j]); } });
-  pista('📏', 'Palabras muy largas o complicadas', Math.floor(lg.length / 3), 1, lg);
-  // ✍️ redacción perfecta: las tildes las corrige el celular o Word, pero las REGLAS de escritura no (mayúscula al empezar, punto al terminar,
-  //    coma después de cada conector, nada de oraciones sin fin ni palabras repetidas). Un niño de 6.° casi siempre se salta alguna.
-  const ORS = t.split(/(?<=[.!?])\s+|\n+/).map(x => x.trim()).filter(x => x.split(/\s+/).length >= 4), nPal = smTok(t).length;
-  const mayus = ORS.filter(x => /^[¿¡«"“(]*[\p{Lu}0-9]/u.test(x)).length, punto = ORS.filter(x => /[.!?…:»")]$/.test(x)).length;
-  const CONx = (lo.match(/(^|[.\n]\s*)(sin embargo|por lo tanto|ademas|asimismo|por otro lado|finalmente|es decir|por ejemplo|en conclusion|por ultimo|en cambio|por eso)\b,?/gm) || []), conC = CONx.filter(x => x.endsWith(',')).length;
-  const sinFin = ORS.filter(x => x.split(/\s+/).length > 35 && (x.match(/,/g) || []).length < 2).length, rep = /\b(\p{L}{3,})\s+\1\b/iu.test(t);
-  const reglas = ORS.length >= 4 && nPal >= 60 && mayus === ORS.length && punto >= ORS.length - 1 && CONx.length >= 2 && conC === CONx.length && !sinFin && !rep;
-  pista('✍️', 'Redacción perfecta (cumple todas las reglas de escritura)', reglas ? 1 : 0, 2, ['mayúscula y punto en cada oración, coma después de cada conector, sin oraciones sin fin']);
-  const PAR = raw.split(/\n+/).map(x => smSinGuia(x).trim()).filter(x => x.split(/\s+/).length >= 15).map(x => x.split(/\s+/).length), mP = PAR.reduce((s, x) => s + x, 0) / (PAR.length || 1);
-  const dsv = Math.sqrt(PAR.reduce((s, x) => s + (x - mP) ** 2, 0) / (PAR.length || 1));
-  pista('🧱', 'Párrafos casi del mismo tamaño', PAR.length >= 3 && dsv / mP < .18 ? 1 : 0, 1, [`${PAR.length} párrafos de unas ${Math.round(mP)} palabras`]);
-  // 📐 oraciones largas y muy ordenadas (muchas comas bien puestas)
-  const OR = t.split(/[.!?]+\s|\n+/).map(x => x.trim()).filter(x => x.split(/\s+/).length >= 4), nw = OR.reduce((s, x) => s + x.split(/\s+/).length, 0), nc = (t.match(/,/g) || []).length;
-  pista('📐', 'Oraciones largas y muy ordenadas', OR.length >= 3 && nw / OR.length >= 20 && nc / OR.length >= 2 ? 1 : 0, 2, [`${Math.round(nw / OR.length)} palabras por oración`]);
-  // 🔗 conectores de redacción en cadena
-  const CN = ['ademas', 'por otro lado', 'asimismo', 'en conclusion', 'finalmente', 'por lo tanto', 'sin embargo', 'en primer lugar', 'en segundo lugar', 'por ultimo', 'de igual manera', 'del mismo modo', 'es decir', 'en otras palabras', 'por otra parte'].filter(c => new RegExp('(^|[.\\n]\\s*)' + c + '\\b', 'm').test(lo));
-  pista('🔗', 'Muchos conectores de redacción', CN.length >= 4 ? CN.length - 3 : 0, 1, CN);
-  // 🎯 listas de tres («X, Y y Z»), muy típicas de la IA
-  const TR3 = (t.match(/\b[\p{L}]+(?: [\p{L}]+)?, [\p{L}]+(?: [\p{L}]+)? y [\p{L}]+/gu) || []);
-  pista('🎯', 'Listas de tres («esto, eso y aquello»)', TR3.length >= 3 ? TR3.length - 2 : 0, 1, TR3.map(x => x.slice(0, 40)));
-  // 🪞 escribe distinto a sus otros trabajos publicados
-  if (!sinPrev) { const ant = (SIM.src || []).filter(x => x.k === w.k && x.id !== w.id).map(x => smIA(x, 1).pts); if (ant.length && Math.max(...ant) <= 2 && P.reduce((s, x) => s + x.pts, 0) >= 6) pista('🪞', 'Escribe muy distinto a sus otros trabajos', 1, 3, [`en sus ${ant.length} trabajo${ant.length > 1 ? 's' : ''} anterior${ant.length > 1 ? 'es' : ''} no había estas marcas`]); }
-  const pts = P.reduce((s, x) => s + x.pts, 0), nv = fr.length || pts >= 8 || P.length >= 4 ? 2 : pts >= 3 || P.length >= 2 ? 1 : 0;   // varias pistas distintas pesan más que una sola
-  return { P, M: M.sort((a, b) => a[0] - b[0]), pts, nv, lg, pl };
+  const sl = busca(/(?<![\d/:.\w])\/(?![\d/])|\b[\p{L}]+\/[\p{L}]+\b/gu, m => !/^\d/.test(m[0])); pista('/', 'Barra ( / ) como «y/o»', sl.length, 2, sl);
+  const pts = P.reduce((s, x) => s + x.pts, 0), nv = fr.length || pts >= 6 || P.length >= 3 ? 2 : pts >= 2 ? 1 : 0;   // varias pistas distintas pesan más que una sola
+  return { P, M: M.sort((a, b) => a[0] - b[0]), pts, nv, lg: [], pl: [] };
 }
-const IA_V = [['v0', '🙂 Pocos indicios', 'Parece escrito por un niño: signos y palabras normales.'], ['v2', '🤔 Algunos indicios', 'Tiene signos o palabras que un niño de 6.° casi no usa. Pregúntale qué significan.'], ['v3', '🤖 Muchos indicios de IA', 'Tiene muchas marcas típicas de la Inteligencia Artificial. Pídele que lo explique con sus palabras.']];
+const IA_V = [['v0', '🙂 Pocos indicios', 'Parece escrito por un niño: no usa signos raros.'], ['v2', '🤔 Algunos indicios', 'Usa signos que un niño de 6.° casi no usa (; — / …). Pregúntale cómo lo escribió.'], ['v3', '🤖 Muchos indicios de IA', 'Tiene muchas marcas típicas de la Inteligencia Artificial. Pídele que lo explique con sus palabras.']];
 function smIAHtml(w, r) {
   const A = r.ia, v = IA_V[A.nv]; let o = '', at = 0; const txt = String(w.d || '');
   A.M.forEach(([i, j]) => { if (i < at) return; o += esc(txt.slice(at, i)) + `<mark class="ci">${esc(txt.slice(i, j))}</mark>`; at = j; }); o += esc(txt.slice(at));
@@ -999,14 +981,6 @@ function smIAHtml(w, r) {
     ${A.nv && PR.length ? `<div class="sm-pr"><b>🗣️ Pregúntale (si lo escribió él, sabrá responder):</b>${PR.map(x => `<span>¿Qué significa «${esc(x)}»? Explícalo con tus palabras.</span>`).join('')}<span>¿Dónde encontraste esta información? Muéstrame la página.</span></div>` : ''}` : ''}
     <p class="sm-wl" style="font-size:12.5px">⚠️ Son pistas, no una prueba: ningún detector sabe con seguridad si lo hizo una IA. Lo mejor es pedirle que te lo explique con sus palabras.</p></div>`;
 }
-function smWebHtml(r) {
-  const W = r.web; if (!W) return '';
-  const cab = `<h4>🌐 Similitud en internet ${W.st === 'ok' ? `<span class="sm-p ${W.p >= 25 ? 'v3' : W.p >= 10 ? 'v2' : W.hits.length ? 'v1' : 'v0'}">${W.p}% igual a internet</span>` : ''}</h4>`;
-  if (W.st === 'busca') return `<div class="sm-web">${cab}<p class="sm-wl">⏳ Buscando sus frases en internet (Wikipedia)…</p></div>`;
-  return `<div class="sm-web">${cab}${W.st === 'err' ? '<p class="sm-wl">📶 No pude buscar en internet ahora. Usa los botones de Google de abajo.</p>' : ''}
-    ${W.hits.length ? W.hits.map(f => `<div class="sm-wh"><q>${esc(f.frase)}</q><a class="btn blue" href="${esc(f.hit.url)}" target="_blank" rel="noopener">📖 Wikipedia: ${esc(f.hit.t)}</a></div>`).join('') : W.st === 'ok' ? '<p class="sm-wl">📗 Ninguna frase aparece igualita en Wikipedia.</p>' : ''}
-    ${W.F.filter(f => !f.hit).length ? `<details><summary>🔎 Revisar otras frases en Google (${W.F.filter(f => !f.hit).length})</summary>${W.F.filter(f => !f.hit).map(f => `<div class="sm-wh"><q>${esc(f.frase)}</q><a class="btn soft" href="${esc(smGoogle(f.q))}" target="_blank" rel="noopener">🔎 Buscar en Google</a></div>`).join('')}<p class="sm-wl">Si Google muestra la frase <b>igualita</b> en una página, es copia de internet: ábrela y compárala.</p></details>` : ''}</div>`;
-}
 async function revisarSim(id) {
   const w = (SIM.pend || []).find(x => x.id === id); if (!w) return;
   const M = $('#modal'); M.hidden = false; M.dataset.id = id; M._w = w; SIM.w = w; SIM.sel = -1;
@@ -1015,7 +989,7 @@ async function revisarSim(id) {
   const pasos = Math.max(lib.length, 1), ms = Math.min(140, 2200 / pasos);
   for (let i = 0; i < pasos; i++) { if (M.dataset.id !== id || M.hidden) return; const x = lib[i], es = $('#smEs'), ba = $('#smBa');
     if (es) es.textContent = x ? `📖 Comparando con «${x.t}» de ${firstName(x.n)}…` : '📖 Comparando…'; if (ba) ba.style.width = (100 * (i + 1) / pasos) + '%'; await new Promise(r => setTimeout(r, ms)); }
-  SIM.res[id] = smComparar(w); SIM.res[id].ia = smIA(w); if (M.dataset.id === id && !M.hidden) pintaInforme(); pintaSim(); smWeb(w, SIM.res[id]);
+  SIM.res[id] = smComparar(w); SIM.res[id].ia = smIA(w); if (M.dataset.id === id && !M.hidden) pintaInforme(); pintaSim();
 }
 const SM_MAX = 15;                                                     // para aprobar: 15 % de similitud o menos
 const smTotal = r => Math.min(100, r.p + (r.web && r.web.st === 'ok' ? r.web.p : 0));
@@ -1032,7 +1006,7 @@ function smConsejo(w, r) {                                             // el con
 }
 async function revisarTodos(b) {                                      // revisa toda la lista de una vez (sin animación)
   b.disabled = true; const L = (SIM.pend || []).filter(w => !SIM.res[w.id]);
-  for (let i = 0; i < L.length; i++) { b.textContent = `⏳ Revisando ${i + 1} de ${L.length}…`; const w = L[i]; SIM.res[w.id] = smComparar(w); SIM.res[w.id].ia = smIA(w); pintaSim(); await smWeb(w, SIM.res[w.id]); }
+  for (let i = 0; i < L.length; i++) { b.textContent = `⏳ Revisando ${i + 1} de ${L.length}…`; const w = L[i]; SIM.res[w.id] = smComparar(w); SIM.res[w.id].ia = smIA(w); pintaSim(); await new Promise(r => setTimeout(r, 30)); }
   b.textContent = '✅ Todos revisados'; b.disabled = false; toast('✅ Listo: ya tienen su % todos los trabajos.'); pintaSim();
 }
 async function limpiarDevueltos(a) {                                   // los devueltos se guardan 21 días para que el estudiante lea su consejo; luego se borran solos
@@ -1050,14 +1024,14 @@ function pintaInforme() {
   const c = ['var(--green2)', '#ca8a04', '#ea580c', 'var(--red)'][nv], fs = SIM.sel >= 0 ? r.fuentes[SIM.sel] : null;
   M.innerHTML = `<article class="art" role="dialog" aria-modal="true" style="width:min(1100px,100%)"><div class="hero"><small>🔎 Reporte de similitud · ${r.nLib} libritos revisados</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
   <div class="bd">
-    <div class="sm-top"><div class="sm-ring" style="--p:${tp};--c:${c}"><div><b>${tp}%</b><small>similitud</small></div></div><div class="sm-v ${v[0]}"><h3>${v[1]}</h3><p>${esc(txt3)}</p><p style="margin-top:6px">📚 ${r.p}% igual a la Biblioteca · 🌐 ${r.web && r.web.st === 'busca' ? 'buscando…' : wp + '% igual a internet'}</p>${r.corto ? '<p style="margin-top:6px">✏️ El texto es muy corto: revísalo con más cuidado.</p>' : ''}</div></div>
+    <div class="sm-top"><div class="sm-ring" style="--p:${tp};--c:${c}"><div><b>${tp}%</b><small>similitud</small></div></div><div class="sm-v ${v[0]}"><h3>${v[1]}</h3><p>${esc(txt3)}</p><p style="margin-top:6px">📚 ${r.p}% igual a la Biblioteca</p>${r.corto ? '<p style="margin-top:6px">✏️ El texto es muy corto: revísalo con más cuidado.</p>' : ''}</div></div>
     ${r.fuentes.length ? `<h4>📚 ¿De dónde salen las partes iguales? <small style="font-weight:700;color:var(--ink2)">(toca uno para compararlo lado a lado)</small></h4><div class="sm-src">${r.fuentes.map((f, k) => `<button type="button" class="sm-s${SIM.sel === k ? ' on' : ''}" data-sms="${k}"><span class="cl c${k}"></span><span class="t">${f.s.lib ? '📖' : '📥'} «${esc(f.s.x.t)}» · ${esc(f.s.x.n)}${f.s.x.sec ? ' · 6.° ' + esc(f.s.x.sec) : ''}<small>${f.s.lib ? 'Librito de la Biblioteca' : 'Otro trabajo en la bandeja'} · ${f.cita ? `✔ Lo cita: ${esc(f.ape)} (${smAnio(f.s.x)})` : '✘ No lo cita'}</small></span><em>${f.p}%</em></button>`).join('')}</div>` : '<div class="tip green">📗 No encontré frases iguales en la Biblioteca ni en los otros envíos.</div>'}
-    ${smWebHtml(r)}${smIAHtml(w, r)}<div class="sm-ley"><span>🟥🟨🟦 Pintado = igualito al librito de ese color</span><span>🟪 Morado ondulado = igualito a internet</span><span>Sin pintar = escrito con sus palabras</span></div>
+    ${smIAHtml(w, r)}<div class="sm-ley"><span>🟥🟨🟦 Pintado = igualito al librito de ese color</span><span>Sin pintar = escrito con sus palabras</span></div>
     <div class="sm-cmp${fs ? ' dos' : ''}"><div class="sm-tx"><h5>📝 Trabajo enviado</h5>${smMarcar(w.d, r.T, r.due.map((d, i) => d < 0 && r.web && r.web.hits.some(f => r.T[i].i >= f.i && r.T[i].j <= f.j) ? 'w' : d), SIM.sel)}</div>${fs ? `<div class="sm-tx"><h5>${fs.s.lib ? '📖' : '📥'} «${esc(fs.s.x.t)}» · ${esc(fs.s.x.n)}</h5>${smMarcar(fs.s.x.d, fs.s.T, fs.mk.map(m => m ? SIM.sel : -1), -1)}</div>` : ''}</div>
     ${ro ? `<div class="tip">${own ? '🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.' : `👀 Este trabajo es de tu sección (6.° ${esc(ROLE.rs)}): puedes ver el reporte, pero lo decide un Revisor de otra sección o tu profe.`}</div>`
     : `<div class="acts"><textarea id="rvFb" maxlength="500" data-sug="${esc(sug)}" placeholder="Comentario para el estudiante (opcional)">${esc(fbTxt)}</textarea>
       <button type="button" class="btn soft sm-cons" data-smcons>✨ Llenar consejo automático</button>
-      <p class="sm-lim ${tp > SM_MAX ? 'no' : 'ok'}">${tp > SM_MAX ? `🔒 No se puede aprobar todavía: tiene <b>${tp}%</b> de similitud y el máximo es <b>${SM_MAX}%</b>. Devuélvelo con el consejo para que lo corrija.` : `✅ Tiene ${tp}% de similitud: está dentro del máximo (${SM_MAX}% o menos).`}${r.web && r.web.st === 'busca' ? ' (aún buscando en internet…)' : ''}</p>
+      <p class="sm-lim ${tp > SM_MAX ? 'no' : 'ok'}">${tp > SM_MAX ? `🔒 No se puede aprobar todavía: tiene <b>${tp}%</b> de similitud y el máximo es <b>${SM_MAX}%</b>. Devuélvelo con el consejo para que lo corrija.` : `✅ Tiene ${tp}% de similitud: está dentro del máximo (${SM_MAX}% o menos).`}</p>
       <button type="button" class="btn go" data-rv="ok"${tp > SM_MAX && !ROLE.t ? ' disabled' : ''}>${tp > SM_MAX ? '🔒' : '✅'} Aprobar y publicar</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver con consejo</button><button type="button" class="btn blue" data-smacc>👌 Aceptar reporte</button></div>`}
   </div></article>`;
 }
@@ -1150,6 +1124,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151212"></script><script src="archivos.js?v=202610151212"></script><script src="mando.js?v=202610151212"></script>
+<script src="pdftrabajo.js?v=202610151219"></script><script src="archivos.js?v=202610151219"></script><script src="mando.js?v=202610151219"></script>
 </body>
 </html>
