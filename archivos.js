@@ -15,11 +15,13 @@
   css.textContent = `#maBtn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(170px,calc(env(safe-area-inset-bottom) + 170px));z-index:26;display:flex;align-items:center;gap:8px;padding:9px 14px 9px 10px;border:3px solid #2b2547;border-radius:16px;background:linear-gradient(180deg,#ffd76a,#f5b62a);color:#3b2a00;font:900 14px Nunito,system-ui,sans-serif;box-shadow:0 6px 0 #2b2547,0 12px 24px rgba(0,0,0,.3);cursor:pointer;transition:transform .15s}
   #maBtn:hover{transform:translateY(-2px)}#maBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #2b2547}#maBtn .ic{font-size:24px;line-height:1}#maBtn b{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#e2483d;color:#fff;font-size:12px;display:grid;place-items:center}#maBtn[hidden],#maBtn b[hidden]{display:none}
   body.repo #maBtn{bottom:max(18px,env(safe-area-inset-bottom))}
-  #maBtn.cuadro{left:auto;bottom:auto;top:max(22px,calc(env(safe-area-inset-top) + 8px));width:62px;height:62px;padding:0;justify-content:center;border-radius:18px;background:linear-gradient(180deg,#fff7d6,#ffd76a);box-shadow:0 5px 0 #2b2547,0 10px 18px rgba(0,0,0,.25);font-size:0}
-  #maBtn.cuadro{background:linear-gradient(180deg,#3b6fc4,#2b579a)}#maBtn.cuadro .ic{display:grid;place-items:center;width:38px;height:38px;border-radius:7px;background:#fff;color:#2b579a;font:900 28px/1 Georgia,'Times New Roman',serif}
-  #maBtn.cuadro:hover{transform:translateY(-2px) rotate(-4deg)}#maBtn.cuadro b{position:absolute;right:-6px;top:-6px;border:2px solid #fff}
+  #maBtn.cuadro{left:auto;bottom:auto;top:max(14px,env(safe-area-inset-top));flex-direction:row-reverse;gap:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.28));transition:opacity .3s,transform .3s}
+  #maBtn.cuadro .ic{position:relative;z-index:2;display:grid;place-items:center;width:70px;height:70px;border-radius:16px;border:3px solid #2b2547;background:linear-gradient(180deg,#3b6fc4,#2b579a);color:#fff;font:900 42px/1 Georgia,'Times New Roman',serif;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+  #maBtn.cuadro .lb{margin-right:-18px;padding:11px 30px 11px 18px;border-radius:999px 0 0 999px;background:linear-gradient(270deg,#1e3f7a,#2b579a);border:3px solid #2b2547;border-right:0;color:#fff;font:900 18px "Trebuchet MS",system-ui,sans-serif;letter-spacing:.14em;white-space:nowrap}
+  #maBtn.cuadro:hover{transform:none}#maBtn.cuadro:hover .ic{transform:rotate(8deg) scale(1.08)}#maBtn.cuadro:active{box-shadow:none}
+  #maBtn.cuadro b{position:absolute;right:-6px;top:-6px;z-index:3;border:2px solid #fff}
   body.open #maBtn.cuadro,body.tut #maBtn.cuadro,body.editando #maBtn.cuadro{opacity:0;pointer-events:none}
-  @media (max-height:500px),(max-width:600px){#maBtn.cuadro{width:48px;height:48px;border-radius:14px}#maBtn.cuadro .ic{width:30px;height:30px;font-size:22px}}
+  @media (max-height:500px),(max-width:600px){#maBtn.cuadro .ic{width:50px;height:50px;font-size:30px;border-radius:12px}#maBtn.cuadro .lb{font-size:13px;padding:8px 24px 8px 12px}}
   #maWin{position:fixed;inset:0;z-index:85;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(8,26,45,.55);backdrop-filter:blur(3px)}#maWin[hidden]{display:none}
   #maWin .ma-c{width:min(640px,100%);max-height:100%;overflow:auto;border-radius:22px;border:4px solid #2b2547;background:#fbfaf6;font-family:Nunito,system-ui,sans-serif;color:#17324d;box-shadow:0 24px 60px rgba(0,0,0,.45)}
   .ma-h{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(115deg,#0b2e4f,#0a6aa1);color:#fff}.ma-h h3{flex:1;margin:0;font:900 22px Fraunces,Georgia,serif}.ma-h button{width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:18px;font-weight:900;cursor:pointer}
@@ -37,7 +39,7 @@
   function estado(h) { if (h.st !== 'env') return ['', '⏳ Por concluir']; const e = EST[cache[h.rid]]; return e || ['en', '📨 Enviado']; }
   function pintar() {
     pintarBtn(); if (win.hidden) return; const L = lista().sort((a, b) => (b.at || 0) - (a.at || 0));
-    win.innerHTML = `<div class="ma-c" role="dialog" aria-modal="true"><div class="ma-h"><span style="font-size:30px">📁</span><h3>Mis archivos</h3><button type="button" data-max aria-label="Cerrar">✕</button></div><div class="ma-b">
+    win.innerHTML = `<div class="ma-c" role="dialog" aria-modal="true"><div class="ma-h"><span style="display:grid;place-items:center;width:40px;height:40px;border-radius:9px;background:#fff;color:#2b579a;font:900 26px Georgia,serif">W</span><h3>Word Molí <small style="font:800 14px Nunito,sans-serif;opacity:.85">· Mis archivos</small></h3><button type="button" data-max aria-label="Cerrar">✕</button></div><div class="ma-b">
       <button type="button" class="ma-n" data-man>➕ Nueva investigación</button>
       ${L.length ? L.map(h => { const e = estado(h), t = TIPO[h.ty]; return `<div class="ma-f"><span class="w">W</span><div class="t"><b>${esc(h.nom || h.t || 'Mi investigación (sin nombre)')}</b><small>${t[0]} ${t[1]} · ${h.np ?? palabras(h)} palabras · ${h.st === 'env' ? 'enviada el ' + fecha(h.env) : 'editada el ' + fecha(h.at)}</small></div><span class="ma-s ${e[0]}">${e[1]}</span><button type="button" data-mao="${esc(h.id)}">${h.st === 'env' ? '👀 Ver' : '✏️ Seguir'}</button>${h.st === 'env' ? '' : `<button type="button" class="del" data-mad="${esc(h.id)}" aria-label="Borrar">🗑</button>`}</div>`; }).join('')
         : '<div class="ma-e">📂 Tu carpeta está vacía.<br>Toca «Nueva investigación» para empezar tu guía.</div>'}
@@ -62,7 +64,7 @@
   addEventListener('moli2:me', pintarBtn); addEventListener('storage', pintarBtn); addEventListener('focus', pintarBtn);
   // en el Aula: un cuadrito al costado de BIBLIOTECA (donde la profe tiene el 🎮)
   const lugar = () => { const m = document.getElementById('mandoBtn'), l = m && !m.hidden && m.offsetWidth ? m : document.getElementById('bibLink'); if (!l) return; const r = l.getBoundingClientRect(); btn.style.right = Math.round(innerWidth - r.left + 12) + 'px'; };
-  if (!REPO && document.getElementById('bibLink')) { btn.classList.add('cuadro'); btn.querySelector('.ic').textContent = 'W'; lugar(); addEventListener('resize', lugar); setInterval(lugar, 1500); }
+  if (!REPO && document.getElementById('bibLink')) { btn.classList.add('cuadro'); [...btn.childNodes].forEach(n => n.nodeType === 3 && n.remove()); btn.querySelector('.ic').textContent = 'W'; btn.querySelector('.ic').insertAdjacentHTML('afterend', '<span class="lb">WORD MOLÍ</span>'); btn.title = 'Word Molí: mis guías'; lugar(); addEventListener('resize', lugar); setInterval(lugar, 1500); }
   window.MisArchivos = { pintar, abrir: () => btn.click() };
   pintarBtn();
 })();
