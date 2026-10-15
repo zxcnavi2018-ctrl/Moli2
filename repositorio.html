@@ -636,7 +636,7 @@ const HOJA_TODAS = {
     { t: 'Boceto de mi infografía', h: 'Dibuja dónde irán el título, los datos y las imágenes: descríbelo aquí y sube la foto de tu boceto en «Anexos».', c: [{ id: 'bo', r: 3 }] },
     { t: 'Dato curioso', h: 'Algo sorprendente para terminar.', c: [{ id: 'dc', r: 2 }] }, H_FU, H_CK(['Tiene título, datos clave y boceto.'])] } };
 const HOJA = { inv: HOJA_TODAS.inv };                                 // por ahora sólo la guía de Investigación se escribe aquí (las demás siguen en Word)
-const FU_C = [['a', 'Autor o página', 'Ej.: Ministerio de Salud'], ['y', 'Año', 'Ej.: 2025'], ['m', 'Tema', 'Ej.: El dengue'], ['l', 'Link', 'https://…']];
+const FU_C = [['a', 'Autor o página', 'Ej.: Ministerio de Salud'], ['y', 'Año', 'Ej.: 2025'], ['m', 'Título', 'Ej.: El dengue en el Perú'], ['l', 'Link', 'https://…']];
 const HJ_K = () => 'moli2:hojas:' + (ME ? ME.key : 'x');
 const hojasTodas = () => { const L = ls.get(HJ_K(), []); return Array.isArray(L) ? L : []; };
 const hojaDoc = id => hojasTodas().find(h => h.id === id);
@@ -660,7 +660,7 @@ function hojaFalta(h) {
   if (!F.length && hojaPal(h) < 60) F.push('escribir un poquito más (mínimo 60 palabras)');
   return F;
 }
-const hojaPal = h => hojaTexto(h).replace(/^PASO.*$|^(Fuente \d|Autor o página:|Año:|Tema:|Link:.*|si .*)$/gm, ' ').split(/\s+/).filter(Boolean).length;
+const hojaPal = h => hojaTexto(h).replace(/^PASO.*$|^(Fuente \d|Autor o página:|Año:|Tema:|Título:|Link:.*|si .*)$/gm, ' ').split(/\s+/).filter(Boolean).length;
 function hojaLanzador(ty) {
   const t = tipo(ty), h = hojaBorr(ty), n = h ? hojaPal(h) : 0, sel = FORM.hid && hojaDoc(FORM.hid);
   return `<div class="wd-2"><button type="button" class="g-doc wd-go" data-hoja="${ty}"><span class="ic">W</span><div><b>📂 Abrir guía de ${t[1]} ${esc(t[2])}</b><small>${h ? `Sigue tu guía <b>por concluir</b>${n ? ` (${n} palabras)` : ''}. ` : `${esc(GUIA_TXT[ty] || '')} `}Escríbela tú: aquí no se puede pegar (sólo en «Link»).</small></div><em>✏️</em></button>
@@ -1150,6 +1150,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151209"></script><script src="archivos.js?v=202610151209"></script><script src="mando.js?v=202610151209"></script>
+<script src="pdftrabajo.js?v=202610151212"></script><script src="archivos.js?v=202610151212"></script><script src="mando.js?v=202610151212"></script>
 </body>
 </html>
