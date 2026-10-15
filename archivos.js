@@ -16,9 +16,10 @@
   #maBtn:hover{transform:translateY(-2px)}#maBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #2b2547}#maBtn .ic{font-size:24px;line-height:1}#maBtn b{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#e2483d;color:#fff;font-size:12px;display:grid;place-items:center}#maBtn[hidden],#maBtn b[hidden]{display:none}
   body.repo #maBtn{bottom:max(18px,env(safe-area-inset-bottom))}
   #maBtn.cuadro{left:auto;bottom:auto;top:max(22px,calc(env(safe-area-inset-top) + 8px));width:62px;height:62px;padding:0;justify-content:center;border-radius:18px;background:linear-gradient(180deg,#fff7d6,#ffd76a);box-shadow:0 5px 0 #2b2547,0 10px 18px rgba(0,0,0,.25);font-size:0}
-  #maBtn.cuadro:hover{transform:translateY(-2px) rotate(-4deg)}#maBtn.cuadro .ic{font-size:36px}#maBtn.cuadro b{position:absolute;right:-6px;top:-6px;border:2px solid #fff}
+  #maBtn.cuadro{background:linear-gradient(180deg,#3b6fc4,#2b579a)}#maBtn.cuadro .ic{display:grid;place-items:center;width:38px;height:38px;border-radius:7px;background:#fff;color:#2b579a;font:900 28px/1 Georgia,'Times New Roman',serif}
+  #maBtn.cuadro:hover{transform:translateY(-2px) rotate(-4deg)}#maBtn.cuadro b{position:absolute;right:-6px;top:-6px;border:2px solid #fff}
   body.open #maBtn.cuadro,body.tut #maBtn.cuadro,body.editando #maBtn.cuadro{opacity:0;pointer-events:none}
-  @media (max-height:500px),(max-width:600px){#maBtn.cuadro{width:48px;height:48px;border-radius:14px}#maBtn.cuadro .ic{font-size:27px}}
+  @media (max-height:500px),(max-width:600px){#maBtn.cuadro{width:48px;height:48px;border-radius:14px}#maBtn.cuadro .ic{width:30px;height:30px;font-size:22px}}
   #maWin{position:fixed;inset:0;z-index:85;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(8,26,45,.55);backdrop-filter:blur(3px)}#maWin[hidden]{display:none}
   #maWin .ma-c{width:min(640px,100%);max-height:100%;overflow:auto;border-radius:22px;border:4px solid #2b2547;background:#fbfaf6;font-family:Nunito,system-ui,sans-serif;color:#17324d;box-shadow:0 24px 60px rgba(0,0,0,.45)}
   .ma-h{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(115deg,#0b2e4f,#0a6aa1);color:#fff}.ma-h h3{flex:1;margin:0;font:900 22px Fraunces,Georgia,serif}.ma-h button{width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:18px;font-weight:900;cursor:pointer}
@@ -61,7 +62,7 @@
   addEventListener('moli2:me', pintarBtn); addEventListener('storage', pintarBtn); addEventListener('focus', pintarBtn);
   // en el Aula: un cuadrito al costado de BIBLIOTECA (donde la profe tiene el 🎮)
   const lugar = () => { const m = document.getElementById('mandoBtn'), l = m && !m.hidden && m.offsetWidth ? m : document.getElementById('bibLink'); if (!l) return; const r = l.getBoundingClientRect(); btn.style.right = Math.round(innerWidth - r.left + 12) + 'px'; };
-  if (!REPO && document.getElementById('bibLink')) { btn.classList.add('cuadro'); lugar(); addEventListener('resize', lugar); setInterval(lugar, 1500); }
+  if (!REPO && document.getElementById('bibLink')) { btn.classList.add('cuadro'); btn.querySelector('.ic').textContent = 'W'; lugar(); addEventListener('resize', lugar); setInterval(lugar, 1500); }
   window.MisArchivos = { pintar, abrir: () => btn.click() };
   pintarBtn();
 })();
