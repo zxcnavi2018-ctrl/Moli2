@@ -50,6 +50,36 @@ button{cursor:pointer}
 .eq-fn{margin:24px auto 0;max-width:900px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .eq-fn div{padding:14px;border-radius:18px;background:#fff;border:2px solid var(--line);font-weight:700;font-size:14px;color:var(--ink2)}.eq-fn b{display:block;font:900 17px var(--serif);color:var(--navy);margin-bottom:4px}
 @media (max-width:820px){.org .rama{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:0}.org .rama::before,.org .sec::before{display:none}.eq-fn{grid-template-columns:1fr}}
+/* 🔎 Similitud (tipo Turnitin) */
+.sm-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}.sm-h h2{margin:0;flex:1;font:900 clamp(24px,3.4vw,34px)/1.1 var(--serif);color:var(--navy)}
+.sm-l{display:grid;gap:10px}
+.sm-r{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#fff;border:2px solid var(--line)}
+.sm-r .ic{font-size:30px;flex:none}.sm-r .t{flex:1;min-width:0}.sm-r .t b{display:block;font:800 17px/1.2 var(--serif);color:var(--navy)}.sm-r .t span{font-size:13px;font-weight:800;color:var(--ink2)}
+.sm-p{padding:6px 12px;border-radius:999px;font-weight:900;font-size:13px;white-space:nowrap;background:#f1f5f9;color:#64748b}
+.sm-p.v0{background:var(--mint);color:var(--green2)}.sm-p.v1{background:#fef9c3;color:#854d0e}.sm-p.v2{background:#ffedd5;color:#9a3412}.sm-p.v3{background:#fde8e6;color:#b23a30}.sm-p.ac{background:#e0f2fe;color:#075985}
+.sm-r .btn{padding:10px 16px;font-size:14px}
+.sm-scan{padding:34px 20px;text-align:center}.sm-scan .bk{font-size:64px;animation:smB .6s ease-in-out infinite alternate}.sm-scan b{display:block;margin-top:8px;font:900 22px var(--serif);color:var(--navy)}.sm-scan span{display:block;min-height:22px;margin-top:6px;font-weight:800;color:var(--ink2)}
+.sm-bar{height:12px;margin:16px auto 0;max-width:420px;border-radius:99px;background:var(--line);overflow:hidden}.sm-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--blue2));transition:width .12s}
+@keyframes smB{to{transform:translateY(-8px) rotate(-6deg)}}
+.sm-top{display:flex;flex-wrap:wrap;align-items:center;gap:18px;padding:16px;border-radius:20px;background:#fff;border:2px solid var(--line)}
+.sm-ring{--p:0;--c:var(--green2);width:118px;height:118px;flex:none;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--p)*1%),#e5edf3 0)}
+.sm-ring>div{width:88px;height:88px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;line-height:1}.sm-ring b{font:900 30px var(--serif);color:var(--navy)}.sm-ring small{display:block;font-size:11px;font-weight:900;color:var(--ink2)}
+.sm-v{flex:1;min-width:220px}.sm-v h3{margin:0 0 4px;font:900 22px/1.15 var(--serif)}.sm-v p{margin:0;font-weight:700;color:var(--ink2)}
+.sm-v.v0 h3{color:var(--green2)}.sm-v.v1 h3{color:#a16207}.sm-v.v2 h3{color:#c2410c}.sm-v.v3 h3{color:var(--red)}
+.sm-src{display:grid;gap:8px}
+.sm-s{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:14px;border:2px solid var(--line);background:#fff;text-align:left}
+.sm-s.on{border-color:var(--navy);box-shadow:0 0 0 3px #cfe3f3}.sm-s .cl{width:16px;height:16px;border-radius:5px;flex:none}.sm-s .t{flex:1;min-width:0;font-weight:800;font-size:14px}.sm-s .t small{display:block;font-weight:700;color:var(--ink2)}.sm-s em{font-style:normal;font:900 20px var(--serif);color:var(--navy)}
+.sm-cmp{display:grid;grid-template-columns:1fr;gap:12px}.sm-cmp.dos{grid-template-columns:1fr 1fr}
+.sm-tx{padding:14px 16px;border-radius:16px;background:#fff;border:2px solid var(--line);font-size:15px;line-height:1.6;white-space:pre-wrap;max-height:52vh;overflow:auto}
+.sm-tx h5{margin:0 0 8px;font:900 14px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);white-space:normal}
+.sm-tx mark{border-radius:4px;padding:0 2px;color:inherit}.sm-tx mark.dim{opacity:.35}
+.c0{background:#fecaca}.c1{background:#fde68a}.c2{background:#bfdbfe}.c3{background:#ddd6fe}.c4{background:#bbf7d0}.c5{background:#fbcfe8}
+.sm-web{padding:14px 16px;border-radius:18px;background:#faf5ff;border:2px solid #e9d5ff}.sm-web h4{margin:0 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sm-wh{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed #e9d5ff}.sm-wh q{flex:1;min-width:220px;font-size:14px;font-weight:700;color:var(--ink)}.sm-wh .btn{padding:8px 14px;font-size:13px;text-decoration:none}
+.sm-wl{margin:4px 0;font-weight:700;color:var(--ink2);font-size:14px}.sm-web summary{cursor:pointer;font-weight:900;color:#6b21a8;padding:6px 0}
+.sm-tx mark.cw{background:#e9d5ff;text-decoration:underline wavy #9333ea}
+.sm-ley{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-weight:800;color:var(--ink2)}
+@media (max-width:720px){.sm-cmp.dos{grid-template-columns:1fr}.sm-r{flex-wrap:wrap}}
 /* pestañas */
 .tabs{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -259,6 +289,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
   <button type="button" data-tab="fuentes">🔍 <span>Buscador</span></button>
   <button type="button" data-tab="enviar">📝 <span>Publicar propuesta</span></button>
   <button type="button" data-tab="bandeja" hidden>📥 <span>Bandeja</span><b class="cnt" hidden></b></button>
+  <button type="button" data-tab="similitud" hidden>🔎 <span>Similitud</span><b class="cnt" hidden></b></button>
   <button type="button" data-tab="trabajos" hidden>👥 <span>Trabajos de estudiantes</span></button>
 </nav>
 <main id="main"><div class="wrap" id="view"></div></main>
@@ -354,7 +385,7 @@ const safeUrl = u => /^https:\/\/[^\s"'<>]+$/i.test(u || '') ? u : '';
 let TAB = '', CACHE = { ok: null, pend: null };
 function setTab(t) {
   TAB = t; document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  $('#main').scrollTop = 0; ({ revista: vRevista, fuentes: vFuentes, enviar: vEnviar, bandeja: vBandeja, trabajos: vTrabajos, equipo: vEquipo })[t]();
+  $('#main').scrollTop = 0; ({ revista: vRevista, fuentes: vFuentes, enviar: vEnviar, bandeja: vBandeja, similitud: vSimilitud, trabajos: vTrabajos, equipo: vEquipo })[t]();
 }
 $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
 
@@ -637,16 +668,128 @@ function drawBandeja() {
   el.innerHTML = L.length ? `${ROLE.rs && !ROLE.t ? `<p class="tr-msg">👀 Los trabajos de tu sección (6.° ${esc(ROLE.rs)}) sólo puedes leerlos: los revisan los Revisores de las otras secciones o tu profe.</p>` : ''}<div class="grid">${L.map(w => cardHtml(w, miSec(w) ? `<span class="st" style="align-self:flex-start;background:#f1f5f9;color:#64748b">👀 Sólo lectura · tu sección</span>` : `<span class="st pend" style="align-self:flex-start">⏳ Por revisar · ${fecha(w.at)}</span>`)).join('')}</div>` : `<div class="empty"><b>¡Bandeja al día!</b>No hay trabajos por revisar. 🎉</div>`;
 }
 function setCount(n) {
-  const b = $('#tabs [data-tab="bandeja"] .cnt'); if (b) { b.hidden = !n; b.textContent = n; }
+  document.querySelectorAll('#tabs [data-tab="bandeja"] .cnt, #tabs [data-tab="similitud"] .cnt').forEach(b => { b.hidden = !n; b.textContent = n; });
   try { parent !== window && parent.postMessage({ rvCount: n }, '*'); } catch (e) {}
 }
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fPin') return; e.preventDefault();
   const p = $('#pinIn').value.replace(/\D/g, ''); if (p.length !== 4) return toast('Son 4 números 🔢');
   const b = e.target.querySelector('button'); b.disabled = true; b.textContent = '⏳ Revisando…';
-  try { await revLogin(p); toast('✅ ¡Bienvenido, Revisor!'); vBandeja(); }
+  try { await revLogin(p); toast('✅ ¡Bienvenido, Revisor!'); TAB === 'similitud' ? vSimilitud() : vBandeja(); }
   catch (x) { b.disabled = false; b.textContent = 'Entrar'; toast(/INVALID|PASSWORD|CREDENTIAL/i.test(x.message) ? '❌ Esa clave no es. Pídela a tu profe.' : '📶 No pude conectarme. Intenta otra vez.', 4500); }
 });
+
+// ---- 🔎 Similitud (tipo Turnitin): compara cada trabajo enviado con los libritos de la Biblioteca y con los otros envíos ----
+const SIM = { pend: null, src: null, res: {}, w: null, sel: -1 }, SM_N = 5;          // frases de 5 palabras seguidas
+const smTok = t => { const R = []; smSinGuia(t).replace(/[\p{L}\p{N}]+/gu, (m, i) => { R.push({ w: norm(m), i, j: i + m.length }); return m; }); return R; };
+const smApe = n => { const p = String(n || '').trim().split(/\s+/); return p.length >= 3 ? p[p.length - 2] : p[p.length - 1] || ''; };   // nombres y dos apellidos → primer apellido
+const smAnio = w => new Date(w.at || Date.now()).getFullYear();
+const SM_V = [['v0', '✅ Trabajo original', 'Casi todo lo escribió con sus propias palabras.'], ['v1', '🟡 Algo de similitud', 'Tiene algunas frases iguales a otros trabajos: mira si las citó.'], ['v2', '⚠️ Mucha similitud', 'Varias partes son iguales a otro trabajo. Debe parafrasear y citar.'], ['v3', '🚨 Copiado y pegado', '']];
+function smNivel(p, max) { return max >= 50 || p >= 60 ? 3 : p >= 25 ? 2 : p >= 10 ? 1 : 0; }
+function smAceptado(w) { const m = /^🔎 Similitud (\d+)%/.exec(w.fb || ''); return m ? +m[1] : null; }
+async function vSimilitud() {
+  const V = $('#view');
+  if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2></div>${tip('Aquí están los trabajos enviados. Toca <b>🔎 Revisar similitud</b> y Molí los compara con <b>todos los libritos de la Biblioteca</b> y con los otros envíos, y busca sus frases en <b>internet</b>: verás en colores lo que es <b>igualito</b> (copiar y pegar), de quién lo tomó y el link de la página. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>👌 Aceptar</b> el reporte.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  try { const a = await staffTok(); if (!a) throw new Error('AUTH');
+    const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
+    CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; setCount(p.filter(w => !miSec(w)).length); pintaSim();
+  } catch (e) { const el = $('#smL'); if (el) el.innerHTML = `<div class="empty"><b>No pude abrir los trabajos</b>${e.message === 'AUTH' ? 'Profe: toca tu fotocheck → «Conectar mi cuenta» y vuelve aquí.' : 'Revisa tu internet e intenta otra vez.'}</div>`; }
+}
+function pintaSim() {
+  const el = $('#smL'); if (!el) return; SIM.pend = CACHE.pend || SIM.pend || []; const L = SIM.pend;
+  el.innerHTML = L.length ? `<div class="sm-l">${L.map(w => { const r = SIM.res[w.id], ac = smAceptado(w);
+    const tp = r && Math.min(100, r.p + (r.web && r.web.p || 0)), nv = r && Math.max(r.nv, smNivel(tp, Math.max(r.max, r.web && r.web.p || 0)));
+    const pill = r ? `<span class="sm-p ${SM_V[nv][0]}">${tp}% · ${SM_V[nv][1].split(' ').slice(1).join(' ')}</span>` : ac !== null ? `<span class="sm-p ac">👌 Aceptado · ${ac}%</span>` : '<span class="sm-p">⏳ Sin revisar</span>';
+    return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}<button type="button" class="btn blue" data-sim="${esc(w.id)}">🔎 Revisar similitud</button></div>`; }).join('')}</div>`
+    : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
+}
+$('#view').addEventListener('click', e => { const b = e.target.closest('[data-sim]'); if (b && TAB === 'similitud') revisarSim(b.dataset.sim); });
+function smComparar(w) {                                                // marca cada palabra del trabajo con el librito del que es igualito
+  const T = smTok(w.d), S = [...(SIM.src || []).map(x => ({ x, lib: 1 })), ...(SIM.pend || []).filter(x => x.id !== w.id).map(x => ({ x, lib: 0 }))].filter(s => s.x.k !== w.k && String(s.x.d || '').trim());
+  const sh = (A, i) => A.slice(i, i + SM_N).map(t => t.w).join(' '), autores = {};
+  S.forEach(s => { s.T = smTok(s.x.d); s.set = new Set(); for (let i = 0; i + SM_N <= s.T.length; i++) { const h = sh(s.T, i); s.set.add(h); (autores[h] = autores[h] || new Set()).add(s.x.k); } });
+  const nA = new Set(S.map(s => s.x.k)).size, plantilla = h => autores[h] && autores[h].size >= Math.max(4, Math.ceil(nA * .25));   // frases de la guía que todos tienen: no cuentan
+  const mio = []; for (let i = 0; i + SM_N <= T.length; i++) { const h = sh(T, i); mio.push(plantilla(h) ? null : h); }
+  S.forEach(s => s.hit = mio.filter(h => h && s.set.has(h)).length);
+  const due = new Array(T.length).fill(-1), F = S.filter(s => s.hit).sort((a, b) => b.hit - a.hit);
+  F.forEach((s, k) => mio.forEach((h, i) => { if (h && s.set.has(h)) for (let j = i; j < i + SM_N; j++) if (due[j] < 0) due[j] = k; }));
+  const txt = norm(w.d), fuentes = F.map((s, k) => { const n = due.filter(d => d === k).length, ape = smApe(s.x.n);
+    const mine = new Set(mio.filter(Boolean)), mk = new Array(s.T.length).fill(0); for (let i = 0; i + SM_N <= s.T.length; i++) if (mine.has(sh(s.T, i))) for (let j = i; j < i + SM_N; j++) mk[j] = 1;
+    return { s, n, p: T.length ? Math.round(100 * n / T.length) : 0, ape, cita: ape.length > 2 && txt.includes(norm(ape)), mk }; }).filter(f => f.n).slice(0, 6);
+  const mapa = {}; fuentes.forEach((f, k) => mapa[F.indexOf(f.s)] = k); for (let i = 0; i < due.length; i++) due[i] = due[i] in mapa ? mapa[due[i]] : -1;
+  const n = due.filter(d => d >= 0).length, p = T.length ? Math.round(100 * n / T.length) : 0, max = fuentes.length ? fuentes[0].p : 0;
+  return { T, due, fuentes, p, max, nv: smNivel(p, max), corto: T.length < 25, nLib: S.filter(s => s.lib).length };
+}
+function smMarcar(txt, T, col, sel) {                                  // el texto con las partes iguales pintadas del color de su fuente
+  let o = '', at = 0, i = 0;
+  while (i < T.length) { const c = col[i]; if (c < 0) { i++; continue; } let j = i; while (j + 1 < T.length && col[j + 1] === c && !txt.slice(T[j].j, T[j + 1].i).includes('\n')) j++;
+    o += esc(txt.slice(at, T[i].i)) + `<mark class="${c === 'w' ? 'cw' : 'c' + c}${sel >= 0 && sel !== c ? ' dim' : ''}">${esc(txt.slice(T[i].i, T[j].j))}</mark>`; at = T[j].j; i = j + 1; }
+  return o + esc(txt.slice(at));
+}
+const smSinGuia = t => String(t || '').replace(/^\s*PASO\b.*$|Hallazgo\s*\d+\s*:?/gmi, m => ' '.repeat(m.length));
+async function smWeb(w, r) {                                          // 🌐 internet: busca sus frases tal cual en Wikipedia (se puede desde la página) y deja enlaces a Google para lo demás
+  const txt = smSinGuia(w.d), F = [];
+  txt.replace(/[^.!?¿¡\n]+/g, (m, i) => { const T = r.T.filter(t => t.i >= i && t.j <= i + m.length); if (T.length >= 8 && T.filter(t => r.due[r.T.indexOf(t)] >= 0).length < T.length / 2) F.push({ i: T[0].i, j: T[T.length - 1].j, T }); return m; });
+  const P = F.sort((a, b) => b.T.length - a.T.length).slice(0, 10).map(f => { const k = Math.max(0, Math.floor((f.T.length - 9) / 2)), Q = f.T.slice(k, k + 9);
+    return { ...f, frase: w.d.slice(f.i, f.j).trim(), q: w.d.slice(Q[0].i, Q[Q.length - 1].j).replace(/["“”«»]/g, '') }; });
+  r.web = { st: 'busca', F: P, hits: [] }; if (SIM.w === w) pintaInforme();
+  try { await Promise.all(P.map(async f => {
+      const u = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent('"' + f.q + '"')}&srlimit=1&srprop=snippet&format=json&origin=*`;
+      const j = await (await fetch(u)).json(), h = j.query && j.query.search && j.query.search[0];
+      if (h) f.hit = { t: h.title, url: 'https://es.wikipedia.org/wiki/' + encodeURIComponent(h.title.replace(/ /g, '_')) }; }));
+    r.web.st = 'ok';
+  } catch (e) { r.web.st = 'err'; }
+  r.web.hits = P.filter(f => f.hit); const n = r.web.hits.reduce((s, f) => s + f.T.length, 0); r.web.p = r.T.length ? Math.round(100 * n / r.T.length) : 0;
+  if (SIM.w === w && !$('#modal').hidden) pintaInforme(); pintaSim();
+}
+const smGoogle = q => 'https://www.google.com/search?q=' + encodeURIComponent('"' + q + '"');
+function smWebHtml(r) {
+  const W = r.web; if (!W) return '';
+  const cab = `<h4>🌐 Similitud en internet ${W.st === 'ok' ? `<span class="sm-p ${W.p >= 25 ? 'v3' : W.p >= 10 ? 'v2' : W.hits.length ? 'v1' : 'v0'}">${W.p}% igual a internet</span>` : ''}</h4>`;
+  if (W.st === 'busca') return `<div class="sm-web">${cab}<p class="sm-wl">⏳ Buscando sus frases en internet (Wikipedia)…</p></div>`;
+  return `<div class="sm-web">${cab}${W.st === 'err' ? '<p class="sm-wl">📶 No pude buscar en internet ahora. Usa los botones de Google de abajo.</p>' : ''}
+    ${W.hits.length ? W.hits.map(f => `<div class="sm-wh"><q>${esc(f.frase)}</q><a class="btn blue" href="${esc(f.hit.url)}" target="_blank" rel="noopener">📖 Wikipedia: ${esc(f.hit.t)}</a></div>`).join('') : W.st === 'ok' ? '<p class="sm-wl">📗 Ninguna frase aparece igualita en Wikipedia.</p>' : ''}
+    ${W.F.filter(f => !f.hit).length ? `<details><summary>🔎 Revisar otras frases en Google (${W.F.filter(f => !f.hit).length})</summary>${W.F.filter(f => !f.hit).map(f => `<div class="sm-wh"><q>${esc(f.frase)}</q><a class="btn soft" href="${esc(smGoogle(f.q))}" target="_blank" rel="noopener">🔎 Buscar en Google</a></div>`).join('')}<p class="sm-wl">Si Google muestra la frase <b>igualita</b> en una página, es copia de internet: ábrela y compárala.</p></details>` : ''}</div>`;
+}
+async function revisarSim(id) {
+  const w = (SIM.pend || []).find(x => x.id === id); if (!w) return;
+  const M = $('#modal'); M.hidden = false; M.dataset.id = id; M._w = w; SIM.w = w; SIM.sel = -1;
+  const lib = (SIM.src || []).filter(x => x.k !== w.k);
+  M.innerHTML = `<div class="art"><div class="sm-scan"><div class="bk">📚</div><b>Revisando similitudes en la Biblioteca…</b><span id="smEs"></span><div class="sm-bar"><i id="smBa"></i></div></div></div>`;
+  const pasos = Math.max(lib.length, 1), ms = Math.min(140, 2200 / pasos);
+  for (let i = 0; i < pasos; i++) { if (M.dataset.id !== id || M.hidden) return; const x = lib[i], es = $('#smEs'), ba = $('#smBa');
+    if (es) es.textContent = x ? `📖 Comparando con «${x.t}» de ${firstName(x.n)}…` : '📖 Comparando…'; if (ba) ba.style.width = (100 * (i + 1) / pasos) + '%'; await new Promise(r => setTimeout(r, ms)); }
+  SIM.res[id] = smComparar(w); if (M.dataset.id === id && !M.hidden) pintaInforme(); pintaSim(); smWeb(w, SIM.res[id]);
+}
+function pintaInforme() {
+  const M = $('#modal'), w = SIM.w, r = SIM.res[w.id]; if (!r) return;
+  const own = ME && w.k === ME.key && !ROLE.t, ro = own || miSec(w), f0 = r.fuentes[0], wp = r.web && r.web.st === 'ok' ? r.web.p : 0, tp = Math.min(100, r.p + wp);
+  const nv = Math.max(r.nv, smNivel(tp, Math.max(r.max, wp))), v = SM_V[nv], wh = r.web && r.web.hits[0];
+  const txt3 = wp > r.max && nv >= 2 && wh ? `El ${wp}% es igualito a internet (Wikipedia: «${wh.hit.t}»). ${nv === 3 ? '¡Lo copió y pegó de internet!' : 'Debe parafrasear y citar la fuente.'}` : nv === 3 && f0 ? `El ${f0.p}% es igualito al librito «${f0.s.x.t}» de ${f0.s.x.n}${f0.cita ? ' (sí lo cita, pero copió textual: falta parafrasear).' : '. ¡Lo copió y pegó sin citarlo!'}` : v[2];
+  const sug = wp > r.max && nv >= 2 && wh ? `Copiaste partes de internet (Wikipedia: «${wh.hit.t}»). Escríbelo con tus palabras (parafrasea) y pon la fuente con su año.` : nv >= 2 && f0 ? `Copiaste partes del librito «${f0.s.x.t}» de ${f0.s.x.n}. Escríbelo con tus palabras (parafrasea) y cítalo así: ${f0.ape} (${smAnio(f0.s.x)}) menciona que…` : '';
+  const ta = $('#rvFb'), fbTxt = ta && ta.value !== ta.dataset.sug ? ta.value : sug;   // si ya escribió su comentario, no se lo borro
+  const c = ['var(--green2)', '#ca8a04', '#ea580c', 'var(--red)'][nv], fs = SIM.sel >= 0 ? r.fuentes[SIM.sel] : null;
+  M.innerHTML = `<article class="art" role="dialog" aria-modal="true" style="width:min(1100px,100%)"><div class="hero"><small>🔎 Reporte de similitud · ${r.nLib} libritos revisados</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
+  <div class="bd">
+    <div class="sm-top"><div class="sm-ring" style="--p:${tp};--c:${c}"><div><b>${tp}%</b><small>similitud</small></div></div><div class="sm-v ${v[0]}"><h3>${v[1]}</h3><p>${esc(txt3)}</p><p style="margin-top:6px">📚 ${r.p}% igual a la Biblioteca · 🌐 ${r.web && r.web.st === 'busca' ? 'buscando…' : wp + '% igual a internet'}</p>${r.corto ? '<p style="margin-top:6px">✏️ El texto es muy corto: revísalo con más cuidado.</p>' : ''}</div></div>
+    ${r.fuentes.length ? `<h4>📚 ¿De dónde salen las partes iguales? <small style="font-weight:700;color:var(--ink2)">(toca uno para compararlo lado a lado)</small></h4><div class="sm-src">${r.fuentes.map((f, k) => `<button type="button" class="sm-s${SIM.sel === k ? ' on' : ''}" data-sms="${k}"><span class="cl c${k}"></span><span class="t">${f.s.lib ? '📖' : '📥'} «${esc(f.s.x.t)}» · ${esc(f.s.x.n)}${f.s.x.sec ? ' · 6.° ' + esc(f.s.x.sec) : ''}<small>${f.s.lib ? 'Librito de la Biblioteca' : 'Otro trabajo en la bandeja'} · ${f.cita ? `✔ Lo cita: ${esc(f.ape)} (${smAnio(f.s.x)})` : '✘ No lo cita'}</small></span><em>${f.p}%</em></button>`).join('')}</div>` : '<div class="tip green">📗 No encontré frases iguales en la Biblioteca ni en los otros envíos.</div>'}
+    ${smWebHtml(r)}<div class="sm-ley"><span>🟥🟨🟦 Pintado = igualito al librito de ese color</span><span>🟪 Morado ondulado = igualito a internet</span><span>Sin pintar = escrito con sus palabras</span></div>
+    <div class="sm-cmp${fs ? ' dos' : ''}"><div class="sm-tx"><h5>📝 Trabajo enviado</h5>${smMarcar(w.d, r.T, r.due.map((d, i) => d < 0 && r.web && r.web.hits.some(f => r.T[i].i >= f.i && r.T[i].j <= f.j) ? 'w' : d), SIM.sel)}</div>${fs ? `<div class="sm-tx"><h5>${fs.s.lib ? '📖' : '📥'} «${esc(fs.s.x.t)}» · ${esc(fs.s.x.n)}</h5>${smMarcar(fs.s.x.d, fs.s.T, fs.mk.map(m => m ? SIM.sel : -1), -1)}</div>` : ''}</div>
+    ${ro ? `<div class="tip">${own ? '🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.' : `👀 Este trabajo es de tu sección (6.° ${esc(ROLE.rs)}): puedes ver el reporte, pero lo decide un Revisor de otra sección o tu profe.`}</div>`
+    : `<div class="acts"><textarea id="rvFb" maxlength="500" data-sug="${esc(sug)}" placeholder="Comentario para el estudiante (opcional)">${esc(fbTxt)}</textarea>
+      <button type="button" class="btn go" data-rv="ok">✅ Aprobar y publicar</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver (se borra)</button><button type="button" class="btn blue" data-smacc>👌 Aceptar reporte</button></div>`}
+  </div></article>`;
+}
+async function aceptarSim(b) {                                        // deja anotado en el trabajo que ya se revisó su similitud (sigue en la bandeja)
+  const w = SIM.w, r = w && SIM.res[w.id]; if (!r) return;
+  const a = await staffTok(); if (!a) return toast('🔐 Vuelve a entrar para revisar.');
+  b.disabled = true; const up = { fb: `🔎 Similitud ${Math.min(100, r.p + (r.web && r.web.p || 0))}% · revisado por ${ROLE.t ? 'tu profe' : firstName(ROLE.rn || ME.name)}`.slice(0, 500) };
+  try { const x = await fetch(`${BASE}/revista/${encodeURIComponent(w.id)}?key=${F.apiKey}&updateMask.fieldPaths=fb&currentDocument.exists=true`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(up) }) });
+    if (!x.ok) throw new Error(x.status === 403 ? 'AUTH' : 'NET');
+    w.fb = up.fb; delete SIM.res[w.id]; $('#modal').hidden = true; $('#modal').innerHTML = ''; pintaSim(); toast('👌 Reporte aceptado: el trabajo sigue en la bandeja, marcado como revisado.');
+  } catch (x) { b.disabled = false; toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
+}
 
 // ---- ver un trabajo (artículo de la revista o revisión) ----
 async function bajarWord(id, b) {                                     // el Word que subió el estudiante (sólo la profe y los Revisores)
@@ -683,6 +826,8 @@ $('#modal').addEventListener('click', async e => {
   const M = $('#modal');
   if (e.target === M || e.target.closest('[data-x]')) { M.hidden = true; M.innerHTML = ''; return; }
   if (e.target.closest('[data-word]')) return bajarWord(M.dataset.id, e.target.closest('[data-word]'));
+  if (e.target.closest('[data-smacc]')) return aceptarSim(e.target.closest('[data-smacc]'));
+  const sx = e.target.closest('[data-sms]'); if (sx) { SIM.sel = SIM.sel === +sx.dataset.sms ? -1 : +sx.dataset.sms; return pintaInforme(); }
   if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
   const b = e.target.closest('[data-rv]'); if (!b) return;
   const id = M.dataset.id, act = b.dataset.rv, fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
@@ -704,7 +849,7 @@ $('#modal').addEventListener('click', async e => {
     M.hidden = true; M.innerHTML = '';
     toast(act === 'no' ? '✏️ Devuelto: se borró para que lo envíe corregido.' : act === 'ok' ? '🎉 ¡Publicado en la Revista Innovadora!' : act === 'no' ? '✏️ Devuelto con tu consejo.' : act === 'pend' ? '↩️ Volvió a la bandeja.' : '🗑 Borrado.');
     CACHE.ok = null; if (CACHE.pend) CACHE.pend = CACHE.pend.filter(x => x.id !== id);
-    if (TAB === 'bandeja') drawBandeja(); else vRevista();
+    if (TAB === 'bandeja') drawBandeja(); else if (TAB === 'similitud') pintaSim(); else vRevista();
   } catch (x) { M.querySelectorAll('[data-rv]').forEach(y => y.disabled = false); toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
 });
 addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden) { $('#modal').hidden = true; $('#modal').innerHTML = ''; } });
@@ -714,12 +859,12 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if (ME) { const me = $('#me'); me.hidden = false; me.innerHTML = `<i>${esc((firstName(ME.name)[0] || '🙂').toUpperCase())}</i><span class="nm">${esc(firstName(ME.name) || 'Hola')}</span>${ME.teacher ? '<span class="rol">Docente</span>' : ''}`; }
   await checkRole();
   if (ROLE.r) { const r = $('#me .rol'); if (!r) $('#me').insertAdjacentHTML('beforeend', '<span class="rol">🧐 Revisor</span>'); }
-  if (ROLE.t || ROLE.r) $('#tabs [data-tab="bandeja"]').hidden = false;
+  if (ROLE.t || ROLE.r) { $('#tabs [data-tab="bandeja"]').hidden = !ROLE.t; $('#tabs [data-tab="similitud"]').hidden = false; }   // los Revisores revisan sólo desde «Similitud» (su bandeja)
   if (ROLE.t) $('#tabs [data-tab="trabajos"]').hidden = false;
-  const want = QS.get('v'); setTab(want === 'bandeja' && (ROLE.t || ROLE.r) ? 'bandeja' : want === 'enviar' ? 'enviar' : want === 'fuentes' ? 'fuentes' : 'revista');
-  if ((ROLE.t || ROLE.r) && TAB !== 'bandeja') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
+  const want = QS.get('v'); setTab(want === 'bandeja' && ROLE.t ? 'bandeja' : want === 'bandeja' && ROLE.r ? 'similitud' : want === 'enviar' ? 'enviar' : want === 'fuentes' ? 'fuentes' : 'revista');
+  if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610150156"></script><script src="mando.js?v=202610150156"></script>
+<script src="pdftrabajo.js?v=202610151124"></script><script src="mando.js?v=202610151124"></script>
 </body>
 </html>
