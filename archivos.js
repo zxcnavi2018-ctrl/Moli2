@@ -35,7 +35,8 @@
   document.head.appendChild(css); if (REPO) document.body.classList.add('repo');
   const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'maBtn'; btn.innerHTML = '<span class="ic">📁</span>Mis archivos<b hidden></b>'; document.body.appendChild(btn); btn.title = 'Mis archivos';
   const win = document.createElement('div'); win.id = 'maWin'; win.hidden = true; document.body.appendChild(win);
-  function pintarBtn() { const m = yo(); btn.hidden = !m || !!(m.teacher || m.docente); const n = lista().filter(h => h.st === 'por').length, b = btn.querySelector('b'); b.hidden = !n; b.textContent = n; }
+  function pintarBtn() { const m = yo(); btn.hidden = !m || (!!(m.teacher || m.docente) && !lista().length);   // la docente lo ve sólo si tiene guías (p. ej. sus trabajos de práctica)
+  const n = lista().filter(h => h.st === 'por').length, b = btn.querySelector('b'); b.hidden = !n; b.textContent = n; }
   function estado(h) { if (h.st !== 'env') return h.dev ? ['mj', '✏️ Por corregir'] : ['', '⏳ Por concluir']; const e = EST[cache[h.rid]]; return e || ['en', '📨 Enviado']; }
   function pintar() {
     pintarBtn(); if (win.hidden) return; const L = lista().sort((a, b) => (b.at || 0) - (a.at || 0));

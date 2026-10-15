@@ -898,7 +898,8 @@ document.addEventListener('submit', async e => {
   const id = ME.key + '-' + Date.now().toString(36);
   const w = { k: ME.key, n: String(ME.name || '').slice(0, 60), sec: String(ME.section || '').toUpperCase().slice(-1), u: 'rev', kw: kw.slice(0, 200), ty: FORM.ty, t: t.slice(0, 100), d: d.slice(0, 20000), f: f.slice(0, 600), link, th: FORM.th, img: FORM.img, st: 'pend', at: new Date() };
   if (!w.link) delete w.link; if (!w.f) delete w.f; delete w.img; if (FORM.fotos[0]) w.img = FORM.fotos[0]; if (FORM.fotos[1]) w.img2 = FORM.fotos[1]; if (FORM.fotos[2]) w.img3 = FORM.fotos[2]; if (!w.th) delete w.th;
-  if (ME.teacher) Object.assign(w, { st: 'ok', rv: 'tu profe', rvAt: new Date(), g: FORM.g, sec: '' });
+  if (ME.teacher && hj && hj.prac) Object.assign(w, { n: 'Molí', sec: '' });   // 🧪 práctica corregida: vuelve a la bandeja de los Revisores
+  else if (ME.teacher) Object.assign(w, { st: 'ok', rv: 'tu profe', rvAt: new Date(), g: FORM.g, sec: '' });
   try {
     const h = { 'Content-Type': 'application/json' }; if (ME.teacher) { const t = await staffTok(); if (!t) throw new Error('AUTHT'); h.Authorization = 'Bearer ' + t; }
     const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf(w) }) });
@@ -908,7 +909,7 @@ document.addEventListener('submit', async e => {
     if (hj) { hj.st = 'env'; hj.env = Date.now(); hj.rid = id; hj.mapa = hojaTexto(hj, 1).mapa; delete hj.dev; if (!hj.t) hj.t = t; hojaPut(hj); FORM.hid = ''; }
     const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40)); ls.set('moli2:revtit', { ...ls.get('moli2:revtit', {}), [id]: t.slice(0, 100) });
     try { parent !== window && parent.postMessage({ revistaSent: 1 }, '*'); } catch (x) {}
-    vEnviar(); toast(ME.teacher ? '📰 ¡Publicado en la revista y en la Biblioteca!' : '🎉 ¡Enviado! Un Revisor o tu profe lo revisará pronto.', 4500);
+    vEnviar(); toast(ME.teacher && w.st === 'pend' ? '🧪 Reenviado: les llegará otra vez a los Revisores.' : ME.teacher ? '📰 ¡Publicado en la revista y en la Biblioteca!' : '🎉 ¡Enviado! Un Revisor o tu profe lo revisará pronto.', 4500);
   } catch (x) { b.disabled = false; b.textContent = ME.teacher ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'; toast(x.message === 'AUTHT' ? '🔐 Profe: conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : x.message === 'AUTH' ? '🔐 Tu cuenta todavía no puede enviar. Avísale a tu profe.' : '📶 No se pudo enviar. Revisa tu internet e intenta otra vez.', 5000); }
 });
 async function drawMine() {
@@ -962,10 +963,59 @@ const smAnio = w => new Date(w.at || Date.now()).getFullYear();
 const SM_V = [['v0', '✅ Trabajo original', 'Casi todo lo escribió con sus propias palabras.'], ['v1', '🟡 Algo de similitud', 'Tiene algunas frases iguales a otros trabajos: mira si las citó.'], ['v2', '⚠️ Mucha similitud', 'Varias partes son iguales a otro trabajo. Debe parafrasear y citar.'], ['v3', '🚨 Copiado y pegado', '']];
 function smNivel(p, max) { return max >= 50 || p >= 60 ? 3 : p >= 25 ? 2 : p >= 10 ? 1 : 0; }
 function smAceptado(w) { const m = /^🔎 Similitud (\d+)%/.exec(w.fb || ''); return m ? +m[1] : null; }
+// ---- 🧪 Trabajos de práctica (sólo la docente): 5 investigaciones de «Molí» con errores a propósito, para que los Revisores practiquen.
+//      Llegan como cualquier envío (sin sección: los puede revisar cualquier Revisor). Lo devuelto vuelve a la carpeta Word Molí de la docente.
+const F3 = (a, y, m, l) => ({ a, y, m, l });
+const PRAC = [
+  { t: 'Los ongos y su importancia', kw: 'hongos, moho, esporas, champiñones', q: '¿Por que los hongos son importantes para la naturaleza?',
+    h1: 'Según la Universidad de Lima (2022) los hongos ayudan a decomponer las ojas secas y los animales muertos y aci devuelven nutrientes al suelo.',
+    h2: 'Los hongos se reproducen por esporas muy pequeñas que viajan con el viento y el agua (Martínez, 2021).',
+    h3: 'Tanbien hay hongos que nos sirven de alimento como los champiñones y otros que sirven para hacer medicinas como la penisilina.',
+    r: 'Los hongos son importantes porque limpian la naturaleza y nos dan comida y medicinas.', f: [F3('Universidad de Lima', '2022', 'Los hongos descomponedores', ''), F3('Martínez', '2021', 'Reproducción de los hongos', ''), F3('Medicinas con hongos', '', '', '')] },
+  { t: 'Las bacterias buenas y malas', kw: 'bacterias, intestino, enfermedades, higiene', q: '¿Todas las bacterias son malas?',
+    h1: 'No todas las bacterias son malas, algunas viven en nuestro intestino y nos ayudan a digerir la comida.',
+    h2: 'Una bacteria es tan grande que se puede ver a simple vista sin usar el microscopio.',
+    h3: 'Según el Ministerio de Salud (2024) lavarse las manos con agua y jabón elimina muchas bacterias que causan enfermedades.',
+    r: 'No todas son malas.', f: [F3('Ministerio de Salud', '2024', 'Lavado de manos', 'https://www.gob.pe/minsa')] },
+  { t: 'Los virus y los antibióticos', kw: 'virus, gripe, antibióticos, vacunas', q: '¿Cómo se curan las enfermedades que causan los virus?',
+    h1: 'Según la OMS (2023) los virus son muy pequeños y sólo pueden reproducirse dentro de las células de otro ser vivo.',
+    h2: 'Cuando tenemos gripe debemos tomar antibióticos porque los antibióticos matan a los virus (Rojas, 2020).',
+    h3: 'Las vacunas ayudan a que nuestro cuerpo aprenda a defenderse de algunos virus como el del sarampión (UNICEF, 2022).',
+    r: 'Las enfermedades que causan los virus se curan siempre con antibióticos y con vacunas.', f: [F3('OMS', '2023', 'Qué son los virus', ''), F3('Rojas', '2020', 'La gripe', ''), F3('UNICEF', '2022', 'Las vacunas', '')] },
+  { t: 'La levadura y nuestra salud', kw: 'levadura, salud, vitaminas, pan', q: '¿La levadura es buena para la salud?',
+    h1: 'Según el medio “Clarin” (2024) las levaduras pueden afectar nuestra salud como problemas digestivos o reacciones alérgicas sin embargo también tiene beneficios como aportar buenas proteínas y vitaminas como B1 B2 B3 B5 etc.',
+    h2: 'Además, según la fuente WebMD (2022) la levadura nutricional nos puede ayudar a problemas del corazón, apoyo al sistema inmunitario a combatir a la fatiga desafortunadamente también tiene desventajas como migrañas debido a que tiene tiramina que a veces causa dolores de cabeza o alergias las personas sensibles a estos elementos',
+    h3: 'Finalmente según la pagina nutricional Healthline (2021) la levadura que se usa en el pan o cerveza es rica en vitaminas B y en potasio proteínas magnesio etc.',
+    r: 'La levadura es buena para la salud porque tiene vitaminas, pero a algunas personas les puede dar alergia.', f: [F3('Clarín', '2024', 'Efectos de la levadura', ''), F3('WebMD', '2022', 'La levadura nutricional', ''), F3('Healthline', '2021', 'La levadura de cerveza', '')] },
+  { t: 'Enfermedades que no se contagian', kw: 'diabetes, obesidad, enfermedades no contagiosas, alimentación', q: '¿la diabetes y la obesidad se contagian?',
+    h1: 'Según el Minsa (2023) la diabetes es una enfermedad no contagiosa que pasa cuando hay mucha azucar en la sangre por mucho tiempo.',
+    h2: 'La obesidad si se contagia si pasas mucho tiempo junto a una persona obesa.',
+    h3: 'Para prevenir estas enfermedades debemos comer frutas verduras y hacer ejercisio todos los dias (Pérez, 2021).',
+    r: 'La diabetes no se contagia pero la obesidad si se contagia.', f: [F3('Minsa', '2023', 'La diabetes', ''), F3('Pérez', '2021', 'Vida saludable', ''), F3('', '', '', '')] }];
+async function enviarPractica(b) {
+  if (!ROLE.t || !ME) return;
+  if (!confirm('Se enviarán 5 investigaciones de práctica con el autor «Molí» (hongos, bacterias, virus, levadura y enfermedades no contagiosas), con errores a propósito.\n\nLes llegarán a los Revisores como trabajos normales. Cuando los devuelvan, volverán a TU carpeta Word Molí para que los corrijas y los vuelvas a enviar. ¿Enviar?')) return;
+  const a = await staffTok(); if (!a) return toast('🔐 Conecta tu cuenta de docente.');
+  b.disabled = true; let ok = 0;
+  for (let i = 0; i < PRAC.length; i++) { const P = PRAC[i]; b.textContent = `⏳ Enviando ${i + 1} de ${PRAC.length}…`;
+    const v = { q: P.q, h1: P.h1, h2: P.h2, h3: P.h3, r: P.r, c0: true, c1: true, c2: true, c3: true };
+    P.f.forEach((x, k) => { v[`f${k + 1}a`] = x.a; v[`f${k + 1}y`] = x.y; v[`f${k + 1}m`] = x.m; v[`f${k + 1}l`] = x.l; });
+    const h = { id: 'h' + (Date.now() + i).toString(36), ty: 'inv', t: P.t, kw: P.kw, nom: '🧪 ' + P.t, v, at: Date.now(), st: 'por', prac: 1 };
+    const id = ME.key + '-' + (Date.now() + i).toString(36), d = hojaTexto(h);
+    const w = { k: ME.key, n: 'Molí', sec: '', u: 'rev', kw: P.kw, ty: 'inv', t: P.t, d, st: 'pend', at: new Date(Date.now() - (PRAC.length - i) * 6e4) };
+    try { const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(w) }) });
+      if (!r.ok) throw new Error(r.status);
+      Object.assign(h, { st: 'env', env: Date.now(), rid: id, mapa: hojaTexto(h, 1).mapa }); hojaPut(h); ok++;
+      const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40));
+    } catch (x) {} }
+  b.disabled = false; b.textContent = '🧪 Trabajos de práctica';
+  toast(ok === PRAC.length ? '🧪 ¡Listo! Se enviaron los 5 trabajos de práctica de «Molí».' : `⚠️ Se enviaron ${ok} de ${PRAC.length}. Revisa tu internet e intenta otra vez.`, 5000);
+  try { window.MisArchivos && MisArchivos.pintar(); } catch (x) {} vSimilitud();
+}
 async function vSimilitud() {
   const V = $('#view');
   if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
-  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2><button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>📝 Revisar</b>: el trabajo se abre en el <b>Word Molí</b> y se pinta solo: 🟧 lo igualito a los libritos de la Biblioteca y 🟦 la ortografía. Tú subraya en 🟨 lo extraño y deja 💬 comentarios. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>❌ Rechazar</b>.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2>${ROLE.t ? '<button type="button" class="btn soft" id="smPrac">🧪 Trabajos de práctica</button>' : ''}<button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>📝 Revisar</b>: el trabajo se abre en el <b>Word Molí</b> y se pinta solo: 🟧 lo igualito a los libritos de la Biblioteca y 🟦 la ortografía. Tú subraya en 🟨 lo extraño y deja 💬 comentarios. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>❌ Rechazar</b>.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
     CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; if (ROLE.t) limpiarDevueltos(a); setCount(p.filter(w => !miSec(w)).length); pintaSim();
@@ -979,7 +1029,7 @@ function pintaSim() {
     return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}<button type="button" class="btn blue" data-sim="${esc(w.id)}">📝 Revisar</button></div>`; }).join('')}</div>`
     : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
 }
-$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); });
+$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); if (e.target.closest('#smPrac')) enviarPractica(e.target.closest('#smPrac')); });
 function smComparar(w) {                                                // marca cada palabra del trabajo con el librito del que es igualito
   const T = smTok(w.d), S = [...(SIM.src || []).map(x => ({ x, lib: 1 })), ...(SIM.pend || []).filter(x => x.id !== w.id).map(x => ({ x, lib: 0 }))].filter(s => s.x.k !== w.k && String(s.x.d || '').trim());
   const sh = (A, i) => A.slice(i, i + SM_N).map(t => t.w).join(' '), autores = {};
@@ -1237,6 +1287,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610152042"></script><script src="archivos.js?v=202610152042"></script><script src="mando.js?v=202610152042"></script>
+<script src="pdftrabajo.js?v=202610152146"></script><script src="archivos.js?v=202610152146"></script><script src="mando.js?v=202610152146"></script>
 </body>
 </html>
