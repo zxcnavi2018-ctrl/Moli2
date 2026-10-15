@@ -929,7 +929,7 @@ async function vBandeja() {
     V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`;
     setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return;
   }
-  V.innerHTML = tip(ROLE.t ? 'Profe, aquí llegan los trabajos de tus estudiantes. Ábrelos, léelos y decide: <b>✅ Publicar</b> o <b>✏️ Devolver para mejorar</b> con un consejo.' : `¡Hola, Revisor <b>${esc(firstName(ROLE.rn || ME.name))}</b>! 🧐 Lee cada trabajo con cuidado. Si está listo, publícalo; si le falta algo, devuélvelo con un consejo amable.`, 'pensativa') + '<div id="blist"><div class="load">📥 Abriendo la bandeja…</div></div>';
+  V.innerHTML = tip(ROLE.t ? 'Profe, aquí llegan los trabajos de tus estudiantes. Ábrelos, léelos y decide: <b>✅ Publicar</b> o <b>✏️ Devolver para mejorar</b> con un consejo.' : `¡Hola, Revisor <b>${esc(firstName(ROLE.rn || ME.name))}</b>! 🧐 Aquí sólo <b>ves</b> los trabajos que llegaron. Para revisarlos (aprobar, devolver o rechazar) ve a la pestaña <b>🔎 Similitud</b>.`, 'pensativa') + '<div id="blist"><div class="load">📥 Abriendo la bandeja…</div></div>';
   try {
     const a = await staffTok(); if (!a) throw new Error('AUTH');
     CACHE.pend = await query('pend', a, LIST_F); drawBandeja();
@@ -1223,10 +1223,11 @@ async function openArt(id) {
   let w = [...(CACHE.ok || []), ...(CACHE.pend || [])].find(x => x.id === id);
   try { const full = await getDoc(id); if (full) w = full; } catch (e) {}
   if (!w) { M.hidden = true; return toast('No encontré ese trabajo.'); }
-  const staff = (ROLE.t || ROLE.r) && TAB === 'bandeja' && w.st === 'pend', own = ME && w.k === ME.key, link = safeUrl(w.link), t = tipo(w.ty);
+  const staff = ROLE.t && TAB === 'bandeja' && w.st === 'pend', rvVer = ROLE.r && !ROLE.t && TAB === 'bandeja' && w.st === 'pend', own = ME && w.k === ME.key, link = safeUrl(w.link), t = tipo(w.ty);
   M.innerHTML = `<article class="art" role="dialog" aria-modal="true"><div class="hero"><small>${t[1]} ${t[2]} · ${unidad(w.u)[1]} ${esc(unidad(w.u)[2])}</small><h2>${esc(w.t)}</h2><div class="by">✍️ ${esc(w.n)} · ${esc(w.sec ? '6.° ' + w.sec : '6.°')} · ${fecha(w.at)}</div><button type="button" class="x" data-x aria-label="Cerrar">✕</button></div>
   <div class="bd"><p>${esc(w.d)}</p>${[w.img, w.img2, w.img3].filter(Boolean).length ? `<h4>📎 Anexos</h4><div class="anx">${[w.img, w.img2, w.img3].filter(Boolean).map((x, i) => `<figure><img src="${esc(x)}" alt="Anexo ${i + 1}"><figcaption>Anexo ${i + 1}</figcaption></figure>`).join('')}</div>` : ''}${w.f ? `<h4>📚 Fuentes</h4><p style="font-size:14.5px">${esc(w.f)}</p>` : ''}
- ${ROLE.t || ROLE.r ? '<button type="button" class="btn blue" data-word style="justify-self:start">📄 Descargar su Word</button>' : ''}
+ ${ROLE.t ? '<button type="button" class="btn blue" data-word style="justify-self:start">📄 Descargar su Word</button>' : ''}
+  ${rvVer ? `<div class="acts"><p style="margin:0;padding:12px 16px;border-radius:16px;background:var(--sky);font-weight:800;color:var(--navy)">👀 Aquí sólo lo lees. Para revisarlo, ábrelo en <b>🔎 Similitud</b>: se pinta solo y ahí decides.</p>${miSec(w) || (ME && w.k === ME.key) ? '' : `<button type="button" class="btn blue" data-asim="${esc(w.id)}">🔎 Revisar en Similitud</button>`}</div>` : ''}
   ${link ? `<a class="btn blue" href="${esc(link)}" target="_blank" rel="noopener" style="justify-self:start;text-decoration:none">🔗 Ver el trabajo completo</a>` : ''}
   ${w.st === 'ok' && w.rv ? `<span class="rv">✔ Revisado por ${esc(w.rv)}</span>` : ''}
   ${w.st === 'ok' ? '<button type="button" class="btn soft pdfb" data-pdf>📄 Descargar PDF</button>' : ''}
@@ -1240,6 +1241,7 @@ $('#modal').addEventListener('click', async e => {
   const M = $('#modal');
   if (e.target === M || e.target.closest('[data-x]')) { M.hidden = true; M.innerHTML = ''; return; }
   if (e.target.closest('[data-word]')) return bajarWord(M.dataset.id, e.target.closest('[data-word]'));
+  const as = e.target.closest('[data-asim]'); if (as) { const id = as.dataset.asim; M.hidden = true; M.innerHTML = ''; setTab('similitud'); for (let k = 0; k < 60 && !(SIM.pend && SIM.pend.some(x => x.id === id)); k++) await new Promise(r => setTimeout(r, 100)); return revisarSim(id); }
   if (e.target.closest('[data-smacc]')) return aceptarSim(e.target.closest('[data-smacc]'));
   if (e.target.closest('[data-smcons]')) { const ta = $('#rvFb'), r = SIM.w && SIM.res[SIM.w.id]; if (ta && r) { ta.value = smConsejo(SIM.w, blanco(r)); ta.dataset.sug = '_'; ta.focus(); toast('✨ Consejo listo: puedes cambiarlo antes de devolver.'); } return; }
     if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
@@ -1279,7 +1281,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if (ME) { const me = $('#me'); me.hidden = false; me.innerHTML = `<i>${esc((firstName(ME.name)[0] || '🙂').toUpperCase())}</i><span class="nm">${esc(firstName(ME.name) || 'Hola')}</span>${ME.teacher ? '<span class="rol">Docente</span>' : ''}`; }
   await checkRole();
   if (ROLE.r) { const r = $('#me .rol'); if (!r) $('#me').insertAdjacentHTML('beforeend', '<span class="rol">🧐 Revisor</span>'); }
-  if (ROLE.t || ROLE.r) { $('#tabs [data-tab="bandeja"]').hidden = !ROLE.t; $('#tabs [data-tab="similitud"]').hidden = false; }   // los Revisores revisan sólo desde «Similitud» (su bandeja)
+  if (ROLE.t || ROLE.r) { $('#tabs [data-tab="bandeja"]').hidden = false; $('#tabs [data-tab="similitud"]').hidden = false; }   // los Revisores revisan sólo desde «Similitud» (su bandeja)
   if (ROLE.t) $('#tabs [data-tab="trabajos"]').hidden = false;
   const want = QS.get('v'); setTab(want === 'bandeja' && ROLE.t ? 'bandeja' : want === 'bandeja' && ROLE.r ? 'similitud' : want === 'enviar' ? 'enviar' : want === 'fuentes' ? 'fuentes' : 'revista');
   if (QS.get('rev')) setTimeout(() => verRevision(QS.get('rev')), 60);
@@ -1287,6 +1289,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610152148"></script><script src="archivos.js?v=202610152148"></script><script src="mando.js?v=202610152148"></script>
+<script src="pdftrabajo.js?v=202610152200"></script><script src="archivos.js?v=202610152200"></script><script src="mando.js?v=202610152200"></script>
 </body>
 </html>
