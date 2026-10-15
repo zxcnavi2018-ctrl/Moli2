@@ -151,8 +151,8 @@
 <div id="mGlobo" role="dialog" aria-label="Molí te ayuda a buscar"></div>
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610152146"></script>
-<script src="pdftrabajo.js?v=202610152146"></script>
+<script src="moli3d.js?v=202610152148"></script>
+<script src="pdftrabajo.js?v=202610152148"></script>
 <script>
 (function () {
 'use strict';
@@ -187,7 +187,9 @@ const GRADOS = [
   { g: 11, n: 'UNDÉCIMO', t: 'Undécimo grado', x: 5.4, x2: 2.75, w: 2.6, y: 4.66, z: -15.35, ry: 0, c: 0x1f6f78 }];
 const PISOS = GRADOS.flatMap(G => [{ ...G, p: 1, y: 0 }, { ...G, p: 2, y: 4.66 }]);   // cada grado: 2 estantes en el 1.er piso y 2 encima, en la galería (2.° piso)
 const PISO_TX = p => p === 2 ? '2.° PISO' : '1.er PISO';
-const COL_SEC = { A: '#6b2a2f', B: '#2c4a6e', C: '#35603f', D: '#7d4d22', E: '#55406e', F: '#235a60' };
+const COL_SEC = { A: '#6b2a2f', B: '#2c4a6e', C: '#35603f', D: '#7d4d22', E: '#55406e', F: '#235a60' }, COL_MOLI = '#0f8fb8';
+const esMoli = t => String(t.n || '').trim() === 'Molí' && !t.sec;          // 🧪 trabajos de práctica de los Revisores: libro de otro color
+const colDe = t => esMoli(t) ? COL_MOLI : COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39';
 const TIPOS = { opi: ['💭', 'Opinión científica'], ens: ['📝', 'Ensayo'], inv: ['🔬', 'Investigación'], pro: ['🛠️', 'Producto'], maq: ['🧩', 'Maqueta'], info: ['🖼️', 'Infografía'], vid: ['🎬', 'Video'], exp: ['⚗️', 'Experimento'] };
 
 // ===================================================================
@@ -473,11 +475,11 @@ scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ map: BRILLO, size: 0
 // ===================================================================
 let TRABAJOS = [];
 const lomoGeo = new THREE.BoxGeometry(1, 1, 1);
-function lomoTex(t, i) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39';
+function lomoTex(t, i) { const col = colDe(t);
   return canvasTex(96, 512, (g, w, h) => { g.fillStyle = col; g.fillRect(0, 0, w, h); const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, 'rgba(0,0,0,.25)'); gr.addColorStop(.35, 'rgba(255,255,255,.15)'); gr.addColorStop(1, 'rgba(0,0,0,.3)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
     g.fillStyle = '#e0b45a'; [26, 40, h - 46, h - 32].forEach(y => g.fillRect(0, y, w, 6)); g.save(); g.translate(w / 2 + 12, h / 2); g.rotate(-Math.PI / 2); g.textAlign = 'center'; g.fillStyle = '#ffe7a3'; g.font = '800 30px Cinzel, Georgia, serif';
     let s = String(t.t || 'Trabajo'); while (g.measureText(s).width > h - 120 && s.length > 4) s = s.slice(0, -2); if (s !== String(t.t || 'Trabajo')) s = s.replace(/\s*\S?$/, '') + '…'; g.fillText(s, 0, 0); g.restore();
-    g.fillStyle = '#fff8ea'; g.font = '900 24px Nunito, sans-serif'; g.textAlign = 'center'; g.fillText(String(t.n || '').split(' ').slice(0, 2).map(x => x[0] || '').join(''), w / 2, h - 66); }); }
+    g.fillStyle = '#fff8ea'; g.font = '900 24px Nunito, sans-serif'; g.textAlign = 'center'; g.fillText(esMoli(t) ? '★' : String(t.n || '').split(' ').slice(0, 2).map(x => x[0] || '').join(''), w / 2, h - 66); }); }
 function ponerLibros() {
   ESTANTES.forEach(E => { [E.libs, E.libs2].forEach(G => { G.children.forEach(o => { [].concat(o.material).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); }); if (o.geometry !== lomoGeo) o.geometry.dispose(); }); G.clear(); });
     E.items = []; E.hit = []; });
@@ -580,8 +582,8 @@ addEventListener('keydown', e => { if ($('#libro').classList.contains('on')) { i
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let hover = null, fijo = null, px = 0, py = 0;
 function tocado(cx, cy, lista) { ptr.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera); const h = ray.intersectObjects(lista, false)[0]; return h ? h.object : null; }
 const estanteDe = o => { while (o) { const E = ESTANTES.find(x => x.m === o || x.m2 === o); if (E) return E; o = o.parent; } return null; };
-function portadaHtml(t) { const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39', ty = TIPOS[t.ty] || TIPOS.inv;
-  return `<div class="cover" style="background:linear-gradient(135deg, ${col}, ${shade(col, -35)})"><div class="em">${ty[0]}</div><div class="ti">${esc(t.t || 'Trabajo')}</div><div class="orn"></div>${t.th ? `<img class="th" src="${esc(t.th)}" alt="">` : ''}<div class="au">✍️ ${esc(t.n || '')}<small>6.° ${esc(t.sec || '')} · ${esc(ty[1])}</small></div></div>`; }
+function portadaHtml(t) { const col = colDe(t), ty = TIPOS[t.ty] || TIPOS.inv;
+  return `<div class="cover" style="background:linear-gradient(135deg, ${col}, ${shade(col, -35)})"><div class="em">${ty[0]}</div><div class="ti">${esc(t.t || 'Trabajo')}</div><div class="orn"></div>${t.th ? `<img class="th" src="${esc(t.th)}" alt="">` : ''}<div class="au">✍️ ${esc(t.n || '')}<small>${esMoli(t) ? '🧪 Práctica de los Revisores' : '6.° ' + esc(t.sec || '')} · ${esc(ty[1])}</small></div></div>`; }
 function shade(hex, p) { const n = parseInt(hex.slice(1), 16), f = v => Math.max(0, Math.min(255, v + p)); return '#' + ((f(n >> 16) << 16) | (f((n >> 8) & 255) << 8) | f(n & 255)).toString(16).padStart(6, '0'); }
 function mostrarTapa(b, cx, cy, fij) { const t = b.userData.t, el = $('#tapa');
   el.innerHTML = portadaHtml(t) + (fij ? '<button class="abrir" type="button">📖 Abrir libro</button>' : '<div class="hint">🖱️ Clic para abrir</div>');
@@ -610,7 +612,7 @@ renderer.domElement.addEventListener('pointerup', e => {
   const m = tocado(e.clientX, e.clientY, ESTANTES.flatMap(E => [E.m, E.m2])); const E = m && estanteDe(m);                 // tocar otro estante = ir a ese estante
   if (E) { const i = ESTANTES.indexOf(E); if (i !== actual) irEstante(i); }
 });
-function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[String(t.sec || 'A').toUpperCase()] || '#8c2f39', ty = TIPOS[t.ty] || TIPOS.inv, d = String(t.d || '').trim();
+function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = colDe(t), ty = TIPOS[t.ty] || TIPOS.inv, d = String(t.d || '').trim();
   const fecha = t.at ? new Date(t.at).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const L = $('#libro'); L.style.setProperty('--c', col);
   const parr = d.split(/\n+/).map(x => x.trim()).filter(Boolean);
@@ -619,7 +621,7 @@ function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = COL_SEC[Strin
   const izq = `<div class="pg l"><h2>${esc(t.t || 'Trabajo')}</h2><div class="meta"><span>${ty[0]} ${esc(ty[1])}</span><span>📰 Revista Innovadora</span></div>
       ${t.th || t.img ? `<img class="foto" src="${esc(t.img || t.th)}" alt="Foto del trabajo">` : `<div style="font-size:90px;text-align:center;margin:20px 0">${ty[0]}</div>`}
       ${t.kw ? `<p class="fu">🔑 ${esc(t.kw)}</p>` : ''}
-      <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>${t.sec ? '6.° ' + esc(t.sec) : 'Docente'}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div>${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}
+      <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>${t.sec ? '6.° ' + esc(t.sec) : esMoli(t) ? '🧪 Práctica de los Revisores' : 'Docente'}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div>${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}
       <button type="button" class="pdf" data-pdf>📄 Descargar PDF</button>${DOCENTE && t.id && !String(t.id).startsWith('demo') ? '<button type="button" class="borrar" data-del>🗑 Eliminar libro</button>' : ''}</div>`;
   const der = `<div class="pg r">${texto}${t.f ? `<h3 class="sub">📚 Fuentes</h3><p class="fu">${esc(t.f)}</p>` : ''}<span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div>`;
   const pintar = () => { const A = [t.img, t.img2, t.img3].filter(Boolean), hojas = [[izq, der]];
@@ -820,6 +822,6 @@ addEventListener('pointerup', e => { if (!MOLI || modo === 'intro' || $('#libro'
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
-<script src="mando.js?v=202610152146"></script>
+<script src="mando.js?v=202610152148"></script>
 </body>
 </html>
