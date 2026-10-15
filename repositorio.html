@@ -87,6 +87,40 @@ button{cursor:pointer}
 .sm-pr{display:grid;gap:6px;margin:8px 0;padding:10px 12px;border-radius:14px;background:#fff;border:2px dashed #fdba74;font-size:14px;font-weight:700}.sm-pr b{color:#9a3412}
 .sm-ley{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-weight:800;color:var(--ink2)}
 @media (max-width:720px){.sm-cmp.dos{grid-template-columns:1fr}.sm-r{flex-wrap:wrap}}
+/* ✍️ hoja tipo Word */
+#hoja{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;background:#e6e6e6;font-family:Carlito,Calibri,"Segoe UI",Arial,sans-serif;color:#222}#hoja[hidden]{display:none}
+.wd-bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#2b579a;color:#fff;flex:none}.wd-bar b{flex:1;min-width:0;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wd-w{display:grid;place-items:center;width:28px;height:28px;border-radius:5px;background:#fff;color:#2b579a;font:900 17px Georgia,serif}.wd-sv{font-size:13px;opacity:.9;white-space:nowrap}
+.wd-ok{padding:8px 16px;border:0;border-radius:8px;background:#8cc63f;color:#123000;font-weight:900;font-size:14px}.wd-x{width:34px;height:34px;border:0;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;font-size:17px;font-weight:900}
+.wd-rib{display:flex;align-items:center;gap:14px;padding:7px 14px;background:#f3f3f3;border-bottom:1px solid #d4d4d4;font-size:13px;color:#444;overflow-x:auto;white-space:nowrap;flex:none;scrollbar-width:none}
+.wd-rib .on{color:#2b579a;font-weight:700;border-bottom:2px solid #2b579a;padding-bottom:2px}.wd-rib i{width:1px;height:18px;background:#ccc}.wd-f{padding:2px 8px;border:1px solid #ccc;border-radius:3px;background:#fff}.wd-rib b,.wd-rib em,.wd-rib u{font-family:Georgia,serif;color:#666}
+.wd-np{padding:2px 9px;border-radius:999px;background:#fde8e6;color:#b23a30;font-weight:700}
+.wd-sc{flex:1;overflow:auto;padding:24px 12px 40px}
+.wd-pg{max-width:794px;min-height:1000px;margin:0 auto;padding:64px 72px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.08);font-size:16px;line-height:1.5}
+.wd-k{margin:0;font-size:11px;letter-spacing:.2em;color:#2b579a;font-weight:700}.wd-pg h1{margin:4px 0 2px;font:700 30px Cambria,Georgia,serif;color:#1f3864}.wd-sub{margin:0 0 18px;color:#555;font-size:14.5px}
+.wd-tt label,.wd-pg h3{display:block;margin:12px 0 2px;font-weight:700;font-size:14px;color:#2b579a}
+.wd-tt input{width:100%;padding:4px 0;border:0;border-bottom:2px solid #c9d6ea;font:700 22px Cambria,Georgia,serif;color:#1f3864;outline:0}.wd-tt input:focus{border-bottom-color:#2b579a}
+.wd-ps{margin-top:22px}.wd-ps h2{margin:0;padding-bottom:4px;border-bottom:1px solid #8eaadb;font:700 19px Cambria,Georgia,serif;color:#1f3864}.wd-ps h2 span{display:inline-block;margin-right:6px;padding:1px 9px;border-radius:4px;background:#2b579a;color:#fff;font:700 12px/1.6 Calibri,Arial,sans-serif;letter-spacing:.06em;vertical-align:3px}
+.wd-h{margin:6px 0 4px;font-size:13.5px;font-style:italic;color:#777}
+.wd-pg textarea{display:block;width:100%;min-height:52px;padding:6px 8px;border:1px dashed transparent;border-left:3px solid #dbe5f3;border-radius:2px;background:transparent;font:inherit;line-height:1.55;resize:none;overflow:hidden;outline:0}
+.wd-pg textarea:hover{border-color:#dde4ee}.wd-pg textarea:focus{border-color:#9fb6d9;border-left-color:#2b579a;background:#fbfcfe}
+.wd-fu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}.wd-fu table{width:100%;border-collapse:collapse;font-size:13.5px}
+.wd-fu caption{text-align:left;padding:3px 8px;background:#2b579a;color:#fff;font-weight:700}.wd-fu th{width:40%;padding:4px 6px;border:1px solid #b4c6e7;background:#f2f6fc;text-align:left;font-weight:700;color:#1f3864;vertical-align:top}.wd-fu th small{display:block;font-weight:600;color:#2e7d32}
+.wd-fu td{border:1px solid #b4c6e7;padding:0}.wd-fu input{width:100%;padding:5px 6px;border:0;font:inherit;outline:0;background:transparent}.wd-fu input:focus{background:#fbfcfe;box-shadow:inset 0 0 0 2px #9fb6d9}.wd-fu input[data-link]{color:#0563c1;text-decoration:underline}
+.wd-pre{display:flex;align-items:flex-start;gap:8px;margin:4px 0}.wd-pre b{flex:none;padding-top:7px;color:#1f3864}.wd-pre textarea{min-height:36px}.wd-pre input{flex:1;padding:6px 8px;border:0;border-bottom:1px dashed #b4c6e7;font:inherit;outline:0}
+.wd-tb{width:100%;margin-top:6px;border-collapse:collapse;font-size:14px}.wd-tb th{padding:5px 8px;border:1px solid #b4c6e7;background:#f2f6fc;color:#1f3864}.wd-tb td{border:1px solid #b4c6e7;padding:0}.wd-tb input{width:100%;padding:6px;border:0;font:inherit;outline:0;text-align:center}
+.wd-ro{margin:0 0 14px;padding:10px 12px;border-radius:6px;background:#e8f0fb;color:#1f3864;font-weight:700;font-size:14px}
+.g-doc small b{display:inline!important}
+.wd-2{display:grid;grid-template-columns:1.25fr 1fr;gap:10px}.wd-go.env{border-color:#6aa52b}.wd-go.env .ic{background:#6aa52b;font-size:22px}@media (max-width:720px){.wd-2{grid-template-columns:1fr}}
+#wdDlg{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,26,45,.55)}#wdDlg[hidden]{display:none}
+.wd-dc{width:min(460px,100%);display:grid;gap:10px;padding:20px;border-radius:20px;background:#fff;border:3px solid #2b579a;box-shadow:0 24px 60px rgba(0,0,0,.4)}.wd-dc>b{font:900 21px var(--serif);color:var(--navy)}.wd-dc>span{font-weight:700;color:var(--ink2)}
+.wd-dc input{padding:12px 14px;border:2px solid var(--line);border-radius:14px;font-weight:800;font-size:16px}.wd-dc>div{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.wd-e{margin:0;font-weight:800;color:var(--ink2)}
+.wd-dc .wd-ls{display:grid;justify-content:stretch;gap:8px;max-height:50vh;overflow:auto}.wd-ls button{display:flex;align-items:center;gap:10px;padding:10px;border:2px solid var(--line);border-radius:14px;background:#fff;text-align:left;cursor:pointer}.wd-ls button:hover{border-color:#2b579a}.wd-ls i{display:grid;place-items:center;width:36px;height:42px;border-radius:6px;background:#2b579a;color:#fff;font:900 18px Georgia,serif;font-style:normal}.wd-ls b{display:block;color:var(--navy)}.wd-ls small{font-weight:800;color:var(--ink2)}
+.wd-ck{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:15px;cursor:pointer}.wd-ck input{width:18px;height:18px}
+.wd-st{display:flex;gap:18px;padding:5px 14px;background:#2b579a;color:#e8eefb;font-size:12.5px;flex:none;overflow-x:auto;white-space:nowrap}.wd-st .wd-np{background:rgba(255,255,255,.18);color:#fff}
+.wd-no{animation:wdNo .45s}@keyframes wdNo{25%{transform:translateX(-6px);background:#fde8e6}75%{transform:translateX(6px)}}
+.wd-go{width:100%;border:2px solid #2b579a;cursor:pointer;text-align:left;font:inherit}.wd-go:hover{background:#f2f6fc}
+@media (max-width:760px){.wd-pg{padding:28px 18px;min-height:0}.wd-fu{grid-template-columns:1fr}.wd-sv{display:none}}
 /* pestañas */
 .tabs{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -192,7 +226,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 .art .rv{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--mint);color:var(--green2);font-weight:900;font-size:13px;justify-self:start}
 .art .acts{display:flex;flex-wrap:wrap;gap:10px;padding-top:6px;border-top:2px dashed var(--line)}
 .art textarea{width:100%;min-height:80px;padding:12px;border:2px solid var(--line);border-radius:14px;font-weight:700}
-#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;padding:12px 18px;border-radius:16px;background:var(--navy);color:#fff;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:pop .3s}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:95;padding:12px 18px;border-radius:16px;background:var(--navy);color:#fff;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:pop .3s}
 #toast[hidden]{display:none}
 .pin{display:grid;gap:10px;justify-items:center;text-align:center;padding:24px;max-width:360px;margin:30px auto;border-radius:24px;background:#fff;border:2px solid var(--line)}
 .pin input{width:150px;padding:12px;border:2px solid var(--line);border-radius:14px;text-align:center;font-size:26px;font-weight:900;letter-spacing:.4em}
@@ -315,7 +349,7 @@ const ME = (m => m && m.key ? m : null)(ls.get(K_ME, null)) || (m => m && m.key 
 const TIPOS = [['opi', '💭', 'Opinión científica'], ['ens', '📝', 'Ensayo'], ['inv', '🔬', 'Investigación'], ['dis', '🧪', 'Diseño de investigación'], ['pro', '🛠️', 'Producto o maqueta'], ['info', '🖼️', 'Infografía'], ['exp', '⚗️', 'Experimento'], ['maq', '🧩', 'Maqueta'], ['vid', '🎬', 'Video']];
 const TIPOS_F = TIPOS.slice(0, 6);
 const GUIA_TXT = { opi: 'Tema, tu opinión, 3 razones, lo que otros piensan y tu conclusión.', ens: 'Introducción, 3 párrafos de desarrollo y conclusión.', inv: 'Tu pregunta, lo que encontraste y tu respuesta.', dis: 'Pregunta, qué dice la ciencia, hipótesis, variables, materiales, pasos, seguridad y tabla de datos.', pro: 'Para qué sirve, boceto, materiales, pasos, cómo funciona y mejoras.', info: 'Tema, título llamativo, datos clave, boceto y dato curioso.' };
-const guiaHtml = k => { const t = tipo(k); return `<a class="g-doc" href="docs/guias/${esc(t[0])}.docx" download="Guía ${esc(t[2])}.docx"><span class="ic">W</span><div><b>Descarga la guía de ${t[1]} ${esc(t[2])}</b><small>${esc(GUIA_TXT[t[0]] || '')} Con tus 3 citas dentro del trabajo y sus fuentes al final.</small></div><em>⬇</em></a>`; };
+const guiaHtml = k => { if (HOJA[k]) return hojaLanzador(k); const t = tipo(k); return `<a class="g-doc" href="docs/guias/${esc(t[0])}.docx" download="Guía ${esc(t[2])}.docx"><span class="ic">W</span><div><b>Descarga la guía de ${t[1]} ${esc(t[2])}</b><small>${esc(GUIA_TXT[t[0]] || '')} Con tus 3 citas dentro del trabajo y sus fuentes al final.</small></div><em>⬇</em></a>`; };
 const UNITS = [['unit7', '🦠', 'Unidad 7 · Microorganismos'], ['unit8', '🧬', 'Unidad 8 · Sistema reproductor'], ['otra', '🌎', 'Otro tema de Ciencia']];
 const tipo = k => TIPOS.find(t => t[0] === k) || TIPOS[0], unidad = k => UNITS.find(u => u[0] === k) || UNITS[2];
 if (ME && ME.docente) ME.teacher = true;
@@ -552,12 +586,168 @@ function vEnviar() {
     <div class="fld"><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" required placeholder="El mismo título de tu guía"></div>
     <div class="fld"><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" required placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
     ${T0 ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
-    <div class="fld"><label>Sube tu guía completada (Word)</label><label class="photo" id="eDocL"><input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="eDoc" hidden><span id="eDocV">📄 Toca aquí para elegir tu guía .docx</span></label><small>Lo que escribiste en tu guía será el contenido de tu libro en la Biblioteca.</small></div>
+    <div class="fld" id="fDoc"${HOJA[FORM.ty] ? ' hidden' : ''}><label>Sube tu guía completada (Word)</label><label class="photo" id="eDocL"><input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="eDoc" hidden><span id="eDocV">📄 Toca aquí para elegir tu guía .docx</span></label><small>Lo que escribiste en tu guía será el contenido de tu libro en la Biblioteca.</small></div>
     <div class="fld"><label>Anexos: fotos de tu trabajo <span style="font-weight:700;color:var(--ink2)">(hasta 3, opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" multiple hidden><span id="ePv">📷 Toca aquí para elegir tus fotos</span></label><small>Irán al final de tu libro, en la página de Anexos.</small></div>
     <div><button type="submit" class="btn go" id="eGo">${T0 ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
   </form><div class="mine" id="mine"></div>`;
   FORM.img = FORM.th = ''; FORM.txt = ''; FORM.fotos = []; drawMine();
 }
+// ---- ✍️ Guías tipo Word: «Abrir guía» abre una hoja con la estructura de la guía; NO se puede pegar, salvo en «Link» de sus fuentes ----
+//      Cada guía queda en 📁 Mis archivos (archivos.js): «Por concluir» hasta que la envían; luego «Enviado».
+const CITAS = 'Aquí van tus citas: «Según López (2020), …» o «… (Soto, 2019)».';
+const H_FU = { t: 'Mis fuentes', h: '¿De dónde sacaste la información? Completa un recuadro por cada cita. Sólo en «Link» puedes pegar.', fu: 3 };
+const H_CK = L => ({ t: 'Revisa y publica', h: 'Marca cada casilla antes de publicar.', ck: [...L, 'Usé mínimo 3 citas con mis palabras.', 'Escribí las fuentes de mis citas.', 'Revisé la ortografía y lo leí en voz alta.'] });
+const nums = (n, ph) => Array.from({ length: n }, (_, i) => ({ id: 'n' + (i + 1), pre: (i + 1) + '.', r: 1, ph }));
+const HOJA_TODAS = {
+  opi: { sub: 'Dices lo que piensas sobre un tema de ciencia y lo defiendes con razones y evidencias.', pasos: [
+    { t: 'El tema o la pregunta', h: '¿Sobre qué vas a opinar? Ejemplo: ¿Es bueno usar antibióticos para cualquier enfermedad?', c: [{ id: 'a', r: 2 }] },
+    { t: 'Mi opinión', h: 'Escribe tu postura en una oración clara.', c: [{ id: 'b', pre: 'Yo pienso que', r: 2 }] },
+    { t: 'Mis razones', h: 'Da 3 razones. Apoya cada una con una cita o un dato. ' + CITAS, c: [1, 2, 3].map(n => ({ id: 'r' + n, lab: 'Razón ' + n })) },
+    { t: 'Lo que otros podrían pensar', h: '¿Quién no estaría de acuerdo? ¿Qué le responderías?', c: [{ id: 'o1', lab: 'Algunos dirían que…', r: 2 }, { id: 'o2', lab: 'Pero yo respondo que…', r: 2 }] },
+    { t: 'Mi conclusión', h: 'Repite tu opinión y di qué debería hacerse.', c: [{ id: 'cn', r: 4 }] }, H_FU, H_CK(['Escribí mi opinión y 3 razones.', 'Respondí a lo que otros podrían pensar.'])] },
+  ens: { sub: 'Explicas un tema con tus propias ideas, en párrafos ordenados.', pasos: [
+    { t: 'Introducción', h: 'Presenta el tema y escribe tu idea principal.', c: [{ id: 'i1', lab: '¿De qué trata mi ensayo?', r: 2 }, { id: 'i2', pre: 'Mi idea principal es', r: 2 }] },
+    { t: 'Desarrollo', h: 'Escribe 3 párrafos. Cada uno con una idea y una cita. ' + CITAS, c: [1, 2, 3].flatMap(n => [{ id: `p${n}i`, lab: `Párrafo ${n} · Idea`, uno: 1 }, { id: 'p' + n, r: 4, ph: 'Escribe tu párrafo con una cita…' }]) },
+    { t: 'Conclusión', h: 'Resume lo más importante y cierra con una reflexión.', c: [{ id: 'cn', r: 4 }] }, H_FU, H_CK(['Tiene introducción, 3 párrafos y conclusión.'])] },
+  inv: { sub: 'Buscas información en fuentes confiables para responder una pregunta.', pasos: [
+    { t: 'Mi pregunta de investigación', h: '¿Qué quieres averiguar? Empieza con: ¿Qué…? ¿Cómo…? ¿Por qué…?', c: [{ id: 'q', ph: '¿…?', r: 2 }] },
+    { t: 'Lo que encontré', h: 'Escribe lo más importante de cada fuente con tus palabras. ' + CITAS, c: [1, 2, 3].map(n => ({ id: 'h' + n, lab: 'Hallazgo ' + n, ph: n < 3 ? 'Según … (año), …' : '… (Apellido, año).' })) },
+    { t: 'La respuesta a mi pregunta', h: 'Con todo lo que encontraste, responde tu pregunta.', c: [{ id: 'r', r: 5, ph: 'Mi respuesta es…' }] }, H_FU, H_CK(['Respondí mi pregunta con lo que encontré.'])] },
+  dis: { sub: 'Planificas un experimento para comprobar una hipótesis.', pasos: [
+    { t: 'Pregunta de indagación', h: 'Debe relacionar una causa con un efecto. Ejemplo: ¿Cómo influye la temperatura del agua en la actividad de la levadura?', c: [{ id: 'a', r: 2 }] },
+    { t: '¿Qué dice la ciencia?', h: 'Lo que encontraste en fuentes confiables sobre tu tema. Aquí van tus 3 citas: «Según López (2020), …» o «… (Soto, 2019)».', c: [{ id: 'b', r: 6 }] },
+    { t: 'Hipótesis', h: 'Tu respuesta posible: «Si… entonces… porque…».', c: [{ id: 'h1', pre: 'Si', r: 1 }, { id: 'h2', pre: 'entonces', r: 1 }, { id: 'h3', pre: 'porque', r: 1 }] },
+    { t: 'Variables', h: '¿Qué cambias, qué mides y qué dejas igual?', c: [{ id: 'v1', lab: 'Lo que cambio (independiente)', r: 1 }, { id: 'v2', lab: 'Lo que mido (dependiente)', r: 1 }, { id: 'v3', lab: 'Lo que dejo igual (controladas)', r: 1 }] },
+    { t: 'Materiales', h: 'Haz la lista de todo lo que necesitas.', c: [{ id: 'm', r: 4 }] },
+    { t: 'Procedimiento', h: 'Escribe los pasos en orden. ¿Cuántas veces repetirás la prueba?', c: nums(5) },
+    { t: 'Medidas de seguridad', h: '¿Cómo trabajarás con cuidado?', c: [{ id: 's', r: 3 }] },
+    { t: 'Cómo registraré mis datos', h: 'Prepara tu tabla.', tb: { cols: ['Prueba', 'Medida 1', 'Medida 2', 'Medida 3'], rows: 3 } }, H_FU, H_CK(['Tiene pregunta, hipótesis, variables, materiales, pasos y tabla.'])] },
+  pro: { sub: 'Creas algo con tus manos para explicar o resolver algo.', pasos: [
+    { t: '¿Qué problema resuelve o qué explica?', h: '¿Para qué sirve tu producto o maqueta?', c: [{ id: 'a', r: 3 }] },
+    { t: 'Mi idea (boceto)', h: 'Dibuja cómo será: descríbelo aquí y sube la foto de tu dibujo en «Anexos».', c: [{ id: 'b', r: 3 }] },
+    { t: 'Materiales', h: '¿Qué usaste? Si puedes, materiales reciclados.', c: [{ id: 'm', r: 3 }] },
+    { t: '¿Cómo lo hice?', h: 'Escribe los pasos.', c: nums(4) },
+    { t: '¿Cómo funciona?', h: 'Explícalo con ciencia. ' + CITAS, c: [{ id: 'f', r: 5 }] },
+    { t: 'Pruebas y mejoras', h: '¿Funcionó? ¿Qué mejorarías?', c: [{ id: 'pm', r: 3 }] }, H_FU, H_CK(['Explico para qué sirve y cómo funciona.'])] },
+  info: { sub: 'Explicas un tema con pocas palabras, datos e imágenes.', pasos: [
+    { t: 'Tema y público', h: '¿De qué trata y para quién es?', c: [{ id: 'a', r: 2 }, { id: 'a2', lab: '¿Quién la leerá?', r: 1 }] },
+    { t: 'Título llamativo', h: 'Corto y que dé ganas de leer. Ejemplo: ¡Los microbios no se ven, pero ahí están!', c: [{ id: 'b', r: 1 }] },
+    { t: 'Datos clave', h: 'De 3 a 5 datos cortos. Cada uno con su fuente. ' + CITAS, c: [1, 2, 3, 4, 5].map(n => ({ id: 'd' + n, lab: 'Dato ' + n, r: 2 })) },
+    { t: 'Boceto de mi infografía', h: 'Dibuja dónde irán el título, los datos y las imágenes: descríbelo aquí y sube la foto de tu boceto en «Anexos».', c: [{ id: 'bo', r: 3 }] },
+    { t: 'Dato curioso', h: 'Algo sorprendente para terminar.', c: [{ id: 'dc', r: 2 }] }, H_FU, H_CK(['Tiene título, datos clave y boceto.'])] } };
+const HOJA = { inv: HOJA_TODAS.inv };                                 // por ahora sólo la guía de Investigación se escribe aquí (las demás siguen en Word)
+const FU_C = [['a', 'Autor o página', 'Ej.: Ministerio de Salud'], ['y', 'Año', 'Ej.: 2025'], ['m', 'Tema', 'Ej.: El dengue'], ['l', 'Link', 'https://…']];
+const HJ_K = () => 'moli2:hojas:' + (ME ? ME.key : 'x');
+const hojasTodas = () => { const L = ls.get(HJ_K(), []); return Array.isArray(L) ? L : []; };
+const hojaDoc = id => hojasTodas().find(h => h.id === id);
+function hojaPut(h) { const L = hojasTodas().filter(x => x.id !== h.id); h.at = Date.now(); L.unshift(h); if (!ls.set(HJ_K(), L.slice(0, 40))) toast('⚠️ No pude guardar: tu navegador está lleno.'); }
+const hojaNueva = ty => { const h = { id: 'h' + Date.now().toString(36), ty, t: '', v: {}, at: Date.now(), st: 'por' }; hojaPut(h); return h; };
+const hojaBorr = ty => hojasTodas().find(h => h.ty === ty && h.st === 'por');
+function hojaTexto(h) {                                               // el mismo formato que sale al leer la guía en Word
+  const G = HOJA[h.ty], v = h.v || {}, val = k => String(v[k] || '').replace(/[ \t]+/g, ' ').trim(), L = [];
+  G.pasos.forEach(p => { const A = [];
+    (p.c || []).forEach(c => { const x = val(c.id); if (!x) return; A.push(c.pre ? `${c.pre} ${x}` : c.lab ? (/[?…]$/.test(c.lab) ? `${c.lab}\n${x}` : `${c.lab}: ${x}`) : x); });
+    if (p.tb) for (let r = 1; r <= p.tb.rows; r++) { const F = p.tb.cols.slice(1).map((_, c) => val(`t${r}${c}`)); if (F.some(Boolean)) A.push(`${p.tb.cols[0]} ${r}: ${F.map(x => x || '—').join(' · ')}`); }
+    for (let n = 1; n <= (p.fu || 0); n++) { const F = FU_C.map(([k, lab]) => [lab, val(`f${n}${k}`)]).filter(x => x[1]); if (F.length) A.push(`Fuente ${n}`, ...F.map(([lab, x]) => `${lab}: ${x}`)); }
+    (p.ck || []).forEach((c, j) => { if (v['c' + j]) A.push('si ' + c); });
+    if (A.length) L.push('PASO ' + p.t, ...A); });
+  return L.join('\n').slice(0, 20000);
+}
+function hojaFalta(h) {
+  const v = h.v || {}, x = k => String(v[k] || '').trim(), F = [];
+  HOJA[h.ty].pasos.forEach((p, i) => { if (p.c && !p.c.some(c => x(c.id).length >= 3)) F.push(`el Paso ${i + 1} (${p.t})`);
+    if (p.fu && [1, 2, 3].filter(n => x(`f${n}a`) && x(`f${n}y`)).length < 3) F.push(`el autor y el año de tus 3 fuentes (Paso ${i + 1})`); });
+  if (!F.length && hojaPal(h) < 60) F.push('escribir un poquito más (mínimo 60 palabras)');
+  return F;
+}
+const hojaPal = h => hojaTexto(h).replace(/^PASO.*$|^(Fuente \d|Autor o página:|Año:|Tema:|Link:.*|si .*)$/gm, ' ').split(/\s+/).filter(Boolean).length;
+function hojaLanzador(ty) {
+  const t = tipo(ty), h = hojaBorr(ty), n = h ? hojaPal(h) : 0, sel = FORM.hid && hojaDoc(FORM.hid);
+  return `<div class="wd-2"><button type="button" class="g-doc wd-go" data-hoja="${ty}"><span class="ic">W</span><div><b>📂 Abrir guía de ${t[1]} ${esc(t[2])}</b><small>${h ? `Sigue tu guía <b>por concluir</b>${n ? ` (${n} palabras)` : ''}. ` : `${esc(GUIA_TXT[ty] || '')} `}Escríbela tú: aquí no se puede pegar (sólo en «Link»).</small></div><em>✏️</em></button>
+    <button type="button" class="g-doc wd-go env" data-envsel><span class="ic">📤</span><div><b>Enviar investigación</b><small>${sel && sel.st === 'por' ? `Vas a enviar: <b>«${esc(sel.nom || sel.t || 'Mi investigación')}»</b>. Toca para cambiarla.` : 'Elige tu trabajo de tu carpeta 📁 Mis archivos.'}</small></div><em>📁</em></button></div>`;
+}
+function abrirHojaDoc(id) {
+  const h = hojaDoc(id); if (!h || !HOJA[h.ty]) return toast('No encontré esa guía.');
+  const G = HOJA[h.ty], t = tipo(h.ty), v = h.v || (h.v = {}), ro = h.st === 'env'; let d = document.getElementById('hoja');
+  if (!d) { d = document.createElement('div'); d.id = 'hoja'; document.body.appendChild(d); }
+  const dis = ro ? ' disabled' : '';
+  const ta = (id, ph, r = 3) => `<textarea data-k="${id}" rows="${r}" placeholder="${esc(ph || '')}" spellcheck="true" lang="es"${dis}>${esc(v[id] || '')}</textarea>`;
+  const inp = (id, ph, ex = '') => `<input data-k="${id}" ${ex} placeholder="${esc(ph || '')}" value="${esc(v[id] || '')}"${dis}>`;
+  d.innerHTML = `<div class="wd-bar"><span class="wd-w">W</span><b>${esc(h.t || 'Mi ' + t[2].toLowerCase())} - Word de Molí</b><span class="wd-sv" id="wdSv">${ro ? '📨 Enviado' : '💾 Guardado'}</span>${ro ? '<button type="button" class="wd-ok" data-hcopia>✏️ Hacer una copia para corregir</button>' : '<button type="button" class="wd-ok" data-hok>💾 Guardar trabajito</button>'}<button type="button" class="wd-x" data-hx aria-label="Cerrar">✕</button></div>
+  <div class="wd-rib"><span class="on">Inicio</span><span>Insertar</span><span>Diseño</span><span>Revisar</span><i></i><span class="wd-f">Calibri</span><span class="wd-f">11</span><b>N</b><em>K</em><u>S</u><i></i><span class="wd-np">🚫📋 Pegar desactivado · sólo en Link</span></div>
+  <div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
+    <p class="wd-k">REVISTA INNOVADORA · GUÍA PASO A PASO</p><h1>${t[1]} ${esc(t[2])}</h1><p class="wd-sub">${esc(G.sub)} Usa mínimo 3 citas parafraseadas dentro de tu trabajo y escribe sus fuentes al final.</p>
+    <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
+    ${G.pasos.map((p, i) => `<section class="wd-ps"><h2><span>PASO ${i + 1}</span> ${esc(p.t)}</h2><p class="wd-h">${esc(p.h)}</p>
+      ${(p.c || []).map(c => c.pre ? `<div class="wd-pre"><b>${esc(c.pre)}</b>${ta(c.id, c.ph || '…', c.r || 1)}</div>` : c.uno ? `<div class="wd-pre"><b>${esc(c.lab)}:</b>${inp(c.id, 'la idea de este párrafo', 'maxlength="160"')}</div>` : `${c.lab ? `<h3>${esc(c.lab)}</h3>` : ''}${ta(c.id, c.ph, c.r)}`).join('')}
+      ${p.tb ? `<table class="wd-tb"><tr>${p.tb.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${Array.from({ length: p.tb.rows }, (_, r) => `<tr><th>${r + 1}</th>${p.tb.cols.slice(1).map((_, c) => `<td>${inp(`t${r + 1}${c}`, '', 'maxlength="40"')}</td>`).join('')}</tr>`).join('')}</table>` : ''}
+      ${p.fu ? `<div class="wd-fu">${Array.from({ length: p.fu }, (_, n) => `<table><caption>Fuente ${n + 1}</caption>${FU_C.map(([k, lab, ej]) => `<tr><th>${lab}${k === 'l' ? ' <small>📋 aquí sí pegas</small>' : ''}</th><td>${inp(`f${n + 1}${k}`, ej, k === 'l' ? 'data-link inputmode="url" maxlength="300"' : k === 'y' ? 'inputmode="numeric" maxlength="12"' : 'maxlength="160"')}</td></tr>`).join('')}</table>`).join('')}</div>` : ''}
+      ${(p.ck || []).map((c, j) => `<label class="wd-ck"><input type="checkbox" data-k="c${j}" ${v['c' + j] ? 'checked' : ''}${dis}> ${esc(c)}</label>`).join('')}</section>`).join('')}
+  </div></div>
+  <div class="wd-st"><span>Página 1 de 1</span><span id="wdN">${hojaPal(h)} palabras</span><span>Español (Perú)</span><span class="wd-np">🚫 Escribe con tus palabras</span></div>`;
+  d.hidden = false; d.dataset.id = id; document.body.style.overflow = 'hidden';
+  d.querySelectorAll('textarea').forEach(crecer); d.querySelectorAll('[data-k]').forEach(x => HPREV.set(x, x.value));
+}
+window.abrirHojaDoc = abrirHojaDoc; window.nuevaHoja = ty => ME && HOJA[ty] ? hojaNueva(ty).id : null;
+function abrirHoja(ty) { if (!ME) return avisoDni(); abrirHojaDoc((hojaBorr(ty) || hojaNueva(ty)).id); }
+const crecer = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; };
+const HPREV = new WeakMap();
+let hojaT = 0;
+function hojaGuardar() {
+  const d = $('#hoja'); if (!d || d.hidden) return; const h = hojaDoc(d.dataset.id); if (!h || h.st === 'env') return;
+  d.querySelectorAll('[data-k]').forEach(x => { const k = x.dataset.k; if (k === '_t') h.t = x.value; else h.v[k] = x.type === 'checkbox' ? x.checked : x.value; });
+  h.np = hojaPal(h); hojaPut(h); const s = $('#wdSv'), n = $('#wdN'); if (s) s.textContent = '💾 Guardado'; if (n) n.textContent = hojaPal(h) + ' palabras';
+}
+function noPegar(x) { toast('🚫 Aquí no se puede pegar: escríbelo con tus propias palabras. Sólo puedes pegar en «Link».', 3600); if (x) { x.classList.remove('wd-no'); void x.offsetWidth; x.classList.add('wd-no'); } }
+['paste', 'drop'].forEach(ev => document.addEventListener(ev, e => { const h = e.target.closest && e.target.closest('#hoja'); if (!h || e.target.closest('[data-link]')) return; e.preventDefault(); noPegar(e.target.closest('[data-k]')); }, true));
+document.addEventListener('beforeinput', e => { if (!e.target.closest || !e.target.closest('#hoja') || e.target.closest('[data-link]')) return; if (/^insertFrom(Paste|Drop|Yank)/.test(e.inputType || '')) { e.preventDefault(); noPegar(e.target); } }, true);
+document.addEventListener('input', e => {
+  const x = e.target; if (!x.closest || !x.closest('#hoja') || !x.dataset.k) return;
+  const prev = HPREV.get(x) ?? '';
+  if (!x.hasAttribute('data-link') && x.type !== 'checkbox' && x.value.length - prev.length > 60) { x.value = prev; noPegar(x); return; }   // el teclado del celular pega de golpe: también se frena
+  HPREV.set(x, x.value); if (x.tagName === 'TEXTAREA') crecer(x);
+  const s = $('#wdSv'); if (s) s.textContent = '✏️ Guardando…'; clearTimeout(hojaT); hojaT = setTimeout(hojaGuardar, 500);
+});
+document.addEventListener('change', e => { if (e.target.closest && e.target.closest('#hoja') && e.target.type === 'checkbox') hojaGuardar(); });
+function cerrarHoja() {
+  const d = $('#hoja'); if (!d) return; clearTimeout(hojaT); hojaGuardar(); d.hidden = true; document.body.style.overflow = '';
+  const h = hojaDoc(d.dataset.id); if (!h) return;
+  if (h.st === 'por' && TAB === 'enviar') { if (FORM.ty !== h.ty) { FORM.ty = h.ty; const ty = $('#eTy'); if (ty) ty.innerHTML = tyHtml(); } const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(h.ty); const t = $('#eT'); if (t && !t.value.trim() && h.t) t.value = h.t; }
+  try { window.MisArchivos && MisArchivos.pintar(); } catch (x) {}
+}
+document.addEventListener('click', e => {
+  const go = e.target.closest('[data-hoja]'); if (go) return abrirHoja(go.dataset.hoja);
+  const d = $('#hoja'); if (!d || d.hidden) return;
+  if (e.target.closest('[data-hcopia]')) { const h = hojaDoc(d.dataset.id); if (!h) return; const c = hojaNueva(h.ty); c.t = h.t; c.v = JSON.parse(JSON.stringify(h.v || {})); hojaPut(c); toast('✏️ Copia lista: corrígela y vuelve a enviarla.'); return abrirHojaDoc(c.id); }
+  const hx = e.target.closest('[data-hx]'), hk = e.target.closest('[data-hok]'); if (!hx && !hk) return;
+  hojaGuardar(); const h = hojaDoc(d.dataset.id); if (!h || h.st === 'env') return cerrarHoja();
+  const fin = () => { const F = hojaFalta(h); cerrarHoja(); if (TAB !== 'enviar') setTab('enviar');
+    toast(F.length ? `💾 «${h.nom}» quedó guardado en 📁 Mis archivos como ⏳ Por concluir.` : `💾 «${h.nom}» está guardado y ✅ listo: toca «📤 Enviar investigación» cuando quieras.`, 5200); };
+  if (hk || !h.nom) dlgGuardar(h, fin); else fin();
+});
+// 💾 Guardar trabajito (con un nombre para reconocerlo en la carpeta) y 📤 Enviar investigación (elige el trabajo de su carpeta)
+function dlgGuardar(h, cb) {
+  let m = document.getElementById('wdDlg'); if (!m) { m = document.createElement('div'); m.id = 'wdDlg'; document.body.appendChild(m); }
+  m.innerHTML = `<form class="wd-dc"><b>💾 Guardar mi trabajito</b><span>Ponle un nombre para encontrarlo en tu carpeta 📁 Mis archivos.</span><input maxlength="60" required placeholder="Ej.: Mi investigación del pan" value="${esc(h.nom || h.t || '')}"><div><button type="button" class="btn soft" data-dno>Seguir escribiendo</button><button type="submit" class="btn go">💾 Guardar</button></div></form>`;
+  m.hidden = false; const i = m.querySelector('input'); setTimeout(() => { i.focus(); i.select(); }, 50);
+  m.querySelector('[data-dno]').onclick = () => { m.hidden = true; };
+  m.querySelector('form').onsubmit = e => { e.preventDefault(); const n = i.value.replace(/\s+/g, ' ').trim(); if (n.length < 3) return toast('✏️ Escribe un nombre un poquito más largo.'); h.nom = n.slice(0, 60); hojaPut(h); m.hidden = true; cb && cb(); };
+}
+function elegirParaEnviar() {
+  if (!ME) return avisoDni();
+  const L = hojasTodas().filter(h => HOJA[h.ty] && h.st === 'por'); let m = document.getElementById('wdDlg'); if (!m) { m = document.createElement('div'); m.id = 'wdDlg'; document.body.appendChild(m); }
+  m.innerHTML = `<div class="wd-dc"><b>📁 ¿Qué trabajo vas a enviar?</b><span>Elige tu investigación de tu carpeta. Debe tener todos sus pasos completos.</span>
+    ${L.length ? `<div class="wd-ls">${L.map(h => { const f = hojaFalta(h); return `<button type="button" data-envh="${esc(h.id)}"><i>W</i><span><b>${esc(h.nom || h.t || 'Mi investigación')}</b><small>${hojaPal(h)} palabras · ${f.length ? '⏳ Por concluir' : '✅ Lista para enviar'}</small></span></button>`; }).join('')}</div>` : '<p class="wd-e">📂 Tu carpeta no tiene investigaciones por enviar. Primero toca «Abrir guía» y escríbela.</p>'}
+    <div><button type="button" class="btn soft" data-dno>Cerrar</button></div></div>`;
+  m.hidden = false; m.querySelector('[data-dno]').onclick = () => { m.hidden = true; };
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-envh]'); if (b) { const h = hojaDoc(b.dataset.envh), F = h ? hojaFalta(h) : []; $('#wdDlg').hidden = true; if (!h) return;
+    if (F.length) { toast('✏️ Esa investigación aún está por concluir. Te falta: ' + F.join(', ') + '.', 5200); return abrirHojaDoc(h.id); }
+    FORM.ty = h.ty; FORM.hid = h.id; const ty = $('#eTy'); if (ty) ty.innerHTML = tyHtml(); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(h.ty); const t = $('#eT'); if (t && h.t) t.value = h.t;
+    const f = $('#fEnv'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('📤 ¡Listo! Pon tus palabras clave y toca «Enviar mi trabajo».', 4200); return; }
+  if (e.target.closest('[data-envsel]')) return elegirParaEnviar();
+});
 let dniT = 0;
 function avisoDni() { const a = $('#dniAviso'); a.hidden = false; const b = a.querySelector('.da-b'); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; clearTimeout(dniT); dniT = setTimeout(() => a.hidden = true, 5000); }
 $('#dniAviso').addEventListener('click', () => { $('#dniAviso').hidden = true; clearTimeout(dniT); });
@@ -615,15 +805,18 @@ document.addEventListener('change', async e => {
 document.addEventListener('click', e => {
   const lk = e.target.closest('#eTy [data-tlk]'); if (lk) { const k = lk.dataset.tlk; TCERR[k] = !TCERR[k]; $('#eTy').innerHTML = tyHtml(); return guardarTipos(); }
   const t = e.target.closest('#eTy [data-ty]'), u = e.target.closest('#eU [data-u]');
-  if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(FORM.ty); }
+  if (t) { FORM.ty = t.dataset.ty; document.querySelectorAll('#eTy button').forEach(b => b.classList.toggle('on', b === t)); const g = $('#eGuia'); if (g) g.innerHTML = guiaHtml(FORM.ty); const fd = $('#fDoc'); if (fd) fd.hidden = !!HOJA[FORM.ty]; }
   if (u) { FORM.u = u.dataset.u; document.querySelectorAll('#eU button').forEach(b => b.classList.toggle('on', b === u)); }
   const gg = e.target.closest('#eG [data-g]'); if (gg) { FORM.g = +gg.dataset.g; document.querySelectorAll('#eG button').forEach(b => b.classList.toggle('on', b === gg)); }
 });
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
   if (!ME) return avisoDni();
-  const kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = FORM.txt, f = '', link = '';
+  const hj = HOJA[FORM.ty] && FORM.hid && hojaDoc(FORM.hid), kw = $('#eK').value.replace(/\s+/g, ' ').trim(), t = $('#eT').value.replace(/\s+/g, ' ').trim(), d = hj ? hojaTexto(hj) : FORM.txt, f = '', link = '';
   if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
+  if (HOJA[FORM.ty] && (!hj || hj.st !== 'por')) { toast('📤 Primero elige qué investigación vas a enviar.'); return elegirParaEnviar(); }
+  if (hj && hj.ty !== FORM.ty) FORM.ty = hj.ty;
+  if (hj) { const fa = hojaFalta(hj); if (fa.length) { toast('✍️ En tu guía aún te falta: ' + fa.join(', ') + '.', 5200); return abrirHojaDoc(hj.id); } }
   if (!d) return toast('📄 Sube tu guía completada en Word.');
   if (kw.split(',').filter(x => x.trim()).length < 2) return toast('🔑 Escribe al menos 3 palabras clave separadas por comas.');
   if (link && !safeUrl(link)) return toast('🔗 El link debe empezar con https://');
@@ -636,8 +829,9 @@ document.addEventListener('submit', async e => {
     const h = { 'Content-Type': 'application/json' }; if (ME.teacher) { const t = await staffTok(); if (!t) throw new Error('AUTHT'); h.Authorization = 'Bearer ' + t; }
     const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf(w) }) });
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
-    if (FORM.doc) fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf({ n: FORM.doc.n, b64: FORM.doc.b64, at: new Date() }) }) }).catch(() => {});
+    if (FORM.doc && !hj) fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf({ n: FORM.doc.n, b64: FORM.doc.b64, at: new Date() }) }) }).catch(() => {});
     if (ME.teacher) CACHE.ok = null;
+    if (hj) { hj.st = 'env'; hj.env = Date.now(); hj.rid = id; if (!hj.t) hj.t = t; hojaPut(hj); FORM.hid = ''; }
     const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40)); ls.set('moli2:revtit', { ...ls.get('moli2:revtit', {}), [id]: t.slice(0, 100) });
     try { parent !== window && parent.postMessage({ revistaSent: 1 }, '*'); } catch (x) {}
     vEnviar(); toast(ME.teacher ? '📰 ¡Publicado en la revista y en la Biblioteca!' : '🎉 ¡Enviado! Un Revisor o tu profe lo revisará pronto.', 4500);
@@ -952,9 +1146,10 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if (ROLE.t || ROLE.r) { $('#tabs [data-tab="bandeja"]').hidden = !ROLE.t; $('#tabs [data-tab="similitud"]').hidden = false; }   // los Revisores revisan sólo desde «Similitud» (su bandeja)
   if (ROLE.t) $('#tabs [data-tab="trabajos"]').hidden = false;
   const want = QS.get('v'); setTab(want === 'bandeja' && ROLE.t ? 'bandeja' : want === 'bandeja' && ROLE.r ? 'similitud' : want === 'enviar' ? 'enviar' : want === 'fuentes' ? 'fuentes' : 'revista');
+  if (TAB === 'enviar' && ME && (QS.get('hoja') || QS.get('nueva'))) setTimeout(() => { const id = QS.get('hoja') || window.nuevaHoja(QS.get('nueva')); if (id) abrirHojaDoc(id); }, 60);
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610151158"></script><script src="mando.js?v=202610151158"></script>
+<script src="pdftrabajo.js?v=202610151209"></script><script src="archivos.js?v=202610151209"></script><script src="mando.js?v=202610151209"></script>
 </body>
 </html>
