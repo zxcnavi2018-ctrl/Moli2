@@ -122,6 +122,7 @@ button{cursor:pointer}
 .wd-ed .rvm{background:#fde047;border-radius:2px}.wd-ed .rvs{background:#fdba74;border-radius:2px}.wd-ed .rvm.rvs{background:linear-gradient(#fde047 55%,#fdba74 55%)}.wd-ed .rvo{text-decoration:underline wavy #2563eb;text-underline-offset:3px}.wd-ed [data-n]::after{content:attr(data-n);display:inline-grid;place-items:center;min-width:16px;height:16px;margin-left:2px;border-radius:50%;background:#ca8a04;color:#fff;font:800 10px/1 Arial,sans-serif;vertical-align:super}
 .wd-dev{margin:0 0 16px;padding:12px 14px;border-radius:8px;background:#fffbea;border:2px solid #fde047;color:#5b4300;font-size:14.5px}.wd-dev b{display:block;font-size:15.5px}.wd-dev p{margin:6px 0}.wd-dev ol{margin:6px 0;padding-left:20px}.wd-dev q{font-style:italic;color:#854d0e}.wd-dev small{display:block;margin-top:6px;font-weight:700}
 #hoja .rv-gr .wd-sc{padding:24px 12px 40px}#hoja .wd-ed .pulso{outline:3px solid #ca8a04;outline-offset:2px}
+.mj-box{border:2px solid #7dd3fc!important;background:#f0f9ff!important}.mj-box .btn{width:100%;margin-top:6px}
 .wd-ck{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:15px;cursor:pointer}.wd-ck input{width:18px;height:18px}
 .wd-st{display:flex;gap:18px;padding:5px 14px;background:#2b579a;color:#e8eefb;font-size:12.5px;flex:none;overflow-x:auto;white-space:nowrap}.wd-st .wd-np{background:rgba(255,255,255,.18);color:#fff}
 .wd-no{animation:wdNo .45s}@keyframes wdNo{25%{transform:translateX(-6px);background:#fde8e6}75%{transform:translateX(6px)}}
@@ -700,9 +701,9 @@ function hojaLanzador(ty) {
   return `<div class="wd-2"><button type="button" class="g-doc wd-go" data-hoja="${ty}"><span class="ic">W</span><div><b>📂 Abrir guía de ${t[1]} ${esc(t[2])}</b><small>${h ? `Sigue tu guía <b>por concluir</b>${n ? ` (${n} palabras)` : ''}. ` : `${esc(GUIA_TXT[ty] || '')} `}Escríbela tú: aquí no se puede pegar (sólo en «Link»).</small></div><em>✏️</em></button>
     <button type="button" class="g-doc wd-go env" data-envsel><span class="ic">📤</span><div><b>Enviar investigación</b><small>${sel && sel.st === 'por' ? `Vas a enviar: <b>«${esc(sel.nom || sel.t || 'Mi investigación')}»</b>. Toca para cambiarla.` : 'Elige tu trabajo de tu carpeta 📁 Mis archivos.'}</small></div><em>📁</em></button></div>`;
 }
-function devSide(dv) {                                                 // al costado (como lo ve el Revisor): el detector, sus comentarios y qué hacer
-  const by = (dv.by || 'Tu Revisor').replace(/^./, c => c.toUpperCase()), tp = dv.p;
-  return `<aside class="rv-side"><section><h4>✏️ ${esc(by)} te devolvió tu trabajo</h4><p class="rv-f">Corrige lo pintado. Cuando cambies un recuadro, se despinta. Luego toca <b>💾 Guardar trabajito</b> y vuelve a enviarlo.</p></section>
+function devSide(dv, h) {                                              // al costado (como lo ve el Revisor): el detector, sus comentarios y qué hacer
+  const pr = h && h.prac && ME && ME.teacher, by = (dv.by || 'Tu Revisor').replace(/^./, c => c.toUpperCase()), tp = dv.p;
+  return `<aside class="rv-side">${pr ? `<section class="mj-box"><h4>🧪 Trabajo de práctica</h4>${h.mejorada ? '<p class="rv-f">✅ Molí ya lo mejoró. Revísalo si quieres y vuelve a enviarlo.</p><button type="button" class="btn go" data-mjenv>📤 Volver a enviar a los Revisores</button>' : '<p class="rv-f">Molí corrige todo lo que marcaron los Revisores (ortografía, citas, errores de ciencia y fuentes).</p><button type="button" class="btn blue" data-mj>✨ Molí mejora</button>'}</section>` : ''}<section><h4>✏️ ${esc(by)} te devolvió tu trabajo</h4><p class="rv-f">Corrige lo pintado. Cuando cambies un recuadro, se despinta. Luego toca <b>💾 Guardar trabajito</b> y vuelve a enviarlo.</p></section>
     ${tp != null ? `<section><h4>🔎 Detector de similitud</h4><div class="rv-res"><div class="sm-ring" style="--p:${tp};--c:${tp > SM_MAX ? 'var(--red)' : 'var(--green2)'}"><div><b>${tp}%</b><small>Biblioteca</small></div></div><div>
       ${(dv.f || []).length ? dv.f.map(f => `<p class="rv-f">📖 «${esc(f[0])}» · ${esc(f[1])} <b>${f[2]}%</b><small>${f[3] ? '✔ lo citaste' : '✘ no lo citaste'}</small></p>`).join('') : '<p class="rv-f">📗 Nada copiado de la Biblioteca.</p>'}
       ${dv.no ? `<p class="rv-f">🟦 ${dv.no} palabra${dv.no === 1 ? '' : 's'} con error de ortografía</p>` : ''}</div></div>${tp > SM_MAX ? `<p class="sm-lim no" style="margin-top:8px">🔒 Para aprobar debe tener ${SM_MAX}% o menos.</p>` : ''}</section>` : ''}
@@ -710,6 +711,11 @@ function devSide(dv) {                                                 // al cos
     ${dv.fb ? `<section><h4>📝 Su consejo</h4><p class="rv-f" style="white-space:pre-line;font-weight:600">${esc(dv.fb)}</p></section>` : ''}
     <section><p class="rv-f"><span style="background:#fde047;padding:0 4px">🟨</span> Lo que marcó tu Revisor<br><span style="background:#fdba74;padding:0 4px">🟧</span> Igualito a un librito: escríbelo con tus palabras<br><span style="text-decoration:underline wavy #2563eb">🟦 ortografía</span>: corrige la palabra</p></section></aside>`;
 }
+document.addEventListener('click', e => {
+  if (!e.target.closest) return; const d = $('#hoja'), h = d && hojaDoc(d.dataset.id);
+  if (e.target.closest('#hoja [data-mj]') && h) { if (!moliMejora(h)) return toast('No encontré la versión corregida de este trabajo.'); toast('✨ ¡Molí lo mejoró! Ya corrigió la ortografía, las citas, los errores y las fuentes.', 4500); return abrirHojaDoc(h.id); }
+  if (e.target.closest('#hoja [data-mjenv]') && h) { const F = hojaFalta(h); if (F.length) return toast('✏️ Aún falta: ' + F.join(', ')); cerrarHoja(); if (TAB !== 'enviar') setTab('enviar'); FORM.ty = h.ty; FORM.hid = h.id; setTimeout(() => { const g = $('#eGo'); if (g) g.click(); }, 120); }
+});
 document.addEventListener('click', e => { const c = e.target.closest && e.target.closest('#hoja [data-irn]'); if (!c) return; const el = document.querySelector(`#hoja .wd-ed [data-n="${c.dataset.irn}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('pulso'); setTimeout(() => el.classList.remove('pulso'), 1200); } else toast('✅ Esa parte ya la corregiste.'); });
 function abrirHojaDoc(id) {
   const h = hojaDoc(id); if (!h || !HOJA[h.ty]) return toast('No encontré esa guía.');
@@ -735,7 +741,7 @@ function abrirHojaDoc(id) {
       ${p.tb ? `<table class="wd-tb"><tr>${p.tb.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${Array.from({ length: p.tb.rows }, (_, r) => `<tr><th>${r + 1}</th>${p.tb.cols.slice(1).map((_, c) => `<td>${inp(`t${r + 1}${c}`, '', 'maxlength="40"')}</td>`).join('')}</tr>`).join('')}</table>` : ''}
       ${p.fu ? `<div class="wd-fu">${Array.from({ length: p.fu }, (_, n) => `<table><caption>Fuente ${n + 1}</caption>${FU_C.map(([k, lab, ej]) => `<tr><th>${lab}${k === 'l' ? ' <small>📋 aquí sí pegas</small>' : ''}</th><td>${inp(`f${n + 1}${k}`, ej, k === 'l' ? 'data-link inputmode="url" maxlength="300"' : k === 'y' ? 'inputmode="numeric" maxlength="12"' : 'maxlength="160"')}</td></tr>`).join('')}</table>`).join('')}</div>` : ''}
       ${(p.ck || []).map((c, j) => `<label class="wd-ck"><input type="checkbox" data-k="c${j}" ${v['c' + j] ? 'checked' : ''}${dis}> ${esc(c)}</label>`).join('')}</section>`).join('')}
-  </div></div>${dv ? devSide(dv) + '</div>' : ''}
+  </div></div>${dv ? devSide(dv, h) + '</div>' : ''}
   <div class="wd-st"><span>Página 1 de 1</span><span id="wdN">${hojaPal(h)} palabras</span><span>Español (Perú)</span><span class="wd-np">🚫 Escribe con tus palabras</span></div>`;
   d.hidden = false; d.dataset.id = id; document.body.style.overflow = 'hidden';
   d.querySelectorAll('[data-k]').forEach(x => HPREV.set(x, prevDe(x)));
@@ -906,7 +912,7 @@ document.addEventListener('submit', async e => {
     if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
     if (FORM.doc && !hj) fetch(`${BASE}/revdoc/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf({ n: FORM.doc.n, b64: FORM.doc.b64, at: new Date() }) }) }).catch(() => {});
     if (ME.teacher) CACHE.ok = null;
-    if (hj) { hj.st = 'env'; hj.env = Date.now(); hj.rid = id; hj.mapa = hojaTexto(hj, 1).mapa; delete hj.dev; if (!hj.t) hj.t = t; hojaPut(hj); FORM.hid = ''; }
+    if (hj) { hj.st = 'env'; hj.env = Date.now(); hj.rid = id; hj.mapa = hojaTexto(hj, 1).mapa; delete hj.dev; delete hj.mejorada; if (!hj.t) hj.t = t; hojaPut(hj); FORM.hid = ''; }
     const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40)); ls.set('moli2:revtit', { ...ls.get('moli2:revtit', {}), [id]: t.slice(0, 100) });
     try { parent !== window && parent.postMessage({ revistaSent: 1 }, '*'); } catch (x) {}
     vEnviar(); toast(ME.teacher && w.st === 'pend' ? '🧪 Reenviado: les llegará otra vez a los Revisores.' : ME.teacher ? '📰 ¡Publicado en la revista y en la Biblioteca!' : '🎉 ¡Enviado! Un Revisor o tu profe lo revisará pronto.', 4500);
@@ -992,24 +998,118 @@ const PRAC = [
     h2: 'La obesidad si se contagia si pasas mucho tiempo junto a una persona obesa.',
     h3: 'Para prevenir estas enfermedades debemos comer frutas verduras y hacer ejercisio todos los dias (Pérez, 2021).',
     r: 'La diabetes no se contagia pero la obesidad si se contagia.', f: [F3('Minsa', '2023', 'La diabetes', ''), F3('Pérez', '2021', 'Vida saludable', ''), F3('', '', '', '')] }];
-async function enviarPractica(b) {
+const PRAC2 = [
+  { t: 'Las enfermedades contagiosas', kw: 'enfermedades contagiosas, microbios, contagio, prevención', q: '¿Como se contagian las enfermedades?',
+    h1: 'Según el Minsa (2023) las enfermedades contagiosas son las que pasan de una persona a otra por microbios como virus, bacterias u hongos.',
+    h2: 'Algunas se contagian por el aire cuando alguien estornuda o tose cerca de nosotros, como la gripe y la tuberculosis.',
+    h3: 'La diabetes tambien es una enfermedad contagiosa porque se pasa por la saliva (Gómez, 2020).',
+    r: 'Las enfermedades se contagian por el aire, la saliva y el contacto, por eso hay que lavarse las manos.', f: [F3('Minsa', '2023', 'Enfermedades contagiosas', ''), F3('Gómez', '2020', 'Cómo se contagian las enfermedades', ''), F3('', '', '', '')] },
+  { t: 'Las enfermedades no contagiosas', kw: 'enfermedades no contagiosas, diabetes, hipertensión, hábitos', q: '¿Por qué algunas enfermedades no se contagian?',
+    h1: 'Según la OMS (2023) las enfermedades no contagiosas no son causadas por microbios, sino por la herencia, la mala alimentación o la falta de ejercicio.',
+    h2: 'Ejemplos de estas enfermedades son la diabetes, la hipertensión, el asma y el resfriado (Torres, 2022).',
+    h3: 'Estas enfermedades duran poco tiempo y se curan solas en unos dias.',
+    r: 'No se contagian porque no tienen microbios.', f: [F3('OMS', '2023', 'Enfermedades no transmisibles', ''), F3('Torres', '2022', 'Enfermedades crónicas', ''), F3('Internet', '', '', '')] },
+  { t: '¿El dengue es una enfermedad contagiosa?', kw: 'dengue, zancudo, Aedes aegypti, prevención', q: '¿El dengue se contagia de persona a persona?',
+    h1: 'Según el Ministerio de Salud (2024) el dengue es causado por un virus que transmite el zancudo Aedes aegypti cuando pica a una persona.',
+    h2: 'Si abrazas o saludas a una persona con dengue, tú también te vas a contagiar.',
+    h3: 'Para evitar el dengue hay que tapar los recipientes con agua y botar las llantas viejas donde el zancudo pone sus guevos (OPS, 2023).',
+    r: 'Sí, el dengue se contagia de persona a persona por el contacto.', f: [F3('Ministerio de Salud', '2024', 'El dengue', 'https://www.gob.pe/minsa'), F3('OPS', '2023', 'Prevención del dengue', ''), F3('', '', '', '')] },
+  { t: 'La importancia de las bacterias', kw: 'bacterias, yogur, suelo, descomposición', q: '¿Para qué sirven las bacterias?',
+    h1: 'Todas las bacterias son malas y nos enferman, por eso debemos eliminarlas a todas.',
+    h2: 'Según la Universidad Nacional (2021) algunas bacterias ayudan a hacer el yogur y el queso al transformar la leche.',
+    h3: 'Las bacterias del suelo descomponen las ojas y los animales muertos y devuelven nutrientes a las plantas (Ramírez, 2022).',
+    r: 'Las bacterias son importantes porque ayudan a hacer comida y limpian el suelo, aunque algunas nos enferman.', f: [F3('Universidad Nacional', '2021', 'Bacterias en los alimentos', ''), F3('Ramírez', '2022', 'Bacterias del suelo', ''), F3('', '', '', '')] },
+  { t: 'Las bacterias de nuestro organismo', kw: 'microbiota, intestino, bacterias buenas, defensas', q: '¿Que bacterias viven en nuestro cuerpo?',
+    h1: 'Según el Instituto Nacional de Salud (2022) en nuestro intestino viven millones de bacterias buenas que nos ayudan a digerir los alimentos y a producir vitaminas.',
+    h2: 'Estas bacterias tambien nos defienden de las bacterias malas porque ocupan su lugar.',
+    h3: 'Cuando tomamos antibioticos sin receta, podemos matar a las bacterias buenas de nuestro intestino (López, 2023).',
+    r: 'En nuestro cuerpo viven bacterias buenas.', f: [F3('Instituto Nacional de Salud', '2022', 'La microbiota intestinal', ''), F3('López', '2023', 'Uso de antibióticos', ''), F3('', '', '', '')] }];
+const GRUPOS_P = [['1', '🍄 Grupo 1: hongos, bacterias, virus, levadura y enfermedades no contagiosas', PRAC], ['2', '🦟 Grupo 2: enfermedades contagiosas y no contagiosas, dengue e importancia de las bacterias', PRAC2]];
+// ✨ «Molí mejora»: la versión corregida de cada trabajo de práctica (sin errores, con citas y 3 fuentes completas)
+const FIX = {
+  'Los ongos y su importancia': { t: 'Los hongos y su importancia', q: '¿Por qué los hongos son importantes para la naturaleza?',
+    h1: 'Según la Universidad de Lima (2022), los hongos ayudan a descomponer las hojas secas y los animales muertos, y así devuelven nutrientes al suelo.',
+    h2: 'Los hongos se reproducen por esporas muy pequeñas que viajan con el viento y el agua (Martínez, 2021).',
+    h3: 'También hay hongos que nos sirven de alimento, como los champiñones, y otros que sirven para hacer medicinas, como la penicilina (Fleming, 2020).',
+    r: 'Los hongos son importantes porque descomponen la materia muerta y devuelven nutrientes al suelo; además, algunos nos sirven de alimento y otros para fabricar medicinas.', f: [F3('Universidad de Lima', '2022', 'Los hongos descomponedores', ''), F3('Martínez', '2021', 'Reproducción de los hongos', ''), F3('Fleming', '2020', 'La penicilina', '')] },
+  'Las bacterias buenas y malas': { q: '¿Todas las bacterias son malas?',
+    h1: 'Según el Instituto Nacional de Salud (2022), no todas las bacterias son malas: algunas viven en nuestro intestino y nos ayudan a digerir la comida.',
+    h2: 'Las bacterias son tan pequeñas que sólo se pueden ver con un microscopio (Universidad Nacional, 2021).',
+    h3: 'Según el Ministerio de Salud (2024), lavarse las manos con agua y jabón elimina muchas bacterias que causan enfermedades.',
+    r: 'No todas las bacterias son malas. Algunas nos ayudan a digerir los alimentos y otras causan enfermedades; por eso debemos lavarnos las manos para evitar las dañinas.', f: [F3('Instituto Nacional de Salud', '2022', 'Bacterias del intestino', ''), F3('Universidad Nacional', '2021', 'Las bacterias', ''), F3('Ministerio de Salud', '2024', 'Lavado de manos', 'https://www.gob.pe/minsa')] },
+  'Los virus y los antibióticos': { q: '¿Cómo se curan las enfermedades que causan los virus?',
+    h1: 'Según la OMS (2023), los virus son muy pequeños y sólo pueden reproducirse dentro de las células de otro ser vivo.',
+    h2: 'Los antibióticos sólo sirven contra las bacterias; no matan a los virus, por eso no curan la gripe (Rojas, 2020).',
+    h3: 'Las vacunas ayudan a que nuestro cuerpo aprenda a defenderse de algunos virus, como el del sarampión (UNICEF, 2022).',
+    r: 'Las enfermedades causadas por virus no se curan con antibióticos. Nuestro cuerpo se defiende con ayuda del descanso y los cuidados, y las vacunas nos protegen antes de enfermarnos.', f: [F3('OMS', '2023', 'Qué son los virus', ''), F3('Rojas', '2020', 'La gripe y los antibióticos', ''), F3('UNICEF', '2022', 'Las vacunas', '')] },
+  'La levadura y nuestra salud': { q: '¿La levadura es buena para la salud?',
+    h1: 'Alarcón (2026) explica que, según el diario Clarín, la levadura nos aporta proteínas y vitaminas del grupo B, aunque a algunas personas les puede causar alergias o molestias en el estómago.',
+    h2: 'Según WebMD (2022), la levadura nutricional puede ayudar a nuestras defensas, pero en personas sensibles puede provocar dolores de cabeza.',
+    h3: 'Espirilla (2026) menciona que la levadura es un hongo de una sola célula que hace crecer la masa del pan.',
+    r: 'La levadura puede ser buena para la salud porque nos da vitaminas y proteínas, pero hay que consumirla con cuidado, porque a algunas personas les causa alergias o dolores de cabeza.', f: [F3('Alarcón Gambetta, Emilio José', '2026', 'Levaduras (Biblioteca de Molí 2)', ''), F3('WebMD', '2022', 'La levadura nutricional', ''), F3('Espirilla Solis, Matías Misael', '2026', 'Qué es la levadura (Biblioteca de Molí 2)', '')] },
+  'Enfermedades que no se contagian': { q: '¿La diabetes y la obesidad se contagian?',
+    h1: 'Según el Minsa (2023), la diabetes es una enfermedad no contagiosa que aparece cuando hay mucha azúcar en la sangre por mucho tiempo.',
+    h2: 'La obesidad no se contagia: aparece por comer de más, moverse poco y, a veces, por herencia (OMS, 2022).',
+    h3: 'Para prevenir estas enfermedades debemos comer frutas y verduras y hacer ejercicio todos los días (Pérez, 2021).',
+    r: 'La diabetes y la obesidad no se contagian. Se pueden prevenir con una alimentación sana y haciendo ejercicio.', f: [F3('Minsa', '2023', 'La diabetes', ''), F3('Pérez', '2021', 'Vida saludable', ''), F3('OMS', '2022', 'La obesidad', '')] },
+  'Las enfermedades contagiosas': { q: '¿Cómo se contagian las enfermedades?',
+    h1: 'Según el Minsa (2023), las enfermedades contagiosas son las que pasan de una persona a otra por microbios como virus, bacterias u hongos.',
+    h2: 'Algunas se contagian por el aire cuando alguien estornuda o tose cerca de nosotros, como la gripe y la tuberculosis (OMS, 2022).',
+    h3: 'La diabetes no es contagiosa, pero otras enfermedades sí se pasan por la saliva o el contacto, como la varicela (Gómez, 2020).',
+    r: 'Las enfermedades contagiosas se transmiten por el aire, la saliva y el contacto; por eso debemos lavarnos las manos y cubrirnos al toser.', f: [F3('Minsa', '2023', 'Enfermedades contagiosas', ''), F3('Gómez', '2020', 'Cómo se contagian las enfermedades', ''), F3('OMS', '2022', 'La tuberculosis', '')] },
+  'Las enfermedades no contagiosas': { q: '¿Por qué algunas enfermedades no se contagian?',
+    h1: 'Según la OMS (2023), las enfermedades no contagiosas no son causadas por microbios, sino por la herencia, la mala alimentación o la falta de ejercicio.',
+    h2: 'Ejemplos de estas enfermedades son la diabetes, la hipertensión y el asma; el resfriado no es una de ellas, porque sí se contagia (Torres, 2022).',
+    h3: 'Muchas de estas enfermedades duran mucho tiempo y necesitan cuidados de por vida (Minsa, 2023).',
+    r: 'Algunas enfermedades no se contagian porque no las causa un microbio, sino nuestros hábitos o la herencia; por eso se previenen con una vida sana.', f: [F3('OMS', '2023', 'Enfermedades no transmisibles', ''), F3('Torres', '2022', 'Enfermedades crónicas', ''), F3('Minsa', '2023', 'Cuidados de las enfermedades crónicas', '')] },
+  '¿El dengue es una enfermedad contagiosa?': { q: '¿El dengue se contagia de persona a persona?',
+    h1: 'Según el Ministerio de Salud (2024), el dengue es causado por un virus que transmite el zancudo Aedes aegypti cuando pica a una persona.',
+    h2: 'El dengue no se contagia por abrazar o saludar a una persona enferma: sólo se transmite por la picadura del zancudo (OMS, 2023).',
+    h3: 'Para evitar el dengue hay que tapar los recipientes con agua y botar las llantas viejas donde el zancudo pone sus huevos (OPS, 2023).',
+    r: 'No, el dengue no se contagia de persona a persona. Lo transmite el zancudo Aedes aegypti, por eso debemos eliminar los lugares donde pone sus huevos.', f: [F3('Ministerio de Salud', '2024', 'El dengue', 'https://www.gob.pe/minsa'), F3('OPS', '2023', 'Prevención del dengue', ''), F3('OMS', '2023', 'Dengue y dengue grave', '')] },
+  'La importancia de las bacterias': { q: '¿Para qué sirven las bacterias?',
+    h1: 'No todas las bacterias son malas: muchas son útiles y sólo algunas nos enferman (Instituto Nacional de Salud, 2022).',
+    h2: 'Según la Universidad Nacional (2021), algunas bacterias ayudan a hacer el yogur y el queso al transformar la leche.',
+    h3: 'Las bacterias del suelo descomponen las hojas y los animales muertos, y devuelven nutrientes a las plantas (Ramírez, 2022).',
+    r: 'Las bacterias son importantes porque ayudan a preparar alimentos y a limpiar el suelo; sólo algunas causan enfermedades.', f: [F3('Universidad Nacional', '2021', 'Bacterias en los alimentos', ''), F3('Ramírez', '2022', 'Bacterias del suelo', ''), F3('Instituto Nacional de Salud', '2022', 'Bacterias útiles y dañinas', '')] },
+  'Las bacterias de nuestro organismo': { q: '¿Qué bacterias viven en nuestro cuerpo?',
+    h1: 'Según el Instituto Nacional de Salud (2022), en nuestro intestino viven millones de bacterias buenas que nos ayudan a digerir los alimentos y a producir vitaminas.',
+    h2: 'Estas bacterias también nos defienden de las bacterias malas, porque ocupan su lugar (Universidad Nacional, 2021).',
+    h3: 'Cuando tomamos antibióticos sin receta, podemos matar a las bacterias buenas de nuestro intestino (López, 2023).',
+    r: 'En nuestro cuerpo viven bacterias buenas que nos ayudan a digerir, producen vitaminas y nos defienden; por eso no debemos tomar antibióticos sin receta.', f: [F3('Instituto Nacional de Salud', '2022', 'La microbiota intestinal', ''), F3('Universidad Nacional', '2021', 'Bacterias que nos defienden', ''), F3('López', '2023', 'Uso de antibióticos', '')] } };
+function moliMejora(h) {                                               // corrige la guía de práctica con la versión buena y la deja lista para reenviar
+  const X = FIX[h.t] || Object.entries(FIX).find(([k, x]) => x.t === h.t)?.[1]; if (!X) return false;
+  const v = h.v = { ...h.v }; ['q', 'h1', 'h2', 'h3', 'r'].forEach(k => { v[k] = X[k]; delete v[k + '_h']; });
+  X.f.forEach((x, k) => { v[`f${k + 1}a`] = x.a; v[`f${k + 1}y`] = x.y; v[`f${k + 1}m`] = x.m; v[`f${k + 1}l`] = x.l; }); [0, 1, 2, 3].forEach(j => v['c' + j] = true);
+  if (X.t) { h.t = X.t; h.nom = '🧪 ' + X.t; } h.mejorada = Date.now(); hojaPut(h); return true;
+}
+function elegirPractica(b) {
+  if (!ROLE.t) return; const env = ls.get('moli2:pracEnv', {}); let m = document.getElementById('wdDlg'); if (!m) { m = document.createElement('div'); m.id = 'wdDlg'; document.body.appendChild(m); }
+  m.innerHTML = `<div class="wd-dc"><b>🧪 Trabajos de práctica</b><span>Elige qué grupo de 5 investigaciones de «Molí» (con errores a propósito) les llegará a los Revisores.</span>
+    <div class="wd-ls">${GRUPOS_P.map(([k, nom, L]) => `<button type="button" data-pgr="${k}"><i>🧪</i><span><b>${esc(nom)}</b><small>${L.map(x => esc(x.t)).join(' · ')}${env[k] ? ` · ✅ ya enviado el ${fecha(env[k])}` : ''}</small></span></button>`).join('')}</div>
+    <div><button type="button" class="btn soft" data-dno>Cerrar</button></div></div>`;
+  m.hidden = false; m.querySelector('[data-dno]').onclick = () => { m.hidden = true; };
+  m.querySelectorAll('[data-pgr]').forEach(x => x.onclick = () => { m.hidden = true; const g = GRUPOS_P.find(z => z[0] === x.dataset.pgr); enviarPractica(b, g[2], g[0]); });
+}
+async function enviarPractica(b, LISTA = PRAC, gk = '1') {
   if (!ROLE.t || !ME) return;
-  if (!confirm('Se enviarán 5 investigaciones de práctica con el autor «Molí» (hongos, bacterias, virus, levadura y enfermedades no contagiosas), con errores a propósito.\n\nLes llegarán a los Revisores como trabajos normales. Cuando los devuelvan, volverán a TU carpeta Word Molí para que los corrijas y los vuelvas a enviar. ¿Enviar?')) return;
+  if (!confirm('Se enviarán estas 5 investigaciones de práctica con el autor «Molí», con errores a propósito:\n\n• ' + LISTA.map(x => x.t).join('\n• ') + '\n\nLes llegarán a los Revisores como trabajos normales. Cuando los devuelvan, volverán a TU carpeta Word Molí para que los corrijas y los vuelvas a enviar. ¿Enviar?')) return;
   const a = await staffTok(); if (!a) return toast('🔐 Conecta tu cuenta de docente.');
   b.disabled = true; let ok = 0;
-  for (let i = 0; i < PRAC.length; i++) { const P = PRAC[i]; b.textContent = `⏳ Enviando ${i + 1} de ${PRAC.length}…`;
+  for (let i = 0; i < LISTA.length; i++) { const P = LISTA[i]; b.textContent = `⏳ Enviando ${i + 1} de ${LISTA.length}…`;
     const v = { q: P.q, h1: P.h1, h2: P.h2, h3: P.h3, r: P.r, c0: true, c1: true, c2: true, c3: true };
     P.f.forEach((x, k) => { v[`f${k + 1}a`] = x.a; v[`f${k + 1}y`] = x.y; v[`f${k + 1}m`] = x.m; v[`f${k + 1}l`] = x.l; });
     const h = { id: 'h' + (Date.now() + i).toString(36), ty: 'inv', t: P.t, kw: P.kw, nom: '🧪 ' + P.t, v, at: Date.now(), st: 'por', prac: 1 };
     const id = ME.key + '-' + (Date.now() + i).toString(36), d = hojaTexto(h);
-    const w = { k: ME.key, n: 'Molí', sec: '', u: 'rev', kw: P.kw, ty: 'inv', t: P.t, d, st: 'pend', at: new Date(Date.now() - (PRAC.length - i) * 6e4) };
+    const w = { k: ME.key, n: 'Molí', sec: '', u: 'rev', kw: P.kw, ty: 'inv', t: P.t, d, st: 'pend', at: new Date(Date.now() - (LISTA.length - i) * 6e4) };
     try { const r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(w) }) });
       if (!r.ok) throw new Error(r.status);
       Object.assign(h, { st: 'env', env: Date.now(), rid: id, mapa: hojaTexto(h, 1).mapa }); hojaPut(h); ok++;
       const my = ls.get(K_MY, []); my.unshift(id); ls.set(K_MY, my.slice(0, 40));
     } catch (x) {} }
   b.disabled = false; b.textContent = '🧪 Trabajos de práctica';
-  toast(ok === PRAC.length ? '🧪 ¡Listo! Se enviaron los 5 trabajos de práctica de «Molí».' : `⚠️ Se enviaron ${ok} de ${PRAC.length}. Revisa tu internet e intenta otra vez.`, 5000);
+  if (ok) ls.set('moli2:pracEnv', { ...ls.get('moli2:pracEnv', {}), [gk]: Date.now() });
+  toast(ok === LISTA.length ? '🧪 ¡Listo! Se enviaron los 5 trabajos de práctica de «Molí».' : `⚠️ Se enviaron ${ok} de ${LISTA.length}. Revisa tu internet e intenta otra vez.`, 5000);
   try { window.MisArchivos && MisArchivos.pintar(); } catch (x) {} vSimilitud();
 }
 async function vSimilitud() {
@@ -1029,7 +1129,7 @@ function pintaSim() {
     return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}<button type="button" class="btn blue" data-sim="${esc(w.id)}">📝 Revisar</button></div>`; }).join('')}</div>`
     : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
 }
-$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); if (e.target.closest('#smPrac')) enviarPractica(e.target.closest('#smPrac')); });
+$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); if (e.target.closest('#smPrac')) elegirPractica(e.target.closest('#smPrac')); });
 function smComparar(w) {                                                // marca cada palabra del trabajo con el librito del que es igualito
   const T = smTok(w.d), S = [...(SIM.src || []).map(x => ({ x, lib: 1 })), ...(SIM.pend || []).filter(x => x.id !== w.id).map(x => ({ x, lib: 0 }))].filter(s => s.x.k !== w.k && String(s.x.d || '').trim());
   const sh = (A, i) => A.slice(i, i + SM_N).map(t => t.w).join(' '), autores = {};
@@ -1146,7 +1246,7 @@ function rmTexto() {                                                  // lo que 
 }
 function smConsejo(w, r) {                                             // el consejo que verá el estudiante en «Mis envíos», armado con el reporte
   const tp = smTotal(r), L = [], cort = (a, b) => { const T = r.T.filter(t => t.i >= a && t.j <= b); if (!T.length) return ''; return '«' + w.d.slice(T[0].i, T[Math.min(T.length, 7) - 1].j) + (T.length > 7 ? '…»' : '»'); };
-  L.push(`🔎 Tu trabajo tiene ${tp}% de similitud con la Biblioteca. Para aprobar debe tener ${SM_MAX}% o menos.`);
+  L.push(tp > SM_MAX ? `🔎 Tu trabajo tiene ${tp}% de similitud con la Biblioteca. Para aprobar debe tener ${SM_MAX}% o menos.` : `🔎 Similitud con la Biblioteca: ${tp}% (¡bien, está dentro del máximo!).`);
   const G = []; for (let i = 0; i < r.T.length; i++) { const d = r.due[i]; if (d < 0) continue; let j = i; while (j + 1 < r.T.length && r.due[j + 1] === d) j++; G.push({ d, a: r.T[i].i, b: r.T[j].j, n: j - i + 1 }); i = j; }
   const cp = G.sort((x, y) => y.n - x.n).slice(0, 2).map(g => { const f = r.fuentes[g.d]; return `${cort(g.a, g.b)} (del librito de ${firstName(f.s.x.n)} ${f.ape})`; });
   if (cp.length) L.push('✂️ Copiaste igualito: ' + cp.join(' · '));
@@ -1289,6 +1389,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610152200"></script><script src="archivos.js?v=202610152200"></script><script src="mando.js?v=202610152200"></script>
+<script src="pdftrabajo.js?v=202610152205"></script><script src="archivos.js?v=202610152205"></script><script src="mando.js?v=202610152205"></script>
 </body>
 </html>
