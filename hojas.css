@@ -515,3 +515,11 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 
 /* meta y criterios: más grande para que llene la diapositiva */
 .cv-meta .cv-h2 { font-size: 2.3em; } .cv-meta .cv-lead { font-size: 1.6em; } .cv-meta h3 { font-size: 1.45em; margin: .6em 0 .3em; } .cv-meta .cv-cards li { font-size: 1.3em; padding: .5em .9em; } .cv-meta .cv-sub { font-size: 1.1em; }
+
+#herr .rv-bus { display: grid; gap: 6px; margin-bottom: 6px; } #herr .rv-secs { display: flex; flex-wrap: wrap; gap: 6px; }
+#herr .rv-secs button { padding: 6px 12px; border: 2px solid #2b2547; border-radius: 999px; background: #fff; font: 800 14px system-ui, sans-serif; cursor: pointer; } #herr .rv-secs button.on { background: #2563eb; border-color: #2563eb; color: #fff; }
+#herr .rv-q-in { width: 100%; box-sizing: border-box; padding: 11px 14px; border: 2px solid #2b2547; border-radius: 12px; font: 700 16px system-ui, sans-serif; }
+#herr .rv-res { display: flex; flex-wrap: wrap; gap: 6px; max-height: 210px; overflow: auto; padding: 2px; }
+#herr .rv-res button { padding: 7px 11px; border: 2px solid #cbd5e1; border-radius: 10px; background: #fff; font: 700 14px system-ui, sans-serif; cursor: pointer; text-align: left; } #herr .rv-res button:hover { border-color: #2563eb; }
+#herr .rv-res button.on { border-color: #16a34a; background: #dcfce7; } #herr .rv-res button[disabled] { opacity: .5; cursor: default; } #herr .rv-res small { color: #64748b; font-weight: 700; }
+#herr .rv-sel { margin: 0; padding: 8px 12px; border-radius: 10px; background: #dcfce7; color: #14532d; font-weight: 700; }
