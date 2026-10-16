@@ -533,7 +533,7 @@
   // =================================================================
   //  5) MI PRESENTACIÓN (modo Canva, en el proyector)
   // =================================================================
-  const CV_K = { uni: ['📘', 'Unidad'], ses: ['🗓️', 'Sesión'], meta: ['🎯', 'Meta y criterios'], rol: ['👥', 'Roles'], acu: ['🤝', 'Acuerdos'], act: ['🧪', 'Actividad'], exit: ['🎟️', 'Exit ticket'], mq: ['🤖', 'Molí pregunta'], aq: ['🤖', 'Molí pregunta'], exa: ['✅', 'Respuestas'], voc: ['📖', 'Palabra nueva'], sab: ['💡', '¿Sabías que?'], ref: ['🪞', 'Reflexión'] };
+  const CV_K = { uni: ['📘', 'Unidad'], ses: ['🗓️', 'Sesión'], meta: ['🎯', 'Meta y criterios'], rol: ['👥', 'Roles'], acu: ['🤝', 'Acuerdos'], act: ['🧪', 'Actividad'], exit: ['🎟️', 'Exit ticket'], mq: ['🤖', 'Molí pregunta'], aq: ['🤖', 'Molí pregunta'], exa: ['✅', 'Respuestas'], sync: ['🚩', 'Molí nos sincroniza'], voc: ['📖', 'Palabra nueva'], sab: ['💡', '¿Sabías que?'], ref: ['🪞', 'Reflexión'] };
   const CV_BG = { reto: ['#0b2e4f', '#0a6aa1'], meta: ['#2563eb', '#38bdf8'], rol: ['#7c3aed', '#c084fc'], acu: ['#0d9488', '#34d399'], act: ['#ea580c', '#facc15'], exit: ['#db2777', '#f472b6'], mq: ['#4338ca', '#0ea5e9'], aq: ['#0e7490', '#a855f7'], exa: ['#be185d', '#f472b6'], voc: ['#0f766e', '#22d3ee'], sab: ['#c2410c', '#facc15'], ref: ['#4338ca', '#22d3ee'] };
   const CV_PAL = [['#7c3aed', '#06b6d4'], ['#0ea5e9', '#22c55e'], ['#f97316', '#ec4899'], ['#2563eb', '#8b5cf6'], ['#14b8a6', '#6366f1'], ['#e11d48', '#f59e0b']];
   const CV_ROL = [['🎤', 'SPEAKER', 'Presenta y habla por el equipo'], ['🧰', 'HELPER', 'Trae y organiza los materiales'], ['⏱️', 'TIMER', 'Cuida el tiempo del equipo'], ['🎨', 'DESIGNER', 'Hace que el trabajo se vea bonito y ordenado']];
@@ -585,7 +585,7 @@
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (L(C.s) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(C.s) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(C.s) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
@@ -625,6 +625,38 @@ Devuelve JSON:
         MD.LS.set(k, limpiarIA(R)); const cur = P.L[P.i]; armar(); if (cur) P.i = Math.max(0, P.L.findIndex(z => z.k === cur.k && z.u === cur.u && z.n === cur.n && z.j === cur.j)); pinta(false);
       } catch (e) { MD.LS.set(k, { _fallo: Date.now() }); pinta(false); }
     }
+    // ---- 🚩 «Molí nos sincroniza»: una pregunta por actividad con 2 respuestas (izquierda / derecha), que Molí piensa según la sesión ----
+    const SYK = it => 'moli2:sy:' + hashQ(it).slice(9);
+    const hs = t => { let h = 7; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0; return h; };
+    const aLados = (x, wait) => hs(x.q) % 2 ? { q: x.q, i: x.ok, d: x.mal, ok: 'i', wait } : { q: x.q, i: x.mal, d: x.ok, ok: 'd', wait };   // la correcta cae a veces a la izquierda y a veces a la derecha
+    async function pedirSync(it) {
+      const k = SYK(it); if (P.pide.has(k) || MD.LS.get(k, null)) return; P.pide.add(k);
+      const s = it.s, acts = actsDe(it.u, s).slice(0, 3), tq = ((s.ticket && s.ticket.questions) || []).map(x => x && x.q).filter(L);
+      const pr = `Eres Molí, un robot amigable que acompaña a una docente de Ciencia y Tecnología de 6.° grado de primaria en Perú. Vas a jugar con las niñas y niños a «mano izquierda o mano derecha»: en una diapositiva gigante sale una pregunta y dos respuestas, una a cada lado, y levantan la mano del lado de la respuesta correcta.
+Unidad ${it.u.num}: «${it.u.title}». Sesión ${it.n}: «${s.title || ''}». Meta: «${s.meta || ''}».
+Actividades de hoy:
+${acts.map((x, j) => x && (L(x.title) || L(x.desc)) ? `${j + 1}) «${x.title || ''}»: ${x.desc || ''}` : `${j + 1}) (no hay)`).join('\n')}
+${tq.length ? `No repitas estas preguntas del Exit ticket: ${tq.map(q => `«${q}»`).join(' ')}` : ''}
+Devuelve JSON con "p": 3 preguntas, una para DESPUÉS de cada actividad (en orden), sobre lo que se trabaja en la sesión y en esa actividad. Cada una:
+- "q": la pregunta, clara y corta (máximo 16 palabras), con signos ¿?, sin la respuesta dentro.
+- "ok": la respuesta correcta y científicamente cierta (máximo 8 palabras).
+- "mal": una respuesta incorrecta pero creíble, parecida en largo a la correcta (máximo 8 palabras).
+Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
+      try {
+        const R = await MD.pensar(pr, { type: 'OBJECT', properties: { p: { type: 'ARRAY', items: { type: 'OBJECT', properties: { q: { type: 'STRING' }, ok: { type: 'STRING' }, mal: { type: 'STRING' } }, required: ['q', 'ok', 'mal'] } } }, required: ['p'] });
+        const p = (R && Array.isArray(R.p) ? R.p : []).slice(0, 3).map(x => { const q = limpio(x && x.q, 170), ok = limpio(x && x.ok, 90), mal = limpio(x && x.mal, 90); return q && /\?\s*$/.test(q) && ok && mal && ok.toLowerCase() !== mal.toLowerCase() ? { q, ok, mal } : null; });
+        MD.LS.set(k, p.some(Boolean) ? { p } : { _fallo: Date.now() });
+      } catch (e) { MD.LS.set(k, { _fallo: Date.now() }); }
+      const cur = P.L[P.i]; if (cur && cur.k === 'sync' && SYK(cur) === k && window.Sincro) Sincro.actualizar(syncDe(cur));
+    }
+    function syncDe(it) {
+      const C = MD.LS.get(SYK(it), null), x = C && Array.isArray(C.p) && C.p[it.j - 1];
+      if (x && x.q) return aLados(x);
+      if (!C) { pedirSync(it); return { wait: true }; }
+      const qs = ((it.s.ticket && it.s.ticket.questions) || []).filter(z => z && L(z.q) && Array.isArray(z.options)), t = qs.length && qs[(it.j - 1) % qs.length];   // si Molí no pudo pensarla: una del Exit ticket
+      const ok = t && t.options[t.answer], mal = t && t.options.find((o, k) => k !== t.answer && L(o));
+      return ok && mal ? aLados({ q: t.q, ok, mal }) : { q: '¿Estamos listos para seguir aprendiendo?', i: '¡Sí, listos!', d: 'Todavía no', ok: 'i' };
+    }
     const preguntasDe = it => { const C = cacheIA(hashQ(it)), key = it.k === 'aq' ? 'a' + it.j : 'r'; if (C && Array.isArray(C[key]) && C[key].length) return { q: C[key] }; pedirIA(it); return { q: plantilla(it), wait: P.pide.has(hashQ(it)) && !C }; };
     const tema = it => { if (L(it.s.title)) return it.s.title; const C = cacheIA(hashQ(it)); return C && L(C.t) ? C.t : temaDe(it.s, it.n); };
     const color = u => CV_PAL[(parseInt(u.num, 10) || 1) % CV_PAL.length];
@@ -639,6 +671,7 @@ Devuelve JSON:
     }
     function slide(it) {
       if (it.k === 'vid') return slideVideo(it);
+      if (it.k === 'sync') return Sincro.html(syncDe(it));
       const u = it.u, s = it.s, [c1, c2] = it.k in CV_BG ? CV_BG[it.k] : color(u), st = `style="--c1:${c1};--c2:${c2}"`;
       const mol = (im, inner) => `<div class="cv-sl" ${st}>${crumb(it)}<div class="cv-mqb"><img class="cv-moli" src="${IMG(im)}" alt="Molí"><div class="cv-bub">${inner}</div></div></div>`;
       if (it.k === 'uni') return `<div class="cv-sl cv-c" ${st}><span class="cv-pill">UNIDAD ${esc(u.num)}</span><div class="cv-ico">${esc(u.icon || '📘')}</div><h2 class="cv-h1">${esc(u.title)}</h2><p class="cv-sub">${it.ss.length} ${it.ss.length === 1 ? 'sesión' : 'sesiones'}</p></div>`;
@@ -664,7 +697,7 @@ Devuelve JSON:
       return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">✅ Respuestas del Exit ticket</h2>${qs.length ? `<ol class="cv-cards cv-q">${qs.map(x => `<li><b>${esc(x.q)}</b><ul>${(x.options || []).map((o, k) => L(o) ? `<li class="${k === x.answer ? 'ok' : ''}">${k === x.answer ? '✓ ' : ''}${esc(o)}</li>` : '').join('')}</ul></li>`).join('')}</ol>` : '<p class="cv-lead">Sin preguntas todavía.</p>'}</div>`;
     }
     function ajustar(d) {                                               // la diapositiva usa todo el cuadro: agranda la letra hasta llenarlo sin cortarse
-      if (!d || d.classList.contains('cv-foto') || d.classList.contains('cv-vid') || d.querySelector('.cv-rfig')) return;
+      if (!d || d.classList.contains('sy') || d.classList.contains('cv-foto') || d.classList.contains('cv-vid') || d.querySelector('.cv-rfig')) return;
       const H = d.clientHeight, Wd = d.clientWidth; if (!H || !Wd) return;
       const prev = d.style.justifyContent; d.style.justifyContent = 'flex-start'; d.style.overflow = 'visible';
       const cabe = () => { const kids = [...d.children].filter(c => getComputedStyle(c).position !== 'absolute'); if (!kids.length) return true;
@@ -680,7 +713,10 @@ Devuelve JSON:
       if (!el) return;
       const sl = el.querySelector('.cv-stage'); if (!P.L.length) { sl.innerHTML = `<div class="cv-sl cv-c" style="--c1:#7c3aed;--c2:#06b6d4"><div class="cv-ico">🎨</div><h2 class="cv-h1">Aún no hay sesiones</h2></div>`; return; }
       P.i = Math.max(0, Math.min(P.L.length - 1, P.i)); const it = P.L[P.i];
-      sl.innerHTML = slide(it); ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in');
+      const sk = it.k === 'sync' ? claveSl(it) : '';
+      if (sk && P.syk === sk && Sincro.activo()) Sincro.actualizar(syncDe(it));   // ya está en pantalla (llegó lo que pensó Molí): no se reinicia la animación
+      else { if (window.Sincro) Sincro.parar(); P.syk = sk; sl.innerHTML = slide(it); ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); }
+      if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });                // Molí piensa las preguntas de la sesión desde antes
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
       el.querySelector('.cv-n').textContent = `${P.i + 1} / ${P.L.length}`;
       el.querySelector('[data-cv="-1"]').disabled = P.i === 0; el.querySelector('[data-cv="1"]').disabled = P.i === P.L.length - 1;
@@ -734,7 +770,7 @@ Devuelve JSON:
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
       Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
-    P.cerrar = () => { P.ro && P.ro.disconnect(); };
+    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); P.syk = ''; };
     return P;
   }
 

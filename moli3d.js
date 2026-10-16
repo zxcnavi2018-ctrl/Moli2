@@ -4,7 +4,7 @@
 //  alrededor), ojos ovalados celestes que brillan y boquita cuando habla, audífonos azul noche con aro de luz,
 //  bracitos gorditos con manitos azul noche, una línea en el cuerpo, base azul noche y su luz azul de abajo.
 //  Todo se mueve con resortes: llega suave, con un poquito de rebote.
-//  crearMoli(THREE, { renderer }) -> { root, update(t, dt, mov), expr(nombre), accion(nombre, lado), hablar(on), mirar(v3) }
+//  crearMoli(THREE, { renderer }) -> { root, update(t, dt, mov), expr(nombre), accion(nombre, lado), hablar(on), mirar(v3), brazo(lado, arriba), manos }
 // ===================================================================
 function crearMoli(THREE, opt = {}) {
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -210,13 +210,14 @@ function crearMoli(THREE, opt = {}) {
 
   // ---- estado y animación ----
   const S = { expr: 'normal', act: null, side: -1, at: 0, talk: false, mo: 0, moT: 0, blink: 0, nextBlink: 1.2, look: V(0, 1.2, 6),
-    idle: V(0, 0, 0), nextIdle: 2.5, sac: V(0, 0, 0), nextSac: 1, hy: 0, vy: 0, hx: 0, vx: 0, hz: 0, vz: 0, tilt: 0, vt: 0, yaw: 0, vyaw: 0, ex: 0, ey: 0, sq: 0, vsq: 0 };
+    idle: V(0, 0, 0), nextIdle: 2.5, sac: V(0, 0, 0), nextSac: 1, hy: 0, vy: 0, hx: 0, vx: 0, hz: 0, vz: 0, tilt: 0, vt: 0, yaw: 0, vyaw: 0, ex: 0, ey: 0, sq: 0, vsq: 0, up: {} };
   const spring = (x, v, to, k, d, dt) => { v += (to - x) * k * dt; v *= Math.exp(-d * dt); return [x + v * dt, v]; };
   const tmp = V(0, 0, 0);
   function expr(n) { S.expr = n || 'normal'; }
   function accion(n, lado) { S.act = n; S.at = 0; if (lado) S.side = lado; }
   function hablar(on) { S.talk = !!on; }
   function mirar(v) { S.look.copy(v); }
+  function brazo(lado, on) { S.up[lado] = !!on; }                     // 🚩 levanta (o baja) el brazo de ese lado: 1 = derecha de la pantalla, -1 = izquierda
   function update(t, dt, mov = 0) {                                  // mov: qué tan rápido se mueve la cámara (se inclina y los brazos quedan atrás)
     dt = Math.min(Math.max(dt, 0), 0.1); S.at += dt; mov = Math.max(-1.6, Math.min(1.6, mov || 0));   // (el primer cuadro puede venir con tiempo negativo)
     let jump = 0, spin = 0, wave = 0, point = 0, nod = 0, cheer = S.expr === 'feliz';
@@ -255,6 +256,7 @@ function crearMoli(THREE, opt = {}) {
       if (cheer) { to = 2.05 + Math.sin(t * 9 + i * 2.2) * 0.2; fwd = -0.3; }
       if (wave && lead) { to = 2.0 + Math.sin(S.at * 11) * 0.25; fwd = -0.45; }
       if (point && lead) { to = 1.5 + Math.sin(S.at * 3) * 0.04; fwd = -0.35; }
+      if (S.up[A.sx]) { to = 2.75 + Math.sin(t * 7 + i) * 0.04; fwd = -0.12; }
       to += mov * 0.35 * A.sx;
       [A.a, A.v] = spring(A.a, A.v, to, 75, 9.5, dt); A.f += (fwd - A.f) * Math.min(1, dt * 8);
       A.sh.rotation.z = A.a * A.sx; A.sh.rotation.x = A.f;
@@ -289,6 +291,6 @@ function crearMoli(THREE, opt = {}) {
     floorGlow.material.opacity = (0.22 + pulse * 0.16) * (0.4 + near * 0.6);
     ripples.forEach((r, k) => { const ph = (t * 0.42 + k / 3) % 1; r.scale.setScalar(0.62 + ph * 0.75); r.material.opacity = Math.sin(ph * Math.PI) * (1 - ph) * 0.7 * (0.4 + near * 0.6); });
   }
-  return { root, update, expr, accion, hablar, mirar, env };
+  return { root, update, expr, accion, hablar, mirar, brazo, manos: { '-1': arms[0].hand, 1: arms[1].hand }, env };
 }
 window.crearMoli = crearMoli;
