@@ -597,7 +597,7 @@
       document.body.appendChild(R.el);
       R.el.addEventListener('click', e => { const b = e.target.closest('[data-rt]'); if (!b) return; e.stopPropagation(); const i = +b.dataset.rt;
         if (i < R.n) { if (i === R.n - 1) { R.n--; guardar(); pinta(); } return; }     // tocar la última coloreada la despinta (por si fue sin querer)
-        R.n = i + 1; guardar(); pinta(i); ding(); if (R.n >= RUT.length && window.aviso) setTimeout(() => aviso('🎉 ¡Rutina completa! ¡Excelente clase!', 3.5), 500); });
+        R.n = i + 1; guardar(); pinta(i); ding(); if (R.n >= RUT.length) setTimeout(() => { const t = window.toast || window.aviso; t && t('🎉 ¡Rutina completa! ¡Excelente clase!', 3.5); }, 500); });
       R.el.addEventListener('pointerdown', e => e.stopPropagation()); R.el.addEventListener('pointerup', e => e.stopPropagation());
       ubicar(); R.t = setInterval(ubicar, 300); addEventListener('resize', ubicar);
     };
