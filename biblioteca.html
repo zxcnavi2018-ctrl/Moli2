@@ -80,6 +80,7 @@
   #libro.on { display: flex; animation: fade .3s ease-out; }
   @keyframes fade { from { opacity: 0; } }
   .ab { position: relative; width: min(980px, 100%); max-height: calc(100vh - 32px); display: grid; grid-template-columns: 1fr 1fr; padding: 14px; border-radius: 14px; background: var(--c, #6b2f2f); box-shadow: 0 30px 80px rgba(0,0,0,.6), inset 0 0 0 3px rgba(255,231,163,.5); perspective: 1800px; }
+  body.nocopia .ab .pg { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   .pg { position: relative; background: linear-gradient(90deg, #f7ecd4, #fff8ea 12%, #fff8ea 88%, #f0e2c4); padding: 26px 28px 22px; overflow: auto; min-height: 420px; color: #3b2414; }
   .pg.l { border-radius: 6px 0 0 6px; box-shadow: inset -18px 0 24px -14px rgba(90,60,30,.45); transform-origin: right center; animation: abrirL .9s cubic-bezier(.2,.8,.2,1); }
   .pg.r { border-radius: 0 6px 6px 0; box-shadow: inset 18px 0 24px -14px rgba(90,60,30,.45); }
@@ -151,8 +152,8 @@
 <div id="mGlobo" role="dialog" aria-label="Molí te ayuda a buscar"></div>
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610160259"></script>
-<script src="pdftrabajo.js?v=202610160259"></script>
+<script src="moli3d.js?v=202610160306"></script>
+<script src="pdftrabajo.js?v=202610160306"></script>
 <script>
 (function () {
 'use strict';
@@ -719,6 +720,11 @@ $('#pcompleta').onclick = () => pantalla(!document.fullscreenElement);
 $('#volver').addEventListener('click', () => { try { sessionStorage.setItem('moli2:fs', document.fullscreenElement ? '1' : '0'); } catch (e) {} });
 if (EMBED) $('#volver').addEventListener('click', e => { e.preventDefault(); parent.postMessage({ bibCerrar: 1 }, '*'); });
 const YO = LSA('moli2:me'), DOCENTE = !!(YO && (YO.teacher || YO.docente));
+// 🚫 el texto de los libros no se copia (para eso está «📄 Descargar investigación (PDF)»); la docente sí puede
+if (!DOCENTE) { document.body.classList.add('nocopia');
+  const enLibro = e => e.target && e.target.closest && e.target.closest('.ab');
+  ['copy', 'cut'].forEach(ev => document.addEventListener(ev, e => { if (!enLibro(e)) return; e.preventDefault(); aviso('🚫 No se puede copiar el libro. Para usarlo, toca «📄 Descargar investigación (PDF)» y cítalo con tus palabras.', 4); }, true));
+  ['contextmenu', 'dragstart', 'selectstart'].forEach(ev => document.addEventListener(ev, e => { if (enLibro(e) && !e.target.closest('button, a')) e.preventDefault(); }, true)); }
 function aplicarTX(x) {
   if (x && typeof x === 'object' && typeof x.sup === 'string') TX.sup = x.sup.slice(0, 160);
   if (x && typeof x === 'object') ['titulo', 'instT', 'pag'].forEach(k => { if (typeof x[k] === 'string' && x[k].trim()) TX[k] = x[k].slice(0, 160); });
@@ -822,6 +828,6 @@ addEventListener('pointerup', e => { if (!MOLI || modo === 'intro' || $('#libro'
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
-<script src="mando.js?v=202610160259"></script>
+<script src="mando.js?v=202610160306"></script>
 </body>
 </html>

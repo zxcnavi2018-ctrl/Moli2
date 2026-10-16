@@ -151,6 +151,7 @@ button{cursor:pointer}
 .rv-side .acts{display:grid;gap:8px}.rv-side .acts h4{margin:0}.rv-side .acts textarea{min-height:90px;font-size:13.5px}.rv-side .btn{padding:10px 14px;font-size:14px}
 .wd-dc textarea{padding:10px 12px;border:2px solid var(--line);border-radius:12px;font:700 15px var(--sans);resize:vertical}
 @media (max-width:900px){.rv-gr{grid-template-columns:1fr;overflow:auto}.rv-gr .wd-sc{overflow:visible}.rv-side{border-left:0;border-top:1px solid #d4d4d4}.rv-pg{padding:22px 16px}}
+body:not(.docente) #modal .art:not(.rv-art) .bd > p { -webkit-user-select: none; user-select: none; }
 /* pestañas */
 .tabs{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -642,7 +643,8 @@ const HOJA_TODAS = {
   inv: { sub: 'Buscas información en fuentes confiables para responder una pregunta.', pasos: [
     { t: 'Mi pregunta de investigación', h: '¿Qué quieres averiguar? Empieza con: ¿Qué…? ¿Cómo…? ¿Por qué…?', c: [{ id: 'q', ph: '¿…?', r: 2 }] },
     { t: 'Lo que encontré', h: 'Escribe lo más importante de cada fuente con tus palabras. ' + CITAS, c: [1, 2, 3].map(n => ({ id: 'h' + n, lab: 'Hallazgo ' + n, ph: n < 3 ? 'Según … (año), …' : '… (Apellido, año).' })) },
-    { t: 'La respuesta a mi pregunta', h: 'Con todo lo que encontraste, responde tu pregunta.', c: [{ id: 'r', r: 5, ph: 'Mi respuesta es…' }] }, H_FU, H_CK(['Respondí mi pregunta con lo que encontré.'])] },
+    { t: 'La respuesta a mi pregunta', h: 'Lee otra vez lo que dicen tus 3 autores citados y saca UNA idea propia que responda tu pregunta. No copies sus frases: júntalas y explícalo con tus palabras.', c: [{ id: 'r', r: 5, ph: 'Después de leer a …, … y …, concluyo que…' }] },
+    { t: 'Mi resumen', h: 'Escribe 2 o 3 oraciones cortas: 1) qué quisiste averiguar, 2) qué encontraste en tus fuentes y 3) qué concluiste. Escríbelo al final, cuando ya terminaste todo.', c: [{ id: 'res', r: 4, ph: 'En esta investigación quise saber… Encontré que… Por eso concluyo que…' }] }, H_FU, H_CK(['Respondí mi pregunta con lo que encontré.'])] },
   dis: { sub: 'Planificas un experimento para comprobar una hipótesis.', pasos: [
     { t: 'Pregunta de indagación', h: 'Debe relacionar una causa con un efecto. Ejemplo: ¿Cómo influye la temperatura del agua en la actividad de la levadura?', c: [{ id: 'a', r: 2 }] },
     { t: '¿Qué dice la ciencia?', h: 'Lo que encontraste en fuentes confiables sobre tu tema. Aquí van tus 3 citas: «Según López (2020), …» o «… (Soto, 2019)».', c: [{ id: 'b', r: 6 }] },
@@ -780,12 +782,18 @@ function hojaGuardar() {
   h.np = hojaPal(h); hojaPut(h); const s = $('#wdSv'), n = $('#wdN'); if (s) s.textContent = '💾 Guardado'; if (n) n.textContent = hojaPal(h) + ' palabras';
 }
 function noPegar(x) { toast('🚫 Aquí no se puede pegar: escríbelo con tus propias palabras. Sólo puedes pegar en «Link».', 3600); if (x) { x.classList.remove('wd-no'); void x.offsetWidth; x.classList.add('wd-no'); } }
+// 🚫 en el Word Molí no se copia, no se corta ni se pega (sólo se puede pegar en «Link»): ni con el mouse, ni con el teclado, ni arrastrando
+const enHoja = e => e.target && e.target.closest && e.target.closest('#hoja'), enLink = e => e.target.closest('[data-link]');
+['copy', 'cut'].forEach(ev => document.addEventListener(ev, e => { if (!enHoja(e) || enLink(e)) return; e.preventDefault(); toast('🚫 En el Word Molí no se puede copiar: todo se escribe con tus propias palabras.', 3200); }, true));
+['dragstart', 'contextmenu'].forEach(ev => document.addEventListener(ev, e => { if (enHoja(e) && !enLink(e)) e.preventDefault(); }, true));
+document.addEventListener('keydown', e => { if (!enHoja(e) || enLink(e)) return; const k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
+  if ((mod && (k === 'v' || k === 'c' || k === 'x')) || (e.shiftKey && k === 'insert') || (mod && k === 'insert')) { e.preventDefault(); k === 'v' || k === 'insert' ? noPegar(e.target.closest('[data-k]')) : toast('🚫 En el Word Molí no se puede copiar ni cortar.', 3000); } }, true);
 ['paste', 'drop'].forEach(ev => document.addEventListener(ev, e => { const h = e.target.closest && e.target.closest('#hoja'); if (!h || e.target.closest('[data-link]')) return; e.preventDefault(); noPegar(e.target.closest('[data-k]')); }, true));
 document.addEventListener('beforeinput', e => { if (!e.target.closest || !e.target.closest('#hoja') || e.target.closest('[data-link]')) return; if (/^insertFrom(Paste|Drop|Yank)/.test(e.inputType || '')) { e.preventDefault(); noPegar(e.target); } }, true);
 document.addEventListener('input', e => {
   const x = e.target; if (!x.closest || !x.closest('#hoja') || !x.dataset.k) return;
   const prev = HPREV.get(x) || { h: '', n: 0 }, ed = x.hasAttribute('data-ed'), now = prevDe(x);
-  if (!x.hasAttribute('data-link') && x.type !== 'checkbox' && now.n - prev.n > 60) { if (ed) x.innerHTML = prev.h; else x.value = prev.h; noPegar(x); return; }   // el teclado del celular pega de golpe: también se frena
+  if (!x.hasAttribute('data-link') && x.type !== 'checkbox' && now.n - prev.n > 30) { if (ed) x.innerHTML = prev.h; else x.value = prev.h; noPegar(x); return; }   // el teclado del celular pega de golpe: también se frena
   HPREV.set(x, now);
   const s = $('#wdSv'); if (s) s.textContent = '✏️ Guardando…'; clearTimeout(hojaT); hojaT = setTimeout(hojaGuardar, 500);
 });
@@ -1080,6 +1088,7 @@ const FIX = {
 function moliMejora(h) {                                               // corrige la guía de práctica con la versión buena y la deja lista para reenviar
   const X = FIX[h.t] || Object.entries(FIX).find(([k, x]) => x.t === h.t)?.[1]; if (!X) return false;
   const v = h.v = { ...h.v }; ['q', 'h1', 'h2', 'h3', 'r'].forEach(k => { v[k] = X[k]; delete v[k + '_h']; });
+  v.res = X.res || `En esta investigación quise saber ${X.q.replace(/^¿|\?$/g, '').replace(/^./, c => c.toLowerCase())}. ${X.r}`; delete v.res_h;
   X.f.forEach((x, k) => { v[`f${k + 1}a`] = x.a; v[`f${k + 1}y`] = x.y; v[`f${k + 1}m`] = x.m; v[`f${k + 1}l`] = x.l; }); [0, 1, 2, 3].forEach(j => v['c' + j] = true);
   if (X.t) { h.t = X.t; h.nom = '🧪 ' + X.t; } h.mejorada = Date.now(); hojaPut(h); return true;
 }
@@ -1374,12 +1383,15 @@ $('#modal').addEventListener('click', async e => {
     if (TAB === 'bandeja') drawBandeja(); else if (TAB === 'similitud') pintaSim(); else vRevista();
   } catch (x) { M.querySelectorAll('[data-rv]').forEach(y => y.disabled = false); toast(x.message === 'AUTH' ? '🔐 No tienes permiso para esto.' : '📶 No se pudo guardar. Intenta otra vez.', 4500); }
 });
+// 🚫 los artículos publicados tampoco se copian (sólo la docente); para usarlos está el PDF
+['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart'].forEach(ev => document.addEventListener(ev, e => { if (ROLE.t || !e.target.closest || !e.target.closest('#modal .art:not(.rv-art) .bd') || e.target.closest('textarea, input, button, a')) return; e.preventDefault(); if (ev === 'copy' || ev === 'cut') toast('🚫 No se puede copiar. Usa «📄 Descargar investigación (PDF)» y cítalo con tus palabras.', 3600); }, true));
 addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden) { $('#modal').hidden = true; $('#modal').innerHTML = ''; } });
 
 // ---- inicio ----
 (async function () {
   if (ME) { const me = $('#me'); me.hidden = false; me.innerHTML = `<i>${esc((firstName(ME.name)[0] || '🙂').toUpperCase())}</i><span class="nm">${esc(firstName(ME.name) || 'Hola')}</span>${ME.teacher ? '<span class="rol">Docente</span>' : ''}`; }
   await checkRole();
+  if (ROLE.t) document.body.classList.add('docente');
   if (ROLE.r) { const r = $('#me .rol'); if (!r) $('#me').insertAdjacentHTML('beforeend', '<span class="rol">🧐 Revisor</span>'); }
   if (ROLE.t || ROLE.r) { $('#tabs [data-tab="bandeja"]').hidden = false; $('#tabs [data-tab="similitud"]').hidden = false; }   // los Revisores revisan sólo desde «Similitud» (su bandeja)
   if (ROLE.t) $('#tabs [data-tab="trabajos"]').hidden = false;
@@ -1389,6 +1401,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610160259"></script><script src="archivos.js?v=202610160259"></script><script src="mando.js?v=202610160259"></script>
+<script src="pdftrabajo.js?v=202610160306"></script><script src="archivos.js?v=202610160306"></script><script src="mando.js?v=202610160306"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@
     for (const x of L) {
       if (/^PASO\b/.test(x)) { const t = x.replace(/^PASO\s*\d*\s*/, '').trim(); enF = /fuentes/i.test(t); fu = null;
         salta = /revisa y publica/i.test(t); if (salta) { cur = null; continue; }
-        if (!enF) { cur = { t, k: /respuesta|conclusi/i.test(t) ? 'r' : /pregunta|tema/i.test(t) ? 'q' : /encontr|desarrollo|razones|datos|ciencia/i.test(t) ? 'h' : 'o', p: [] }; S.push(cur); } continue; }
+        if (!enF) { cur = { t, k: /resumen/i.test(t) ? 's' : /respuesta|conclusi/i.test(t) ? 'r' : /pregunta|tema/i.test(t) ? 'q' : /encontr|desarrollo|razones|datos|ciencia/i.test(t) ? 'h' : 'o', p: [] }; S.push(cur); } continue; }
       if (enF) { if (/^Fuente\s*\d/i.test(x)) { fu = {}; F.push(fu); continue; }
         const m = /^(Autor o página|Año|Tema|Título|Link):\s*(.*)$/i.exec(x); if (m && fu) fu[{ 'autor o página': 'a', 'año': 'y', 'tema': 't', 'título': 't', 'link': 'l' }[m[1].toLowerCase()]] = m[2]; continue; }
       if (salta || /^(si|x|✓|☑|☐)(\s|$)/i.test(x)) continue;
@@ -29,10 +29,10 @@
   const apellido = n => { const p = String(n || '').trim().split(/\s+/); return p.length >= 3 ? p[p.length - 2] : p[p.length - 1] || ''; };
   const lnk = h => h.replace(/https?:\/\/[^\s<]+/g, u => `<span class="url">${u}</span>`);
   function html(w) {
-    const P = partes(w), q = P.S.find(s => s.k === 'q'), r = P.S.find(s => s.k === 'r'), rest = P.S.filter(s => s !== q && s !== r);
+    const P = partes(w), q = P.S.find(s => s.k === 'q'), r = P.S.find(s => s.k === 'r'), su = P.S.find(s => s.k === 's'), rest = P.S.filter(s => s !== q && s !== r && s !== su);
     const kws = String(w.kw || '').split(',').map(x => x.trim()).filter(Boolean), A = [w.img, w.img2, w.img3].filter(Boolean), y = anio(w);
     const ref = x => `${esc(x.a || 'Autor desconocido')}. (${esc(x.y || 's. f.')}). <i>${esc(x.t || 'Sin título')}</i>.${x.l ? ` Recuperado de <span class="url">${esc(x.l)}</span>` : ''}`;
-    const res0 = [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ').split(/\s+/).filter(Boolean), resumen = res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');   // como en las revistas: corto
+    const res0 = (su ? su.p.join(' ') : [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ')).split(/\s+/).filter(Boolean), resumen = !su && res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');   // como en las revistas: corto
     let n = 0; const sec = (t, ps) => `<h2>${++n}. ${esc(t)}</h2>${ps.map(x => `<p>${lnk(esc(x))}</p>`).join('')}`;
     const cuerpo = (q ? sec('Pregunta de investigación', q.p) : '') + rest.map(s => sec(s.k === 'h' ? (rest.length === 1 ? 'Desarrollo' : s.t) : s.t || 'Desarrollo', s.p)).join('') + (r ? sec('Conclusión', r.p) : '');
     const cita = w.sec ? `${apellido(w.n)} (${y})` : `${String(w.n || '').split(/\s+/).pop()} (${y})`;
