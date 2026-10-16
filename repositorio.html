@@ -102,6 +102,7 @@ button{cursor:pointer}
 .wd-tt input{width:100%;padding:4px 0;border:0;border-bottom:2px solid #c9d6ea;font:700 22px Cambria,Georgia,serif;color:#1f3864;outline:0}.wd-tt input:focus{border-bottom-color:#2b579a}
 .wd-ps{margin-top:22px}.wd-ps h2{margin:0;padding-bottom:4px;border-bottom:1px solid #8eaadb;font:700 19px Cambria,Georgia,serif;color:#1f3864}.wd-ps h2 span{display:inline-block;margin-right:6px;padding:1px 9px;border-radius:4px;background:#2b579a;color:#fff;font:700 12px/1.6 Calibri,Arial,sans-serif;letter-spacing:.06em;vertical-align:3px}
 .wd-h{margin:6px 0 4px;font-size:13.5px;font-style:italic;color:#777}
+.wd-cnt{margin:3px 0 10px;text-align:right;font:700 12.5px/1.3 Arial,sans-serif;color:#b45309}.wd-cnt.ok{color:#15803d}.wd-cnt.cero{color:#8a94a6;font-weight:600}
 .wd-pg .wd-ed{display:block;width:100%;min-height:52px;padding:6px 8px;border:1px dashed transparent;border-left:3px solid #dbe5f3;border-radius:2px;background:transparent;font:inherit;line-height:1.55;resize:none;overflow:hidden;outline:0}
 .wd-pg .wd-ed:hover{border-color:#dde4ee}.wd-pg .wd-ed:focus{border-color:#9fb6d9;border-left-color:#2b579a;background:#fbfcfe}
 .wd-fu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}.wd-fu table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -642,8 +643,8 @@ const HOJA_TODAS = {
     { t: 'Conclusión', h: 'Resume lo más importante y cierra con una reflexión.', c: [{ id: 'cn', r: 4 }] }, H_FU, H_CK(['Tiene introducción, 3 párrafos y conclusión.'])] },
   inv: { sub: 'Buscas información en fuentes confiables para responder una pregunta.', pasos: [
     { t: 'Mi pregunta de investigación', h: '¿Qué quieres averiguar? Empieza con: ¿Qué…? ¿Cómo…? ¿Por qué…?', c: [{ id: 'q', ph: '¿…?', r: 2 }] },
-    { t: 'Lo que encontré', h: 'Escribe lo más importante de cada fuente con tus palabras. ' + CITAS, c: [1, 2, 3].map(n => ({ id: 'h' + n, lab: 'Hallazgo ' + n, ph: n < 3 ? 'Según … (año), …' : '… (Apellido, año).' })) },
-    { t: 'La respuesta a mi pregunta', h: 'Lee otra vez lo que dicen tus 3 autores citados y saca UNA idea propia que responda tu pregunta. No copies sus frases: júntalas y explícalo con tus palabras.', c: [{ id: 'r', r: 5, ph: 'Después de leer a …, … y …, concluyo que…' }] },
+    { t: 'Lo que encontré', h: 'Escribe lo más importante de cada fuente con tus palabras: mínimo 30 palabras en cada hallazgo (unas 3 o 4 líneas). ' + CITAS, c: [1, 2, 3].map(n => ({ id: 'h' + n, lab: 'Hallazgo ' + n, min: 30, ph: n < 3 ? 'Según … (año), …' : '… (Apellido, año).' })) },
+    { t: 'La respuesta a mi pregunta', h: 'Lee otra vez lo que dicen tus 3 autores citados y saca UNA idea propia que responda tu pregunta. No copies sus frases: júntalas y explícalo con tus palabras (mínimo 35 palabras).', c: [{ id: 'r', r: 5, min: 35, ph: 'Después de leer a …, … y …, concluyo que…' }] },
     { t: 'Mi resumen', h: 'Escribe 2 o 3 oraciones cortas: 1) qué quisiste averiguar, 2) qué encontraste en tus fuentes y 3) qué concluiste. Escríbelo al final, cuando ya terminaste todo.', c: [{ id: 'res', r: 4, ph: 'En esta investigación quise saber… Encontré que… Por eso concluyo que…' }] }, H_FU, H_CK(['Respondí mi pregunta con lo que encontré.'])] },
   dis: { sub: 'Planificas un experimento para comprobar una hipótesis.', pasos: [
     { t: 'Pregunta de indagación', h: 'Debe relacionar una causa con un efecto. Ejemplo: ¿Cómo influye la temperatura del agua en la actividad de la levadura?', c: [{ id: 'a', r: 2 }] },
@@ -693,9 +694,16 @@ function hojaFalta(h) {
   if (String(h.t || '').trim().length < 4) F.push('el título de tu trabajo');
   if (String(h.kw || '').split(',').filter(x => x.trim()).length < 3) F.push('3 palabras clave separadas por comas (debajo del título)');
   HOJA[h.ty].pasos.forEach((p, i) => { if (p.c && !p.c.some(c => x(c.id).length >= 3)) F.push(`el Paso ${i + 1} (${p.t})`);
+    else (p.c || []).forEach(c => { const n = palCampo(v[c.id]), f = c.min - n; if (f > 0) F.push(`escribir ${f === 1 ? '1 palabra' : f + ' palabras'} más en «${c.lab || p.t}» (mínimo ${c.min})`); });
     if (p.fu && [1, 2, 3].filter(n => x(`f${n}a`) && x(`f${n}y`)).length < 3) F.push(`el autor y el año de tus 3 fuentes (Paso ${i + 1})`); });
   if (!F.length && hojaPal(h) < 60) F.push('escribir un poquito más (mínimo 60 palabras)');
   return F;
+}
+const palCampo = s => (String(s || '').match(/[\p{L}\p{N}]+/gu) || []).length;   // palabras de un recuadro (cuenta «salud(2025),las» como 3)
+function cntPinta(x) {                                                 // ✏️ el contador debajo de cada hallazgo y de la respuesta
+  const c = x && x.dataset && document.querySelector(`#hoja [data-cnt="${x.dataset.k}"]`); if (!c) return; const m = +c.dataset.min, n = palCampo(valDe(x));
+  c.className = 'wd-cnt' + (n >= m ? ' ok' : n ? '' : ' cero');
+  c.textContent = n >= m ? `✅ ${n} palabras · ¡cumpliste el mínimo de ${m}!` : n ? `✏️ ${n} de ${m} palabras · te ${m - n === 1 ? 'falta 1' : 'faltan ' + (m - n)}` : `✏️ Mínimo ${m} palabras`;
 }
 const hojaPal = h => hojaTexto(h).replace(/^PASO.*$|^(Fuente \d|Autor o página:|Año:|Tema:|Título:|Link:.*|si .*)$/gm, ' ').split(/\s+/).filter(Boolean).length;
 function hojaLanzador(ty) {
@@ -716,7 +724,7 @@ function devSide(dv, h) {                                              // al cos
 document.addEventListener('click', e => {
   if (!e.target.closest) return; const d = $('#hoja'), h = d && hojaDoc(d.dataset.id);
   if (e.target.closest('#hoja [data-mj]') && h) { if (!moliMejora(h)) return toast('No encontré la versión corregida de este trabajo.'); toast('✨ ¡Molí lo mejoró! Ya corrigió la ortografía, las citas, los errores y las fuentes.', 4500); return abrirHojaDoc(h.id); }
-  if (e.target.closest('#hoja [data-mjenv]') && h) { const F = hojaFalta(h); if (F.length) return toast('✏️ Aún falta: ' + F.join(', ')); cerrarHoja(); if (TAB !== 'enviar') setTab('enviar'); FORM.ty = h.ty; FORM.hid = h.id; setTimeout(() => { const g = $('#eGo'); if (g) g.click(); }, 120); }
+  if (e.target.closest('#hoja [data-mjenv]') && h) { if (h.prac && hojaFalta(h).length && moliMejora(h)) abrirHojaDoc(h.id); const F = hojaFalta(h); if (F.length) return toast('✏️ Aún falta: ' + F.join(', ')); cerrarHoja(); if (TAB !== 'enviar') setTab('enviar'); FORM.ty = h.ty; FORM.hid = h.id; setTimeout(() => { const g = $('#eGo'); if (g) g.click(); }, 120); }
 });
 document.addEventListener('click', e => { const c = e.target.closest && e.target.closest('#hoja [data-irn]'); if (!c) return; const el = document.querySelector(`#hoja .wd-ed [data-n="${c.dataset.irn}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('pulso'); setTimeout(() => el.classList.remove('pulso'), 1200); } else toast('✅ Esa parte ya la corregiste.'); });
 function abrirHojaDoc(id) {
@@ -739,14 +747,14 @@ function abrirHojaDoc(id) {
     <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
     <div class="wd-tt wd-kw"><label>Palabras clave <small>(de 3 a 5, separadas por comas: con ellas te encontrarán en el 🔍 Buscador)</small></label><input data-k="_kw" maxlength="200" value="${esc(h.kw || '')}" placeholder="Ej.: levadura, pan, hongos"${dis}></div>
     ${G.pasos.map((p, i) => `<section class="wd-ps"><h2><span>PASO ${i + 1}</span> ${esc(p.t)}</h2><p class="wd-h">${esc(p.h)}</p>
-      ${(p.c || []).map(c => c.pre ? `<div class="wd-pre"><b>${esc(c.pre)}</b>${ta(c.id, c.ph || '…', c.r || 1)}</div>` : c.uno ? `<div class="wd-pre"><b>${esc(c.lab)}:</b>${inp(c.id, 'la idea de este párrafo', 'maxlength="160"')}</div>` : `${c.lab ? `<h3>${esc(c.lab)}</h3>` : ''}${ta(c.id, c.ph, c.r)}`).join('')}
+      ${(p.c || []).map(c => c.pre ? `<div class="wd-pre"><b>${esc(c.pre)}</b>${ta(c.id, c.ph || '…', c.r || 1)}</div>` : c.uno ? `<div class="wd-pre"><b>${esc(c.lab)}:</b>${inp(c.id, 'la idea de este párrafo', 'maxlength="160"')}</div>` : `${c.lab ? `<h3>${esc(c.lab)}</h3>` : ''}${ta(c.id, c.ph, c.r)}${c.min ? `<div class="wd-cnt" data-cnt="${c.id}" data-min="${c.min}"></div>` : ''}`).join('')}
       ${p.tb ? `<table class="wd-tb"><tr>${p.tb.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${Array.from({ length: p.tb.rows }, (_, r) => `<tr><th>${r + 1}</th>${p.tb.cols.slice(1).map((_, c) => `<td>${inp(`t${r + 1}${c}`, '', 'maxlength="40"')}</td>`).join('')}</tr>`).join('')}</table>` : ''}
       ${p.fu ? `<div class="wd-fu">${Array.from({ length: p.fu }, (_, n) => `<table><caption>Fuente ${n + 1}</caption>${FU_C.map(([k, lab, ej]) => `<tr><th>${lab}${k === 'l' ? ' <small>📋 aquí sí pegas</small>' : ''}</th><td>${inp(`f${n + 1}${k}`, ej, k === 'l' ? 'data-link inputmode="url" maxlength="300"' : k === 'y' ? 'inputmode="numeric" maxlength="12"' : 'maxlength="160"')}</td></tr>`).join('')}</table>`).join('')}</div>` : ''}
       ${(p.ck || []).map((c, j) => `<label class="wd-ck"><input type="checkbox" data-k="c${j}" ${v['c' + j] ? 'checked' : ''}${dis}> ${esc(c)}</label>`).join('')}</section>`).join('')}
   </div></div>${dv ? devSide(dv, h) + '</div>' : ''}
   <div class="wd-st"><span>Página 1 de 1</span><span id="wdN">${hojaPal(h)} palabras</span><span>Español (Perú)</span><span class="wd-np">🚫 Escribe con tus palabras</span></div>`;
   d.hidden = false; d.dataset.id = id; document.body.style.overflow = 'hidden';
-  d.querySelectorAll('[data-k]').forEach(x => HPREV.set(x, prevDe(x)));
+  d.querySelectorAll('[data-k]').forEach(x => HPREV.set(x, prevDe(x))); d.querySelectorAll('[data-ed]').forEach(cntPinta);
 }
 window.abrirHojaDoc = abrirHojaDoc; window.nuevaHoja = ty => ME && HOJA[ty] ? hojaNueva(ty).id : null;
 function abrirHoja(ty) { if (!ME) return avisoDni(); abrirHojaDoc((hojaBorr(ty) || hojaNueva(ty)).id); }
@@ -794,7 +802,7 @@ document.addEventListener('input', e => {
   const x = e.target; if (!x.closest || !x.closest('#hoja') || !x.dataset.k) return;
   const prev = HPREV.get(x) || { h: '', n: 0 }, ed = x.hasAttribute('data-ed'), now = prevDe(x);
   if (!x.hasAttribute('data-link') && x.type !== 'checkbox' && now.n - prev.n > 30) { if (ed) x.innerHTML = prev.h; else x.value = prev.h; noPegar(x); return; }   // el teclado del celular pega de golpe: también se frena
-  HPREV.set(x, now);
+  HPREV.set(x, now); if (ed) cntPinta(x);
   const s = $('#wdSv'); if (s) s.textContent = '✏️ Guardando…'; clearTimeout(hojaT); hojaT = setTimeout(hojaGuardar, 500);
 });
 document.addEventListener('change', e => { if (e.target.closest && e.target.closest('#hoja') && e.target.type === 'checkbox') hojaGuardar(); });
@@ -1036,55 +1044,55 @@ const GRUPOS_P = [['1', '🍄 Grupo 1: hongos, bacterias, virus, levadura y enfe
 // ✨ «Molí mejora»: la versión corregida de cada trabajo de práctica (sin errores, con citas y 3 fuentes completas)
 const FIX = {
   'Los ongos y su importancia': { t: 'Los hongos y su importancia', q: '¿Por qué los hongos son importantes para la naturaleza?',
-    h1: 'Según la Universidad de Lima (2022), los hongos ayudan a descomponer las hojas secas y los animales muertos, y así devuelven nutrientes al suelo.',
-    h2: 'Los hongos se reproducen por esporas muy pequeñas que viajan con el viento y el agua (Martínez, 2021).',
-    h3: 'También hay hongos que nos sirven de alimento, como los champiñones, y otros que sirven para hacer medicinas, como la penicilina (Fleming, 2020).',
-    r: 'Los hongos son importantes porque descomponen la materia muerta y devuelven nutrientes al suelo; además, algunos nos sirven de alimento y otros para fabricar medicinas.', f: [F3('Universidad de Lima', '2022', 'Los hongos descomponedores', ''), F3('Martínez', '2021', 'Reproducción de los hongos', ''), F3('Fleming', '2020', 'La penicilina', '')] },
+    h1: 'Según la Universidad de Lima (2022), los hongos ayudan a descomponer las hojas secas, las ramas caídas y los animales muertos. Así devuelven al suelo los nutrientes que las plantas necesitan para crecer sanas.',
+    h2: 'Los hongos se reproducen por esporas, que son partes tan pequeñas que no las podemos ver. Las esporas viajan con el viento y el agua, y cuando caen en un lugar húmedo crece un nuevo hongo (Martínez, 2021).',
+    h3: 'También hay hongos que nos sirven de alimento, como los champiñones, y otros que se usan para hacer medicinas. Por ejemplo, del hongo Penicillium se obtiene la penicilina, que combate infecciones causadas por bacterias (Fleming, 2020).',
+    r: 'Después de leer a la Universidad de Lima, a Martínez y a Fleming, concluyo que los hongos son muy importantes para la naturaleza. Descomponen la materia muerta y devuelven nutrientes al suelo, se reproducen con facilidad por esporas y, además, algunos nos sirven de alimento y otros para fabricar medicinas.', f: [F3('Universidad de Lima', '2022', 'Los hongos descomponedores', ''), F3('Martínez', '2021', 'Reproducción de los hongos', ''), F3('Fleming', '2020', 'La penicilina', '')] },
   'Las bacterias buenas y malas': { q: '¿Todas las bacterias son malas?',
-    h1: 'Según el Instituto Nacional de Salud (2022), no todas las bacterias son malas: algunas viven en nuestro intestino y nos ayudan a digerir la comida.',
-    h2: 'Las bacterias son tan pequeñas que sólo se pueden ver con un microscopio (Universidad Nacional, 2021).',
-    h3: 'Según el Ministerio de Salud (2024), lavarse las manos con agua y jabón elimina muchas bacterias que causan enfermedades.',
-    r: 'No todas las bacterias son malas. Algunas nos ayudan a digerir los alimentos y otras causan enfermedades; por eso debemos lavarnos las manos para evitar las dañinas.', f: [F3('Instituto Nacional de Salud', '2022', 'Bacterias del intestino', ''), F3('Universidad Nacional', '2021', 'Las bacterias', ''), F3('Ministerio de Salud', '2024', 'Lavado de manos', 'https://www.gob.pe/minsa')] },
+    h1: 'Según el Instituto Nacional de Salud (2022), no todas las bacterias son malas. Algunas viven en nuestro intestino y nos ayudan a digerir la comida; otras, en cambio, pueden causarnos enfermedades como la diarrea o la tifoidea.',
+    h2: 'Las bacterias son seres vivos formados por una sola célula. Son tan pequeñas que sólo se pueden ver con un microscopio, y viven en casi todas partes: en el agua, en el suelo y en nuestro cuerpo (Universidad Nacional, 2021).',
+    h3: 'Según el Ministerio de Salud (2024), lavarse las manos con agua y jabón durante al menos 20 segundos elimina muchas bacterias que causan enfermedades. Por eso debemos hacerlo antes de comer y después de ir al baño.',
+    r: 'Después de leer al Instituto Nacional de Salud, a la Universidad Nacional y al Ministerio de Salud, concluyo que no todas las bacterias son malas. Algunas nos ayudan a digerir los alimentos y otras causan enfermedades; por eso debemos lavarnos bien las manos para alejar a las dañinas.', f: [F3('Instituto Nacional de Salud', '2022', 'Bacterias del intestino', ''), F3('Universidad Nacional', '2021', 'Las bacterias', ''), F3('Ministerio de Salud', '2024', 'Lavado de manos', 'https://www.gob.pe/minsa')] },
   'Los virus y los antibióticos': { q: '¿Cómo se curan las enfermedades que causan los virus?',
-    h1: 'Según la OMS (2023), los virus son muy pequeños y sólo pueden reproducirse dentro de las células de otro ser vivo.',
-    h2: 'Los antibióticos sólo sirven contra las bacterias; no matan a los virus, por eso no curan la gripe (Rojas, 2020).',
-    h3: 'Las vacunas ayudan a que nuestro cuerpo aprenda a defenderse de algunos virus, como el del sarampión (UNICEF, 2022).',
-    r: 'Las enfermedades causadas por virus no se curan con antibióticos. Nuestro cuerpo se defiende con ayuda del descanso y los cuidados, y las vacunas nos protegen antes de enfermarnos.', f: [F3('OMS', '2023', 'Qué son los virus', ''), F3('Rojas', '2020', 'La gripe y los antibióticos', ''), F3('UNICEF', '2022', 'Las vacunas', '')] },
+    h1: 'Según la OMS (2023), los virus son mucho más pequeños que las bacterias y no pueden vivir solos. Sólo se reproducen dentro de las células de otro ser vivo, y así causan enfermedades como la gripe o el resfriado.',
+    h2: 'Los antibióticos sólo sirven contra las bacterias; no matan a los virus. Por eso no curan la gripe ni el resfriado, y si los tomamos sin necesidad las bacterias pueden volverse más resistentes (Rojas, 2020).',
+    h3: 'Las vacunas ayudan a que nuestro cuerpo aprenda a defenderse de algunos virus antes de enfermarnos, como el del sarampión o el de la polio. Gracias a ellas, muchas enfermedades ya casi no aparecen (UNICEF, 2022).',
+    r: 'Después de leer a la OMS, a Rojas y a UNICEF, concluyo que las enfermedades causadas por virus no se curan con antibióticos. Nuestro cuerpo se defiende con ayuda del descanso y los cuidados del médico, y las vacunas nos protegen antes de enfermarnos.', f: [F3('OMS', '2023', 'Qué son los virus', ''), F3('Rojas', '2020', 'La gripe y los antibióticos', ''), F3('UNICEF', '2022', 'Las vacunas', '')] },
   'La levadura y nuestra salud': { q: '¿La levadura es buena para la salud?',
-    h1: 'Alarcón (2026) explica que, según el diario Clarín, la levadura nos aporta proteínas y vitaminas del grupo B, aunque a algunas personas les puede causar alergias o molestias en el estómago.',
-    h2: 'Según WebMD (2022), la levadura nutricional puede ayudar a nuestras defensas, pero en personas sensibles puede provocar dolores de cabeza.',
-    h3: 'Espirilla (2026) menciona que la levadura es un hongo de una sola célula que hace crecer la masa del pan.',
-    r: 'La levadura puede ser buena para la salud porque nos da vitaminas y proteínas, pero hay que consumirla con cuidado, porque a algunas personas les causa alergias o dolores de cabeza.', f: [F3('Alarcón Gambetta, Emilio José', '2026', 'Levaduras (Biblioteca de Molí 2)', ''), F3('WebMD', '2022', 'La levadura nutricional', ''), F3('Espirilla Solis, Matías Misael', '2026', 'Qué es la levadura (Biblioteca de Molí 2)', '')] },
+    h1: 'Alarcón (2026) explica que, según el diario Clarín, la levadura nos aporta proteínas y vitaminas del grupo B, aunque a algunas personas les puede causar alergias o molestias en el estómago, como gases o hinchazón.',
+    h2: 'Según WebMD (2022), la levadura nutricional puede ayudar a nuestras defensas y a combatir el cansancio. Sin embargo, tiene una sustancia llamada tiramina que, en personas sensibles, puede provocar dolores de cabeza o migrañas.',
+    h3: 'Espirilla (2026) menciona que la levadura es un hongo de una sola célula, tan pequeño que sólo se ve con microscopio. Al alimentarse, produce un gas que hace crecer la masa del pan y la vuelve esponjosa.',
+    r: 'Después de leer a Alarcón, a WebMD y a Espirilla, concluyo que la levadura puede ser buena para la salud porque nos da vitaminas y proteínas. Pero hay que consumirla con cuidado, porque a algunas personas les causa alergias o dolores de cabeza.', f: [F3('Alarcón Gambetta, Emilio José', '2026', 'Levaduras (Biblioteca de Molí 2)', ''), F3('WebMD', '2022', 'La levadura nutricional', ''), F3('Espirilla Solis, Matías Misael', '2026', 'Qué es la levadura (Biblioteca de Molí 2)', '')] },
   'Enfermedades que no se contagian': { q: '¿La diabetes y la obesidad se contagian?',
-    h1: 'Según el Minsa (2023), la diabetes es una enfermedad no contagiosa que aparece cuando hay mucha azúcar en la sangre por mucho tiempo.',
-    h2: 'La obesidad no se contagia: aparece por comer de más, moverse poco y, a veces, por herencia (OMS, 2022).',
-    h3: 'Para prevenir estas enfermedades debemos comer frutas y verduras y hacer ejercicio todos los días (Pérez, 2021).',
-    r: 'La diabetes y la obesidad no se contagian. Se pueden prevenir con una alimentación sana y haciendo ejercicio.', f: [F3('Minsa', '2023', 'La diabetes', ''), F3('Pérez', '2021', 'Vida saludable', ''), F3('OMS', '2022', 'La obesidad', '')] },
+    h1: 'Según el Minsa (2023), la diabetes es una enfermedad no contagiosa que aparece cuando hay demasiada azúcar en la sangre por mucho tiempo. Nadie se contagia de diabetes por estar cerca de una persona que la tiene.',
+    h2: 'La obesidad tampoco se contagia: aparece por comer más de lo que el cuerpo necesita, por moverse poco y, a veces, por herencia de la familia. Hoy afecta a muchos niños en el mundo (OMS, 2022).',
+    h3: 'Para prevenir estas enfermedades debemos comer frutas y verduras, tomar agua en lugar de gaseosas y hacer ejercicio todos los días, por lo menos una hora jugando o haciendo deporte (Pérez, 2021).',
+    r: 'Después de leer al Minsa, a la OMS y a Pérez, concluyo que la diabetes y la obesidad no se contagian, porque no las causa ningún microbio. Aparecen por nuestros hábitos o por herencia, y se pueden prevenir con una alimentación sana y haciendo ejercicio.', f: [F3('Minsa', '2023', 'La diabetes', ''), F3('Pérez', '2021', 'Vida saludable', ''), F3('OMS', '2022', 'La obesidad', '')] },
   'Las enfermedades contagiosas': { q: '¿Cómo se contagian las enfermedades?',
-    h1: 'Según el Minsa (2023), las enfermedades contagiosas son las que pasan de una persona a otra por microbios como virus, bacterias u hongos.',
-    h2: 'Algunas se contagian por el aire cuando alguien estornuda o tose cerca de nosotros, como la gripe y la tuberculosis (OMS, 2022).',
-    h3: 'La diabetes no es contagiosa, pero otras enfermedades sí se pasan por la saliva o el contacto, como la varicela (Gómez, 2020).',
-    r: 'Las enfermedades contagiosas se transmiten por el aire, la saliva y el contacto; por eso debemos lavarnos las manos y cubrirnos al toser.', f: [F3('Minsa', '2023', 'Enfermedades contagiosas', ''), F3('Gómez', '2020', 'Cómo se contagian las enfermedades', ''), F3('OMS', '2022', 'La tuberculosis', '')] },
+    h1: 'Según el Minsa (2023), las enfermedades contagiosas son las que pasan de una persona a otra por microbios como virus, bacterias u hongos. Estos microbios entran a nuestro cuerpo y lo enferman, y luego pueden pasar a otras personas.',
+    h2: 'Algunas enfermedades se contagian por el aire, cuando alguien estornuda o tose cerca de nosotros y lanza gotitas con microbios. Así se pasan de una persona a otra la gripe y la tuberculosis (OMS, 2022).',
+    h3: 'Otras enfermedades se pasan por la saliva o por el contacto con la piel o con objetos que tocó una persona enferma, como la varicela. Por eso no debemos compartir vasos ni cubiertos (Gómez, 2020).',
+    r: 'Después de leer al Minsa, a la OMS y a Gómez, concluyo que las enfermedades contagiosas se transmiten por microbios que pasan por el aire, la saliva y el contacto. Por eso debemos lavarnos las manos, cubrirnos al toser y no compartir vasos.', f: [F3('Minsa', '2023', 'Enfermedades contagiosas', ''), F3('Gómez', '2020', 'Cómo se contagian las enfermedades', ''), F3('OMS', '2022', 'La tuberculosis', '')] },
   'Las enfermedades no contagiosas': { q: '¿Por qué algunas enfermedades no se contagian?',
-    h1: 'Según la OMS (2023), las enfermedades no contagiosas no son causadas por microbios, sino por la herencia, la mala alimentación o la falta de ejercicio.',
-    h2: 'Ejemplos de estas enfermedades son la diabetes, la hipertensión y el asma; el resfriado no es una de ellas, porque sí se contagia (Torres, 2022).',
-    h3: 'Muchas de estas enfermedades duran mucho tiempo y necesitan cuidados de por vida (Minsa, 2023).',
-    r: 'Algunas enfermedades no se contagian porque no las causa un microbio, sino nuestros hábitos o la herencia; por eso se previenen con una vida sana.', f: [F3('OMS', '2023', 'Enfermedades no transmisibles', ''), F3('Torres', '2022', 'Enfermedades crónicas', ''), F3('Minsa', '2023', 'Cuidados de las enfermedades crónicas', '')] },
+    h1: 'Según la OMS (2023), las enfermedades no contagiosas no son causadas por microbios, sino por la herencia, la mala alimentación o la falta de ejercicio. Por eso no pasan de una persona a otra.',
+    h2: 'Ejemplos de estas enfermedades son la diabetes, la hipertensión y el asma; el resfriado no es una de ellas, porque sí se contagia: lo causa un virus que pasa de persona a persona (Torres, 2022).',
+    h3: 'Muchas de estas enfermedades duran mucho tiempo y necesitan cuidados de por vida, como tomar medicinas, ir al médico con frecuencia y comer sano. Por eso es mejor prevenirlas desde niños (Minsa, 2023).',
+    r: 'Después de leer a la OMS, a Torres y al Minsa, concluyo que algunas enfermedades no se contagian porque no las causa un microbio, sino nuestros hábitos o la herencia. Por eso se previenen con una vida sana: comer bien y hacer ejercicio.', f: [F3('OMS', '2023', 'Enfermedades no transmisibles', ''), F3('Torres', '2022', 'Enfermedades crónicas', ''), F3('Minsa', '2023', 'Cuidados de las enfermedades crónicas', '')] },
   '¿El dengue es una enfermedad contagiosa?': { q: '¿El dengue se contagia de persona a persona?',
-    h1: 'Según el Ministerio de Salud (2024), el dengue es causado por un virus que transmite el zancudo Aedes aegypti cuando pica a una persona.',
-    h2: 'El dengue no se contagia por abrazar o saludar a una persona enferma: sólo se transmite por la picadura del zancudo (OMS, 2023).',
-    h3: 'Para evitar el dengue hay que tapar los recipientes con agua y botar las llantas viejas donde el zancudo pone sus huevos (OPS, 2023).',
-    r: 'No, el dengue no se contagia de persona a persona. Lo transmite el zancudo Aedes aegypti, por eso debemos eliminar los lugares donde pone sus huevos.', f: [F3('Ministerio de Salud', '2024', 'El dengue', 'https://www.gob.pe/minsa'), F3('OPS', '2023', 'Prevención del dengue', ''), F3('OMS', '2023', 'Dengue y dengue grave', '')] },
+    h1: 'Según el Ministerio de Salud (2024), el dengue es causado por un virus que transmite el zancudo Aedes aegypti cuando pica a una persona. Produce fiebre alta, dolor de cabeza y dolor en los huesos.',
+    h2: 'El dengue no se contagia por abrazar o saludar a una persona enferma: sólo se transmite por la picadura del zancudo, que se infecta al picar a una persona enferma y luego pica a otra (OMS, 2023).',
+    h3: 'Para evitar el dengue hay que tapar los recipientes con agua y botar las llantas viejas donde el zancudo pone sus huevos. También ayuda usar repelente y dormir con mosquitero (OPS, 2023).',
+    r: 'Después de leer al Ministerio de Salud, a la OMS y a la OPS, concluyo que el dengue no se contagia de persona a persona. Lo transmite el zancudo Aedes aegypti, por eso debemos eliminar los lugares con agua estancada donde pone sus huevos.', f: [F3('Ministerio de Salud', '2024', 'El dengue', 'https://www.gob.pe/minsa'), F3('OPS', '2023', 'Prevención del dengue', ''), F3('OMS', '2023', 'Dengue y dengue grave', '')] },
   'La importancia de las bacterias': { q: '¿Para qué sirven las bacterias?',
-    h1: 'No todas las bacterias son malas: muchas son útiles y sólo algunas nos enferman (Instituto Nacional de Salud, 2022).',
-    h2: 'Según la Universidad Nacional (2021), algunas bacterias ayudan a hacer el yogur y el queso al transformar la leche.',
-    h3: 'Las bacterias del suelo descomponen las hojas y los animales muertos, y devuelven nutrientes a las plantas (Ramírez, 2022).',
-    r: 'Las bacterias son importantes porque ayudan a preparar alimentos y a limpiar el suelo; sólo algunas causan enfermedades.', f: [F3('Universidad Nacional', '2021', 'Bacterias en los alimentos', ''), F3('Ramírez', '2022', 'Bacterias del suelo', ''), F3('Instituto Nacional de Salud', '2022', 'Bacterias útiles y dañinas', '')] },
+    h1: 'No todas las bacterias son malas: muchas son útiles para los seres vivos y sólo algunas nos enferman. Por ejemplo, las de nuestro intestino nos ayudan a digerir los alimentos (Instituto Nacional de Salud, 2022).',
+    h2: 'Según la Universidad Nacional (2021), algunas bacterias ayudan a hacer el yogur y el queso, porque transforman el azúcar de la leche en un ácido que la vuelve espesa y le da un sabor agrio.',
+    h3: 'Las bacterias del suelo descomponen las hojas y los animales muertos, y devuelven nutrientes a las plantas. Sin ellas, la basura natural se acumularía y el suelo no sería fértil (Ramírez, 2022).',
+    r: 'Después de leer al Instituto Nacional de Salud, a la Universidad Nacional y a Ramírez, concluyo que las bacterias son muy importantes. Nos ayudan a digerir, sirven para preparar alimentos como el yogur y limpian el suelo; sólo algunas causan enfermedades.', f: [F3('Universidad Nacional', '2021', 'Bacterias en los alimentos', ''), F3('Ramírez', '2022', 'Bacterias del suelo', ''), F3('Instituto Nacional de Salud', '2022', 'Bacterias útiles y dañinas', '')] },
   'Las bacterias de nuestro organismo': { q: '¿Qué bacterias viven en nuestro cuerpo?',
-    h1: 'Según el Instituto Nacional de Salud (2022), en nuestro intestino viven millones de bacterias buenas que nos ayudan a digerir los alimentos y a producir vitaminas.',
-    h2: 'Estas bacterias también nos defienden de las bacterias malas, porque ocupan su lugar (Universidad Nacional, 2021).',
-    h3: 'Cuando tomamos antibióticos sin receta, podemos matar a las bacterias buenas de nuestro intestino (López, 2023).',
-    r: 'En nuestro cuerpo viven bacterias buenas que nos ayudan a digerir, producen vitaminas y nos defienden; por eso no debemos tomar antibióticos sin receta.', f: [F3('Instituto Nacional de Salud', '2022', 'La microbiota intestinal', ''), F3('Universidad Nacional', '2021', 'Bacterias que nos defienden', ''), F3('López', '2023', 'Uso de antibióticos', '')] } };
+    h1: 'Según el Instituto Nacional de Salud (2022), en nuestro intestino viven millones de bacterias buenas que nos ayudan a digerir los alimentos y a producir vitaminas. A este grupo de bacterias se le llama microbiota.',
+    h2: 'Estas bacterias también nos defienden de las bacterias malas, porque ocupan su espacio y se comen sus alimentos. Así, a las bacterias dañinas les cuesta más crecer y enfermarnos (Universidad Nacional, 2021).',
+    h3: 'Cuando tomamos antibióticos sin receta del médico, podemos matar también a las bacterias buenas de nuestro intestino. Entonces nos puede doler el estómago o dar diarrea, y nuestras defensas se debilitan (López, 2023).',
+    r: 'Después de leer al Instituto Nacional de Salud, a la Universidad Nacional y a López, concluyo que en nuestro cuerpo viven bacterias buenas que nos ayudan a digerir, producen vitaminas y nos defienden. Por eso no debemos tomar antibióticos sin receta.', f: [F3('Instituto Nacional de Salud', '2022', 'La microbiota intestinal', ''), F3('Universidad Nacional', '2021', 'Bacterias que nos defienden', ''), F3('López', '2023', 'Uso de antibióticos', '')] } };
 function moliMejora(h) {                                               // corrige la guía de práctica con la versión buena y la deja lista para reenviar
   const X = FIX[h.t] || Object.entries(FIX).find(([k, x]) => x.t === h.t)?.[1]; if (!X) return false;
   const v = h.v = { ...h.v }; ['q', 'h1', 'h2', 'h3', 'r'].forEach(k => { v[k] = X[k]; delete v[k + '_h']; });
@@ -1401,6 +1409,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610160306"></script><script src="archivos.js?v=202610160306"></script><script src="mando.js?v=202610160306"></script>
+<script src="pdftrabajo.js?v=202610160314"></script><script src="archivos.js?v=202610160314"></script><script src="mando.js?v=202610160314"></script>
 </body>
 </html>
