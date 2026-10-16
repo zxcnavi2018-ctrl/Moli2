@@ -1113,6 +1113,29 @@ function ampliaD(d, A) {
   if (A.r) { const re = /(PASO La respuesta a mi pregunta\n[\s\S]*?)\s*(\nPASO )/; if (!re.test(x)) return null; x = x.replace(re, (m, a, b) => a + ' ' + A.r + b); }
   if (!/\nPASO Mis fuentes\n/.test(x)) return null; return x.replace(/\nPASO Mis fuentes\n/, '\nPASO Mi resumen\n' + A.res + '\nPASO Mis fuentes\n');
 }
+// 📚 Trabajos que la docente recibió en papel y publica directo (aprobados), a nombre de la estudiante. Se busca en su lista por nombre.
+const EN_PAPEL = [{ id: 'yireh', busca: ['yireh', 'mamani'], t: '¿Por qué la diabetes no se contagia?', kw: 'diabetes, insulina, enfermedades no contagiosas, hábitos saludables', d: 'PASO Mi pregunta de investigación\n¿Por qué la diabetes no se contagia?\nPASO Lo que encontré\nHallazgo 1: Según gob.pe (2022), las enfermedades no contagiosas se desarrollan principalmente por estilos de vida poco saludables, como no hacer ejercicio o tener una alimentación inadecuada. Además, pueden ser el resultado del tabaquismo, del consumo excesivo de alcohol y de factores hereditarios y ambientales. La diabetes es una de estas enfermedades, por eso no pasa de una persona a otra.\nHallazgo 2: Según la Organización Mundial de la Salud (2024), la diabetes es una enfermedad crónica que aparece cuando el páncreas no produce suficiente insulina o cuando el cuerpo no logra usar bien la insulina que produce. La insulina es una hormona que regula la concentración de glucosa, es decir, la cantidad de azúcar que hay en la sangre.\nHallazgo 3: Según Canal Diabetes (2013), a diferencia de otras enfermedades crónicas, la diabetes no se puede contagiar como si fuera un virus. Es un mito pensar que se pasa por abrazar, compartir la comida o estar cerca de una persona que la tiene. Lo que sí influye es la herencia de la familia y nuestros hábitos de vida.\nPASO La respuesta a mi pregunta\nLa diabetes es un trastorno metabólico interno. Esto ocurre únicamente porque el propio cuerpo tiene problemas para producir o usar la insulina, debido a factores como la herencia genética de los padres, los hábitos de alimentación o la falta de ejercicio. Al no ser provocada por un virus o una bacteria, es biológicamente imposible contagiarse por convivir con alguien que la padece.\nPASO Mi resumen\nEn esta investigación quise saber por qué la diabetes no se contagia. Encontré que es una enfermedad crónica en la que el cuerpo no produce o no usa bien la insulina, y que aparece por la herencia y los hábitos de vida. Concluyo que no se contagia porque no la causa ningún virus ni bacteria.\nPASO Mis fuentes\nFuente 1\nAutor o página: gob.pe\nAño: 2022\nTítulo: ¿Qué son las enfermedades no transmisibles?\nLink: https://www.gob.pe/23384-que-son-las-enfermedades-no-transmisibles\nFuente 2\nAutor o página: Organización Mundial de la Salud\nAño: 2024\nTítulo: Diabetes\nLink: https://www.who.int/es/news-room/fact-sheets/detail/diabetes\nFuente 3\nAutor o página: Canal Diabetes\nAño: 2013\nTítulo: Mitos sobre la diabetes\nLink: https://canaldiabetes.com/mitos-sobre-la-diabetes/\nPASO Revisa y publica\nsi Respondí mi pregunta con lo que encontré.\nsi Usé mínimo 3 citas con mis palabras.\nsi Escribí las fuentes de mis citas.\nsi Revisé la ortografía y lo leí en voz alta.' }];
+const enPapelPend = () => EN_PAPEL.filter(x => !ls.get('moli2:papel:' + x.id));
+async function publicarPapel(b) {
+  if (!ROLE.t) return; const a = await staffTok(); if (!a) return toast('🔐 Conecta tu cuenta de docente.');
+  b.disabled = true; b.textContent = '⏳ Publicando…'; const R = [];
+  try {
+    const E = await estudiantesRepo(a), sin = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    for (const x of enPapelPend()) {
+      const M = E.filter(s => x.busca.every(w => sin(s.name).includes(w)));
+      if (M.length !== 1) { R.push(`⚠️ ${x.busca.join(' ')}: ${M.length ? 'hay ' + M.length + ' estudiantes con ese nombre' : 'no la encontré en tu lista'}`); continue; }
+      const s = M[0], q = { structuredQuery: { from: [{ collectionId: 'revista' }], where: { fieldFilter: { field: { fieldPath: 'k' }, op: 'EQUAL', value: { stringValue: s.key } } }, limit: 50 } };
+      const ya = await (await fetch(`${BASE}:runQuery?key=${F.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify(q) })).json();
+      if ((ya || []).some(r => r.document && docOf(r.document).t === x.t)) { ls.set('moli2:papel:' + x.id, Date.now()); R.push(`✅ ${s.name} (ya estaba publicado)`); continue; }
+      const now = new Date(), w = { k: s.key, n: String(s.name).slice(0, 60), sec: s.section, u: 'rev', kw: x.kw, ty: 'inv', t: x.t, d: x.d, at: now, st: 'ok', rv: 'tu profe', rvAt: now };
+      const id = s.key + '-' + Date.now().toString(36), r = await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, body: JSON.stringify({ fields: fieldsOf(w) }) });
+      if (!r.ok) { R.push(`⚠️ ${s.name}: no se pudo (${r.status})`); continue; }
+      ls.set('moli2:papel:' + x.id, Date.now()); R.push(`✅ ${s.name} · ${s.section}: «${x.t}» publicado en la Revista y en la Biblioteca`);
+    }
+  } catch (e) { R.push('⚠️ ' + (e.message === 'AUTH' ? 'Conecta tu cuenta de docente.' : 'Revisa tu internet.')); }
+  b.disabled = false; b.textContent = '📚 Publicar trabajo en papel'; if (!enPapelPend().length) b.remove();
+  alert('📚 Trabajos en papel\n\n' + R.join('\n'));
+}
 async function ampliarAprobados(b) {
   if (!ROLE.t) return;
   if (!confirm('Se completarán los trabajos aprobados de ' + Object.values(AMPLIA).map(x => x.n).join(', ') + ' para que cumplan los mínimos nuevos.\n\nSólo se AGREGAN oraciones al final de sus hallazgos y respuesta, y su «Mi resumen». No se quita ni se cambia nada de lo que escribieron. Siguen publicados con el mismo enlace.\n\n¿Completar?')) return;
@@ -1172,7 +1195,7 @@ async function enviarPractica(b, LISTA = PRAC, gk = '1') {
 async function vSimilitud() {
   const V = $('#view');
   if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
-  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2>${ROLE.t ? '<button type="button" class="btn soft" id="smPrac">🧪 Trabajos de práctica</button>' : ''}${ROLE.t && !ls.get('moli2:amplia1') ? '<button type="button" class="btn soft" id="smAmp">✏️ Completar 3 aprobados</button>' : ''}<button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>📝 Revisar</b>: el trabajo se abre en el <b>Word Molí</b> y se pinta solo: 🟧 lo igualito a los libritos de la Biblioteca y 🟦 la ortografía. Tú subraya en 🟨 lo extraño y deja 💬 comentarios. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>❌ Rechazar</b>.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2>${ROLE.t ? '<button type="button" class="btn soft" id="smPrac">🧪 Trabajos de práctica</button>' : ''}${ROLE.t && !ls.get('moli2:amplia1') ? '<button type="button" class="btn soft" id="smAmp">✏️ Completar 3 aprobados</button>' : ''}${ROLE.t && enPapelPend().length ? '<button type="button" class="btn soft" id="smPapel">📚 Publicar trabajo en papel</button>' : ''}<button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>📝 Revisar</b>: el trabajo se abre en el <b>Word Molí</b> y se pinta solo: 🟧 lo igualito a los libritos de la Biblioteca y 🟦 la ortografía. Tú subraya en 🟨 lo extraño y deja 💬 comentarios. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>❌ Rechazar</b>.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
     CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; if (ROLE.t) limpiarDevueltos(a); setCount(p.filter(w => !miSec(w)).length); pintaSim();
@@ -1186,7 +1209,7 @@ function pintaSim() {
     return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}<button type="button" class="btn blue" data-sim="${esc(w.id)}">📝 Revisar</button></div>`; }).join('')}</div>`
     : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
 }
-$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); if (e.target.closest('#smPrac')) elegirPractica(e.target.closest('#smPrac')); if (e.target.closest('#smAmp')) ampliarAprobados(e.target.closest('#smAmp')); });
+$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); if (e.target.closest('#smPrac')) elegirPractica(e.target.closest('#smPrac')); if (e.target.closest('#smAmp')) ampliarAprobados(e.target.closest('#smAmp')); if (e.target.closest('#smPapel')) publicarPapel(e.target.closest('#smPapel')); });
 function smComparar(w) {                                                // marca cada palabra del trabajo con el librito del que es igualito
   const T = smTok(w.d), S = [...(SIM.src || []).map(x => ({ x, lib: 1 })), ...(SIM.pend || []).filter(x => x.id !== w.id).map(x => ({ x, lib: 0 }))].filter(s => s.x.k !== w.k && String(s.x.d || '').trim());
   const sh = (A, i) => A.slice(i, i + SM_N).map(t => t.w).join(' '), autores = {};
@@ -1449,6 +1472,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610161248"></script><script src="archivos.js?v=202610161248"></script><script src="mando.js?v=202610161248"></script>
+<script src="pdftrabajo.js?v=202610161340"></script><script src="archivos.js?v=202610161340"></script><script src="mando.js?v=202610161340"></script>
 </body>
 </html>
