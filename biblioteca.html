@@ -151,8 +151,8 @@
 <div id="mGlobo" role="dialog" aria-label="Molí te ayuda a buscar"></div>
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610152218"></script>
-<script src="pdftrabajo.js?v=202610152218"></script>
+<script src="moli3d.js?v=202610160259"></script>
+<script src="pdftrabajo.js?v=202610160259"></script>
 <script>
 (function () {
 'use strict';
@@ -622,7 +622,7 @@ function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = colDe(t), ty 
       ${t.th || t.img ? `<img class="foto" src="${esc(t.img || t.th)}" alt="Foto del trabajo">` : `<div style="font-size:90px;text-align:center;margin:20px 0">${ty[0]}</div>`}
       ${t.kw ? `<p class="fu">🔑 ${esc(t.kw)}</p>` : ''}
       <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>${t.sec ? '6.° ' + esc(t.sec) : esMoli(t) ? '🧪 Práctica de los Revisores' : 'Docente'}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div>${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}
-      <button type="button" class="pdf" data-pdf>📄 Descargar PDF</button>${DOCENTE && t.id && !String(t.id).startsWith('demo') ? '<button type="button" class="borrar" data-del>🗑 Eliminar libro</button>' : ''}</div>`;
+      <button type="button" class="pdf" data-pdf>📄 Descargar investigación (PDF)</button>${DOCENTE && t.id && !String(t.id).startsWith('demo') ? '<button type="button" class="borrar" data-del>🗑 Eliminar libro</button>' : ''}</div>`;
   const der = `<div class="pg r">${texto}${t.f ? `<h3 class="sub">📚 Fuentes</h3><p class="fu">${esc(t.f)}</p>` : ''}<span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div>`;
   const pintar = () => { const A = [t.img, t.img2, t.img3].filter(Boolean), hojas = [[izq, der]];
     if (A.length) hojas.push([`<div class="pg l"><h2>📎 Anexos</h2><p class="fu">Fotos y evidencias del trabajo.</p>${A.slice(0, 1).map((x, i) => `<figure class="anx"><img class="foto" src="${esc(x)}" alt=""><figcaption>Anexo ${i + 1}</figcaption></figure>`).join('')}</div>`,
@@ -651,9 +651,9 @@ async function eliminarLibro(t, btn) {                                       // 
   } catch (er) { btn.disabled = false; btn.textContent = '🗑 Eliminar libro'; aviso(er.message === 'AUTH' ? '🔐 Conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo eliminar. Revisa tu internet.', 4.5); }
 }
 async function pdfLibro(t, btn) {                                     // 📄 el trabajo en PDF (con su texto completo y anexos)
-  if (!window.pdfTrabajo) return; const v = { ...t };
+  if (!window.pdfTrabajo) return; const v = { ...t }, win = !t._full && window.pdfVentana ? pdfVentana() : null;   // la ventana se abre al toque (si no, el navegador la bloquea)
   if (t.id && !String(t.id).startsWith('demo') && !t._full) { btn.disabled = true; try { const j = await (await fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`)).json(); ['img', 'img2', 'img3', 'd', 'f', 'kw'].forEach(k => { const x = j.fields && j.fields[k] && j.fields[k].stringValue; if (x) v[k] = x; }); } catch (e) {} btn.disabled = false; }
-  pdfTrabajo(v);
+  pdfTrabajo(v, win);
 }
 $('#libro').addEventListener('click', e => { const pd = e.target.closest('[data-pdf]'); if (pd) return pdfLibro($('#libro')._t, pd); const dl = e.target.closest('[data-del]'); if (dl) return eliminarLibro($('#libro')._t, dl); const hp = e.target.closest('[data-hp]'); if (hp) { const L = $('#libro'); L._h = (L._h || 0) + +hp.dataset.hp; sonar('pasar'); L._pintar && L._pintar(); return; } if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
 
@@ -822,6 +822,6 @@ addEventListener('pointerup', e => { if (!MOLI || modo === 'intro' || $('#libro'
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
-<script src="mando.js?v=202610152218"></script>
+<script src="mando.js?v=202610160259"></script>
 </body>
 </html>

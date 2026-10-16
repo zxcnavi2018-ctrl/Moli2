@@ -1,41 +1,63 @@
 // ===================================================================
 //  MOLÍ 2 · 📄 DESCARGAR UN TRABAJO APROBADO EN PDF (Revista y Biblioteca)
-//  Arma una hoja bonita con el trabajo y abre «Guardar como PDF» del navegador.
+//  Formato «artículo académico» (Modelo A): convierte la guía en un artículo de investigación
+//  (resumen, pregunta, desarrollo, conclusión y referencias APA) y abre «Guardar como PDF» del navegador.
 // ===================================================================
 (function () {
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const TIPO = { opi: 'Opinión científica', ens: 'Ensayo', inv: 'Investigación', dis: 'Diseño de investigación', pro: 'Producto o maqueta', info: 'Infografía', exp: 'Experimento', maq: 'Maqueta', vid: 'Video' };
+  const PROFE = 'Prof. Christian Quispe Llerena';
   const fecha = v => { const d = v ? new Date(v) : null; return d && !isNaN(d) ? d.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; };
-  function pregunta(w) {
-    const L = String(w.d || '').split(/\n+/).map(x => x.trim()).filter(Boolean), es = x => /\?\s*$/.test(x) && x.length > 8 && !/^PASO\b/.test(x);
-    const i = L.findIndex(x => /^PASO\b.*(pregunta|tema)/i.test(x));
-    if (i >= 0) for (let k = i + 1; k < L.length && !/^PASO\b/.test(L[k]); k++) if (es(L[k])) return L[k];
-    const q = L.find(es); return q || '';
+  const anio = w => { const d = new Date(w.at || Date.now()); return isNaN(d) ? new Date().getFullYear() : d.getFullYear(); };
+  // ---- la guía (PASO …) en partes de un artículo ----
+  function partes(w) {
+    const L = String(w.d || '').split(/\n+/).map(x => x.trim()).filter(Boolean), S = [], F = []; let cur = null, fu = null, enF = false, salta = L.some(x => /^PASO\b/.test(x));   // antes del 1.er PASO: sólo títulos repetidos
+    for (const x of L) {
+      if (/^PASO\b/.test(x)) { const t = x.replace(/^PASO\s*\d*\s*/, '').trim(); enF = /fuentes/i.test(t); fu = null;
+        salta = /revisa y publica/i.test(t); if (salta) { cur = null; continue; }
+        if (!enF) { cur = { t, k: /respuesta|conclusi/i.test(t) ? 'r' : /pregunta|tema/i.test(t) ? 'q' : /encontr|desarrollo|razones|datos|ciencia/i.test(t) ? 'h' : 'o', p: [] }; S.push(cur); } continue; }
+      if (enF) { if (/^Fuente\s*\d/i.test(x)) { fu = {}; F.push(fu); continue; }
+        const m = /^(Autor o página|Año|Tema|Título|Link):\s*(.*)$/i.exec(x); if (m && fu) fu[{ 'autor o página': 'a', 'año': 'y', 'tema': 't', 'título': 't', 'link': 'l' }[m[1].toLowerCase()]] = m[2]; continue; }
+      if (salta || /^(si|x|✓|☑|☐)(\s|$)/i.test(x)) continue;
+      if (!cur) { cur = { t: '', k: 'o', p: [] }; S.push(cur); }
+      cur.p.push(x.replace(/^Hallazgo\s*\d+\s*:\s*/i, ''));
+    }
+    return { S: S.filter(s => s.p.length), F };
   }
+  const autorDe = w => { const n = String(w.n || '').trim(); return n === 'Molí' ? 'Molí' : w.sec ? 'Est. ' + n : n ? 'Prof. ' + n.replace(/^Prof\.?\s*/i, '') : ''; };
+  const revDe = w => !w.rv ? '' : w.rv === 'tu profe' ? PROFE : 'Est. ' + w.rv + ' (Revisor Confiable)';
+  const apellido = n => { const p = String(n || '').trim().split(/\s+/); return p.length >= 3 ? p[p.length - 2] : p[p.length - 1] || ''; };
+  const lnk = h => h.replace(/https?:\/\/[^\s<]+/g, u => `<span class="url">${u}</span>`);
   function html(w) {
-    const parr = String(w.d || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
-    const lnk = h => h.replace(/https?:\/\/[^\s<]+/g, u => `<a href="${u}">${u}</a>`);
-    const cuerpo = parr.map(x => /^PASO\b/.test(x) ? ((h) => h ? `<h3>${esc(h)}</h3>` : '')(x.replace(/^PASO\s*\d*\s*/, '')) : /^Fuente \d/.test(x) ? `<p class="fu"><b>${esc(x)}</b></p>` : `<p>${lnk(esc(x))}</p>`).join('');
-    const A = [w.img, w.img2, w.img3].filter(Boolean), q = w.ty === 'inv' ? pregunta(w) : '';
+    const P = partes(w), q = P.S.find(s => s.k === 'q'), r = P.S.find(s => s.k === 'r'), rest = P.S.filter(s => s !== q && s !== r);
+    const kws = String(w.kw || '').split(',').map(x => x.trim()).filter(Boolean), A = [w.img, w.img2, w.img3].filter(Boolean), y = anio(w);
+    const ref = x => `${esc(x.a || 'Autor desconocido')}. (${esc(x.y || 's. f.')}). <i>${esc(x.t || 'Sin título')}</i>.${x.l ? ` Recuperado de <span class="url">${esc(x.l)}</span>` : ''}`;
+    const res0 = [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ').split(/\s+/).filter(Boolean), resumen = res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');   // como en las revistas: corto
+    let n = 0; const sec = (t, ps) => `<h2>${++n}. ${esc(t)}</h2>${ps.map(x => `<p>${lnk(esc(x))}</p>`).join('')}`;
+    const cuerpo = (q ? sec('Pregunta de investigación', q.p) : '') + rest.map(s => sec(s.k === 'h' ? (rest.length === 1 ? 'Desarrollo' : s.t) : s.t || 'Desarrollo', s.p)).join('') + (r ? sec('Conclusión', r.p) : '');
+    const cita = w.sec ? `${apellido(w.n)} (${y})` : `${String(w.n || '').split(/\s+/).pop()} (${y})`;
     return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(w.t || 'Trabajo')} - ${esc(w.n || '')}</title>
-<style>@page { size: A4; margin: 16mm 16mm 18mm; } * { box-sizing: border-box; } body { margin: 0; font: 12pt/1.55 Georgia, "Times New Roman", serif; color: #1f2937; }
-.top { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0b2e4f; padding-bottom: 6px; font: 700 9.5pt Arial, sans-serif; color: #0b2e4f; letter-spacing: .08em; text-transform: uppercase; }
-.top span:last-child { color: #b45309; } h1 { margin: 14px 0 4px; font: 700 24pt/1.15 Georgia, serif; color: #0b2e4f; } .pq { margin: 4px 0 8px; font: italic 700 14pt Georgia, serif; color: #0f4c81; }
-.meta { font: 10pt Arial, sans-serif; color: #475569; margin-bottom: 14px; } .meta b { color: #0b2e4f; } .tag { display: inline-block; padding: 2px 9px; border-radius: 99px; background: #dbeafe; color: #1e3a8a; font-weight: 700; margin-right: 6px; }
-h3 { margin: 16px 0 4px; font: 700 12.5pt Arial, sans-serif; color: #0b2e4f; border-left: 4px solid #f59e0b; padding-left: 8px; } p { margin: 0 0 7px; text-align: justify; } p.fu { margin-top: 8px; }
-a { color: #1d4ed8; word-break: break-all; } .anx { margin-top: 14px; page-break-inside: avoid; } .anx img { max-width: 100%; max-height: 90mm; display: block; margin: 6px auto; border: 1px solid #cbd5e1; border-radius: 6px; } .anx small { display: block; text-align: center; font: 9pt Arial, sans-serif; color: #64748b; }
-.pie { margin-top: 18px; padding-top: 6px; border-top: 1px solid #cbd5e1; font: 9pt Arial, sans-serif; color: #64748b; text-align: center; }</style></head><body>
-<div class="top"><span>Revista Innovadora · Repositorio Educativo</span><span>✔ Aprobado</span></div>
-<h1>${esc(w.t || 'Trabajo')}</h1>${q ? `<p class="pq">❓ ${esc(q)}</p>` : ''}
-<div class="meta"><span class="tag">${esc(TIPO[w.ty] || 'Trabajo')}</span><b>${esc(w.n || '')}</b>${w.sec ? ' · 6.° ' + esc(w.sec) : ''}${fecha(w.at) ? ' · ' + fecha(w.at) : ''}${w.rv ? ' · Revisado por ' + esc(w.rv) : ''}</div>
-${cuerpo || '<p>Este trabajo no trae texto.</p>'}${w.f ? `<h3>Fuentes</h3><p>${lnk(esc(w.f))}</p>` : ''}
-${A.length ? `<h3>Anexos</h3>${A.map((x, i) => `<div class="anx"><img src="${esc(x)}" alt=""><small>Anexo ${i + 1}</small></div>`).join('')}` : ''}
-<div class="pie">Molí 2 · Ciencia y Tecnología · Innova Schools</div>
+<style>@page { size: A4; margin: 20mm 20mm 22mm; } * { box-sizing: border-box; } body { margin: 0; font: 11.5pt/1.6 "Times New Roman", "Liberation Serif", Georgia, serif; color: #111; }
+.hd { display: flex; justify-content: space-between; font: 9pt Arial, "Liberation Sans", sans-serif; color: #555; border-bottom: 1px solid #999; padding-bottom: 4px; }
+h1 { text-align: center; font: 700 20pt/1.25 "Times New Roman", "Liberation Serif", serif; margin: 26px 0 10px; } .au { text-align: center; font-size: 12.5pt; } .af { text-align: center; font-size: 10pt; color: #444; font-style: italic; margin-bottom: 16px; }
+.abs { border-top: 2px solid #111; border-bottom: 2px solid #111; padding: 10px 0; margin: 10px 0 16px; font-size: 10.5pt; text-align: justify; } .abs b { font-variant: small-caps; letter-spacing: .04em; }
+h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0 6px; font-variant: small-caps; letter-spacing: .04em; break-after: avoid; } p { margin: 0 0 8px; text-align: justify; text-indent: 1.2em; }
+.refs p { text-indent: -1.2em; padding-left: 1.2em; font-size: 10.5pt; } .url { word-break: break-all; color: #333; } .anx { margin-top: 12px; text-align: center; break-inside: avoid; } .anx img { max-width: 100%; max-height: 85mm; border: 1px solid #bbb; } .anx small { display: block; font-size: 9.5pt; color: #555; }
+.ft { margin-top: 24px; border-top: 1px solid #999; padding-top: 4px; font: 9pt Arial, "Liberation Sans", sans-serif; color: #555; display: flex; justify-content: space-between; gap: 10px; }</style></head><body>
+<div class="hd"><span>REVISTA INNOVADORA · Repositorio Educativo</span><span>${esc(TIPO[w.ty] || 'Trabajo')} · Vol. 1 · ${y}</span></div>
+<h1>${esc(w.t || 'Trabajo')}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `6.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
+${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}</div>` : ''}
+${cuerpo || '<p>Este trabajo no trae texto.</p>'}
+${P.F.length ? `<div class="refs"><h2>Referencias</h2>${P.F.map(x => `<p>${ref(x)}</p>`).join('')}</div>` : w.f ? `<div class="refs"><h2>Referencias</h2><p>${lnk(esc(w.f))}</p></div>` : ''}
+${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc(x)}" alt=""><small>Anexo ${i + 1}</small></div>`).join('')}` : ''}
+<div class="ft"><span>Publicado el ${esc(fecha(w.at))}${revDe(w) ? ' · Revisado por: ' + esc(revDe(w)) : ''}</span><span>Cómo citar: ${esc(cita)}</span></div>
 <script>addEventListener('load', () => setTimeout(() => { print(); }, 350)); addEventListener('afterprint', () => setTimeout(() => close(), 300));<\/script></body></html>`;
   }
+  window.pdfHtml = html;
   // abre la hoja y el «Guardar como PDF» del navegador (se llama dentro de un toque, así el navegador no la bloquea)
-  window.pdfTrabajo = function (w) {
-    const v = window.open('', '_blank'); if (!v) { alert('Permite las ventanas emergentes para descargar el PDF.'); return; }
+  window.pdfVentana = () => { const v = window.open('', '_blank'); if (!v) { alert('Permite las ventanas emergentes para descargar el PDF.'); return null; } v.document.write('<p style="font:16px Arial;margin:40px">⏳ Preparando el PDF…</p>'); return v; };
+  window.pdfTrabajo = function (w, v) {                               // v: una ventana ya abierta con pdfVentana() (si hubo que esperar datos)
+    v = v || window.open('', '_blank'); if (!v) { alert('Permite las ventanas emergentes para descargar el PDF.'); return; }
     v.document.open(); v.document.write(html(w)); v.document.close();
   };
 })();
