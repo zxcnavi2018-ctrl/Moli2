@@ -1100,6 +1100,46 @@ function moliMejora(h) {                                               // corrig
   X.f.forEach((x, k) => { v[`f${k + 1}a`] = x.a; v[`f${k + 1}y`] = x.y; v[`f${k + 1}m`] = x.m; v[`f${k + 1}l`] = x.l; }); [0, 1, 2, 3].forEach(j => v['c' + j] = true);
   if (X.t) { h.t = X.t; h.nom = '🧪 ' + X.t; } h.mejorada = Date.now(); hojaPut(h); return true;
 }
+// ✏️ Sólo esta vez (pedido de la docente): los 3 trabajos aprobados antes de los mínimos nuevos (50 por hallazgo, 55 en la respuesta, 30 en el resumen)
+//    se completan AGREGANDO lo que les faltaba, sin quitar ni cambiar nada de lo que escribieron. Mismo enlace, misma fecha y mismo revisor.
+const AMPLIA = {
+  'k3a20f2b8172d24798968-mv79ikif': { n: 'Emilio', h1: 'Estas vitaminas del grupo B ayudan a que nuestro cuerpo obtenga energía de los alimentos. Por eso, la levadura puede ser buena para algunas personas, pero no para todas.', h3: 'Esta levadura se llama levadura de cerveza y se puede comer en polvo o en hojuelas. El potasio y el magnesio ayudan a que nuestros músculos y nuestro corazón funcionen bien.', r: 'Por eso, después de leer a Clarín, WebMD y Healthline, concluyo que la levadura es buena para la mayoría de las personas si se come en cantidades normales, pero quienes tienen alergia o migraña deben consultar al médico antes de consumirla.', res: 'En esta investigación quise saber cómo pueden afectar las levaduras a nuestra salud. Encontré que nos dan proteínas y vitaminas del grupo B y ayudan a nuestras defensas, pero en algunas personas causan alergias o dolores de cabeza. Por eso concluyo que la levadura es buena si se consume con cuidado.' },
+  'k9ecbe9a663f938dfe28b-mva3pqap': { n: 'Lia', h2: 'Por eso es importante tapar los baldes y tanques, cambiar el agua de los floreros y botar las cosas viejas que puedan juntar agua de lluvia.', h3: 'La diabetes aparece cuando hay demasiada azúcar en la sangre, y no se pasa de una persona a otra porque no la causa ningún microbio.', res: 'En esta investigación quise saber qué diferencia hay entre las enfermedades contagiosas y las no contagiosas, y cómo prevenirlas. Encontré que la gripe y el dengue se contagian por microbios, pero la diabetes no. Concluyo que podemos prevenirlas con higiene, eliminando el agua estancada, comiendo sano y haciendo ejercicio.' },
+  'kecadb6452703f285646c-mv8w91y5': { n: 'Matías', h3: 'Fermentar significa que los hongos se alimentan de los azúcares y producen gas y otras sustancias. Por eso la levadura se usa para hacer pan, y gracias a ese gas la masa se vuelve más suave y esponjosa.', res: 'En esta investigación quise saber qué es la levadura. Encontré que es un hongo de una sola célula, tan pequeño que se necesita un microscopio para verlo, y que puede fermentar la masa. Concluyo que las levaduras son seres vivos muy útiles, aunque algunas pueden causar enfermedades.' } };
+const AMPLIA_OK = ['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'img', 'img2', 'img3', 'st', 'at', 'rv', 'rvAt', 'g', 'kw'];
+function ampliaD(d, A) {
+  let x = String(d || ''); if (/^PASO Mi resumen$/m.test(x)) return null;                       // ya estaba completado
+  for (const n of [1, 2, 3]) if (A['h' + n]) { const re = new RegExp('^(Hallazgo ' + n + ':.*?)[ \\t]*$', 'm'); if (!re.test(x)) return null; x = x.replace(re, (m, a) => a + ' ' + A['h' + n]); }
+  if (A.r) { const re = /(PASO La respuesta a mi pregunta\n[\s\S]*?)\s*(\nPASO )/; if (!re.test(x)) return null; x = x.replace(re, (m, a, b) => a + ' ' + A.r + b); }
+  if (!/\nPASO Mis fuentes\n/.test(x)) return null; return x.replace(/\nPASO Mis fuentes\n/, '\nPASO Mi resumen\n' + A.res + '\nPASO Mis fuentes\n');
+}
+async function ampliarAprobados(b) {
+  if (!ROLE.t) return;
+  if (!confirm('Se completarán los trabajos aprobados de ' + Object.values(AMPLIA).map(x => x.n).join(', ') + ' para que cumplan los mínimos nuevos.\n\nSólo se AGREGAN oraciones al final de sus hallazgos y respuesta, y su «Mi resumen». No se quita ni se cambia nada de lo que escribieron. Siguen publicados con el mismo enlace.\n\n¿Completar?')) return;
+  const a = await staffTok(); if (!a) return toast('🔐 Conecta tu cuenta de docente.');
+  const H = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a }, U = (id, q = '') => `${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}${q}`, R = [];
+  b.disabled = true; b.textContent = '⏳ Completando…';
+  for (const [id, A] of Object.entries(AMPLIA)) {
+    try {
+      const r0 = await fetch(U(id), { headers: H }); if (!r0.ok) { R.push(`❓ ${A.n}: no encontré su trabajo`); continue; }
+      const j = await r0.json(), f = j.fields || {}, nd = ampliaD(f.d && f.d.stringValue, A);
+      if (!nd) { R.push(`✅ ${A.n} (ya estaba completo)`); continue; }
+      if (!f.st || f.st.stringValue !== 'ok') { R.push(`⚠️ ${A.n}: ya no está publicado, no lo toqué`); continue; }
+      const nf = { ...f, d: { stringValue: nd } }, extra = {}; ['fb', 'rm'].forEach(k => { if (nf[k]) { extra[k] = nf[k]; delete nf[k]; } });
+      if (Object.keys(nf).some(k => !AMPLIA_OK.includes(k))) { R.push(`⚠️ ${A.n}: tiene datos que no conozco, no lo toqué`); continue; }
+      ls.set('moli2:amplia:copia:' + id, f);                                                   // copia del original por si algo falla
+      const crear = flds => fetch(U(id, '&currentDocument.exists=false'), { method: 'PATCH', headers: H, body: JSON.stringify({ fields: flds }) });
+      const extras = () => Object.keys(extra).length ? fetch(U(id, Object.keys(extra).map(k => '&updateMask.fieldPaths=' + k).join('')), { method: 'PATCH', headers: H, body: JSON.stringify({ fields: extra }) }) : null;
+      const rd = await fetch(U(id), { method: 'DELETE', headers: H }); if (!rd.ok) throw new Error('no pude reemplazarlo (' + rd.status + ')');
+      const rc = await crear(nf);
+      if (!rc.ok) { const of = { ...f }; delete of.fb; delete of.rm; await crear(of); await extras(); throw new Error('lo dejé como estaba (' + rc.status + ')'); }
+      await extras(); R.push(`✅ ${A.n}: completado`);
+    } catch (e) { R.push(`⚠️ ${A.n}: ${e.message}`); }
+  }
+  b.disabled = false; b.textContent = '✏️ Completar 3 aprobados';
+  if (R.every(x => x.startsWith('✅'))) { ls.set('moli2:amplia1', Date.now()); b.remove(); }
+  alert('✏️ Trabajos aprobados\n\n' + R.join('\n'));
+}
 function elegirPractica(b) {
   if (!ROLE.t) return; const env = ls.get('moli2:pracEnv', {}); let m = document.getElementById('wdDlg'); if (!m) { m = document.createElement('div'); m.id = 'wdDlg'; document.body.appendChild(m); }
   m.innerHTML = `<div class="wd-dc"><b>🧪 Trabajos de práctica</b><span>Elige qué grupo de 5 investigaciones de «Molí» (con errores a propósito) les llegará a los Revisores.</span>
@@ -1132,7 +1172,7 @@ async function enviarPractica(b, LISTA = PRAC, gk = '1') {
 async function vSimilitud() {
   const V = $('#view');
   if (ROLE.r && !ROLE.t && !await tok(K_R)) { V.innerHTML = `<form class="pin" id="fPin"><b style="font:900 22px var(--serif);color:var(--navy)">🔐 Bandeja del Revisor</b><span style="font-weight:800;color:var(--ink2)">Escribe los 4 números de tu clave de Revisor.</span><input id="pinIn" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]{4}"><button class="btn blue" type="submit">Entrar</button></form>`; setTimeout(() => $('#pinIn') && $('#pinIn').focus(), 80); return; }
-  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2>${ROLE.t ? '<button type="button" class="btn soft" id="smPrac">🧪 Trabajos de práctica</button>' : ''}<button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>📝 Revisar</b>: el trabajo se abre en el <b>Word Molí</b> y se pinta solo: 🟧 lo igualito a los libritos de la Biblioteca y 🟦 la ortografía. Tú subraya en 🟨 lo extraño y deja 💬 comentarios. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>❌ Rechazar</b>.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
+  V.innerHTML = `<div class="sm-h"><h2>🔎 Detector de similitud</h2>${ROLE.t ? '<button type="button" class="btn soft" id="smPrac">🧪 Trabajos de práctica</button>' : ''}${ROLE.t && !ls.get('moli2:amplia1') ? '<button type="button" class="btn soft" id="smAmp">✏️ Completar 3 aprobados</button>' : ''}<button type="button" class="btn blue" id="smTodos">🔎 Revisar todos</button></div>${tip('Aquí están los trabajos enviados. Toca <b>📝 Revisar</b>: el trabajo se abre en el <b>Word Molí</b> y se pinta solo: 🟧 lo igualito a los libritos de la Biblioteca y 🟦 la ortografía. Tú subraya en 🟨 lo extraño y deja 💬 comentarios. Luego decide: <b>✅ Aprobar</b>, <b>✏️ Devolver</b> o <b>❌ Rechazar</b>.')}<div id="smL"><div class="load">📚 Abriendo los trabajos…</div></div>`;
   try { const a = await staffTok(); if (!a) throw new Error('AUTH');
     const [p, o] = await Promise.all([query('pend', a, LIST_F), CACHE.ok ? CACHE.ok : query('ok', null, LIST_F)]);
     CACHE.pend = SIM.pend = p; CACHE.ok = SIM.src = o; if (ROLE.t) limpiarDevueltos(a); setCount(p.filter(w => !miSec(w)).length); pintaSim();
@@ -1146,7 +1186,7 @@ function pintaSim() {
     return `<div class="sm-r"><span class="ic">${tipo(w.ty)[1]}</span><div class="t"><b>${esc(w.t)}</b><span>✍️ ${esc(w.n)}${w.sec ? ' · 6.° ' + esc(w.sec) : ''} · ${fecha(w.at)}</span></div>${pill}<button type="button" class="btn blue" data-sim="${esc(w.id)}">📝 Revisar</button></div>`; }).join('')}</div>`
     : `<div class="empty"><b>¡No hay trabajos por revisar!</b>Cuando tus estudiantes envíen, aparecerán aquí. 🎉</div>`;
 }
-$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); if (e.target.closest('#smPrac')) elegirPractica(e.target.closest('#smPrac')); });
+$('#view').addEventListener('click', e => { if (TAB !== 'similitud') return; const b = e.target.closest('[data-sim]'); if (b) revisarSim(b.dataset.sim); if (e.target.closest('#smTodos')) revisarTodos(e.target.closest('#smTodos')); if (e.target.closest('#smPrac')) elegirPractica(e.target.closest('#smPrac')); if (e.target.closest('#smAmp')) ampliarAprobados(e.target.closest('#smAmp')); });
 function smComparar(w) {                                                // marca cada palabra del trabajo con el librito del que es igualito
   const T = smTok(w.d), S = [...(SIM.src || []).map(x => ({ x, lib: 1 })), ...(SIM.pend || []).filter(x => x.id !== w.id).map(x => ({ x, lib: 0 }))].filter(s => s.x.k !== w.k && String(s.x.d || '').trim());
   const sh = (A, i) => A.slice(i, i + SM_N).map(t => t.w).join(' '), autores = {};
@@ -1409,6 +1449,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610160330"></script><script src="archivos.js?v=202610160330"></script><script src="mando.js?v=202610160330"></script>
+<script src="pdftrabajo.js?v=202610160336"></script><script src="archivos.js?v=202610160336"></script><script src="mando.js?v=202610160336"></script>
 </body>
 </html>
