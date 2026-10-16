@@ -571,8 +571,41 @@
     return /^https?:\/\/\S+$/i.test(u) ? { tipo: 'link', src: u } : null;
   }
   const claveSl = it => it.k === 'vid' ? 'v:' + it.id : [it.k, it.u ? it.u.key : '', it.n == null ? '' : it.n, it.j == null ? '' : it.j, it.p || ''].join('|');
+  // ---- 🟢 la rutina de la clase en bolitas, al costado izquierdo de la presentación: la docente toca cada una (mouse o cursor del mando) y se colorea ----
+  const RUT = [['👋', 'Saludo', '#f59e0b', '#facc15'], ['🪑', 'Organización', '#7c3aed', '#c084fc'], ['🎯', 'Meta y criterios', '#2563eb', '#38bdf8'], ['🧪', 'Actividades de clase', '#ea580c', '#fb923c'], ['🪞', 'Reflexionamos', '#0d9488', '#34d399'], ['🎒', 'Organización final', '#db2777', '#f472b6']];
+  function rutina(host) {
+    const R = { el: null, k: '', n: 0, t: 0 }, hoy = () => new Date().toISOString().slice(0, 10);
+    const ding = () => { try { const a = new Audio('audio/sync/ding.mp3'); a.volume = 0.6; a.play().catch(() => {}); } catch (e) {} };
+    function pinta(pop) {
+      if (!R.el) return; const B = R.el.querySelectorAll('.rt-b');
+      B.forEach((b, i) => { b.classList.toggle('on', i < R.n); b.classList.toggle('sig', i === R.n); b.classList.toggle('pop', i === pop); });
+      R.el.classList.toggle('fin', R.n >= RUT.length);
+    }
+    function guardar() { MD.LS.set('moli2:rutina', { k: R.k, d: hoy(), n: R.n }); }
+    function sesion(k) {                                                // cada sesión tiene su rutina (empieza de cero cada día)
+      if (!k || k === R.k) return; R.k = k; const G = MD.LS.get('moli2:rutina', null); R.n = G && G.k === k && G.d === hoy() ? +G.n || 0 : 0; pinta();
+    }
+    function ubicar() {                                                 // a la izquierda del cuadro de la presentación, de su mismo alto
+      if (!R.el) return; const sh = host.closest('#sheet') || host, r = sh.getBoundingClientRect(), vis = r.width > 50 && getComputedStyle(sh).display !== 'none';
+      R.el.style.display = vis ? '' : 'none'; if (!vis) return;
+      const esp = r.left, w = Math.max(64, Math.min(118, esp - 12));
+      Object.assign(R.el.style, { left: Math.max(4, (esp - w) / 2) + 'px', width: w + 'px', top: Math.max(4, r.top) + 'px', height: (Math.min(innerHeight - 4, r.bottom) - Math.max(4, r.top)) + 'px' });
+    }
+    R.montar = () => {
+      R.el = document.createElement('nav'); R.el.id = 'rutina'; R.el.setAttribute('aria-label', 'Rutina de la clase');
+      R.el.innerHTML = RUT.map(([ic, t, c1, c2], i) => `${i === 3 ? '<i class="rt-esp"></i>' : ''}<button type="button" class="rt-b" data-rt="${i}" style="--c1:${c1};--c2:${c2}" title="${esc(t)}"><span class="rt-o"><span class="rt-i">${ic}</span><span class="rt-ok">✓</span></span><small>${esc(t)}</small></button>`).join('') ;
+      document.body.appendChild(R.el);
+      R.el.addEventListener('click', e => { const b = e.target.closest('[data-rt]'); if (!b) return; e.stopPropagation(); const i = +b.dataset.rt;
+        if (i < R.n) { if (i === R.n - 1) { R.n--; guardar(); pinta(); } return; }     // tocar la última coloreada la despinta (por si fue sin querer)
+        R.n = i + 1; guardar(); pinta(i); ding(); if (R.n >= RUT.length && window.aviso) setTimeout(() => aviso('🎉 ¡Rutina completa! ¡Excelente clase!', 3.5), 500); });
+      R.el.addEventListener('pointerdown', e => e.stopPropagation()); R.el.addEventListener('pointerup', e => e.stopPropagation());
+      ubicar(); R.t = setInterval(ubicar, 300); addEventListener('resize', ubicar);
+    };
+    R.quitar = () => { clearInterval(R.t); removeEventListener('resize', ubicar); if (R.el) R.el.remove(); R.el = null; R.k = ''; };
+    R.sesion = sesion; return R;
+  }
   function flujoPresentacion(host) {
-    const P = { L: [], i: 0, ia: {}, pide: new Set() };
+    const P = { L: [], i: 0, ia: {}, pide: new Set() }, RT = rutina(host);
     const actOk = x => x && (L(x.title) || L(x.desc));
     function armar() {
       const Lst = [];
@@ -716,7 +749,8 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       const sk = it.k === 'sync' ? claveSl(it) : '';
       if (sk && P.syk === sk && Sincro.activo()) Sincro.actualizar(syncDe(it));   // ya está en pantalla (llegó lo que pensó Molí): no se reinicia la animación
       else { if (window.Sincro) Sincro.parar(); P.syk = sk; sl.innerHTML = slide(it); ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); }
-      if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });                // Molí piensa las preguntas de la sesión desde antes
+      if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });
+      if (it.u && it.n != null) RT.sesion(it.u.key + ':' + it.n);                // Molí piensa las preguntas de la sesión desde antes
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
       el.querySelector('.cv-n').textContent = `${P.i + 1} / ${P.L.length}`;
       el.querySelector('[data-cv="-1"]').disabled = P.i === 0; el.querySelector('[data-cv="1"]').disabled = P.i === P.L.length - 1;
@@ -754,7 +788,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     function montar() {
       armar();
       host.innerHTML = `<div class="cv"><div class="cv-stage"></div>${MD.esDocente() ? '<button type="button" class="cv-add" aria-label="Añadir una diapositiva de video aquí">+</button>' : ''}<div class="cv-bar"><button data-cv="-1" aria-label="Anterior">‹</button><select aria-label="Ir a">${MD.unidades().map(u => `<option value="u:${esc(u.key)}">📘 Unidad ${esc(u.num)} · ${esc(u.title)}</option>${MD.sesionesDe(u).map(({ s, n }) => `<option value="s:${esc(u.key)}:${n}">   🗓️ Sesión ${n} · ${esc(temaDe(s, n)).slice(0, 50)}</option>`).join('')}`).join('')}</select><span class="cv-n"></span><button data-cv="1" aria-label="Siguiente">›</button></div></div>`;
-      el = host.firstChild; const fs = () => { el.style.fontSize = Math.max(8, Math.min(60, el.clientHeight / 32.5, el.clientWidth / 57)) + 'px'; const d = el.querySelector('.cv-stage > .cv-sl'); if (d) { d.style.fontSize = ''; ajustar(d); } }; fs(); P.ro = new ResizeObserver(fs); P.ro.observe(el);
+      RT.montar(); el = host.firstChild; const fs = () => { el.style.fontSize = Math.max(8, Math.min(60, el.clientHeight / 32.5, el.clientWidth / 57)) + 'px'; const d = el.querySelector('.cv-stage > .cv-sl'); if (d) { d.style.fontSize = ''; ajustar(d); } }; fs(); P.ro = new ResizeObserver(fs); P.ro.observe(el);
       el.addEventListener('click', e => {
         if (e.target.closest('.cv-add')) { e.stopPropagation(); return formVideo(null); }
         const vb = e.target.closest('[data-vid]'); if (vb) { e.stopPropagation(); const it = P.L[P.i]; if (it && it.k === 'vid') { if (vb.dataset.vid === 'del') quitarVideo(it); else formVideo(CVV.L.find(x => x.id === it.id) || it); } return; }
@@ -770,7 +804,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
       Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
-    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); P.syk = ''; };
+    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); P.syk = ''; RT.quitar(); };
     return P;
   }
 

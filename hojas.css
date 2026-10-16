@@ -560,3 +560,19 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .sy-bt .sy-a { background: #facc15; font-size: 1.05em; animation: syLate 1.4s ease-in-out infinite; } @keyframes syLate { 50% { transform: scale(1.06); } }
 .sy-bt .sy-rep { opacity: .7; }
 .cv-sl.sy > .sy-pre[hidden], .cv-sl.sy > .sy-bub[hidden], .sy-bt button[hidden] { display: none; }
+/* 🟢 rutina de la clase (al costado de Mi presentación) */
+#rutina { position: fixed; z-index: 26; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px 0 16px; font-family: "Trebuchet MS", system-ui, sans-serif; pointer-events: none; }
+#rutina .rt-esp { flex: 0 0 64px; }
+#rutina .rt-b { pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; color: #fff; }
+#rutina .rt-o { position: relative; display: grid; place-items: center; width: min(52px, 74%); aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.88); border: 3px solid #2b2547; box-shadow: 0 4px 0 rgba(0,0,0,.22); transition: transform .25s, background .4s, box-shadow .4s; }
+#rutina .rt-i { font-size: clamp(16px, 2.2vw, 26px); filter: grayscale(1); opacity: .55; transition: filter .4s, opacity .4s; }
+#rutina .rt-ok { position: absolute; right: -6px; top: -6px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #16a34a; border: 2px solid #fff; color: #fff; font: 900 13px/1 system-ui, sans-serif; transform: scale(0); transition: transform .3s cubic-bezier(.3,1.8,.5,1); }
+#rutina small { max-width: 100%; padding: 1px 6px; border-radius: 8px; background: rgba(43,37,71,.78); font: 800 clamp(9px, 1vw, 12px)/1.15 "Trebuchet MS", system-ui, sans-serif; text-align: center; }
+#rutina .rt-b:hover .rt-o { transform: scale(1.08); }
+#rutina .rt-b.on .rt-o { background: radial-gradient(circle at 35% 30%, #fff8, transparent 45%), linear-gradient(145deg, var(--c1), var(--c2)); box-shadow: 0 4px 0 rgba(0,0,0,.22), 0 0 16px var(--c2); }
+#rutina .rt-b.on .rt-i { filter: none; opacity: 1; } #rutina .rt-b.on .rt-ok { transform: scale(1); } #rutina .rt-b.on small { background: var(--c1); }
+#rutina .rt-b.sig .rt-o { animation: rtSig 1.6s ease-in-out infinite; } @keyframes rtSig { 50% { box-shadow: 0 4px 0 rgba(0,0,0,.22), 0 0 0 6px rgba(255,255,255,.55); } }
+#rutina .rt-b.pop .rt-o { animation: rtPop .6s cubic-bezier(.3,1.6,.5,1); } @keyframes rtPop { 0% { transform: scale(.7) rotate(-20deg); } 60% { transform: scale(1.25) rotate(8deg); } 100% { transform: scale(1); } }
+#rutina .rt-b.pop .rt-o::after { content: '✨'; position: absolute; inset: -14px; display: grid; place-items: center; font-size: 34px; animation: rtBrillo .8s ease-out forwards; pointer-events: none; } @keyframes rtBrillo { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
+#rutina .rt-f { display: none; margin: 0; padding: 3px 6px; border-radius: 10px; background: #16a34a; color: #fff; font: 900 11px/1.2 "Trebuchet MS", sans-serif; text-align: center; pointer-events: none; }
+#rutina.fin .rt-f { display: block; animation: rtPop .6s; } #rutina.fin .rt-o { animation: rtArco 2.4s linear infinite; } @keyframes rtArco { 50% { filter: brightness(1.2) saturate(1.3); } }
