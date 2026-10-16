@@ -645,7 +645,7 @@ const HOJA_TODAS = {
     { t: 'Mi pregunta de investigación', h: '¿Qué quieres averiguar? Empieza con: ¿Qué…? ¿Cómo…? ¿Por qué…?', c: [{ id: 'q', ph: '¿…?', r: 2 }] },
     { t: 'Lo que encontré', h: 'Escribe lo más importante de cada fuente con tus palabras: mínimo 50 palabras en cada hallazgo (unas 4 líneas). ' + CITAS, c: [1, 2, 3].map(n => ({ id: 'h' + n, lab: 'Hallazgo ' + n, min: 50, ph: n < 3 ? 'Según … (año), …' : '… (Apellido, año).' })) },
     { t: 'La respuesta a mi pregunta', h: 'Lee otra vez lo que dicen tus 3 autores citados y saca UNA idea propia que responda tu pregunta. No copies sus frases: júntalas y explícalo con tus palabras (mínimo 55 palabras).', c: [{ id: 'r', r: 5, min: 55, ph: 'Después de leer a …, … y …, concluyo que…' }] },
-    { t: 'Mi resumen', h: 'Escribe 2 o 3 oraciones cortas: 1) qué quisiste averiguar, 2) qué encontraste en tus fuentes y 3) qué concluiste. Escríbelo al final, cuando ya terminaste todo.', c: [{ id: 'res', r: 4, ph: 'En esta investigación quise saber… Encontré que… Por eso concluyo que…' }] }, H_FU, H_CK(['Respondí mi pregunta con lo que encontré.'])] },
+    { t: 'Mi resumen', h: 'Escribe 2 o 3 oraciones (mínimo 30 palabras): 1) qué quisiste averiguar, 2) qué encontraste en tus fuentes y 3) qué concluiste. Escríbelo al final, cuando ya terminaste todo.', c: [{ id: 'res', r: 4, min: 30, ph: 'En esta investigación quise saber… Encontré que… Por eso concluyo que…' }] }, H_FU, H_CK(['Respondí mi pregunta con lo que encontré.'])] },
   dis: { sub: 'Planificas un experimento para comprobar una hipótesis.', pasos: [
     { t: 'Pregunta de indagación', h: 'Debe relacionar una causa con un efecto. Ejemplo: ¿Cómo influye la temperatura del agua en la actividad de la levadura?', c: [{ id: 'a', r: 2 }] },
     { t: '¿Qué dice la ciencia?', h: 'Lo que encontraste en fuentes confiables sobre tu tema. Aquí van tus 3 citas: «Según López (2020), …» o «… (Soto, 2019)».', c: [{ id: 'b', r: 6 }] },
@@ -1409,6 +1409,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610160317"></script><script src="archivos.js?v=202610160317"></script><script src="mando.js?v=202610160317"></script>
+<script src="pdftrabajo.js?v=202610160330"></script><script src="archivos.js?v=202610160330"></script><script src="mando.js?v=202610160330"></script>
 </body>
 </html>
