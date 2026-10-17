@@ -6,7 +6,11 @@
 (function () {
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const TIPO = { opi: 'Opinión científica', ens: 'Ensayo', inv: 'Investigación', dis: 'Diseño de investigación', pro: 'Producto o maqueta', info: 'Infografía', exp: 'Experimento', maq: 'Maqueta', vid: 'Video' };
-  const PROFE = 'Prof. Christian Quispe Llerena';
+  // el grado y el profe del trabajo (6.° → Christian; 7.° → el docente de 7.° anotado en config/site.tchG)
+  const P7 = { n: '' }; fetch('https://firestore.googleapis.com/v1/projects/ciencia6abcd/databases/(default)/documents/config/site?key=AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM')
+    .then(r => r.ok ? r.json() : null).then(j => { const G = j && j.fields && j.fields.tchG && j.fields.tchG.mapValue.fields || {}; Object.values(G).forEach(v => { const [e, n] = String(v.stringValue).split('|'); if (e === 'c7' && n) P7.n = n; }); }).catch(() => {});
+  const grado = w => +w.g === 7 || (!+w.g && window.MD && MD.espInfo && MD.espInfo().k === 'c7') ? 7 : 6;
+  const profe = w => grado(w) === 7 ? P7.n || 'Docente de 7.° grado' : 'Christian Quispe Llerena';
   const fecha = v => { const d = v ? new Date(v) : null; return d && !isNaN(d) ? d.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; };
   const anio = w => { const d = new Date(w.at || Date.now()); return isNaN(d) ? new Date().getFullYear() : d.getFullYear(); };
   // ---- la guía (PASO …) en partes de un artículo ----
@@ -25,7 +29,7 @@
     return { S: S.filter(s => s.p.length), F };
   }
   const autorDe = w => { const n = String(w.n || '').trim(); return n === 'Molí' ? 'Molí' : w.sec ? 'Est. ' + n : n ? 'Prof. ' + n.replace(/^Prof\.?\s*/i, '') : ''; };
-  const revDe = w => !w.rv ? '' : w.rv === 'tu profe' ? PROFE : 'Est. ' + w.rv + ' (Revisor Confiable)';
+  const revDe = w => !w.rv ? '' : w.rv === 'tu profe' ? 'Prof. ' + profe(w) : 'Est. ' + w.rv + ' (Revisor Confiable)';
   const apellido = n => { const p = String(n || '').trim().split(/\s+/); return p.length >= 3 ? p[p.length - 2] : p[p.length - 1] || ''; };
   const lnk = h => h.replace(/https?:\/\/[^\s<]+/g, u => `<span class="url">${u}</span>`);
   function html(w) {
@@ -45,7 +49,7 @@ h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0
 .refs p { text-indent: -1.2em; padding-left: 1.2em; font-size: 10.5pt; } .url { word-break: break-all; color: #333; } .anx { margin-top: 12px; text-align: center; break-inside: avoid; } .anx img { max-width: 100%; max-height: 85mm; border: 1px solid #bbb; } .anx small { display: block; font-size: 9.5pt; color: #555; }
 .ft { margin-top: 24px; border-top: 1px solid #999; padding-top: 4px; font: 9pt Arial, "Liberation Sans", sans-serif; color: #555; display: flex; justify-content: space-between; gap: 10px; }</style></head><body>
 <div class="hd"><span>REVISTA INNOVADORA · Repositorio Educativo</span><span>${esc(TIPO[w.ty] || 'Trabajo')} · Vol. 1 · ${y}</span></div>
-<h1>${esc(w.t || 'Trabajo')}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `6.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
+<h1>${esc(w.t || 'Trabajo')}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `${grado(w)}.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
 ${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}</div>` : ''}
 ${cuerpo || '<p>Este trabajo no trae texto.</p>'}
 ${P.F.length ? `<div class="refs"><h2>Referencias</h2>${P.F.map(x => `<p>${ref(x)}</p>`).join('')}</div>` : w.f ? `<div class="refs"><h2>Referencias</h2><p>${lnk(esc(w.f))}</p></div>` : ''}

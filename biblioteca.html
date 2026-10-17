@@ -153,7 +153,7 @@
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="moli3d.js?v=202610161340"></script>
-<script src="pdftrabajo.js?v=202610161340"></script>
+<script src="pdftrabajo.js?v=202610171230"></script>
 <script>
 (function () {
 'use strict';
@@ -515,6 +515,8 @@ async function cargarTrabajos() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const dec = v => !v ? null : 'stringValue' in v ? v.stringValue : 'timestampValue' in v ? Date.parse(v.timestampValue) : 'integerValue' in v ? +v.integerValue : 'doubleValue' in v ? v.doubleValue : 'booleanValue' in v ? v.booleanValue : null;
     TRABAJOS = (await r.json()).filter(x => x.document).map(x => ({ id: x.document.name.split('/').pop(), ...Object.fromEntries(Object.entries(x.document.fields || {}).map(([k, v]) => [k, dec(v)])) })).sort((a, b) => (a.at || 0) - (b.at || 0));
+    await Promise.all(TRABAJOS.filter(t => !+t.g && /^k[0-9a-f]{20}$/.test(t.k || '')).map(async t => {      // sin estante elegido: va al de su grado (7.° → Séptimo)
+      try { const j = await (await fetch(`${BASE}/students/${t.k}?key=${FB.apiKey}`)).json(); if (j.fields && j.fields.grade && j.fields.grade.stringValue === '7mo') t.g = 7; } catch (e) {} }));
   } catch (e) { TRABAJOS = []; if (!/HTTP 40[13]/.test(e.message)) aviso('📶 No pude traer los trabajos de la Revista. Revisa tu internet.', 4); }
   ponerLibros();
 }
