@@ -7,8 +7,9 @@
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const TIPO = { opi: 'Opinión científica', ens: 'Ensayo', inv: 'Investigación', dis: 'Diseño de investigación', pro: 'Producto o maqueta', info: 'Infografía', exp: 'Experimento', maq: 'Maqueta', vid: 'Video' };
   // el grado y el profe del trabajo (6.° → Christian; 7.° → el docente de 7.° anotado en config/site.tchG)
-  const P7 = { n: '' }; fetch('https://firestore.googleapis.com/v1/projects/ciencia6abcd/databases/(default)/documents/config/site?key=AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM')
-    .then(r => r.ok ? r.json() : null).then(j => { const G = j && j.fields && j.fields.tchG && j.fields.tchG.mapValue.fields || {}; Object.values(G).forEach(v => { const [e, n] = String(v.stringValue).split('|'); if (e === 'c7' && n) P7.n = n; }); }).catch(() => {});
+  const P7 = { n: '', rev: [] }; fetch('https://firestore.googleapis.com/v1/projects/ciencia6abcd/databases/(default)/documents/config/site?key=AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM')
+    .then(r => r.ok ? r.json() : null).then(j => { const G = j && j.fields && j.fields.tchG && j.fields.tchG.mapValue.fields || {}; Object.values(G).forEach(v => { const [e, n] = String(v.stringValue).split('|'); if (e === 'c7' && n) P7.n = n; });
+      const RV = j && j.fields && j.fields.rev && j.fields.rev.mapValue.fields || {}; P7.rev = Object.values(RV).map(v => { const [, n, c, g] = String(v.stringValue).split('|'); return { n: n || 'Revisor', c: String(c || '').toUpperCase(), g: +g || 6 }; }).sort((a, b) => a.c.localeCompare(b.c) || a.n.localeCompare(b.n, 'es')); }).catch(() => {});
   const grado = w => +w.g === 7 || (!+w.g && window.MD && MD.espInfo && MD.espInfo().k === 'c7') ? 7 : 6;
   const profe = w => grado(w) === 7 ? P7.n || 'Docente de 7.° grado' : 'Christian Quispe Llerena';
   // ✨ Resumen y Abstract escritos aparte para trabajos ya publicados que llegaron en Word (antes de que Molí los escribiera solo)
@@ -44,19 +45,37 @@ h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0
   const revDe = w => !w.rv ? '' : w.rv === 'tu profe' ? 'Prof. ' + profe(w) : 'Est. ' + w.rv + ' (Revisor Confiable)';
   const apellido = n => { const p = String(n || '').trim().split(/\s+/); return p.length >= 3 ? p[p.length - 2] : p[p.length - 1] || ''; };
   const lnk = h => h.replace(/https?:\/\/[^\s<]+/g, u => `<span class="url">${u}</span>`);
+  function resumenDe(w) {                                             // el Resumen del artículo: el de su guía («Mi resumen»); si no trae, pregunta + conclusión (corto)
+    const S = partes(w).S, q = S.find(s => s.k === 'q'), r = S.find(s => s.k === 'r'), su = S.find(s => s.k === 's'), fx = !su && FIJO[w.id];
+    const res0 = (fx ? fx.s : su ? su.p.join(' ') : [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ')).split(/\s+/).filter(Boolean);
+    return !su && !fx && res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');
+  }
+  // ---- 🌐 Abstract: Molí traduce al inglés el Resumen de cada artículo al descargar (se guarda en este equipo para no repetir) ----
+  const hsh = t => { let h = 5381; for (let i = 0; i < t.length; i++) h = (h * 33 ^ t.charCodeAt(i)) >>> 0; return h.toString(36); };
+  async function abstracts(L) {
+    const C = (() => { try { return JSON.parse(localStorage.getItem('moli2:abs') || '{}'); } catch (e) { return {}; } })(), falta = [];
+    L.forEach(w => { const r = resumenDe(w); if (!r) return; const k = hsh(r); if (C[k]) w._ab = C[k]; else falta.push([w, r, k]); });
+    for (let i = 0; i < falta.length; i += 12) { const G = falta.slice(i, i + 12);
+      const body = JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'Translate each of these Spanish research summaries written by school students into clear, natural English, as the abstract of a school science magazine. Keep the same meaning and the first person if used. Return one translation per item, in the same order.\n\n' + G.map(([, r], j) => `${j + 1}. ${r}`).join('\n') }] }],
+        generationConfig: { responseMimeType: 'application/json', responseSchema: { type: 'OBJECT', required: ['en'], properties: { en: { type: 'ARRAY', items: { type: 'STRING' } } } }, temperature: .2, maxOutputTokens: 4096 } });
+      for (const m of ['gemini-3.5-flash-lite', 'gemini-3.8-flash']) {
+        try { const x = await fetch(`https://firebasevertexai.googleapis.com/v1beta/projects/ciencia6abcd/models/${m}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': 'AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM' }, body });
+          if (!x.ok) continue; const j = await x.json(), en = JSON.parse((((j.candidates || [])[0] || {}).content || {}).parts.map(p => p.text || '').join('')).en || [];
+          if (en.length !== G.length) continue; G.forEach(([w, , k], n) => { const t = String(en[n] || '').replace(/\s+/g, ' ').trim(); if (t) { w._ab = t; C[k] = t; } }); break; } catch (e) {} } }
+    try { const K = Object.keys(C); if (K.length > 300) K.slice(0, K.length - 300).forEach(k => delete C[k]); localStorage.setItem('moli2:abs', JSON.stringify(C)); } catch (e) {}
+  }
   function articulo(w, nro) {
     const P = partes(w), q = P.S.find(s => s.k === 'q'), r = P.S.find(s => s.k === 'r'), su = P.S.find(s => s.k === 's'), ab = P.S.find(s => s.k === 'a'), rest = P.S.filter(s => s !== q && s !== r && s !== su && s !== ab);
     const kws = String(w.kw || '').split(',').map(x => x.trim()).filter(Boolean), A = [w.img, w.img2, w.img3].filter(Boolean), y = anio(w);
     const ref = x => `${esc(x.a || 'Autor desconocido')}. (${esc(x.y || 's. f.')}). <i>${esc(x.t || 'Sin título')}</i>.${x.l ? ` Recuperado de <span class="url">${esc(x.l)}</span>` : ''}`;
-    const fx = !su && FIJO[w.id];                                     // (sin Abstract: el PDF sólo lleva el Resumen)
-    const res0 = (fx ? fx.s : su ? su.p.join(' ') : [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ')).split(/\s+/).filter(Boolean), resumen = !su && !fx && res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');   // como en las revistas: corto
+    const resumen = resumenDe(w);
     let n = 0; const sec = (t, ps) => `<h2>${++n}. ${esc(t)}</h2>${ps.map(x => `<p>${lnk(esc(x))}</p>`).join('')}`;
     const cuerpo = (q ? sec('Pregunta de investigación', q.p) : '') + rest.map(s => sec(s.k === 'h' ? (rest.length === 1 ? 'Desarrollo' : s.t) : s.t || 'Desarrollo', s.p)).join('') + (r ? sec('Conclusión', r.p) : '');
     const cita = w.sec ? `${apellido(w.n)} (${y})` : `${String(w.n || '').split(/\s+/).pop()} (${y})`;
     return `
 <div class="hd"><span>REVISTA INNOVADORA · Repositorio Educativo${nro ? ' · Artículo ' + nro : ''}</span><span>${esc(TIPO[w.ty] || 'Trabajo')} · Vol. 1 · ${y}</span></div>
 <h1>${esc(w.t || 'Trabajo')}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `${grado(w)}.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
-${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}</div>` : ''}
+${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}${w._ab ? `<br><br><b>Abstract.</b> <i>${esc(w._ab)}</i>` : ''}</div>` : ''}
 ${cuerpo || '<p>Este trabajo no trae texto.</p>'}
 ${P.F.length ? `<div class="refs"><h2>Referencias</h2>${P.F.map(x => `<p>${ref(x)}</p>`).join('')}</div>` : w.f ? `<div class="refs"><h2>Referencias</h2><p>${lnk(esc(w.f))}</p></div>` : ''}
 ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc(x)}" alt=""><small>Anexo ${i + 1}</small></div>`).join('')}` : ''}
@@ -77,22 +96,34 @@ ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc
     <circle cx="100" cy="100" r="9" fill="#111"/><circle cx="162" cy="100" r="4" fill="#111"/><circle cx="69" cy="46" r="4" fill="#111"/><circle cx="69" cy="154" r="4" fill="#111"/></svg>`;
   function revista(L, o) {
     const hoy = new Date(), fechaTx = `${MES[hoy.getMonth()]} de ${hoy.getFullYear()}`, GR = o.grado === 7 ? 'Séptimo grado' : 'Sexto grado';
+    const UNI = String(o.edicion || 'Unidad 7').trim(), nEd = (UNI.match(/\d+/) || [])[0], ED = nEd ? `${nEd}.ª Edición` : 'Edición especial';
+    const DIR = 'Prof. Christian Quispe Llerena', JEFE = P7.n ? 'Prof. ' + P7.n : '', RV = P7.rev.filter(r => (o.grado === 7) === (r.g === 7) || !P7.rev.some(x => x.g === 7));
     const portada = `<section class="cv">
       <div class="cv-top"><span>Innova Schools · Tacna</span><span>Ciencia y Tecnología</span><span>Vol. 1 · ${hoy.getFullYear()}</span></div>
       <div class="cv-mast"><small>Revista Innovadora</small><h1>REPOSITORIO<br>EDUCATIVO</h1><div class="cv-sub">Revista de investigación escolar</div></div>
-      <div class="cv-bar"><span>Edición · ${esc(o.edicion || 'Unidad 7')}</span><span>${esc(fechaTx)}</span></div>
+      <div class="cv-bar"><span>${esc(ED)}</span><span>${esc(fechaTx)}</span></div><div class="cv-uni">${esc(UNI)}</div>
       <div class="cv-mid">${ARTE}<div><h2>${GR}</h2><p>Investigaciones de nuestros estudiantes, leídas y aprobadas por el Equipo de la Revista.</p></div></div>
       <div class="cv-en"><b>En esta edición</b>${L.slice(0, 4).map((w, i) => `<p><i>${i + 1}</i>${esc(preguntaDe(w))}</p>`).join('')}${L.length > 4 ? `<p class="mas">… y ${L.length - 4} ${L.length - 4 > 1 ? 'investigaciones' : 'investigación'} más.</p>` : ''}</div>
-      <div class="cv-pie"><span>${L.length} artículo${L.length > 1 ? 's' : ''}</span><span>Dirección: ${esc(o.grado === 7 ? 'Prof. ' + (P7.n || 'Docente de 7.° grado') : 'Prof. Christian Quispe Llerena')}</span></div></section>`;
-    const indice = `<section class="ix"><div class="hd"><span>REPOSITORIO EDUCATIVO · Revista Innovadora</span><span>${esc(GR)} · Edición ${esc(o.edicion || 'Unidad 7')}</span></div>
+      <div class="cv-pie"><span>${L.length} artículo${L.length > 1 ? 's' : ''}</span><span>Dirección: ${esc(DIR)}</span></div></section>`;
+    const caja = (cl, rol, n, sub) => `<div class="eq-c ${cl}"><small>${rol}</small><b>${esc(n)}</b>${sub ? `<i>${esc(sub)}</i>` : ''}</div>`, SECS = [...new Set(RV.map(r => r.c).filter(Boolean))].sort();
+    const equipo = `<section class="eq"><div class="hd"><span>REPOSITORIO EDUCATIVO · Revista Innovadora</span><span>${esc(GR)} · ${esc(ED)}</span></div>
+      <h2 class="ix-t">Equipo de la Revista</h2><p class="ix-s">Quienes leen, revisan y aprueban cada artículo de esta edición</p>
+      <div class="org">${caja('dir', 'Dirección de la Revista', DIR, 'Docente de Ciencia y Tecnología · 6.° grado')}
+        ${JEFE ? `<div class="ln"></div>${caja('dir', 'Jefatura de la Revista', JEFE, 'Docente de Ciencia y Tecnología · 7.° grado')}` : ''}
+        <div class="ln"></div><div class="eq-t">Revisores Confiables</div>
+        <div class="rama">${SECS.length ? SECS.map(c => `<div class="sec"><span>${o.grado === 7 ? '7.°' : '6.°'} «${esc(c)}»</span>${RV.filter(r => r.c === c).map(r => caja('', 'Revisor Confiable', r.n)).join('')}</div>`).join('') : '<p class="ix-s">Los artículos de esta edición fueron revisados por la Dirección.</p>'}</div>
+        <div class="ln"></div>${caja('aut', 'Autores', `Estudiantes de ${GR.toLowerCase()}`, `${L.length} artículo${L.length > 1 ? 's' : ''} en esta edición`)}</div>
+      <div class="eq-fn"><div><b>1. El autor envía</b>Escribe su investigación y la manda a revisión.</div><div><b>2. El equipo revisa</b>Un Revisor Confiable o la Dirección la lee y decide.</div><div><b>3. Se publica</b>Sale en la revista y en la Biblioteca.</div></div></section>`;
+    const indice = `<section class="ix"><div class="hd"><span>REPOSITORIO EDUCATIVO · Revista Innovadora</span><span>${esc(GR)} · ${esc(ED)}</span></div>
       <h2 class="ix-t">Índice</h2><p class="ix-s">Preguntas de investigación de esta edición</p>
       <ol>${L.map((w, i) => `<li><span class="n">${i + 1}</span><div><b>${esc(preguntaDe(w))}</b><small>${esc(autorDe(w))}${w.sec ? ` · ${grado(w)}.° «${esc(w.sec)}»` : ''}</small></div></li>`).join('')}</ol></section>`;
-    return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Repositorio Educativo · ${esc(GR)} · ${esc(o.edicion || 'Unidad 7')}</title><style>${CSS}
-@page { @bottom-center { content: counter(page); font: 9pt "Times New Roman", serif; color: #555; } } @page :first { @bottom-center { content: none; } }
-.cv { height: 253mm; display: flex; flex-direction: column; border: 3px double #111; padding: 9mm 10mm; break-after: page; color: #111; }
+    return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Repositorio Educativo · ${esc(GR)} · ${esc(ED)} · ${esc(UNI)}</title><style>${CSS}
+@page { @bottom-center { content: counter(page); font: 9pt "Times New Roman", serif; color: #555; } } @page :first { margin: 7mm; @bottom-center { content: none; } }
+.cv { height: 282mm; display: flex; flex-direction: column; border: 3px double #111; padding: 9mm 10mm; break-after: page; color: #111; }
 .cv-top { display: flex; justify-content: space-between; font: 700 8.5pt Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; border-bottom: 1px solid #111; padding-bottom: 3mm; }
 .cv-mast { text-align: center; padding: 9mm 0 5mm; border-bottom: 4px solid #111; } .cv-mast small { font: italic 15pt "Times New Roman", serif; letter-spacing: .08em; }
-.cv-mast h1 { margin: 2mm 0 0; font: 900 46pt/0.95 "Times New Roman", "Liberation Serif", serif; letter-spacing: .06em; } .cv-sub { margin-top: 3mm; font: 700 9pt Arial, sans-serif; letter-spacing: .35em; text-transform: uppercase; }
+.cv-uni { text-align: center; padding: 3.5mm 2mm; border-bottom: 1px solid #111; font: italic 700 16pt/1.25 "Times New Roman", serif; }
+.cv-mast h1 { margin: 2mm 0 0; font: 900 54pt/0.95 "Times New Roman", "Liberation Serif", serif; letter-spacing: .06em; } .cv-sub { margin-top: 3mm; font: 700 9pt Arial, sans-serif; letter-spacing: .35em; text-transform: uppercase; }
 .cv-bar { display: flex; justify-content: space-between; padding: 2mm 1mm; border-bottom: 1px solid #111; font: 700 10.5pt "Times New Roman", serif; letter-spacing: .12em; text-transform: uppercase; }
 .cv-mid { flex: 1; display: flex; align-items: center; gap: 9mm; padding: 6mm 4mm; } .cv-mid h2 { margin: 0 0 3mm; font: 900 30pt/1 "Times New Roman", serif; text-transform: uppercase; letter-spacing: .04em; } .cv-mid p { margin: 0; font: italic 13pt/1.45 "Times New Roman", serif; text-indent: 0; text-align: left; }
 .cv-en { border-top: 2px solid #111; padding-top: 3mm; } .cv-en b { font: 700 9pt Arial, sans-serif; letter-spacing: .3em; text-transform: uppercase; } .cv-en p { margin: 2mm 0 0; text-indent: 0; font: 12pt/1.35 "Times New Roman", serif; display: flex; gap: 3mm; } .cv-en i { font-style: normal; font-weight: 900; } .cv-en .mas { font-style: italic; color: #333; }
@@ -100,17 +131,28 @@ ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc
 .ix { break-after: page; } .ix-t { text-align: center; font: 900 26pt "Times New Roman", serif; font-variant: normal; letter-spacing: .1em; margin: 14mm 0 0; text-transform: uppercase; } .ix-s { text-align: center; text-indent: 0; font-style: italic; margin-bottom: 8mm; }
 .ix ol { list-style: none; margin: 0; padding: 0; } .ix li { display: flex; gap: 5mm; padding: 3.2mm 0; border-bottom: 1px dotted #777; break-inside: avoid; } .ix .n { font: 900 15pt "Times New Roman", serif; min-width: 9mm; }
 .ix li b { display: block; font: 700 12pt/1.35 "Times New Roman", serif; } .ix li small { font: 9.5pt Arial, sans-serif; color: #444; }
-.art { break-before: page; }</style></head><body>${portada}${indice}${L.map((w, i) => `<article class="art">${articulo(w, i + 1)}</article>`).join('')}
+.art { break-before: page; }
+.eq { break-after: page; } .org { display: flex; flex-direction: column; align-items: center; margin-top: 6mm; } .ln { width: 0; height: 7mm; border-left: 1.5px solid #111; }
+.eq-c { border: 1.5px solid #111; padding: 3mm 6mm; text-align: center; min-width: 70mm; background: #fff; } .eq-c.dir { border: 3px double #111; min-width: 95mm; } .eq-c.aut { border-style: dashed; }
+.eq-c small { display: block; font: 700 7.5pt Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; color: #333; } .eq-c b { display: block; font: 700 12.5pt "Times New Roman", serif; margin-top: 1mm; } .eq-c i { display: block; font: italic 9.5pt "Times New Roman", serif; color: #333; }
+.eq-t { font: 700 9pt Arial, sans-serif; letter-spacing: .3em; text-transform: uppercase; border-bottom: 1.5px solid #111; padding: 0 4mm 1.5mm; }
+.rama { display: flex; flex-wrap: wrap; justify-content: center; gap: 4mm; margin-top: 4mm; } .rama .sec { display: flex; flex-direction: column; gap: 2.5mm; align-items: center; } .rama .sec > span { font: 700 9.5pt "Times New Roman", serif; letter-spacing: .1em; }
+.rama .eq-c { min-width: 38mm; padding: 2mm 3mm; } .rama .eq-c b { font-size: 10.5pt; }
+.eq-fn { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 10mm; border-top: 2px solid #111; padding-top: 4mm; } .eq-fn div { font: 10pt/1.4 "Times New Roman", serif; } .eq-fn b { display: block; font-size: 11pt; margin-bottom: 1mm; }</style></head><body>${portada}${equipo}${indice}${L.map((w, i) => `<article class="art">${articulo(w, i + 1)}</article>`).join('')}
 <script>addEventListener('load', () => setTimeout(() => { print(); }, 600));<\/script></body></html>`;
   }
-  window.pdfRevista = function (L, o, v) {                            // L: trabajos completos (con su texto); o: { grado: 6|7, edicion }
+  window.pdfRevista = async function (L, o, v) {                      // L: trabajos completos (con su texto); o: { grado: 6|7, edicion }
     v = v || window.open('', '_blank'); if (!v) { alert('Permite las ventanas emergentes para descargar el PDF.'); return; }
+    try { v.document.body.innerHTML = '<p style="font:16px Arial;margin:40px">🌐 Molí escribe los Abstract en inglés…</p>'; } catch (e) {}
+    L = L.map(w => ({ ...w })); await abstracts(L);
     v.document.open(); v.document.write(revista(L, o || {})); v.document.close();
   };
   // abre la hoja y el «Guardar como PDF» del navegador (se llama dentro de un toque, así el navegador no la bloquea)
   window.pdfVentana = () => { const v = window.open('', '_blank'); if (!v) { alert('Permite las ventanas emergentes para descargar el PDF.'); return null; } v.document.write('<p style="font:16px Arial;margin:40px">⏳ Preparando el PDF…</p>'); return v; };
-  window.pdfTrabajo = function (w, v) {                               // v: una ventana ya abierta con pdfVentana() (si hubo que esperar datos)
+  window.pdfTrabajo = async function (w, v) {                         // v: una ventana ya abierta con pdfVentana() (si hubo que esperar datos)
     v = v || window.open('', '_blank'); if (!v) { alert('Permite las ventanas emergentes para descargar el PDF.'); return; }
+    try { v.document.body.innerHTML = '<p style="font:16px Arial;margin:40px">🌐 Molí escribe el Abstract en inglés…</p>'; } catch (e) {}
+    w = { ...w }; await abstracts([w]);                                  // si Molí no puede ahora, sale sin Abstract
     v.document.open(); v.document.write(html(w)); v.document.close();
   };
 })();

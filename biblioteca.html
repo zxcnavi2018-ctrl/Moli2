@@ -161,7 +161,7 @@
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="moli3d.js?v=202610161340"></script>
-<script src="pdftrabajo.js?v=202610171800"></script>
+<script src="pdftrabajo.js?v=202610171900"></script>
 <script>
 (function () {
 'use strict';
@@ -850,7 +850,7 @@ const globo = $('#mGlobo');
 const sinTilde = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 function abrirGlobo(hola) {
   globo.innerHTML = `<button class="x" type="button" aria-label="Cerrar">✕</button><b class="t">🔎 ¡Hola! Soy Molí</b>${hola ? `<span>${hola}</span>` : `<span>¿Qué deseas encontrar? Escribe <b>1 o 2 palabras clave</b>.</span><form><input name="q" maxlength="40" placeholder="Ej.: levadura, bacterias" autocomplete="off"><button type="submit">Buscar</button></form><div class="rs"></div>`}`;
-  if (!hola) globo.insertAdjacentHTML('beforeend', `<div class="rv"><b>📚 Descargar la revista completa (PDF)</b><label>Edición <input name="ed" maxlength="30" value="${esc(sessionStorage.getItem('moli2:edicion') || 'Unidad 7')}"></label>
+  if (!hola) globo.insertAdjacentHTML('beforeend', `<div class="rv"><b>📚 Descargar la revista completa (PDF)</b><label>Unidad <input name="ed" maxlength="70" value="${esc(sessionStorage.getItem('moli2:edicion') || 'Unidad 7 · Microorganismos en acción')}"></label>
     <div><button type="button" data-rev="6">📰 Sexto grado</button><button type="button" data-rev="7">📰 Séptimo grado</button></div></div>`);
   globo.classList.add('on'); if (!hola) { const i = globo.querySelector('input'); setTimeout(() => i.focus(), 60); MOLI && (MOLI.expr('feliz'), MOLI.accion('saludar', 1)); setTimeout(() => MOLI && MOLI.expr('normal'), 1800); }
 }
@@ -866,7 +866,7 @@ function buscarMoli(q) {
 globo.addEventListener('submit', e => { e.preventDefault(); buscarMoli(e.target.elements.q.value); });
 // ---- 📚 la revista de un grado en un solo PDF: carátula, índice con las preguntas y todos sus artículos ----
 async function descargarRevista(g, btn) {
-  const ed = (globo.querySelector('[name=ed]') || {}).value || 'Unidad 7'; try { sessionStorage.setItem('moli2:edicion', ed); } catch (e) {}
+  const ed = (globo.querySelector('[name=ed]') || {}).value || 'Unidad 7 · Microorganismos en acción'; try { sessionStorage.setItem('moli2:edicion', ed); } catch (e) {}
   const L0 = TRABAJOS.filter(t => !esMoli(t) && (g === 7 ? +t.g === 7 : (+t.g || 6) === 6)).sort((a, b) => (a.at || 0) - (b.at || 0));
   if (!L0.length) return aviso(`📭 Todavía no hay trabajos de ${g === 7 ? 'Séptimo' : 'Sexto'} grado en la Biblioteca.`, 3.5);
   if (!window.pdfRevista) return; const win = window.pdfVentana ? pdfVentana() : null; if (!win) return;
