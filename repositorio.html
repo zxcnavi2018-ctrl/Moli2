@@ -630,7 +630,6 @@ function vEnviar() {
   <section class="formatos" id="eGuia">${guiaHtml(FORM.ty)}</section>
   <form class="form" id="fEnv" autocomplete="off">
     <h3 class="f-h">2. Publica tu propuesta</h3>
-    <div class="fld" data-nh${sinWord() ? ' hidden' : ''}><label for="eT">Título de tu trabajo</label><input type="text" id="eT" maxlength="100" placeholder="El mismo título de tu guía"></div>
     <div class="fld" data-nh${sinWord() ? ' hidden' : ''}><label for="eK">Palabras clave</label><input type="text" id="eK" maxlength="200" placeholder="Las del paso 6 de tu guía: levadura, pan, hongos"><small>Separadas por comas: con ellas te encontrarán en el 🔍 Buscador.</small></div>
     ${T0 ? `<div class="fld"><label>¿En qué estante de la Biblioteca va?</label><div class="opts" id="eG">${[6, 7, 8, 9, 10, 11].map(g => `<button type="button" data-g="${g}" class="${FORM.g === g ? 'on' : ''}">${['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo'][g - 6]}</button>`).join('')}</div></div>` : ''}
     <div class="fld" id="fDoc"${sinWord() ? ' hidden' : ''}><label>Sube tu guía completada (Word)</label><label class="photo" id="eDocL"><input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="eDoc" hidden><span id="eDocV">📄 Toca aquí para elegir tu guía .docx</span></label><small>Lo que escribiste en tu guía será el contenido de tu libro en la Biblioteca.</small></div>
@@ -706,8 +705,7 @@ function hojaTexto(h, conMapa) {                                     // el mismo
 }
 function hojaFalta(h) {
   const v = h.v || {}, x = k => String(v[k] || '').trim(), F = [];
-  if (String(h.t || '').trim().length < 4) F.push('el título de tu trabajo');
-  if (String(h.kw || '').split(',').filter(x => x.trim()).length < 3) F.push('3 palabras clave separadas por comas (debajo del título)');
+  if (String(h.kw || '').split(',').filter(x => x.trim()).length < 3) F.push('3 palabras clave separadas por comas (arriba de la guía)');
   HOJA[h.ty].pasos.forEach((p, i) => { if (p.c && !p.c.some(c => x(c.id).length >= 3)) F.push(`el Paso ${i + 1} (${p.t})`);
     else (p.c || []).forEach(c => { const n = palCampo(v[c.id]), f = c.min - n; if (f > 0) F.push(`escribir ${f === 1 ? '1 palabra' : f + ' palabras'} más en «${c.lab || p.t}» (mínimo ${c.min})`); });
     if (p.fu && [1, 2, 3].filter(n => x(`f${n}a`) && x(`f${n}y`)).length < 3) F.push(`el autor y el año de tus 3 fuentes (Paso ${i + 1})`); });
@@ -759,7 +757,6 @@ function abrirHojaDoc(id) {
   <div class="wd-rib">${ro ? '' : '<button type="button" class="wd-fm" data-fmt="bold" title="Negrita"><b>N</b> Negrita</button><button type="button" class="wd-fm mk" data-fmt="mark" title="Marcador"><span>🖍️</span> Marcador</button><i></i>'}<span class="wd-np">🚫📋 Pegar desactivado · sólo en Link</span></div>
   ${dv ? '<div class="rv-gr">' : ''}<div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
     <p class="wd-k">REVISTA INNOVADORA · GUÍA PASO A PASO</p><h1>${t[1]} ${esc(t[2])}</h1><p class="wd-sub">${esc(G.sub)} Usa mínimo 3 citas parafraseadas dentro de tu trabajo y escribe sus fuentes al final.</p>
-    <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" data-may maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
     <div class="wd-tt wd-kw"><label>Palabras clave <small>(de 3 a 5, separadas por comas: con ellas te encontrarán en el 🔍 Buscador)</small></label><input data-k="_kw" maxlength="200" value="${esc(h.kw || '')}" placeholder="Ej.: levadura, pan, hongos"${dis}></div>
     ${G.pasos.map((p, i) => `<section class="wd-ps"><h2><span>PASO ${i + 1}</span> ${esc(p.t)}</h2><p class="wd-h">${esc(p.h)}</p>
       ${(p.c || []).map(c => c.pre ? `<div class="wd-pre"><b>${esc(c.pre)}</b>${ta(c.id, c.ph || '…', c.r || 1)}</div>` : c.uno ? `<div class="wd-pre"><b>${esc(c.lab)}:</b>${inp(c.id, 'la idea de este párrafo', 'maxlength="160"')}</div>` : `${c.lab ? `<h3>${esc(c.lab)}</h3>` : ''}${ta(c.id, c.ph, c.r)}${c.min ? `<div class="wd-cnt" data-cnt="${c.id}" data-min="${c.min}"></div>` : ''}`).join('')}
@@ -800,6 +797,9 @@ const crecer = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight +
 const HPREV = new WeakMap();
 let hojaT = 0;
 // 🔠 el título y la pregunta de investigación se escriben en MAYÚSCULAS (se ven así al escribir y se guardan así)
+// el TÍTULO del trabajo es su pregunta de investigación (en mayúsculas): de la guía o del Word
+const preguntaHoja = h => { const G = HOJA[h.ty], v = h.v || {}; if (!G) return ''; for (const id of qIds(G)) { const x = String(v[id] || '').replace(/\s+/g, ' ').trim(); if (x) return x; } return ''; };
+const preguntaTexto = d => { const L = String(d || '').split(/\n+/).map(x => x.trim()).filter(Boolean); for (let i = 0; i < L.length; i++) if (/^PASO\b.*(pregunta|tema)/i.test(L[i]) && L[i + 1] && !/^PASO\b/.test(L[i + 1])) return L[i + 1]; return L.find(x => /^¿.+\?$/.test(x)) || ''; };
 const qIds = G => new Set(G.pasos.filter(p => /pregunta|tema/i.test(p.t || '')).flatMap(p => (p.c || []).map(c => c.id)));
 function hojaGuardar() {
   const d = $('#hoja'); if (!d || d.hidden) return; const h = hojaDoc(d.dataset.id); if (!h || h.st === 'env') return;
@@ -958,9 +958,9 @@ function pintaWord() { const fd = $('#fDoc'); if (fd) fd.hidden = sinWord(); doc
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
   if (!ME) return avisoDni();
-  const hj = sinWord() && FORM.hid && hojaDoc(FORM.hid), kw = String(hj ? hj.kw || '' : $('#eK').value).replace(/\s+/g, ' ').trim(), t = String(hj ? hj.t || '' : $('#eT').value).replace(/\s+/g, ' ').trim().toLocaleUpperCase('es'), d = hj ? hojaTexto(hj) : FORM.txt, f = '', link = '';
+  const hj = sinWord() && FORM.hid && hojaDoc(FORM.hid), kw = String(hj ? hj.kw || '' : $('#eK').value).replace(/\s+/g, ' ').trim(), t = String(hj ? preguntaHoja(hj) : preguntaTexto(FORM.txt)).replace(/\s+/g, ' ').trim().toLocaleUpperCase('es'), d = hj ? hojaTexto(hj) : FORM.txt, f = '', link = '';
   if (sinWord() && (!hj || hj.st !== 'por')) { toast('📤 Primero elige qué investigación vas a enviar.'); return elegirParaEnviar(); }
-  if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
+  if (t.length < 4) return toast(hj ? '✏️ Escribe tu pregunta de investigación en el Paso 1 de tu guía.' : '✏️ Tu Word debe tener su pregunta de investigación (con ¿…?).', 4500);
   if (hj && hj.ty !== FORM.ty) FORM.ty = hj.ty;
   if (hj) { const fa = hojaFalta(hj); if (fa.length) { toast('✍️ En tu guía aún te falta: ' + fa.join(', ') + '.', 5200); return abrirHojaDoc(hj.id); } }
   if (!d) return toast('📄 Sube tu guía completada en Word.');
@@ -1540,6 +1540,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610172300"></script><script src="archivos.js?v=202610161340"></script><script src="mando.js?v=202610161340"></script>
+<script src="pdftrabajo.js?v=202610172330"></script><script src="archivos.js?v=202610161340"></script><script src="mando.js?v=202610161340"></script>
 </body>
 </html>

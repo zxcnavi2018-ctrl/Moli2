@@ -74,7 +74,7 @@ h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0
     const cita = w.sec ? `${apellido(w.n)} (${y})` : `${String(w.n || '').split(/\s+/).pop()} (${y})`;
     return `
 <div class="hd"><span>REVISTA INNOVADORA · Repositorio Educativo${nro ? ' · Artículo ' + nro : ''}</span><span>${esc(TIPO[w.ty] || 'Trabajo')} · Vol. 1 · ${y}</span></div>
-<h1>${esc(w.t || 'Trabajo')}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `${grado(w)}.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
+<h1>${esc(preguntaDe(w))}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `${grado(w)}.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
 ${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}${w._ab ? `<br><br><b>Abstract.</b> <i>${esc(w._ab)}</i>` : ''}</div>` : ''}
 ${cuerpo || '<p>Este trabajo no trae texto.</p>'}
 ${P.F.length ? `<div class="refs"><h2>Referencias</h2>${P.F.map(x => `<p>${ref(x)}</p>`).join('')}</div>` : w.f ? `<div class="refs"><h2>Referencias</h2><p>${lnk(esc(w.f))}</p></div>` : ''}
