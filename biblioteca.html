@@ -161,7 +161,7 @@
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="moli3d.js?v=202610161340"></script>
-<script src="pdftrabajo.js?v=202610172330"></script>
+<script src="pdftrabajo.js?v=202610180000"></script>
 <script>
 (function () {
 'use strict';
@@ -514,6 +514,10 @@ function ponerLibros() {
   });
   pintarBarra();
 }
+// el título de cada libro es su pregunta de investigación (en mayúsculas), sacada de su texto
+const preguntaLib = t => { const L = String(t.d || '').split(/\n+/).map(x => x.trim()).filter(Boolean); let q = '';
+  for (let i = 0; i < L.length && !q; i++) if (/^PASO\b.*(pregunta|tema)/i.test(L[i]) && L[i + 1] && !/^PASO\b/.test(L[i + 1])) q = L[i + 1];
+  q = q || L.find(x => /^¿.+\?$/.test(x)) || t.t || 'Trabajo'; return q.replace(/\s+/g, ' ').trim().toLocaleUpperCase('es'); };
 async function cargarTrabajos() {
   if (QS.has('demo')) { TRABAJOS = demo(); return ponerLibros(); }
   try {
@@ -523,6 +527,7 @@ async function cargarTrabajos() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const dec = v => !v ? null : 'stringValue' in v ? v.stringValue : 'timestampValue' in v ? Date.parse(v.timestampValue) : 'integerValue' in v ? +v.integerValue : 'doubleValue' in v ? v.doubleValue : 'booleanValue' in v ? v.booleanValue : null;
     TRABAJOS = (await r.json()).filter(x => x.document).map(x => ({ id: x.document.name.split('/').pop(), ...Object.fromEntries(Object.entries(x.document.fields || {}).map(([k, v]) => [k, dec(v)])) })).sort((a, b) => (a.at || 0) - (b.at || 0));
+    TRABAJOS.forEach(t => { t.t = preguntaLib(t); });
     await Promise.all(TRABAJOS.filter(t => !+t.g && /^k[0-9a-f]{20}$/.test(t.k || '')).map(async t => {      // sin estante elegido: va al de su grado (7.° → Séptimo)
       try { const j = await (await fetch(`${BASE}/students/${t.k}?key=${FB.apiKey}`)).json(); if (j.fields && j.fields.grade && j.fields.grade.stringValue === '7mo') t.g = 7; } catch (e) {} }));
   } catch (e) { TRABAJOS = []; if (!/HTTP 40[13]/.test(e.message)) aviso('📶 No pude traer los trabajos de la Revista. Revisa tu internet.', 4); }
@@ -672,15 +677,14 @@ async function editarLibro(t, btn) {
   let d = String(w.d || ''); const fx = window.pdfFijo && pdfFijo[w.id]; if (fx && !/(^|\n)PASO[^\n]*resumen/i.test(d)) d += '\nPASO Mi resumen\n' + fx.s;   // su resumen viaja con el libro
   const P = document.createElement('div'); P.id = 'edLibro';
   P.innerHTML = `<form><h3>✏️ Editar libro</h3><p class="ay">Arregla lo que necesites y guarda. Las líneas que empiezan con <b>PASO</b> son los títulos de cada parte (Pregunta, Lo que encontré, Mi resumen…).</p>
-    <label>Título</label><input name="t" maxlength="100" value="${esc(w.t || '')}">
     <label>Palabras clave (separadas por comas)</label><input name="kw" maxlength="200" value="${esc(w.kw || '')}">
     <label>Texto del trabajo</label><textarea name="d" rows="16" maxlength="20000">${esc(d)}</textarea>
     <div class="bt"><button type="button" data-x>Cancelar</button><button type="submit" class="ok">💾 Guardar cambios</button></div></form>`;
   document.body.appendChild(P);
   P.addEventListener('click', e => { if (e.target === P || e.target.closest('[data-x]')) P.remove(); });
   P.querySelector('form').addEventListener('submit', async e => {
-    e.preventDefault(); const f = e.target, ok = f.querySelector('.ok'), nt = f.t.value.replace(/\s+/g, ' ').trim(), nk = f.kw.value.replace(/\s+/g, ' ').trim(), nd = f.d.value.trim();
-    if (nt.length < 4) return aviso('✏️ El título es muy corto.', 3); if (!nd) return aviso('✏️ El texto no puede quedar vacío.', 3);
+    e.preventDefault(); const f = e.target, ok = f.querySelector('.ok'), nt = preguntaLib({ d: f.d.value, t: w.t }), nk = f.kw.value.replace(/\s+/g, ' ').trim(), nd = f.d.value.trim();
+    if (!nd) return aviso('✏️ El texto no puede quedar vacío.', 3);
     ok.disabled = true; ok.textContent = '⏳ Guardando…';
     try { const a = await token(); if (!a) throw new Error('AUTH');
       const C = ['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'img', 'img2', 'img3', 'st', 'at', 'rv', 'rvAt', 'g', 'kw'], o = {};
