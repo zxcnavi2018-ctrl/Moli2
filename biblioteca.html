@@ -132,6 +132,9 @@
   #mGlobo form { display: flex; gap: 6px; margin-top: 8px; } #mGlobo input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 999px; border: 2px solid #c99a45; font: 800 15px Nunito, sans-serif; color: #3b2414; background: #fff; outline: none; } #mGlobo input:focus { border-color: #6b2f2f; }
   #mGlobo form button { border: 0; border-radius: 999px; padding: 9px 14px; background: #6b2f2f; color: #ffe7a3; font: 900 14px Nunito, sans-serif; cursor: pointer; }
   #mGlobo .rs { margin-top: 8px; max-height: 210px; overflow: auto; display: grid; gap: 5px; } #mGlobo .rs button { text-align: left; border: 1.5px solid #e2c48a; background: #fff; border-radius: 12px; padding: 7px 10px; font: 800 14px Nunito, sans-serif; color: #3b2414; cursor: pointer; } #mGlobo .rs button:hover { background: #fdf0d2; }
+  #mGlobo .rv { margin-top: 10px; padding-top: 9px; border-top: 2px dashed #e2c48a; font: 800 14px Nunito, sans-serif; color: #3b2414; } #mGlobo .rv b { display: block; margin-bottom: 5px; }
+  #mGlobo .rv label { display: flex; align-items: center; gap: 6px; font-size: 13px; } #mGlobo .rv input { flex: 1; padding: 6px 10px; font-size: 14px; }
+  #mGlobo .rv div { display: flex; gap: 6px; margin-top: 7px; } #mGlobo .rv button { flex: 1; border: 0; border-radius: 999px; padding: 9px 10px; background: #3b2414; color: #ffe7a3; font: 900 14px Nunito, sans-serif; cursor: pointer; } #mGlobo .rv button[disabled] { opacity: .6; }
   #mGlobo .rs small { display: block; color: #8a6a44; font-weight: 700; font-size: 12px; } #mGlobo .nada { color: #8a6a44; font-size: 14px; margin-top: 8px; }
   #edLibro { position: fixed; inset: 0; z-index: 14; display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(10,6,3,.72); }
   #edLibro form { width: min(820px, 100%); max-height: calc(100vh - 28px); overflow: auto; background: #fbf1da; border: 3px solid #9c7a3c; border-radius: 14px; padding: 18px 20px; color: #3b2414; box-shadow: 0 30px 80px rgba(0,0,0,.6); font-family: Nunito, sans-serif; }
@@ -158,7 +161,7 @@
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="moli3d.js?v=202610161340"></script>
-<script src="pdftrabajo.js?v=202610171700"></script>
+<script src="pdftrabajo.js?v=202610171800"></script>
 <script>
 (function () {
 'use strict';
@@ -847,6 +850,8 @@ const globo = $('#mGlobo');
 const sinTilde = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 function abrirGlobo(hola) {
   globo.innerHTML = `<button class="x" type="button" aria-label="Cerrar">✕</button><b class="t">🔎 ¡Hola! Soy Molí</b>${hola ? `<span>${hola}</span>` : `<span>¿Qué deseas encontrar? Escribe <b>1 o 2 palabras clave</b>.</span><form><input name="q" maxlength="40" placeholder="Ej.: levadura, bacterias" autocomplete="off"><button type="submit">Buscar</button></form><div class="rs"></div>`}`;
+  if (!hola) globo.insertAdjacentHTML('beforeend', `<div class="rv"><b>📚 Descargar la revista completa (PDF)</b><label>Edición <input name="ed" maxlength="30" value="${esc(sessionStorage.getItem('moli2:edicion') || 'Unidad 7')}"></label>
+    <div><button type="button" data-rev="6">📰 Sexto grado</button><button type="button" data-rev="7">📰 Séptimo grado</button></div></div>`);
   globo.classList.add('on'); if (!hola) { const i = globo.querySelector('input'); setTimeout(() => i.focus(), 60); MOLI && (MOLI.expr('feliz'), MOLI.accion('saludar', 1)); setTimeout(() => MOLI && MOLI.expr('normal'), 1800); }
 }
 const cerrarGlobo = () => { globo.classList.remove('on'); if (globo.contains(document.activeElement)) document.activeElement.blur(); };
@@ -859,7 +864,23 @@ function buscarMoli(q) {
     : `<p class="nada">🤔 No encontré trabajos con «${esc(q)}». Prueba con otra palabra.</p>`;
 }
 globo.addEventListener('submit', e => { e.preventDefault(); buscarMoli(e.target.elements.q.value); });
+// ---- 📚 la revista de un grado en un solo PDF: carátula, índice con las preguntas y todos sus artículos ----
+async function descargarRevista(g, btn) {
+  const ed = (globo.querySelector('[name=ed]') || {}).value || 'Unidad 7'; try { sessionStorage.setItem('moli2:edicion', ed); } catch (e) {}
+  const L0 = TRABAJOS.filter(t => !esMoli(t) && (g === 7 ? +t.g === 7 : (+t.g || 6) === 6)).sort((a, b) => (a.at || 0) - (b.at || 0));
+  if (!L0.length) return aviso(`📭 Todavía no hay trabajos de ${g === 7 ? 'Séptimo' : 'Sexto'} grado en la Biblioteca.`, 3.5);
+  if (!window.pdfRevista) return; const win = window.pdfVentana ? pdfVentana() : null; if (!win) return;
+  const t0 = btn.textContent; btn.disabled = true; btn.textContent = '⏳ Juntando…';
+  const dc = v => !v ? null : 'stringValue' in v ? v.stringValue : 'timestampValue' in v ? Date.parse(v.timestampValue) : 'integerValue' in v ? +v.integerValue : null;
+  try { const L = []; for (let i = 0; i < L0.length; i += 6) L.push(...await Promise.all(L0.slice(i, i + 6).map(async t => {
+      if (String(t.id).startsWith('demo')) return t;
+      const j = await (await fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`)).json(), w = { ...t }; Object.entries(j.fields || {}).forEach(([k, v]) => w[k] = dc(v)); w.g = t.g; return w; })));
+    pdfRevista(L, { grado: g, edicion: ed }, win); }
+  catch (e) { win.close(); aviso('📶 No pude juntar los trabajos. Revisa tu internet.', 4); }
+  btn.disabled = false; btn.textContent = t0;
+}
 globo.addEventListener('click', async e => { if (e.target.closest('.x')) return cerrarGlobo();
+  const rv = e.target.closest('[data-rev]'); if (rv) return descargarRevista(+rv.dataset.rev, rv);
   const b = e.target.closest('[data-id]'); if (!b) return; const t = TRABAJOS.find(x => x.id === b.dataset.id); if (!t) return;
   cerrarGlobo(); const i = ESTANTES.findIndex(E => E.items.includes(t)); if (i >= 0 && i !== actual) { await irEstante(i); await wait(300); } abrirLibro(t); });
 globo.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarGlobo(); return; } if (globo.classList.contains('on')) e.stopPropagation(); });   // al escribir no se mueven los estantes
