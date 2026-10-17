@@ -114,11 +114,26 @@ ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc
         <div class="rama">${SECS.length ? SECS.map(c => `<div class="sec"><span>${o.grado === 7 ? '7.°' : '6.°'} «${esc(c)}»</span>${RV.filter(r => r.c === c).map(r => caja('', 'Revisor Confiable', r.n)).join('')}</div>`).join('') : '<p class="ix-s">Los artículos de esta edición fueron revisados por la Dirección.</p>'}</div>
         <div class="ln"></div>${caja('aut', 'Autores', `Estudiantes de ${GR.toLowerCase()}`, `${L.length} artículo${L.length > 1 ? 's' : ''} en esta edición`)}</div>
       <div class="eq-fn"><div><b>1. El autor envía</b>Escribe su investigación y la manda a revisión.</div><div><b>2. El equipo revisa</b>Un Revisor Confiable o la Dirección la lee y decide.</div><div><b>3. Se publica</b>Sale en la revista y en la Biblioteca.</div></div></section>`;
+    const autores = [...new Set(L.filter(w => w.sec).map(w => String(w.n || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+    const contra = `<section class="cc">
+      <div class="cv-top"><span>Repositorio Educativo</span><span>Revista Innovadora</span><span>${esc(ED)}</span></div>
+      <div class="cc-sobre"><h3>Sobre la revista</h3><p><b>Repositorio Educativo</b> es la revista de investigación escolar del área de Ciencia y Tecnología de Innova Schools · Tacna. Reúne las investigaciones de nuestros estudiantes: preguntas que nacen de su curiosidad, respondidas con fuentes confiables y con sus propias palabras.</p>
+        <p>Cada artículo fue leído por un Revisor Confiable o por la Dirección antes de publicarse, y hoy forma parte de nuestra Biblioteca Educativa.</p></div>
+      <div class="cc-2"><div><h3>Normas de publicación</h3><ul><li>Una pregunta de investigación clara.</li><li>Mínimo 3 citas parafraseadas (Normas APA).</li><li>Fuentes confiables al final del trabajo.</li><li>Revisión del Equipo de la Revista.</li></ul></div>
+        <div><h3>Autores de esta edición</h3><p class="cc-aut">${autores.map(esc).join(' · ') || '—'}</p></div></div>
+      <blockquote>«La ciencia empieza con una pregunta.»</blockquote>
+      <div class="cc-pie">${ARTE.replace('width="190" height="190"', 'width="62" height="62"')}<div><b>REPOSITORIO EDUCATIVO</b><span>${esc(ED)} · ${esc(UNI)} · ${esc(GR)}</span><span>Ciencia y Tecnología · Innova Schools · Tacna · ${hoy.getFullYear()}</span></div></div></section>`;
     const indice = `<section class="ix"><div class="hd"><span>REPOSITORIO EDUCATIVO · Revista Innovadora</span><span>${esc(GR)} · ${esc(ED)}</span></div>
       <h2 class="ix-t">Índice</h2><p class="ix-s">Preguntas de investigación de esta edición</p>
       <ol>${L.map((w, i) => `<li><span class="n">${i + 1}</span><div><b>${esc(preguntaDe(w))}</b><small>${esc(autorDe(w))}${w.sec ? ` · ${grado(w)}.° «${esc(w.sec)}»` : ''}</small></div></li>`).join('')}</ol></section>`;
     return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Repositorio Educativo · ${esc(GR)} · ${esc(ED)} · ${esc(UNI)}</title><style>${CSS}
-@page { @bottom-center { content: counter(page); font: 9pt "Times New Roman", serif; color: #555; } } @page :first { margin: 7mm; @bottom-center { content: none; } }
+@page { @bottom-center { content: counter(page); font: 9pt "Times New Roman", serif; color: #555; } } @page :first { margin: 7mm; @bottom-center { content: none; } } @page contra { margin: 7mm; @bottom-center { content: none; } }
+.cc { page: contra; break-before: page; height: 282mm; display: flex; flex-direction: column; gap: 7mm; border: 3px double #111; padding: 9mm 11mm; color: #111; }
+.cc h3 { margin: 0 0 2.5mm; font: 700 9pt Arial, sans-serif; letter-spacing: .3em; text-transform: uppercase; border-bottom: 1.5px solid #111; padding-bottom: 1.5mm; }
+.cc p { text-indent: 0; font: 12pt/1.55 "Times New Roman", serif; } .cc-sobre p { font-size: 13pt; } .cc-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+.cc ul { margin: 0; padding-left: 5mm; font: 11.5pt/1.6 "Times New Roman", serif; } .cc-aut { font-size: 11pt !important; font-style: italic; }
+.cc blockquote { margin: auto 0 0; text-align: center; font: italic 22pt "Times New Roman", serif; border-top: 1px solid #111; border-bottom: 1px solid #111; padding: 6mm 0; }
+.cc-pie { display: flex; align-items: center; gap: 5mm; border-top: 4px solid #111; padding-top: 4mm; } .cc-pie b { display: block; font: 900 15pt "Times New Roman", serif; letter-spacing: .12em; } .cc-pie span { display: block; font: 700 8.5pt Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
 .cv { height: 282mm; display: flex; flex-direction: column; border: 3px double #111; padding: 9mm 10mm; break-after: page; color: #111; }
 .cv-top { display: flex; justify-content: space-between; font: 700 8.5pt Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; border-bottom: 1px solid #111; padding-bottom: 3mm; }
 .cv-mast { text-align: center; padding: 9mm 0 5mm; border-bottom: 4px solid #111; } .cv-mast small { font: italic 15pt "Times New Roman", serif; letter-spacing: .08em; }
@@ -138,7 +153,7 @@ ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc
 .eq-t { font: 700 9pt Arial, sans-serif; letter-spacing: .3em; text-transform: uppercase; border-bottom: 1.5px solid #111; padding: 0 4mm 1.5mm; }
 .rama { display: flex; flex-wrap: wrap; justify-content: center; gap: 4mm; margin-top: 4mm; } .rama .sec { display: flex; flex-direction: column; gap: 2.5mm; align-items: center; } .rama .sec > span { font: 700 9.5pt "Times New Roman", serif; letter-spacing: .1em; }
 .rama .eq-c { min-width: 38mm; padding: 2mm 3mm; } .rama .eq-c b { font-size: 10.5pt; }
-.eq-fn { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 10mm; border-top: 2px solid #111; padding-top: 4mm; } .eq-fn div { font: 10pt/1.4 "Times New Roman", serif; } .eq-fn b { display: block; font-size: 11pt; margin-bottom: 1mm; }</style></head><body>${portada}${equipo}${indice}${L.map((w, i) => `<article class="art">${articulo(w, i + 1)}</article>`).join('')}
+.eq-fn { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 10mm; border-top: 2px solid #111; padding-top: 4mm; } .eq-fn div { font: 10pt/1.4 "Times New Roman", serif; } .eq-fn b { display: block; font-size: 11pt; margin-bottom: 1mm; }</style></head><body>${portada}${equipo}${indice}${L.map((w, i) => `<article class="art">${articulo(w, i + 1)}</article>`).join('')}${contra}
 <script>addEventListener('load', () => setTimeout(() => { print(); }, 600));<\/script></body></html>`;
   }
   window.pdfRevista = async function (L, o, v) {                      // L: trabajos completos (con su texto); o: { grado: 6|7, edicion }
