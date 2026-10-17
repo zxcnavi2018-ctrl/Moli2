@@ -22,7 +22,7 @@
 h1 { text-align: center; font: 700 19pt/1.25 "Times New Roman", "Liberation Serif", serif; margin: 26px 0 10px; text-transform: uppercase; letter-spacing: .02em; } .au { text-align: center; font-size: 12.5pt; } .af { text-align: center; font-size: 10pt; color: #444; font-style: italic; margin-bottom: 16px; }
 .abs { border-top: 2px solid #111; border-bottom: 2px solid #111; padding: 10px 0; margin: 10px 0 16px; font-size: 10.5pt; text-align: justify; } .abs b { font-variant: small-caps; letter-spacing: .04em; }
 h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0 6px; font-variant: small-caps; letter-spacing: .04em; break-after: avoid; } p { margin: 0 0 8px; text-align: justify; text-indent: 1.2em; }
-.refs p { text-indent: -1.2em; padding-left: 1.2em; font-size: 10.5pt; } .url { word-break: break-all; color: #333; } .anx { margin-top: 12px; text-align: center; break-inside: avoid; } .anx img { max-width: 100%; max-height: 85mm; border: 1px solid #bbb; } .anx small { display: block; font-size: 9.5pt; color: #555; }
+.pq { text-transform: uppercase; font-weight: 700; } .refs p { text-indent: -1.2em; padding-left: 1.2em; font-size: 10.5pt; } .url { word-break: break-all; color: #333; } .anx { margin-top: 12px; text-align: center; break-inside: avoid; } .anx img { max-width: 100%; max-height: 85mm; border: 1px solid #bbb; } .anx small { display: block; font-size: 9.5pt; color: #555; }
 .ft { margin-top: 24px; border-top: 1px solid #999; padding-top: 4px; font: 9pt Arial, "Liberation Sans", sans-serif; color: #555; display: flex; justify-content: space-between; gap: 10px; }`;
   const fecha = v => { const d = v ? new Date(v) : null; return d && !isNaN(d) ? d.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; };
   const anio = w => { const d = new Date(w.at || Date.now()); return isNaN(d) ? new Date().getFullYear() : d.getFullYear(); };
@@ -70,7 +70,7 @@ h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0
     const ref = x => `${esc(x.a || 'Autor desconocido')}. (${esc(x.y || 's. f.')}). <i>${esc(x.t || 'Sin título')}</i>.${x.l ? ` Recuperado de <span class="url">${esc(x.l)}</span>` : ''}`;
     const resumen = resumenDe(w);
     let n = 0; const sec = (t, ps) => `<h2>${++n}. ${esc(t)}</h2>${ps.map(x => `<p>${lnk(esc(x))}</p>`).join('')}`;
-    const cuerpo = (q ? sec('Pregunta de investigación', q.p) : '') + rest.map(s => sec(s.k === 'h' ? (rest.length === 1 ? 'Desarrollo' : s.t) : s.t || 'Desarrollo', s.p)).join('') + (r ? sec('Conclusión', r.p) : '');
+    const cuerpo = (q ? sec('Pregunta de investigación', q.p).replace(/<p>/g, '<p class="pq">') : '') + rest.map(s => sec(s.k === 'h' ? (rest.length === 1 ? 'Desarrollo' : s.t) : s.t || 'Desarrollo', s.p)).join('') + (r ? sec('Conclusión', r.p) : '');
     const cita = w.sec ? `${apellido(w.n)} (${y})` : `${String(w.n || '').split(/\s+/).pop()} (${y})`;
     return `
 <div class="hd"><span>REVISTA INNOVADORA · Repositorio Educativo${nro ? ' · Artículo ' + nro : ''}</span><span>${esc(TIPO[w.ty] || 'Trabajo')} · Vol. 1 · ${y}</span></div>
@@ -142,11 +142,11 @@ ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc
 .cv-mast h1 { margin: 2mm 0 0; font: 900 54pt/0.95 "Times New Roman", "Liberation Serif", serif; letter-spacing: .06em; } .cv-sub { margin-top: 3mm; font: 700 9pt Arial, sans-serif; letter-spacing: .35em; text-transform: uppercase; }
 .cv-bar { display: flex; justify-content: space-between; padding: 2mm 1mm; border-bottom: 1px solid #111; font: 700 10.5pt "Times New Roman", serif; letter-spacing: .12em; text-transform: uppercase; }
 .cv-mid { flex: 1; display: flex; align-items: center; gap: 9mm; padding: 6mm 4mm; } .cv-mid h2 { margin: 0 0 3mm; font: 900 30pt/1 "Times New Roman", serif; text-transform: uppercase; letter-spacing: .04em; } .cv-mid p { margin: 0; font: italic 13pt/1.45 "Times New Roman", serif; text-indent: 0; text-align: left; }
-.cv-en { border-top: 2px solid #111; padding-top: 3mm; } .cv-en b { font: 700 9pt Arial, sans-serif; letter-spacing: .3em; text-transform: uppercase; } .cv-en p { margin: 2mm 0 0; text-indent: 0; font: 12pt/1.35 "Times New Roman", serif; display: flex; gap: 3mm; } .cv-en i { font-style: normal; font-weight: 900; } .cv-en .mas { font-style: italic; color: #333; }
+.cv-en { border-top: 2px solid #111; padding-top: 3mm; } .cv-en b { font: 700 9pt Arial, sans-serif; letter-spacing: .3em; text-transform: uppercase; } .cv-en p { text-transform: uppercase; margin: 2mm 0 0; text-indent: 0; font: 12pt/1.35 "Times New Roman", serif; display: flex; gap: 3mm; } .cv-en i { font-style: normal; font-weight: 900; } .cv-en .mas { font-style: italic; color: #333; }
 .cv-pie { display: flex; justify-content: space-between; margin-top: 5mm; padding-top: 2mm; border-top: 4px solid #111; font: 700 9pt Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
 .ix { break-after: page; } .ix-t { text-align: center; font: 900 26pt "Times New Roman", serif; font-variant: normal; letter-spacing: .1em; margin: 14mm 0 0; text-transform: uppercase; } .ix-s { text-align: center; text-indent: 0; font-style: italic; margin-bottom: 8mm; }
 .ix ol { list-style: none; margin: 0; padding: 0; } .ix li { display: flex; gap: 5mm; padding: 3.2mm 0; border-bottom: 1px dotted #777; break-inside: avoid; } .ix .n { font: 900 15pt "Times New Roman", serif; min-width: 9mm; }
-.ix li b { display: block; font: 700 12pt/1.35 "Times New Roman", serif; } .ix li small { font: 9.5pt Arial, sans-serif; color: #444; }
+.ix li b { text-transform: uppercase; display: block; font: 700 12pt/1.35 "Times New Roman", serif; } .ix li small { font: 9.5pt Arial, sans-serif; color: #444; }
 .art { break-before: page; }
 .eq { break-after: page; } .org { display: flex; flex-direction: column; align-items: center; margin-top: 6mm; } .ln { width: 0; height: 7mm; border-left: 1.5px solid #111; }
 .eq-c { border: 1.5px solid #111; padding: 3mm 6mm; text-align: center; min-width: 70mm; background: #fff; } .eq-c.dir { border: 3px double #111; min-width: 95mm; } .eq-c.aut { border-style: dashed; }
