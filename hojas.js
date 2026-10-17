@@ -710,6 +710,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       if (it.k === 'uni') return `<div class="cv-sl cv-c" ${st}><span class="cv-pill">UNIDAD ${esc(u.num)}</span><div class="cv-ico">${esc(u.icon || '📘')}</div><h2 class="cv-h1">${esc(u.title)}</h2><p class="cv-sub">${it.ss.length} ${it.ss.length === 1 ? 'sesión' : 'sesiones'}</p></div>`;
       if (it.k === 'ses') return `<div class="cv-sl cv-c" ${st}><span class="cv-pill">${esc(u.icon || '📘')} UNIDAD ${esc(u.num)} · ${esc(u.title).toUpperCase()}</span><div class="cv-big">Sesión ${it.n}</div><h2 class="cv-h1">${esc(tema(it))}</h2></div>`;
       if (it.k === 'meta') { const cr = (s.criteria || []).filter(L); return `<div class="cv-sl cv-meta" ${st}>${crumb(it)}<h2 class="cv-h2">🎯 Meta de la sesión</h2><p class="cv-lead">${L(s.meta) ? esc(s.meta) : 'Sin meta todavía'}</p>${cr.length ? `<h3>✅ Criterios de éxito</h3><ul class="cv-cards">${cr.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}${L(s.rubric) ? `<p class="cv-sub">📏 Criterio de la rúbrica: ${esc(s.rubric)}</p>` : ''}</div>`; }
+      if ((it.k === 'rol' || it.k === 'acu') && window.Guion) return Guion.html(it.k);   // Molí los explica con su voz (guion.js)
       if (it.k === 'rol') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">👥 Roles de trabajo</h2><ul class="cv-cards cv-c4">${CV_ROL.map(([i, n, d]) => `<li class="cv-role"><span>${i}</span><b>${n}</b><small>${d}</small></li>`).join('')}</ul></div>`;
       if (it.k === 'acu') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">🤝 Acuerdos de convivencia</h2><ul class="cv-cards cv-c3">${CV_ACU.map(([i, t]) => `<li class="cv-role"><span>${i}</span><b>${t}</b></li>`).join('')}</ul></div>`;
       if (it.k === 'mq' || it.k === 'aq') { const Q = preguntasDe(it), tt = it.k === 'aq' ? `Sobre la actividad ${it.j}${L(it.x.title) ? ': ' + esc(it.x.title) : ''}` : it.prev ? `Recordamos la sesión ${it.prev.n}` : '¡Empezamos la unidad!';
@@ -748,7 +749,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       P.i = Math.max(0, Math.min(P.L.length - 1, P.i)); const it = P.L[P.i];
       const sk = it.k === 'sync' ? claveSl(it) : '';
       if (sk && P.syk === sk && Sincro.activo()) Sincro.actualizar(syncDe(it));   // ya está en pantalla (llegó lo que pensó Molí): no se reinicia la animación
-      else { if (window.Sincro) Sincro.parar(); P.syk = sk; sl.innerHTML = slide(it); ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); }
+      else { if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.syk = sk; sl.innerHTML = slide(it); const gu = (it.k === 'rol' || it.k === 'acu') && window.Guion; if (!gu) ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); if (gu) Guion.montar(sl.firstChild, it.k); }
       if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });
       if (it.u && it.n != null) RT.sesion(it.u.key + ':' + it.n);                // Molí piensa las preguntas de la sesión desde antes
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
@@ -804,7 +805,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
       Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
-    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); P.syk = ''; RT.quitar(); };
+    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.syk = ''; RT.quitar(); };
     return P;
   }
 

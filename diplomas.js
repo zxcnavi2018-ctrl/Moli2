@@ -81,7 +81,7 @@
       const U = MD.unidades().filter(u => MD.sesionesDe(u).length);
       host.innerHTML = `<div class="cv pp"><div class="pp-stage"></div><div class="cv-bar"><button data-pp="-1" aria-label="Anterior">‹</button>
         <select aria-label="Unidad">${U.map(u => `<option value="${esc(u.key)}">🛂 Unidad ${esc(u.num)} · ${esc(u.title)}</option>`).join('')}</select><span class="pp-n"></span><button data-pp="1" aria-label="Siguiente">›</button></div></div>`;
-      el = host.firstChild; const fs = () => { el.style.fontSize = Math.max(8, Math.min(22, el.clientHeight / 26)) + 'px'; }; fs(); P.ro = new ResizeObserver(fs); P.ro.observe(el);
+      el = host.firstChild; const fs = () => { el.style.fontSize = Math.max(8, Math.min(40, el.clientHeight / 22, el.clientWidth / 38)) + 'px'; }; fs(); P.ro = new ResizeObserver(fs); P.ro.observe(el);
       el.addEventListener('click', e => { const b = e.target.closest('[data-pp]'); if (!b) return; e.stopPropagation();
         if (b.dataset.pp === 'dl') return descargar(b, P.L.find(z => z.k === 'dip' && z.n === +b.dataset.n));
         P.i += +b.dataset.pp; pinta(+b.dataset.pp); });

@@ -90,7 +90,8 @@
       if (G.TOUR.i !== 0) return G.go(-G.TOUR.i); return; }
     if (a === 'aceptar') {
       const sh = document.getElementById('sheet'), f = document.activeElement;
-      if (sh && sh.style.display === 'block' && window.Sincro && Sincro.activo()) return Sincro.avanzar();   // 🚩 «Molí nos sincroniza»: A hace el siguiente paso
+      if (sh && sh.style.display === 'block' && window.Sincro && Sincro.activo()) return Sincro.avanzar();
+      if (sh && sh.style.display === 'block' && window.Guion && Guion.activo()) return Guion.avanzar();   // 🤝👥 acuerdos y roles: A hace el siguiente paso   // 🚩 «Molí nos sincroniza»: A hace el siguiente paso
       if (sh && sh.style.display === 'block' && f && sh.contains(f) && /BUTTON|A/.test(f.tagName)) return f.click();
       const bb = document.getElementById('bibBar'); if (bb && bb.classList.contains('on')) { const b = document.getElementById('bibPlay'); if (b) return b.click(); }
       a = 'abrir'; }
