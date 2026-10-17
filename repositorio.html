@@ -638,7 +638,7 @@ function vEnviar() {
     <div class="fld" data-nh${sinWord() ? ' hidden' : ''}><label>Anexos: fotos de tu trabajo <span style="font-weight:700;color:var(--ink2)">(hasta 3, opcional)</span></label><label class="photo" id="ePh"><input type="file" accept="image/*" id="eImg" multiple hidden><span id="ePv">📷 Toca aquí para elegir tus fotos</span></label><small>Irán al final de tu libro, en la página de Anexos.</small></div>
     <div><button type="submit" class="btn go" id="eGo">${T0 ? '📰 Publicar en la revista' : '🚀 Enviar mi trabajo'}</button></div>
   </form><div class="mine" id="mine"></div>`;
-  FORM.img = FORM.th = ''; FORM.txt = ''; FORM.fotos = []; FORM.doc = null; drawMine();
+  FORM.img = FORM.th = ''; FORM.txt = ''; FORM.fotos = []; FORM.fotosMano = false; FORM.doc = null; drawMine();
 }
 // ---- ✍️ Guías tipo Word: «Abrir guía» abre una hoja con la estructura de la guía; NO se puede pegar, salvo en «Link» de sus fuentes ----
 //      Cada guía queda en 📁 Mis archivos (archivos.js): «Por concluir» hasta que la envían; luego «Enviado».
@@ -902,14 +902,22 @@ document.addEventListener('change', async e => {
       if (txt.replace(/^PASO.*$/gm, '').replace(/\s+/g, ' ').length < 40) throw new Error('VACIO');
       FORM.txt = txt.slice(0, 20000);
       FORM.doc = f.size <= 650000 ? { n: f.name.slice(0, 120), b64: await new Promise((ok, no) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1] || ''); fr.onerror = no; fr.readAsDataURL(f); }) } : null;   // el Word original: le llega a la profe para revisarlo
-      v.innerHTML = `✅ <b>${esc(f.name)}</b> · ${FORM.txt.split(/\s+/).length} palabras leídas. Toca para cambiarla.`;
+      let nf = 0;                                                     // 📷 las fotos que pegó dentro del Word (plantilla antigua): van a Anexos si no eligió otras
+      if (!FORM.fotosMano) try {
+        const IM = []; await mammoth.convertToHtml({ arrayBuffer: await f.arrayBuffer() }, { convertImage: mammoth.images.imgElement(im => im.read('base64').then(b => { IM.push({ t: im.contentType, b }); return { src: '' }; })) });
+        const F2 = []; for (const x of IM.filter(x => /^image\/(png|jpe?g|gif|webp|bmp)$/i.test(x.t) && x.b.length > 12000)) { if (F2.length >= 3) break;
+          try { const bin = atob(x.b), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); const bl = new Blob([u8], { type: x.t });
+            let im = await shrinkImg(bl, 1000, 0.62); if (im.length > 280000) im = await shrinkImg(bl, 760, 0.55); F2.push(im); if (F2.length === 1) FORM.th = await shrinkImg(bl, 420, 0.6); } catch (e) {} }
+        if (F2.length) { FORM.fotos = F2; nf = F2.length; const pv = $('#ePv'); if (pv) pv.innerHTML = F2.map(x => `<img src="${x}" alt="">`).join('') + ` ✅ ${nf} foto${nf > 1 ? 's' : ''} de tu Word. Toca para cambiarlas.`; }
+      } catch (e) {}
+      v.innerHTML = `✅ <b>${esc(f.name)}</b> · ${FORM.txt.split(/\s+/).length} palabras leídas${nf ? ` · 📷 ${nf} foto${nf > 1 ? 's' : ''} irá${nf > 1 ? 'n' : ''} en Anexos` : ''}. Toca para cambiarla.`;
     } catch (x) { FORM.txt = ''; v.textContent = x.message === 'VACIO' ? '⚠️ Tu guía parece vacía. Complétala y vuelve a subirla.' : '⚠️ No pude leer ese archivo. Debe ser la guía en Word (.docx).'; }
     return;
   }
   if (e.target.id !== 'eImg' || !e.target.files.length) return;
   const L = [...e.target.files].slice(0, 3); $('#ePv').textContent = '⏳ Preparando tus fotos…';
   try {
-    FORM.fotos = []; for (const f of L) { let im = await shrinkImg(f, 1000, 0.62); if (im.length > 280000) im = await shrinkImg(f, 760, 0.55); FORM.fotos.push(im); }
+    FORM.fotos = []; FORM.fotosMano = true; for (const f of L) { let im = await shrinkImg(f, 1000, 0.62); if (im.length > 280000) im = await shrinkImg(f, 760, 0.55); FORM.fotos.push(im); }
     FORM.th = await shrinkImg(L[0], 420, 0.6);
     $('#ePv').innerHTML = FORM.fotos.map(x => `<img src="${x}" alt="">`).join('') + ` ✅ ${FORM.fotos.length} foto${FORM.fotos.length > 1 ? 's' : ''} lista${FORM.fotos.length > 1 ? 's' : ''}. Toca para cambiarlas.`;
   } catch (x) { FORM.fotos = []; FORM.th = ''; $('#ePv').textContent = '⚠️ No pude abrir esas fotos. Prueba con otras.'; }
