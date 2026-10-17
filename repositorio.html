@@ -930,6 +930,29 @@ document.addEventListener('click', e => {
   if (u) { FORM.u = u.dataset.u; document.querySelectorAll('#eU button').forEach(b => b.classList.toggle('on', b === u)); }
   const gg = e.target.closest('#eG [data-g]'); if (gg) { FORM.g = +gg.dataset.g; document.querySelectorAll('#eG button').forEach(b => b.classList.toggle('on', b === gg)); }
 });
+// ---- ✨ Resumen breve (de todo el trabajo, no la conclusión) y Abstract en inglés: Molí los escribe para los trabajos enviados en Word.
+//      Van al final del texto como «PASO Resumen» y «PASO Abstract»: el PDF del artículo los pone arriba, en su recuadro.
+const RE_RES = /\n*PASO\s*\d*\s*(Resumen|Abstract)\b[\s\S]*$/i;
+const tieneRes = d => /(^|\n)PASO\s*\d*\s*Resumen\b/i.test(d || '');
+async function resumenIA(t, d) {
+  const cuerpo = String(d || '').replace(RE_RES, '').slice(0, 14000), lista = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'], vistos = new Set();
+  const body = JSON.stringify({ contents: [{ role: 'user', parts: [{ text: `Eres el editor de una revista escolar de ciencias. Lee el trabajo de un estudiante y escribe:
+- «resumen»: un resumen breve en español, de 45 a 70 palabras, en un solo párrafo y en tercera persona, de TODO el trabajo: qué pregunta se hizo, qué investigó (con sus datos principales) y a qué conclusión llegó. No copies la conclusión ni repitas la pregunta tal cual.
+- «abstract»: ese mismo resumen traducido al inglés.
+Usa solo la información del trabajo.\n\nTítulo: ${t}\n\n${cuerpo}` }] }],
+    generationConfig: { responseMimeType: 'application/json', responseSchema: { type: 'OBJECT', required: ['resumen', 'abstract'], properties: { resumen: { type: 'STRING' }, abstract: { type: 'STRING' } } }, temperature: .4, maxOutputTokens: 1024 } });
+  while (lista.length) { const m = lista.shift(); if (vistos.has(m)) continue; vistos.add(m);
+    try { const r = await fetch(`https://firebasevertexai.googleapis.com/v1beta/projects/${F.projectId}/models/${m}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': F.apiKey }, body });
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 404) { (JSON.stringify(j).match(/models\/(gemini-[\w.-]+)/g) || []).forEach(x => lista.push(x.slice(7))); continue; }
+      if (!r.ok) continue;
+      const x = JSON.parse((((j.candidates || [])[0] || {}).content || {}).parts.map(p => p.text || '').join('')), un = v => String(v || '').replace(/\s+/g, ' ').trim();
+      const o = { resumen: un(x.resumen), abstract: un(x.abstract) };
+      if (o.resumen.split(' ').length >= 20 && o.resumen.length <= 900 && o.abstract.split(' ').length >= 15 && o.abstract.length <= 900) return o;
+    } catch (e) {} }
+  throw new Error('IA');
+}
+const conResumen = (d, R) => { const extra = `\nPASO Resumen\n${R.resumen}\nPASO Abstract\n${R.abstract}`; return String(d || '').replace(RE_RES, '').slice(0, 20000 - extra.length) + extra; };
 function pintaWord() { const fd = $('#fDoc'); if (fd) fd.hidden = sinWord(); document.querySelectorAll('#fEnv [data-nh]').forEach(x => x.hidden = sinWord());
   const fw = $('#fWord'); if (fw) fw.hidden = !HOJA[FORM.ty]; }
 document.addEventListener('submit', async e => {
@@ -944,8 +967,10 @@ document.addEventListener('submit', async e => {
   if (kw.split(',').filter(x => x.trim()).length < 2) return toast('🔑 Escribe al menos 3 palabras clave separadas por comas.');
   if (link && !safeUrl(link)) return toast('🔗 El link debe empezar con https://');
   const b = $('#eGo'); b.disabled = true; b.textContent = '⏳ Enviando…';
+  let dFin = d;
+  if (!hj) { b.textContent = '✨ Molí escribe tu resumen…'; try { dFin = conResumen(d, await resumenIA(t, d)); } catch (x) {} b.textContent = '⏳ Enviando…'; }   // si Molí no puede ahora, se envía igual
   const id = ME.key + '-' + Date.now().toString(36);
-  const w = { k: ME.key, n: String(ME.name || '').slice(0, 60), sec: String(ME.section || '').toUpperCase().slice(-1), u: 'rev', kw: kw.slice(0, 200), ty: FORM.ty, t: t.slice(0, 100), d: d.slice(0, 20000), f: f.slice(0, 600), link, th: FORM.th, img: FORM.img, st: 'pend', at: new Date() };
+  const w = { k: ME.key, n: String(ME.name || '').slice(0, 60), sec: String(ME.section || '').toUpperCase().slice(-1), u: 'rev', kw: kw.slice(0, 200), ty: FORM.ty, t: t.slice(0, 100), d: dFin.slice(0, 20000), f: f.slice(0, 600), link, th: FORM.th, img: FORM.img, st: 'pend', at: new Date() };
   if (!w.link) delete w.link; if (!w.f) delete w.f; delete w.img; if (FORM.fotos[0]) w.img = FORM.fotos[0]; if (FORM.fotos[1]) w.img2 = FORM.fotos[1]; if (FORM.fotos[2]) w.img3 = FORM.fotos[2]; if (!w.th) delete w.th;
   if (ME.teacher && hj && hj.prac) Object.assign(w, { n: 'Molí', sec: '' });   // 🧪 práctica corregida: vuelve a la bandeja de los Revisores
   else if (ME.teacher) Object.assign(w, { st: 'ok', rv: 'tu profe', rvAt: new Date(), g: FORM.g, sec: '' });
@@ -1425,6 +1450,22 @@ async function bajarWord(id, b) {                                     // el Word
   } catch (x) { toast(x.message === 'NO' ? '📄 Este trabajo se envió sin el Word (fue antes de este cambio o el archivo era muy grande).' : x.message === 'AUTH' ? '🔐 Conecta tu cuenta para descargar el Word.' : '📶 No pude bajar el Word. Revisa tu internet.', 5000); }
   b.disabled = false; b.textContent = t0;
 }
+// ✨ a un trabajo ya publicado (p. ej. enviado en Word antes de esto) se le agrega su Resumen y Abstract.
+//    Las reglas no dejan cambiar el texto de un trabajo: se crea una copia nueva con todo igual y luego se borra la vieja.
+async function resumenPublicado(id, bt) {
+  const t0 = bt.textContent; bt.disabled = true; bt.textContent = '✨ Molí está escribiendo…';
+  try { const a = await staffTok(); if (!a) throw new Error('AUTHT');
+    const w = await getDoc(id); if (!w || w.st !== 'ok') throw new Error('NET');
+    const R = await resumenIA(w.t, w.d), C = ['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'img', 'img2', 'img3', 'st', 'at', 'rv', 'rvAt', 'g', 'kw'], o = {};
+    C.forEach(k => { if (w[k] != null && w[k] !== '') o[k] = w[k]; }); o.d = conResumen(w.d, R); ['at', 'rvAt'].forEach(k => { if (o[k]) o[k] = new Date(o[k]); });
+    const nid = w.k + '-' + Date.now().toString(36), h = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a };
+    const r = await fetch(`${BASE}/revista/${encodeURIComponent(nid)}?key=${F.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: fieldsOf(o) }) });
+    if (!r.ok) throw new Error(r.status === 403 ? 'AUTH' : 'NET');
+    await fetch(`${BASE}/revista/${encodeURIComponent(id)}?key=${F.apiKey}`, { method: 'DELETE', headers: h });
+    CACHE.ok = null; $('#modal').hidden = true; $('#modal').innerHTML = ''; await vRevista(); openArt(nid);
+    toast('✨ Listo: su PDF ya trae el Resumen y el Abstract en inglés.', 4500);
+  } catch (x) { bt.disabled = false; bt.textContent = t0; toast(x.message === 'IA' ? '🤖 Molí no pudo ahora. Intenta en un minuto.' : x.message === 'AUTHT' || x.message === 'AUTH' ? '🔐 Conecta tu cuenta de docente en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo. Revisa tu internet.', 4500); }
+}
 async function openArt(id) {
   const M = $('#modal'); M.hidden = false; M.innerHTML = '<div class="art"><div class="load">📖 Abriendo…</div></div>';
   let w = [...(CACHE.ok || []), ...(CACHE.pend || [])].find(x => x.id === id);
@@ -1440,7 +1481,7 @@ async function openArt(id) {
   ${w.st === 'ok' ? '<button type="button" class="btn soft pdfb" data-pdf>📄 Descargar investigación (PDF)</button>' : ''}
   ${staff ? (own && !ROLE.t ? '<div class="tip">🙈 Este es tu propio trabajo: lo revisará otro Revisor o tu profe.</div>' : miSec(w) ? `<div class="tip">👀 Este trabajo es de tu sección (${MI_G} ${esc(ROLE.rs)}): puedes leerlo, pero lo revisará un Revisor de otra sección o tu profe.</div>` : `<div class="acts"><textarea id="rvFb" maxlength="500" placeholder="Comentario (opcional). Ej.: ¡Buen trabajo! Agrega una foto de tu experimento."></textarea>
     <button type="button" class="btn go" data-rv="ok">✅ Publicar en la revista</button><button type="button" class="btn soft" data-rv="no">✏️ Devolver (se borra)</button>${ROLE.t ? '<button type="button" class="btn red" data-rv="del">🗑 Borrar</button>' : ''}</div>`) : ''}
-  ${ROLE.t && w.st === 'ok' && TAB === 'revista' ? '<div class="acts"><button type="button" class="btn soft" data-rv="pend">↩️ Quitar de la revista</button><button type="button" class="btn red" data-rv="del">🗑 Borrar</button></div>' : ''}
+  ${ROLE.t && w.st === 'ok' && TAB === 'revista' ? `<div class="acts"><button type="button" class="btn blue" data-resia>✨ ${tieneRes(w.d) ? 'Rehacer' : 'Escribir'} Resumen y Abstract</button><button type="button" class="btn soft" data-rv="pend">↩️ Quitar de la revista</button><button type="button" class="btn red" data-rv="del">🗑 Borrar</button></div>` : ''}
   </div></article>`;
   M.dataset.id = id; M._w = w;
 }
@@ -1452,6 +1493,7 @@ $('#modal').addEventListener('click', async e => {
   if (e.target.closest('[data-smacc]')) return aceptarSim(e.target.closest('[data-smacc]'));
   if (e.target.closest('[data-smcons]')) { const ta = $('#rvFb'), r = SIM.w && SIM.res[SIM.w.id]; if (ta && r) { ta.value = smConsejo(SIM.w, blanco(r)); ta.dataset.sug = '_'; ta.focus(); toast('✨ Consejo listo: puedes cambiarlo antes de devolver.'); } return; }
     if (e.target.closest('[data-pdf]')) { const w = M._w; if (w && window.pdfTrabajo) pdfTrabajo(w); return; }
+  if (e.target.closest('[data-resia]')) return resumenPublicado(M.dataset.id, e.target.closest('[data-resia]'));
   const b = e.target.closest('[data-rv]'); if (!b) return;
   const id = M.dataset.id, rej = b.dataset.rv === 'rej', act = rej ? 'no' : b.dataset.rv; let fb = ($('#rvFb') || {}).value ? $('#rvFb').value.trim() : '';
   const borra = act === 'del';                                        // al devolver se queda (sin su Word) para que el estudiante lea el consejo en «Mis envíos»
@@ -1499,6 +1541,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610171230"></script><script src="archivos.js?v=202610161340"></script><script src="mando.js?v=202610161340"></script>
+<script src="pdftrabajo.js?v=202610171500"></script><script src="archivos.js?v=202610161340"></script><script src="mando.js?v=202610161340"></script>
 </body>
 </html>

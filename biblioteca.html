@@ -153,7 +153,7 @@
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="moli3d.js?v=202610161340"></script>
-<script src="pdftrabajo.js?v=202610171230"></script>
+<script src="pdftrabajo.js?v=202610171500"></script>
 <script>
 (function () {
 'use strict';
@@ -618,7 +618,8 @@ renderer.domElement.addEventListener('pointerup', e => {
 function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = colDe(t), ty = TIPOS[t.ty] || TIPOS.inv, d = String(t.d || '').trim();
   const fecha = t.at ? new Date(t.at).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const L = $('#libro'); L.style.setProperty('--c', col);
-  const parr = d.split(/\n+/).map(x => x.trim()).filter(Boolean);
+  const m = /\n*PASO\s*\d*\s*Resumen\b[\s\S]*$/i.exec(d), cuerpo = m ? d.slice(0, m.index) : d;              // ✨ Resumen y Abstract (Word): van primero en el libro
+  const parr = [...(m ? m[0].trim().split(/\n+/) : []), ...cuerpo.split(/\n+/)].map(x => x.trim()).filter(Boolean);
   const lnk = h => h.replace(/https:\/\/[^\s<]+/g, u => `<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
   let cap = 1; const texto = parr.length ? parr.map(x => /^PASO\b/.test(x) ? ((h) => h ? `<h3 class="sub">${esc(h)}</h3>` : '')(x.replace(/^PASO\s*\d*\s*/, '')) : /^Fuente \d/.test(x) ? `<p class="fu"><b>${esc(x)}</b></p>` : cap-- > 0 ? `<p><span class="cap">${esc(x[0])}</span>${lnk(esc(x.slice(1)))}</p>` : `<p>${lnk(esc(x))}</p>`).join('') : `<p>${t.kw ? 'Trata sobre: <b>' + esc(t.kw) + '</b>.' : 'Este trabajo no trae texto.'}</p>`;
   const izq = `<div class="pg l"><h2>${esc(t.t || 'Trabajo')}</h2><div class="meta"><span>${ty[0]} ${esc(ty[1])}</span><span>📰 Revista Innovadora</span></div>

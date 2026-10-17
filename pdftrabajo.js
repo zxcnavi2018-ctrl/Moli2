@@ -11,6 +11,10 @@
     .then(r => r.ok ? r.json() : null).then(j => { const G = j && j.fields && j.fields.tchG && j.fields.tchG.mapValue.fields || {}; Object.values(G).forEach(v => { const [e, n] = String(v.stringValue).split('|'); if (e === 'c7' && n) P7.n = n; }); }).catch(() => {});
   const grado = w => +w.g === 7 || (!+w.g && window.MD && MD.espInfo && MD.espInfo().k === 'c7') ? 7 : 6;
   const profe = w => grado(w) === 7 ? P7.n || 'Docente de 7.° grado' : 'Christian Quispe Llerena';
+  // ✨ Resumen y Abstract escritos aparte para trabajos ya publicados que llegaron en Word (antes de que Molí los escribiera solo)
+  const FIJO = { 'ke61a1080d4e6873e9fb7-mvbskrdm': {
+    s: 'Mariana investigó qué diferencia a una enfermedad contagiosa de una que no lo es. Con información de la Organización Mundial de la Salud, explica que la gripe se transmite por virus al hablar, toser o estornudar, mientras que la diabetes y las enfermedades cardiovasculares no se contagian y se relacionan con la genética y los hábitos de vida. Concluye que la higiene, las vacunas, una buena alimentación y el ejercicio ayudan a prevenirlas.',
+    a: 'Mariana investigated the difference between a contagious disease and one that is not. Using information from the World Health Organization, she explains that the flu is spread by viruses when people talk, cough or sneeze, while diabetes and cardiovascular diseases are not contagious and are linked to genetics and lifestyle habits. She concludes that hygiene, vaccines, a healthy diet and exercise help prevent them.' } };
   const fecha = v => { const d = v ? new Date(v) : null; return d && !isNaN(d) ? d.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; };
   const anio = w => { const d = new Date(w.at || Date.now()); return isNaN(d) ? new Date().getFullYear() : d.getFullYear(); };
   // ---- la guía (PASO …) en partes de un artículo ----
@@ -19,7 +23,7 @@
     for (const x of L) {
       if (/^PASO\b/.test(x)) { const t = x.replace(/^PASO\s*\d*\s*/, '').trim(); enF = /fuentes/i.test(t); fu = null;
         salta = /revisa y publica/i.test(t); if (salta) { cur = null; continue; }
-        if (!enF) { cur = { t, k: /resumen/i.test(t) ? 's' : /respuesta|conclusi/i.test(t) ? 'r' : /pregunta|tema/i.test(t) ? 'q' : /encontr|desarrollo|razones|datos|ciencia/i.test(t) ? 'h' : 'o', p: [] }; S.push(cur); } continue; }
+        if (!enF) { cur = { t, k: /^abstract/i.test(t) ? 'a' : /resumen/i.test(t) ? 's' : /respuesta|conclusi/i.test(t) ? 'r' : /pregunta|tema/i.test(t) ? 'q' : /encontr|desarrollo|razones|datos|ciencia/i.test(t) ? 'h' : 'o', p: [] }; S.push(cur); } continue; }
       if (enF) { if (/^Fuente\s*\d/i.test(x)) { fu = {}; F.push(fu); continue; }
         const m = /^(Autor o página|Año|Tema|Título|Link):\s*(.*)$/i.exec(x); if (m && fu) fu[{ 'autor o página': 'a', 'año': 'y', 'tema': 't', 'título': 't', 'link': 'l' }[m[1].toLowerCase()]] = m[2]; continue; }
       if (salta || /^(si|x|✓|☑|☐)(\s|$)/i.test(x)) continue;
@@ -33,10 +37,11 @@
   const apellido = n => { const p = String(n || '').trim().split(/\s+/); return p.length >= 3 ? p[p.length - 2] : p[p.length - 1] || ''; };
   const lnk = h => h.replace(/https?:\/\/[^\s<]+/g, u => `<span class="url">${u}</span>`);
   function html(w) {
-    const P = partes(w), q = P.S.find(s => s.k === 'q'), r = P.S.find(s => s.k === 'r'), su = P.S.find(s => s.k === 's'), rest = P.S.filter(s => s !== q && s !== r && s !== su);
+    const P = partes(w), q = P.S.find(s => s.k === 'q'), r = P.S.find(s => s.k === 'r'), su = P.S.find(s => s.k === 's'), ab = P.S.find(s => s.k === 'a'), rest = P.S.filter(s => s !== q && s !== r && s !== su && s !== ab);
     const kws = String(w.kw || '').split(',').map(x => x.trim()).filter(Boolean), A = [w.img, w.img2, w.img3].filter(Boolean), y = anio(w);
     const ref = x => `${esc(x.a || 'Autor desconocido')}. (${esc(x.y || 's. f.')}). <i>${esc(x.t || 'Sin título')}</i>.${x.l ? ` Recuperado de <span class="url">${esc(x.l)}</span>` : ''}`;
-    const res0 = (su ? su.p.join(' ') : [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ')).split(/\s+/).filter(Boolean), resumen = !su && res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');   // como en las revistas: corto
+    const fx = !su && FIJO[w.id], abT = ab ? ab.p.join(' ') : fx ? fx.a : '';
+    const res0 = (fx ? fx.s : su ? su.p.join(' ') : [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ')).split(/\s+/).filter(Boolean), resumen = !su && !fx && res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');   // como en las revistas: corto
     let n = 0; const sec = (t, ps) => `<h2>${++n}. ${esc(t)}</h2>${ps.map(x => `<p>${lnk(esc(x))}</p>`).join('')}`;
     const cuerpo = (q ? sec('Pregunta de investigación', q.p) : '') + rest.map(s => sec(s.k === 'h' ? (rest.length === 1 ? 'Desarrollo' : s.t) : s.t || 'Desarrollo', s.p)).join('') + (r ? sec('Conclusión', r.p) : '');
     const cita = w.sec ? `${apellido(w.n)} (${y})` : `${String(w.n || '').split(/\s+/).pop()} (${y})`;
@@ -50,7 +55,7 @@ h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0
 .ft { margin-top: 24px; border-top: 1px solid #999; padding-top: 4px; font: 9pt Arial, "Liberation Sans", sans-serif; color: #555; display: flex; justify-content: space-between; gap: 10px; }</style></head><body>
 <div class="hd"><span>REVISTA INNOVADORA · Repositorio Educativo</span><span>${esc(TIPO[w.ty] || 'Trabajo')} · Vol. 1 · ${y}</span></div>
 <h1>${esc(w.t || 'Trabajo')}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `${grado(w)}.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
-${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}</div>` : ''}
+${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}${abT ? `<br><br><b>Abstract.</b> <i>${esc(abT)}</i>` : ''}</div>` : ''}
 ${cuerpo || '<p>Este trabajo no trae texto.</p>'}
 ${P.F.length ? `<div class="refs"><h2>Referencias</h2>${P.F.map(x => `<p>${ref(x)}</p>`).join('')}</div>` : w.f ? `<div class="refs"><h2>Referencias</h2><p>${lnk(esc(w.f))}</p></div>` : ''}
 ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc(x)}" alt=""><small>Anexo ${i + 1}</small></div>`).join('')}` : ''}
