@@ -133,6 +133,11 @@
   #mGlobo form button { border: 0; border-radius: 999px; padding: 9px 14px; background: #6b2f2f; color: #ffe7a3; font: 900 14px Nunito, sans-serif; cursor: pointer; }
   #mGlobo .rs { margin-top: 8px; max-height: 210px; overflow: auto; display: grid; gap: 5px; } #mGlobo .rs button { text-align: left; border: 1.5px solid #e2c48a; background: #fff; border-radius: 12px; padding: 7px 10px; font: 800 14px Nunito, sans-serif; color: #3b2414; cursor: pointer; } #mGlobo .rs button:hover { background: #fdf0d2; }
   #mGlobo .rs small { display: block; color: #8a6a44; font-weight: 700; font-size: 12px; } #mGlobo .nada { color: #8a6a44; font-size: 14px; margin-top: 8px; }
+  #edLibro { position: fixed; inset: 0; z-index: 14; display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(10,6,3,.72); }
+  #edLibro form { width: min(820px, 100%); max-height: calc(100vh - 28px); overflow: auto; background: #fbf1da; border: 3px solid #9c7a3c; border-radius: 14px; padding: 18px 20px; color: #3b2414; box-shadow: 0 30px 80px rgba(0,0,0,.6); font-family: Nunito, sans-serif; }
+  #edLibro h3 { margin: 0 0 6px; font: 800 20px Cinzel, serif; color: #7a2a22; } #edLibro .ay { margin: 0 0 10px; font-size: 13.5px; }
+  #edLibro label { display: block; font-weight: 800; font-size: 13px; margin: 8px 0 3px; } #edLibro input, #edLibro textarea { width: 100%; padding: 8px 10px; border: 1.5px solid #c9a96a; border-radius: 8px; background: #fffaf0; font: 600 14.5px/1.5 Nunito, sans-serif; color: #3b2414; }
+  #edLibro .bt { display: flex; gap: 8px; justify-content: flex-end; position: sticky; bottom: -18px; background: #fbf1da; padding: 10px 0 2px; } #edLibro .bt button { border: 0; border-radius: 999px; padding: 10px 18px; font: 900 14px Nunito, sans-serif; background: #e9d9b5; color: #3b2414; cursor: pointer; } #edLibro .bt .ok { background: #6b2f2f; color: #ffe7a3; }
 </style>
 </head>
 <body>
@@ -153,7 +158,7 @@
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="moli3d.js?v=202610161340"></script>
-<script src="pdftrabajo.js?v=202610171630"></script>
+<script src="pdftrabajo.js?v=202610171700"></script>
 <script>
 (function () {
 'use strict';
@@ -626,7 +631,7 @@ function abrirLibro(t) { cerrarTapa(); sonar('abrir'); const col = colDe(t), ty 
       ${t.th || t.img ? `<img class="foto" src="${esc(t.img || t.th)}" alt="Foto del trabajo">` : `<div style="font-size:90px;text-align:center;margin:20px 0">${ty[0]}</div>`}
       ${t.kw ? `<p class="fu">🔑 ${esc(t.kw)}</p>` : ''}
       <div class="autor"><i>${esc(String(t.n || '?').split(' ').slice(0, 2).map(x => x[0] || '').join(''))}</i><div><b>${esc(t.n || '')}</b><small>${t.sec ? '6.° ' + esc(t.sec) : esMoli(t) ? '🧪 Práctica de los Revisores' : 'Docente'}${fecha ? ' · ' + esc(fecha) : ''}</small></div></div>${t.rv ? `<p class="rvd">✔ Revisado por ${esc(t.rv)}</p>` : ''}
-      <button type="button" class="pdf" data-pdf>📄 Descargar investigación (PDF)</button>${DOCENTE && t.id && !String(t.id).startsWith('demo') ? '<button type="button" class="borrar" data-del>🗑 Eliminar libro</button>' : ''}</div>`;
+      <button type="button" class="pdf" data-pdf>📄 Descargar investigación (PDF)</button>${DOCENTE && t.id && !String(t.id).startsWith('demo') ? '<button type="button" class="pdf" data-edl>✏️ Editar libro</button><button type="button" class="borrar" data-del>🗑 Eliminar libro</button>' : ''}</div>`;
   const der = `<div class="pg r">${texto}${t.f ? `<h3 class="sub">📚 Fuentes</h3><p class="fu">${esc(t.f)}</p>` : ''}<span class="sello">REVISTA INNOVADORA ✦ APROBADO</span></div>`;
   const pintar = () => { const A = [t.img, t.img2, t.img3].filter(Boolean), hojas = [[izq, der]];
     if (A.length) hojas.push([`<div class="pg l"><h2>📎 Anexos</h2><p class="fu">Fotos y evidencias del trabajo.</p>${A.slice(0, 1).map((x, i) => `<figure class="anx"><img class="foto" src="${esc(x)}" alt=""><figcaption>Anexo ${i + 1}</figcaption></figure>`).join('')}</div>`,
@@ -654,12 +659,46 @@ async function eliminarLibro(t, btn) {                                       // 
     TRABAJOS = TRABAJOS.filter(x => x.id !== t.id); cerrarLibro(); ponerLibros(); aviso('🗑 Libro eliminado de la Biblioteca y de la Revista.', 3.5);
   } catch (er) { btn.disabled = false; btn.textContent = '🗑 Eliminar libro'; aviso(er.message === 'AUTH' ? '🔐 Conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo eliminar. Revisa tu internet.', 4.5); }
 }
+// ---- ✏️ la docente arregla un libro (título, palabras clave y texto). Las reglas no dejan cambiar el texto de un trabajo publicado:
+//      se crea una copia con los arreglos (todo lo demás igual) y luego se borra la vieja.
+async function editarLibro(t, btn) {
+  btn.disabled = true; let w;
+  try { const j = await (await fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`)).json(); w = { id: t.id }; const dc = v => !v ? null : 'stringValue' in v ? v.stringValue : 'timestampValue' in v ? Date.parse(v.timestampValue) : 'integerValue' in v ? +v.integerValue : null; Object.entries(j.fields || {}).forEach(([k, v]) => w[k] = dc(v)); }
+  catch (e) { btn.disabled = false; return aviso('📶 No pude abrir el libro. Revisa tu internet.', 4); }
+  btn.disabled = false;
+  let d = String(w.d || ''); const fx = window.pdfFijo && pdfFijo[w.id]; if (fx && !/(^|\n)PASO[^\n]*resumen/i.test(d)) d += '\nPASO Mi resumen\n' + fx.s;   // su resumen viaja con el libro
+  const P = document.createElement('div'); P.id = 'edLibro';
+  P.innerHTML = `<form><h3>✏️ Editar libro</h3><p class="ay">Arregla lo que necesites y guarda. Las líneas que empiezan con <b>PASO</b> son los títulos de cada parte (Pregunta, Lo que encontré, Mi resumen…).</p>
+    <label>Título</label><input name="t" maxlength="100" value="${esc(w.t || '')}">
+    <label>Palabras clave (separadas por comas)</label><input name="kw" maxlength="200" value="${esc(w.kw || '')}">
+    <label>Texto del trabajo</label><textarea name="d" rows="16" maxlength="20000">${esc(d)}</textarea>
+    <div class="bt"><button type="button" data-x>Cancelar</button><button type="submit" class="ok">💾 Guardar cambios</button></div></form>`;
+  document.body.appendChild(P);
+  P.addEventListener('click', e => { if (e.target === P || e.target.closest('[data-x]')) P.remove(); });
+  P.querySelector('form').addEventListener('submit', async e => {
+    e.preventDefault(); const f = e.target, ok = f.querySelector('.ok'), nt = f.t.value.replace(/\s+/g, ' ').trim(), nk = f.kw.value.replace(/\s+/g, ' ').trim(), nd = f.d.value.trim();
+    if (nt.length < 4) return aviso('✏️ El título es muy corto.', 3); if (!nd) return aviso('✏️ El texto no puede quedar vacío.', 3);
+    ok.disabled = true; ok.textContent = '⏳ Guardando…';
+    try { const a = await token(); if (!a) throw new Error('AUTH');
+      const C = ['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'img', 'img2', 'img3', 'st', 'at', 'rv', 'rvAt', 'g', 'kw'], o = {};
+      C.forEach(k => { if (w[k] != null && w[k] !== '') o[k] = w[k]; }); Object.assign(o, { t: nt.slice(0, 100), d: nd.slice(0, 20000) }); if (nk) o.kw = nk.slice(0, 200); else delete o.kw;
+      const enc = v => v instanceof Date ? { timestampValue: v.toISOString() } : typeof v === 'number' ? { integerValue: String(v) } : { stringValue: String(v) };
+      ['at', 'rvAt'].forEach(k => { if (o[k]) o[k] = new Date(o[k]); });
+      const nid = o.k + '-' + Date.now().toString(36), h = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + a };
+      const r = await fetch(`${BASE}/revista/${encodeURIComponent(nid)}?key=${FB.apiKey}&currentDocument.exists=false`, { method: 'PATCH', headers: h, body: JSON.stringify({ fields: Object.fromEntries(Object.entries(o).map(([k, v]) => [k, enc(v)])) }) });
+      if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? 'AUTH' : 'RED');
+      await fetch(`${BASE}/revista/${encodeURIComponent(w.id)}?key=${FB.apiKey}`, { method: 'DELETE', headers: h }).catch(() => {});
+      const nuevo = { ...t, ...o, id: nid, at: +o.at || t.at, _full: 0 }; ['img', 'img2', 'img3'].forEach(k => delete nuevo[k]);
+      TRABAJOS = TRABAJOS.map(x => x.id === t.id ? nuevo : x); P.remove(); cerrarLibro(); ponerLibros(); setTimeout(() => abrirLibro(nuevo), 400); aviso('✅ Libro arreglado: también en la Revista y en su PDF.', 4);
+    } catch (er) { ok.disabled = false; ok.textContent = '💾 Guardar cambios'; aviso(er.message === 'AUTH' ? '🔐 Conecta tu cuenta en el aula (fotocheck → Conectar mi cuenta).' : '📶 No se pudo guardar. Revisa tu internet.', 4.5); }
+  });
+}
 async function pdfLibro(t, btn) {                                     // 📄 el trabajo en PDF (con su texto completo y anexos)
   if (!window.pdfTrabajo) return; const v = { ...t }, win = !t._full && window.pdfVentana ? pdfVentana() : null;   // la ventana se abre al toque (si no, el navegador la bloquea)
   if (t.id && !String(t.id).startsWith('demo') && !t._full) { btn.disabled = true; try { const j = await (await fetch(`${BASE}/revista/${encodeURIComponent(t.id)}?key=${FB.apiKey}`)).json(); ['img', 'img2', 'img3', 'd', 'f', 'kw'].forEach(k => { const x = j.fields && j.fields[k] && j.fields[k].stringValue; if (x) v[k] = x; }); } catch (e) {} btn.disabled = false; }
   pdfTrabajo(v, win);
 }
-$('#libro').addEventListener('click', e => { const pd = e.target.closest('[data-pdf]'); if (pd) return pdfLibro($('#libro')._t, pd); const dl = e.target.closest('[data-del]'); if (dl) return eliminarLibro($('#libro')._t, dl); const hp = e.target.closest('[data-hp]'); if (hp) { const L = $('#libro'); L._h = (L._h || 0) + +hp.dataset.hp; sonar('pasar'); L._pintar && L._pintar(); return; } if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
+$('#libro').addEventListener('click', e => { const pd = e.target.closest('[data-pdf]'); if (pd) return pdfLibro($('#libro')._t, pd); const dl = e.target.closest('[data-del]'); if (dl) return eliminarLibro($('#libro')._t, dl); const ed = e.target.closest('[data-edl]'); if (ed) return editarLibro($('#libro')._t, ed); const hp = e.target.closest('[data-hp]'); if (hp) { const L = $('#libro'); L._h = (L._h || 0) + +hp.dataset.hp; sonar('pasar'); L._pintar && L._pintar(); return; } if (e.target.id === 'libro' || e.target.closest('.cerrar')) cerrarLibro(); else if (e.target.matches('img.foto')) window.open(e.target.src, '_blank'); });
 
 // ---- avisos y sonidos suaves ----
 let avT = 0; function aviso(txt, s = 3) { const a = $('#aviso'); a.textContent = txt; a.classList.add('on'); clearTimeout(avT); avT = setTimeout(() => a.classList.remove('on'), s * 1000); }

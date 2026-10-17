@@ -15,6 +15,7 @@
   const FIJO = { 'ke61a1080d4e6873e9fb7-mvbskrdm': {
     s: 'En esta investigación quise saber qué diferencia hay entre una enfermedad contagiosa y una que no lo es. Encontré que la gripe se contagia por virus cuando una persona habla, tose o estornuda, mientras que la diabetes y las enfermedades del corazón no se transmiten y dependen de la genética y de los hábitos de vida. Por eso concluyo que con higiene, vacunas, buena alimentación y ejercicio podemos prevenirlas.',
     a: 'Mariana investigated the difference between a contagious disease and one that is not. Using information from the World Health Organization, she explains that the flu is spread by viruses when people talk, cough or sneeze, while diabetes and cardiovascular diseases are not contagious and are linked to genetics and lifestyle habits. She concludes that hygiene, vaccines, a healthy diet and exercise help prevent them.' } };
+  window.pdfFijo = FIJO;
   const fecha = v => { const d = v ? new Date(v) : null; return d && !isNaN(d) ? d.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; };
   const anio = w => { const d = new Date(w.at || Date.now()); return isNaN(d) ? new Date().getFullYear() : d.getFullYear(); };
   // ---- la guía (PASO …) en partes de un artículo ----
