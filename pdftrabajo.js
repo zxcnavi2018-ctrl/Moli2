@@ -19,7 +19,7 @@
   window.pdfFijo = FIJO;
   const CSS = `@page { size: A4; margin: 20mm 20mm 22mm; } * { box-sizing: border-box; } body { margin: 0; font: 11.5pt/1.6 "Times New Roman", "Liberation Serif", Georgia, serif; color: #111; }
 .hd { display: flex; justify-content: space-between; font: 9pt Arial, "Liberation Sans", sans-serif; color: #555; border-bottom: 1px solid #999; padding-bottom: 4px; }
-h1 { text-align: center; font: 700 20pt/1.25 "Times New Roman", "Liberation Serif", serif; margin: 26px 0 10px; } .au { text-align: center; font-size: 12.5pt; } .af { text-align: center; font-size: 10pt; color: #444; font-style: italic; margin-bottom: 16px; }
+h1 { text-align: center; font: 700 19pt/1.25 "Times New Roman", "Liberation Serif", serif; margin: 26px 0 10px; text-transform: uppercase; letter-spacing: .02em; } .au { text-align: center; font-size: 12.5pt; } .af { text-align: center; font-size: 10pt; color: #444; font-style: italic; margin-bottom: 16px; }
 .abs { border-top: 2px solid #111; border-bottom: 2px solid #111; padding: 10px 0; margin: 10px 0 16px; font-size: 10.5pt; text-align: justify; } .abs b { font-variant: small-caps; letter-spacing: .04em; }
 h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0 6px; font-variant: small-caps; letter-spacing: .04em; break-after: avoid; } p { margin: 0 0 8px; text-align: justify; text-indent: 1.2em; }
 .refs p { text-indent: -1.2em; padding-left: 1.2em; font-size: 10.5pt; } .url { word-break: break-all; color: #333; } .anx { margin-top: 12px; text-align: center; break-inside: avoid; } .anx img { max-width: 100%; max-height: 85mm; border: 1px solid #bbb; } .anx small { display: block; font-size: 9.5pt; color: #555; }
