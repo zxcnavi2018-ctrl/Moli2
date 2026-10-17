@@ -8,12 +8,12 @@
 // ===================================================================
 (function () {
   const { Libro, esc, L, IMG, cargando, nivelChip, temaDe, MODOS, hojaUnidades, fichaHtml, lk } = Hojas._;
-  const SECS = ['A', 'B', 'C', 'D'];
+  const SECS = ['A', 'B', 'C', 'D'], GN = () => MD.espInfo().gn;
   const LSd = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
   const PAV = ['', '1', '2', '3', '+4'], CONDK = ['', 'C', 'B', 'A', 'AD'];
   const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
   const errTxt = e => e && e.message === 'AUTH' ? '🔐 Conecta tu cuenta de docente: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No pude traer los datos. Revisa tu internet.';
-  const secBar = F => `<div class="secs w">${SECS.map(x => `<button class="sec${F.sec === x ? ' on' : ''}" data-a="sec" data-k="${x}">6° ${x}</button>`).join('')}</div>`;
+  const secBar = F => `<div class="secs w">${SECS.map(x => `<button class="sec${F.sec === x ? ' on' : ''}" data-a="sec" data-k="${x}">${GN()} ${x}</button>`).join('')}</div>`;
   const nomCorto = n => String(n || '').split(' ').slice(0, 3).join(' ');
   const pBool = v => Array.isArray(v) ? true : !!v;
 
@@ -25,10 +25,11 @@
     F.recargar = carga;
     F.hojas = () => {
       if (!F.listo) return [{ l: cargando(), r: '' }];
-      if (!F.u) return [hojaUnidades(titulo, icono, frase, F.me)];
+      if (!F.u) { const h = hojaUnidades(titulo, icono, frase, F.me); if (F.masUnidades) h.l += F.masUnidades(); return [h]; }
+      if (F.ed0) return F.ed0();                                         // un editor abierto (Exit ticket o misión nueva) no espera la lista de estudiantes
       const cab = `<div class="crumb w">${esc(F.u.icon || '📘')} Unidad ${esc(F.u.num)} · ${esc(F.u.title)}</div><h1 class="w">${icono} ${esc(titulo)}</h1>${secBar(F)}`;
       if (F.err) return [{ l: cab + `<p class="hand w">${F.err}</p><p class="center"><button class="bt" data-a="reint">Intentar otra vez</button></p>`, r: '' }];
-      if (!F.D) return [{ l: cab + cargando('Trayendo lo de 6° ' + F.sec + '…'), r: '' }];
+      if (!F.D) return [{ l: cab + cargando('Trayendo lo de ' + GN() + ' ' + F.sec + '…'), r: '' }];
       return F.paginas(cab);
     };
     F.atras = () => { if (F.u) { F.u = null; F.i = 0; F.pestana = null; } };
@@ -44,6 +45,11 @@
     F.iniciar = () => MD.cargar().then(() => MD.cargarMisiones().catch(() => {})).then(() => { F.listo = true; F.libro.pinta(true); }).catch(() => { F.listo = true; F.libro.pinta(true); });
     return F;
   }
+  const setP = (o, path, v) => { const k = path.split('.'); let x = o; k.slice(0, -1).forEach((p, i) => { if (x[p] == null) x[p] = /^\d+$/.test(k[i + 1]) ? [] : {}; x = x[p]; }); x[k[k.length - 1]] = v; };
+  const iaTxt = e => e && e.message === 'QUOTA' ? '⏳ Google está al límite. Intenta en un minuto.' : '🤖 Molí no pudo ahora. Intenta otra vez.';
+  const pubTxt = x => x && x.message === 'AUTH' ? 'Conecta tu cuenta de docente (fotocheck → Conectar mi cuenta).' : x && x.message === 'GRANDE' ? 'El contenido es muy grande.' : 'No se pudo publicar. Revisa tu internet.';
+  const resumenSes = (u, s, n) => `Unidad ${u.num}: ${u.title || ''}\nSesión ${n}: ${s.title || ''}\nMeta: ${s.meta || ''}\nCriterios: ${(s.criteria || []).filter(L).join('; ')}\nActividades:\n${(s.activities || []).filter(a => a && (L(a.title) || L(a.desc))).map((a, i) => `${i + 1}. ${a.title || ''}: ${a.desc || ''}`).join('\n')}`;
+  const mezclar = A => { for (let i = A.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [A[i], A[j]] = [A[j], A[i]]; } return A; };
   async function estDe(sec) { return (await Docente.estudiantes()).filter(s => s.section === sec); }
   const porEst = T => { const o = {}; T.forEach(t => { (o[t.student] = o[t.student] || {})[t.session] = t; }); return o; };
 
@@ -73,7 +79,7 @@
     const sc = est.map(e => { const N = sinT(e.name).split(/\s+/); let s = 0; Q.forEach(w => { let b = 0; N.forEach(n => { b = Math.max(b, n === w ? 3 : n.startsWith(w) && w.length >= 3 ? 2 : w.startsWith(n) && n.length >= 3 ? 1 : 0); }); s += b; }); return { e, s }; }).filter(x => x.s > 0).sort((a, b) => b.s - a.s);
     return sc.filter(x => x.s === (sc[0] || {}).s).map(x => x.e);
   }
-  const SECRE = /(?:^| )(?:sexto|6to|6 ?°?|seis)\s*(?:grado\s*)?(?:seccion\s*)?([abcd])(?= |$)/;
+  const SECRE = /(?:^| )(?:sexto|6to|6 ?°?|seis|s[eé]ptimo|7mo|7 ?°?|siete)\s*(?:grado\s*)?(?:seccion\s*)?([abcd])(?= |$)/;
   function leerOrden(txt, est, todos, sec) {                          // todos: estudiantes de 6° A-D; sec: la sección abierta
     const out = [];
     sinT(txt).split(/[,.;]| y luego | luego | despues | tambien /).map(x => x.trim()).filter(Boolean).forEach(pz => {
@@ -85,7 +91,7 @@
       const ms = quien.match(SECRE), sc = ms ? ms[1].toUpperCase() : sec; if (ms) quien = quien.replace(SECRE, ' ').trim();   // «Christian sexto C …»
       const grupo = sc === sec ? est : (todos || []).filter(e => e.section === sc);
       if (/(^| )(todos|todas|toda la clase|todo el salon)( |$)/.test(quien)) return grupo.forEach(e => out.push({ s: e.key, t: campo, v }));
-      const C = buscarEst(quien, grupo); out.push({ s: C[0] ? C[0].key : '', t: campo, v, oido: quien + (ms ? ' (6° ' + sc + ')' : ''), duda: C.length !== 1 });
+      const C = buscarEst(quien, grupo); out.push({ s: C[0] ? C[0].key : '', t: campo, v, oido: quien + (ms ? ' (' + GN() + ' ' + sc + ')' : ''), duda: C.length !== 1 });
     });
     return out;
   }
@@ -95,10 +101,10 @@
     Docente.estudiantes().then(L => { todos = L.filter(e => /^[A-D]$/.test(e.section)); }).catch(() => {});
     let V = document.getElementById('vozM'); if (V) V.remove(); V = document.createElement('div'); V.id = 'vozM'; document.body.appendChild(V);
     let filas = [], rec = null;
-    const opcEst = sel => ['A', 'B', 'C', 'D'].map(x => { const L = (x === F.sec ? est : todos.filter(e => e.section === x)); return L.length ? `<optgroup label="6° ${x}">${L.map(e => `<option value="${e.key}"${e.key === sel ? ' selected' : ''}>${esc(e.name)}${x === F.sec ? '' : ' · 6° ' + x}</option>`).join('')}</optgroup>` : ''; }).join('');
+    const opcEst = sel => ['A', 'B', 'C', 'D'].map(x => { const L = (x === F.sec ? est : todos.filter(e => e.section === x)); return L.length ? `<optgroup label="${GN()} ${x}">${L.map(e => `<option value="${e.key}"${e.key === sel ? ' selected' : ''}>${esc(e.name)}${x === F.sec ? '' : ' · 6° ' + x}</option>`).join('')}</optgroup>` : ''; }).join('');
     const buscaTodos = k => est.find(e => e.key === k) || todos.find(e => e.key === k);
     const pinta = (txt) => {
-      V.innerHTML = `<div class="vz"><div class="vz-h"><b>🎤 Dictar notas · Sesión ${n} · 6° ${esc(F.sec)}</b><button class="vz-x" data-v="x">✕</button></div>
+      V.innerHTML = `<div class="vz"><div class="vz-h"><b>🎤 Dictar notas · Sesión ${n} · ${GN()} ${esc(F.sec)}</b><button class="vz-x" data-v="x">✕</button></div>
         <p class="vz-tip">Di o escribe, por ejemplo: <i>«Chris conducta B»</i>, <i>«Ana participación 3»</i>, <i>«Luis trabajo en clase A»</i>, <i>«todos refuerzo realizado»</i>. Puedes decir varias seguidas, separadas con «luego».</p>
         <div class="vz-in"><input placeholder="Lo que dijiste aparece aquí…" value="${esc(txt || '')}"><button data-v="leer">Leer</button>${SR ? '<button class="vz-mic" data-v="mic">🎤 Hablar</button>' : ''}</div>
         ${SR ? '' : '<p class="vz-tip" style="color:#b45309">ℹ️ Este navegador no reconoce la voz (usa Chrome o tu celular). Puedes escribir la orden.</p>'}
@@ -149,7 +155,7 @@
     #vozM .vz-ok { background: #22c55e; color: #fff; border-color: #15803d; font-size: 16px; padding: 10px 18px; } #vozM .vz-ok:disabled { opacity: .5; }
     .bk .voz-b { margin: .4em 0; border: .15em solid #2b2547; border-radius: 999px; padding: .3em .9em; background: #ef4444; color: #fff; font: 900 .95em "Trebuchet MS", system-ui; cursor: pointer; box-shadow: 0 .2em 0 #2b2547; }`; document.head.appendChild(st); }
   function registro() {
-    const F = base('Registro', '📂', 'Elige la unidad: verás el registro de 6° A, B, C y D. Se llena solo con los Exit tickets; tú pones participación y conducta. ✏️');
+    const F = base('Registro', '📂', 'Elige la unidad: verás el registro de ' + GN() + ' A, B, C y D. Se llena solo con los Exit tickets; tú pones participación y conducta. ✏️');
     F.datos = async (u, sec) => {
       const [est, T, M, rm] = await Promise.all([estDe(sec), Docente.ticketsUnidad(u.key, sec), Docente.misionesTodos().catch(() => []), MD.refuerzoManual(u.key)]);
       const mp = {}; M.forEach(m => { mp[m.key] = m.p; });
@@ -188,7 +194,7 @@
         r: `<h2 class="w">🏁 Resumen de la unidad</h2><div class="rg rg-h w"><span class="rg-n">Estudiante</span><span class="rg-c">🎟️<i>Exit</i></span><span class="rg-c">✔<i>hechos</i></span><span class="rg-c">🛠️<i>Trabajo</i></span><span class="rg-c">🙋<i>Particip.</i></span><span class="rg-c">💪<i>Refuerzo</i></span></div>${res}` }];
       S.forEach(({ s, n }) => {
         const resp = D.est.filter(e => (D.byS[e.key] || {})[n]), pr = MD.promedio(resp.map(e => D.byS[e.key][n]));
-        H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · 6° ${F.sec}</div><div class="big w">Sesión ${n}</div><h2 class="w">${esc(temaDe(s, n))}</h2>${secBar(F)}
+        H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)} · ${GN()} ${F.sec}</div><div class="big w">Sesión ${n}</div><h2 class="w">${esc(temaDe(s, n))}</h2>${secBar(F)}
             <p class="hand w">🎟️ Exit ticket: <b>${resp.length} de ${D.est.length}</b> respondieron${pr ? ' · promedio ' + nivelChip(pr) : ''}.</p><p class="hand w">Toca la casilla de cada estudiante para poner su nota, o <b>⚡ Llenar</b> para ponerla a todos los que faltan.</p><button class="voz-b w" data-a="voz" data-n="${n}">🎤 Dictar notas</button>${F.llenando ? `<p class="hand w" style="color:#b45309">⏳ ${esc(F.llenando)}</p>` : ''}`,
           r: `<div class="rg rg-h w"><span class="rg-n">Sesión ${n}</span><span class="rg-c">🎟️<i>Exit</i></span>${['w', 'p', 'c', 'r'].map(t => `<span class="rg-c">${TNOM[t].split(' ')[0]}<i>${TCOR[t]}</i><button class="rg-q" data-a="llenar" data-t="${t}" data-n="${n}" title="Llenado rápido: lo mismo a todos los que faltan">⚡ Llenar</button></span>`).join('')}</div>`
             + (F.fill && F.fill.n === n ? `<div class="rg pick w"><span class="rg-n">⚡ ${TNOM[F.fill.t]}: poner a todos los que faltan</span>${OPS(F.fill.t).map(([v, tx]) => `<button class="rg-b" data-a="llenaTodos" data-v="${v}">${tx}</button>`).join('')}<button class="rg-b x" data-a="llenaTodos" data-v="0">✕</button></div>` : '')
@@ -242,23 +248,75 @@
       const u = F.u, D = F.D, S = MD.sesionesDe(u).filter(x => MD.preguntas(x.s).length);
       const fila = ({ s, n }, k) => { const R = D.est.filter(e => (D.byS[e.key] || {})[n]), pr = MD.promedio(R.map(e => D.byS[e.key][n]));
         return `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dcfce7;color:#166534">${n}</b><span class="rt"><b>Sesión ${n} · ${R.length}/${D.est.length}</b><small>${esc(temaDe(s, n))}</small></span>${pr ? nivelChip(pr) : ''}${lk(u.key, n)}</button>`; };
-      const H = [{ l: cab + `<p class="hand w">${D.est.length} estudiantes en 6° ${F.sec}.</p><p class="hand w">Toca una sesión para ver sus preguntas: las que están en rojo hay que <b>reforzarlas</b>. ⚠️</p>`,
-        r: `<h2 class="w">📋 Sesiones</h2>${S.length ? S.map(fila).join('') : '<p class="hand w">Esta unidad aún no tiene Exit tickets.</p>'}` }];
+      const H = [{ l: cab + `<p class="hand w">${D.est.length} estudiantes en ${GN()} ${F.sec}.</p><p class="hand w">Toca una sesión para ver sus preguntas: las que están en rojo hay que <b>reforzarlas</b>. ⚠️</p>`,
+        r: `<h2 class="w">📋 Sesiones</h2>${S.length ? S.map(fila).join('') : '<p class="hand w">Esta unidad aún no tiene Exit tickets.</p>'}
+          <h3 class="w">✏️ Crear o editar el Exit ticket</h3><p class="w">${MD.sesionesDe(u).map(({ s, n }) => `<button class="bt${MD.preguntas(s).length ? ' gr' : ''}" data-a="tedit" data-n="${n}" title="${esc(temaDe(s, n))}">S${n}${MD.preguntas(s).length ? ' ✓' : ' ➕'}</button>`).join(' ') || '<span class="hand">Primero crea tus sesiones en el cuaderno de sesiones.</span>'}</p>` }];
       S.forEach(({ s, n }) => {
         const qs = MD.preguntas(s), R = D.est.map(e => [e, (D.byS[e.key] || {})[n]]), hechos = R.filter(x => x[1]).map(x => x[1]);
         const dist = { AD: 0, A: 0, B: 0, C: 0 }; hechos.forEach(t => dist[MD.nivel(t).k]++);
         const ok = qs.map((q, k) => { const c = hechos.filter(t => (t.answers || []).length > k); return c.length ? pct(c.filter(t => t.answers[k] === true).length, c.length) : null; });
         const peor = ok.reduce((m, v, k) => v != null && (m < 0 || v < ok[m]) ? k : m, -1), pr = MD.promedio(hechos);
         const tot = hechos.length || 1;
-        H.push({ l: `<div class="crumb w">Unidad ${esc(u.num)} · 6° ${F.sec}</div><div class="big w">Sesión ${n}</div>${secBar(F)}
+        H.push({ l: `<div class="crumb w">Unidad ${esc(u.num)} · ${GN()} ${F.sec}</div><div class="big w">Sesión ${n}</div>${secBar(F)}
             <p class="hand w">Respondieron <b>${hechos.length} de ${D.est.length}</b>${pr ? ' · promedio ' + nivelChip(pr) + ' ' + pr.score + '%' : ''}</p>
             <div class="dist w">${['AD', 'A', 'B', 'C'].map(k => dist[k] ? `<i class="d${k}" style="flex:${dist[k]}">${k} ${dist[k]}</i>` : '').join('') || '<i class="d0" style="flex:1">Nadie aún</i>'}</div>
-            <h3 class="w">❓ Preguntas</h3>` + qs.map((q, k) => `<div class="qst w${ok[k] != null && ok[k] < 60 ? ' mal' : ''}${k === peor && hechos.length ? ' peor' : ''}"><b>P${k + 1}</b><span class="qt">${esc(q.q)}</span><span class="qb"><i style="width:${ok[k] || 0}%"></i></span><b>${ok[k] == null ? '—' : ok[k] + '%'}</b>${ok[k] != null && ok[k] < 60 ? '<small>⚠️ Reforzar</small>' : ''}${k === peor && hechos.length ? '<small>🔥 La más difícil</small>' : ''}</div>`).join(''),
+            <h3 class="w">❓ Preguntas <button class="mini" data-a="tedit" data-n="${n}">✏️ Editar</button></h3>` + qs.map((q, k) => `<div class="qst w${ok[k] != null && ok[k] < 60 ? ' mal' : ''}${k === peor && hechos.length ? ' peor' : ''}"><b>P${k + 1}</b><span class="qt">${esc(q.q)}</span><span class="qb"><i style="width:${ok[k] || 0}%"></i></span><b>${ok[k] == null ? '—' : ok[k] + '%'}</b>${ok[k] != null && ok[k] < 60 ? '<small>⚠️ Reforzar</small>' : ''}${k === peor && hechos.length ? '<small>🔥 La más difícil</small>' : ''}</div>`).join(''),
           r: `<h2 class="w">👥 Estudiantes</h2>` + R.sort((a, b) => (a[1] ? a[1].score / a[1].total : 2) - (b[1] ? b[1].score / b[1].total : 2)).map(([e, t]) => t
             ? `<div class="rg w"><span class="rg-n">${esc(nomCorto(e.name))}</span>${nivelChip(t)}<small>${t.score}/${t.total}</small><span class="dots">${(t.answers || []).map((b, k) => `<i class="${b ? 'si' : 'no'}" title="P${k + 1}"></i>`).join('')}</span></div>`
             : `<div class="rg off w"><span class="rg-n">${esc(nomCorto(e.name))}</span><small>⏳ Pendiente</small></div>`).join('') + `<p class="hand w"><small>🟢 correcta · 🔴 incorrecta (P1, P2, …)</small></p>` });
       });
       return H;
+    };
+    // ---- ✏️ el Exit ticket de una sesión: 5 preguntas con 4 opciones (Molí puede proponerlas) ----
+    const qVacia = () => ({ q: '', options: ['', '', '', ''], answer: 0, why: '' });
+    const tc = (path, val, ph) => `<input data-te="${path}" value="${esc(val || '')}" placeholder="${ph}">`;
+    function paginasTicket() {
+      const e = F.ted;
+      if (e.estado === 'cargando') return [{ l: cargando('Abriendo el Exit ticket…'), r: '' }];
+      if (e.estado === 'listo') return [{ l: `<img class="moli w" src="${IMG('estrellas')}" alt=""><h1 class="w">✅ ¡Publicado!</h1><p class="hand w">Tus estudiantes ya pueden responder el Exit ticket de la Sesión ${e.n} en su portafolio. 🎟️</p><p class="center"><button class="bt gr" data-a="tcerrar">‹ Volver</button></p>`, r: '' }];
+      const ocupado = e.estado === 'pensando' || e.estado === 'guardando';
+      const P = [`<div class="crumb">✏️ Exit ticket · Unidad ${esc(F.u.num)}</div>`, `<div class="big">Sesión ${e.n}</div>`, `<p class="hand">${esc(temaDe(e.s, e.n))}</p>`,
+        `<p class="center"><button class="bt or" data-a="tmoli"${ocupado ? ' disabled' : ''}>${e.estado === 'pensando' ? '🤖 Molí está pensando…' : '✨ Molí, propón las 5 preguntas'}</button></p>`];
+      e.qs.forEach((q, k) => P.push(`<div class="fld q-ed"><label>Pregunta ${k + 1} <button class="mini" data-a="tqrm" data-k="${k}">🗑️</button></label>${tc(`${k}.q`, q.q, 'Pregunta')}
+        ${[0, 1, 2, 3].map(i => `<div class="opt-ed"><input type="radio" name="tans${k}" data-te="${k}.answer" value="${i}"${+q.answer === i ? ' checked' : ''}>${tc(`${k}.options.${i}`, (q.options || [])[i], 'Opción ' + 'ABCD'[i])}</div>`).join('')}
+        ${tc(`${k}.why`, q.why, '💡 Por qué (se muestra al responder)')}</div>`));
+      P.push(`<p class="center"><button class="bt" data-a="tqadd">➕ Agregar pregunta</button></p>`,
+        `<div class="fld guardar"><p class="hand">${e.err ? '⚠️ ' + esc(e.err) : 'Marca con ⚪ la respuesta correcta de cada pregunta.'}</p><p class="center"><button class="bt gr" data-a="tguardar"${ocupado ? ' disabled' : ''}>${e.estado === 'guardando' ? 'Publicando…' : '💾 Guardar y publicar'}</button> <button class="bt" data-a="tcerrar">Cancelar</button></p></div>`);
+      return [{ l: P.join(''), r: null }];
+    }
+    const ESQ_TK = { type: 'OBJECT', required: ['qs'], properties: { qs: { type: 'ARRAY', items: { type: 'OBJECT', required: ['q', 'options', 'answer'], properties: { q: { type: 'STRING' }, options: { type: 'ARRAY', items: { type: 'STRING' } }, answer: { type: 'INTEGER' }, why: { type: 'STRING' } } } } } };
+    async function moliTicket(u, s, n) {
+      const I = MD.espInfo();
+      const R = await MD.pensar(`Eres una docente experta de ${I.area} de ${I.txt} en Perú. Escribe el EXIT TICKET de esta sesión: 5 preguntas de opción múltiple con 4 opciones cada una, de la más fácil a la más difícil, que evalúen la meta y lo que se hizo en las actividades. Preguntas de máximo 14 palabras; opciones cortas (máximo 6 palabras) y de largo parecido; las incorrectas son errores típicos de estudiantes de ${I.edad}. «answer» es el número (0 a 3) de la opción correcta y «why» explica en una frase corta por qué es la correcta. Todo en español sencillo.\n\n${resumenSes(u, s, n)}`, ESQ_TK);
+      const qs = ((R && R.qs) || []).filter(q => L(q.q) && Array.isArray(q.options) && q.options.length === 4 && q.options.every(L) && q.answer >= 0 && q.answer < 4).slice(0, 5)
+        .map(q => { const o = mezclar(q.options.map((t, i) => ({ t: String(t).trim(), ok: i === q.answer }))); return { q: String(q.q).trim(), options: o.map(x => x.t), answer: o.findIndex(x => x.ok), why: String(q.why || '').trim() }; });
+      if (!qs.length) throw new Error('IA'); return qs;
+    }
+    F.alPintar = el => { if (el._te) return; el._te = 1;
+      const fija = ev => { const t = ev.target, p = t.dataset && t.dataset.te; if (!p || !F.ted) return; setP(F.ted.qs, p, t.type === 'radio' ? +t.value : t.value); };
+      el.addEventListener('input', fija); el.addEventListener('change', fija); };
+    F.act2 = async (a, ds) => {
+      const e = F.ted;
+      if (a === 'tedit') { const n = +ds.n; F.ted = { n, s: {}, qs: [], estado: 'cargando' }; F.ed0 = paginasTicket; F.libro.pasar(1, () => { F.i = 0; });
+        try { const s = await MD.sesionCruda(F.u.key, n) || {}, Q = (s.ticket && s.ticket.questions) || [];
+          F.ted = { n, s, qs: Q.length ? Q.map(q => ({ q: q.q || '', options: [0, 1, 2, 3].map(i => (q.options || [])[i] || ''), answer: +q.answer || 0, why: q.why || '' })) : [0, 1, 2, 3, 4].map(qVacia), estado: '' }; }
+        catch (x) { F.ted = null; F.ed0 = null; alert(errTxt(x)); }
+        return F.libro.pinta(true); }
+      if (!e) return;
+      if (a === 'tqadd') { e.qs.push(qVacia()); return F.libro.pinta(false); }
+      if (a === 'tqrm') { e.qs.splice(+ds.k, 1); return F.libro.pinta(false); }
+      if (a === 'tmoli') { e.estado = 'pensando'; e.err = ''; F.libro.pinta(false);
+        try { e.qs = await moliTicket(F.u, e.s, e.n); e.estado = ''; } catch (x) { e.estado = ''; e.err = iaTxt(x); }
+        return F.libro.pinta(false); }
+      if (a === 'tguardar') {
+        const qs = e.qs.filter(q => L(q.q)).map(q => ({ q: q.q.trim(), options: q.options.map(o => o || ''), answer: +q.answer || 0, why: q.why || '' }));
+        if (qs.some(q => q.options.filter(L).length < 2 || !L(q.options[q.answer]))) { e.err = 'Cada pregunta necesita sus opciones y la respuesta correcta marcada.'; return F.libro.pinta(false); }
+        e.estado = 'guardando'; e.err = ''; F.libro.pinta(false);
+        try { await MD.publicar(units => { const u = units.find(x => x.key === F.u.key), s = u && u.sessions[e.n - 1]; if (!s) throw new Error('NOSES'); s.ticket = { ...(s.ticket || {}), questions: qs }; });
+          F.u = MD.unidades().find(x => x.key === F.u.key) || F.u; e.estado = 'listo'; }
+        catch (x) { e.estado = ''; e.err = pubTxt(x); }
+        return F.libro.pinta(false); }
+      if (a === 'tcerrar') return F.libro.pasar(-1, () => { F.ted = null; F.ed0 = null; F.i = 0; F.recargar(); });
     };
     return F;
   }
@@ -272,20 +330,97 @@
     const hechas = (m, p) => m.acts.filter(a => pBool((p || {})[a.id])).length;
     F.paginas = (cab) => {
       const D = F.D, ms = D.mis;
-      if (!ms.length) return [{ l: cab + '<p class="hand w">Esta unidad aún no tiene misiones de refuerzo.</p>', r: '' }];
-      const H = [{ l: cab + `<p class="hand w">${ms.length} misiones · ${D.est.length} estudiantes.</p><p class="hand w">${D.est.filter(e => ms.every(m => hechas(m, D.mp[e.key]) === m.acts.length)).length} completaron todas. 🏆</p>`,
+      if (!ms.length) return [{ l: cab + '<p class="hand w">Esta unidad aún no tiene misiones de refuerzo.</p>', r: crearBox() }];
+      const H = [{ l: cab + `<p class="hand w">${ms.length} misiones · ${D.est.length} estudiantes.</p><p class="hand w">${D.est.filter(e => ms.every(m => hechas(m, D.mp[e.key]) === m.acts.length)).length} completaron todas. 🏆</p>` + crearBox(),
         r: `<h2 class="w">👥 Avance</h2>` + D.est.map(e => { const c = ms.filter(m => hechas(m, D.mp[e.key]) === m.acts.length).length;
           return `<div class="rg w"><span class="rg-n">${esc(nomCorto(e.name))}</span><span class="qb"><i style="width:${pct(c, ms.length)}%"></i></span><b>${c}/${ms.length}</b><span>${c === ms.length ? '✅' : '⏳'}</span></div>`; }).join('') }];
       ms.forEach((m, j) => {
         const errs = m.acts.map(a => D.est.reduce((s, e) => { const v = (D.mp[e.key] || {})[a.id]; return s + (Array.isArray(v) ? +v[0] || 0 : 0); }, 0));
         const kp = errs.reduce((b, v, k) => v > (errs[b] || 0) ? k : b, 0), comp = D.est.filter(e => hechas(m, D.mp[e.key]) === m.acts.length).length;
-        H.push({ l: `<div class="crumb w">Misión ${j + 1} · Sesión ${m.ses.n} · 6° ${F.sec}</div><h1 class="w">💪 ${esc(m.t || 'Misión ' + (j + 1))}</h1>${secBar(F)}
+        H.push({ l: `<div class="crumb w">Misión ${j + 1} · Sesión ${m.ses.n} · ${GN()} ${F.sec}</div><h1 class="w">💪 ${esc(m.t || 'Misión ' + (j + 1))}</h1>${secBar(F)}
             <p class="hand w"><b>${comp} de ${D.est.length}</b> la completaron · ${m.acts.length} actividades.</p>
-            ${errs[kp] ? `<div class="box w">🔥 <b>Lo que más costó:</b><br><span class="hand">${esc(m.acts[kp].t || 'Actividad ' + (kp + 1))}</span> <small>(${errs[kp]} errores)</small></div>` : ''}`,
+            ${errs[kp] ? `<div class="box w">🔥 <b>Lo que más costó:</b><br><span class="hand">${esc(m.acts[kp].t || 'Actividad ' + (kp + 1))}</span> <small>(${errs[kp]} errores)</small></div>` : ''}
+            <p class="w"><button class="mini" data-a="mver" data-k="${j}">👀 Ver actividades</button> <button class="mini" data-a="mborrar" data-k="${j}">🗑️ Borrar misión</button></p>`,
           r: `<h2 class="w">👥 Estudiantes</h2>` + D.est.map(e => { const h = hechas(m, D.mp[e.key]);
             return `<div class="rg w${h ? '' : ' off'}"><span class="rg-n">${esc(nomCorto(e.name))}</span><span class="qb"><i style="width:${pct(h, m.acts.length)}%"></i></span><small>${h}/${m.acts.length}</small><span>${h === m.acts.length ? '✅ Cumplió' : h ? '⏳ Le falta' : '⬜ No empezó'}</span></div>`; }).join('') });
       });
       return H;
+    };
+    // ---- ✨ crear una misión con Molí: eliges la sesión y los juegos, la revisas y la publicas ----
+    const TIPOS = [['tf', '✅ Verdadero o falso'], ['mc', '🔤 Opción múltiple'], ['match', '🔗 Unir parejas'], ['fill', '✍️ Completar el texto'], ['order', '🔢 Ordenar pasos'], ['sort', '📦 Clasificar'], ['ws', '🔎 Sopa de letras']];
+    const TIT = { tf: 'Verdadero o falso', mc: 'Elige la respuesta', match: 'Une las parejas', fill: 'Completa el texto', order: 'Ordena los pasos', sort: 'Clasifica', ws: 'Sopa de letras' };
+    F.tipos = F.tipos || ['tf', 'mc', 'match', 'fill'];
+    function crearBox() {
+      const S = MD.sesionesDe(F.u);
+      if (!S.length) return '<p class="hand w">Primero crea tus sesiones en el cuaderno de sesiones.</p>';
+      return `<div class="box w"><b>✨ Crear misión con Molí</b><br><select class="mg-s">${S.map(({ s, n }) => `<option value="${n}">Sesión ${n} · ${esc(temaDe(s, n)).slice(0, 50)}</option>`).join('')}</select>
+        <div class="mg-t">${TIPOS.map(([k, t]) => `<label><input type="checkbox" value="${k}"${F.tipos.includes(k) ? ' checked' : ''}> ${t}</label>`).join(' ')}</div>
+        <button class="bt gr" data-a="mcrear">✨ ¡Molí, crea la misión!</button></div>`;
+    }
+    const resumenAct = x => x.ty === 'tf' ? x.qs.map(q => `${q[1] ? '✔️' : '❌'} ${q[0]}`) : x.ty === 'mc' ? x.qs.map(q => `${q.q} → ${q.o[q.a]}`) : x.ty === 'match' ? x.p.map(p => `${p[0]} ↔ ${p[1]}`)
+      : x.ty === 'fill' ? [x.tx.map(t => /^\{\d+\}$/.test(t) ? `[${x.w[+t.slice(1, -1)]}]` : t).join('')] : x.ty === 'order' ? x.it.map((t, i) => `${i + 1}. ${t}`) : x.ty === 'sort' ? x.it.map(p => `${p[0]} → ${x.g[p[1]]}`) : x.ty === 'ws' ? [x.w.join(' · ')] : [];
+    const verActs = m => m.acts.map(x => `<div class="fld"><label>${esc(TIPOS.find(t => t[0] === x.ty)[1])}</label>${resumenAct(x).map(t => `<p class="hand" style="margin:.15em 0">${esc(t)}</p>`).join('')}</div>`).join('');
+    function paginasMision() {
+      const g = F.mg;
+      if (g.estado === 'pensando') return [{ l: `<img class="moli w" src="${IMG('pensativa')}" alt="">` + cargando('🤖 Molí está creando la misión de la Sesión ' + g.n + '…'), r: '' }];
+      if (g.estado === 'listo') return [{ l: `<img class="moli w" src="${IMG('estrellas')}" alt=""><h1 class="w">✅ ¡Misión publicada!</h1><p class="hand w">Tus estudiantes ya la ven en su cuaderno de misiones. 💪</p><p class="center"><button class="bt gr" data-a="mcerrar">‹ Volver</button></p>`, r: '' }];
+      if (g.estado === 'ver') return [{ l: `<div class="crumb">💪 Misión · Sesión ${g.m.ses.n}</div><h2>${esc(g.m.t)}</h2>${verActs(g.m)}<p class="center"><button class="bt" data-a="mcerrar">‹ Volver</button></p>`, r: null }];
+      if (!g.m) return [{ l: `<h2 class="w">😕 ${esc(g.err || 'Molí no pudo crear la misión.')}</h2><p class="center"><button class="bt gr" data-a="motra">🔄 Intentar otra vez</button> <button class="bt" data-a="mcerrar">Cancelar</button></p>`, r: '' }];
+      return [{ l: `<div class="crumb">✨ Misión nueva · Sesión ${g.n}</div><h2>💪 ${esc(g.m.t)}</h2><p class="hand">Revísala: así la jugarán tus estudiantes.</p>${verActs(g.m)}
+        <div class="fld guardar"><p class="hand">${g.err ? '⚠️ ' + esc(g.err) : ''}</p><p class="center"><button class="bt gr" data-a="mpub"${g.estado === 'guardando' ? ' disabled' : ''}>${g.estado === 'guardando' ? 'Publicando…' : '💾 Publicar misión'}</button> <button class="bt or" data-a="motra">🔄 Otra</button> <button class="bt" data-a="mcerrar">Cancelar</button></p></div>`, r: null }];
+    }
+    const S_ = t => ({ type: t }), SA = { type: 'ARRAY', items: { type: 'STRING' } };
+    const ESQ_MS = { type: 'OBJECT', required: ['t'], properties: { t: S_('STRING'),
+      tf: { type: 'ARRAY', items: { type: 'OBJECT', required: ['s', 'v'], properties: { s: S_('STRING'), v: S_('BOOLEAN'), why: S_('STRING') } } },
+      mc: { type: 'ARRAY', items: { type: 'OBJECT', required: ['q', 'o', 'a'], properties: { q: S_('STRING'), o: SA, a: S_('INTEGER'), why: S_('STRING') } } },
+      match: { type: 'ARRAY', items: { type: 'OBJECT', required: ['a', 'b'], properties: { a: S_('STRING'), b: S_('STRING') } } },
+      fill: { type: 'OBJECT', properties: { texto: S_('STRING'), extra: SA } }, order: SA,
+      sort: { type: 'OBJECT', properties: { g: SA, it: { type: 'ARRAY', items: { type: 'OBJECT', required: ['t', 'g'], properties: { t: S_('STRING'), g: S_('INTEGER') } } } } }, ws: SA } };
+    const PIDE = { tf: '«tf»: 4 afirmaciones cortas (la mitad verdaderas), con «why» que explica en una frase.', mc: '«mc»: 3 preguntas con 4 opciones cortas en «o»; «a» es el número (0 a 3) de la correcta.',
+      match: '«match»: 5 parejas concepto (a) y su definición muy corta (b, máximo 6 palabras).', fill: '«fill»: un «texto» de 2 o 3 oraciones con 3 o 4 palabras clave entre corchetes [así], y 2 palabras de «extra» que confunden.',
+      order: '«order»: 4 o 5 pasos de un proceso de la sesión, en el orden correcto.', sort: '«sort»: 2 grupos en «g» y 6 elementos en «it» (g es el número del grupo, 0 o 1).', ws: '«ws»: 6 palabras clave de una sola palabra, sin tildes, de máximo 10 letras.' };
+    const cut = (t, n) => String(t == null ? '' : t).replace(/\s+/g, ' ').trim().slice(0, n);
+    function armar(R, tipos, n) {
+      const id = k => 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + k, A = [];
+      tipos.forEach((ty, k) => { const b = { id: id(k), ty, t: TIT[ty] };
+        if (ty === 'tf') { const qs = (R.tf || []).filter(x => L(x.s)).slice(0, 6).map(x => [cut(x.s, 160), !!x.v, cut(x.why, 160)]); if (qs.length >= 3) A.push({ ...b, qs }); }
+        if (ty === 'mc') { const qs = (R.mc || []).filter(x => L(x.q) && Array.isArray(x.o) && x.o.length === 4 && x.o.every(L) && x.a >= 0 && x.a < 4).slice(0, 4)
+          .map(x => { const o = mezclar(x.o.map((t, i) => ({ t: cut(t, 60), ok: i === x.a }))); return { q: cut(x.q, 160), o: o.map(z => z.t), a: o.findIndex(z => z.ok), why: cut(x.why, 160) }; }); if (qs.length >= 2) A.push({ ...b, qs }); }
+        if (ty === 'match') { const p = (R.match || []).filter(x => L(x.a) && L(x.b)).slice(0, 6).map(x => [cut(x.a, 40), cut(x.b, 60)]); if (p.length >= 3) A.push({ ...b, p }); }
+        if (ty === 'fill' && R.fill && L(R.fill.texto)) { const parts = String(R.fill.texto).split(/\[([^\]]+)\]/), tx = [], w = [];
+          parts.forEach((t, i) => { if (i % 2) { tx.push('{' + w.length + '}'); w.push(cut(t, 30)); } else if (t) tx.push(t); });
+          if (w.length >= 2) A.push({ ...b, tx, w, x: (R.fill.extra || []).filter(L).slice(0, 3).map(t => cut(t, 30)) }); }
+        if (ty === 'order') { const it = (R.order || []).filter(L).slice(0, 6).map(t => cut(t, 90)); if (it.length >= 3) A.push({ ...b, it }); }
+        if (ty === 'sort' && R.sort) { const g = (R.sort.g || []).filter(L).slice(0, 3).map(t => cut(t, 30)), it = (R.sort.it || []).filter(x => L(x.t) && x.g >= 0 && x.g < g.length).slice(0, 8).map(x => [cut(x.t, 40), x.g]);
+          if (g.length >= 2 && it.length >= 4) A.push({ ...b, g, it }); }
+        if (ty === 'ws') { const w = (R.ws || []).map(t => String(t).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-ZÑ]/g, '')).filter(t => t.length >= 3 && t.length <= 10).slice(0, 8); if (w.length >= 4) A.push({ ...b, w }); }
+      });
+      if (!A.length) throw new Error('IA');
+      return { t: cut(R.t, 60) || 'Misión de la sesión ' + n, ses: { u: F.u.key, n }, acts: A };
+    }
+    async function generar() {
+      const g = F.mg; g.estado = 'pensando'; g.m = null; g.err = ''; F.libro.pinta(false);
+      try { const I = MD.espInfo(), s = await MD.sesionCruda(F.u.key, g.n) || {};
+        const R = await MD.pensar(`Eres una docente experta de ${I.area} de ${I.txt} en Perú. Crea UNA misión de refuerzo (juegos cortos) para que estudiantes de ${I.edad} repasen esta sesión. «t» es un título corto y motivador (máximo 6 palabras). Llena SOLO estos juegos:\n${g.tipos.map(k => '- ' + PIDE[k]).join('\n')}\nTodo en español sencillo, correcto y sobre lo que se trabajó en la sesión.\n\n${resumenSes(F.u, s, g.n)}`, ESQ_MS);
+        g.m = armar(R || {}, g.tipos, g.n); g.estado = ''; }
+      catch (x) { g.estado = ''; g.m = null; g.err = iaTxt(x); }
+      F.libro.pinta(false);
+    }
+    F.act2 = async (a, ds, el) => {
+      if (a === 'mcrear') { const box = el.closest('.box'), n = +box.querySelector('.mg-s').value, tipos = [...box.querySelectorAll('.mg-t input:checked')].map(x => x.value);
+        if (!tipos.length) return alert('Elige al menos un juego.');
+        F.tipos = tipos; F.mg = { n, tipos }; F.ed0 = paginasMision; F.libro.pasar(1, () => { F.i = 0; }); return generar(); }
+      if (a === 'mver') { F.mg = { estado: 'ver', m: F.D.mis[+ds.k] }; F.ed0 = paginasMision; return F.libro.pasar(1, () => { F.i = 0; }); }
+      if (a === 'mborrar') { const m = F.D.mis[+ds.k]; if (!m || !confirm(`¿Borrar la misión «${m.t}»? Tus estudiantes ya no la verán.`)) return;
+        try { await MD.publicarMisiones(ms => { const i = ms.findIndex(x => x.acts && m.acts && x.acts[0] && x.acts[0].id === m.acts[0].id && x.ses && x.ses.n === m.ses.n && x.ses.u === m.ses.u); if (i >= 0) ms.splice(i, 1); });
+          F.i = 0; F.recargar(); } catch (x) { alert(pubTxt(x)); }
+        return F.libro.pinta(true); }
+      const g = F.mg; if (!g) return;
+      if (a === 'motra') return generar();
+      if (a === 'mpub') { g.estado = 'guardando'; g.err = ''; F.libro.pinta(false);
+        try { await MD.publicarMisiones(ms => { ms.push(g.m); }); g.estado = 'listo'; } catch (x) { g.estado = ''; g.err = pubTxt(x); }
+        return F.libro.pinta(false); }
+      if (a === 'mcerrar') return F.libro.pasar(-1, () => { F.mg = null; F.ed0 = null; F.i = 0; F.recargar(); });
     };
     return F;
   }
@@ -300,12 +435,15 @@
   function sesionesDoc() {
     const F = base('Sesiones', '📗', 'Elige la unidad. En cada sesión tienes «✏️ Editar sesión»: lo que cambies lo ven tus estudiantes en su cuaderno.');
     F.datos = async () => ({});
+    F.masUnidades = () => `<div class="box w"><b>➕ Nueva unidad</b><div class="hp-row"><input class="un-n" inputmode="numeric" maxlength="3" placeholder="N.°" style="width:4em"> <input class="un-t" maxlength="80" placeholder="Título de la unidad"></div>
+      <button class="bt gr" data-a="unew">➕ Crear unidad</button>${F.uerr ? `<p class="hand">⚠️ ${esc(F.uerr)}</p>` : ''}</div>`;
     F.paginas = () => {
       const u = F.u;
       if (F.ed) return paginasEditar();
       const S = MD.sesionesDe(u);
-      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Cuaderno de sesiones · ${S.length} sesiones</p>${Hojas._.docsUnidad(u)}`,
-        r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span>${lk(u.key, n)}</button>`).join('')}` }];
+      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · ${GN()}</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Cuaderno de sesiones · ${S.length} sesiones</p>${Hojas._.docsUnidad(u)}`,
+        r: `<h2 class="w">📑 Índice</h2>${S.map(({ s, n }, k) => `<button class="row w" data-a="ir" data-i="${k + 1}"><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${esc(temaDe(s, n))}</small></span>${lk(u.key, n)}</button>`).join('')}
+          <p class="center w"><button class="bt gr" data-a="snew"${F.creando ? ' disabled' : ''}>${F.creando ? 'Creando…' : '➕ Nueva sesión'}</button></p>` }];
       S.forEach(({ s, n }) => {
         const cr = (s.criteria || []).filter(L), acts = Hojas._.actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length;
         H.push({ l: `<div class="crumb w">${esc(u.icon || '📘')} Unidad ${esc(u.num)}</div><div class="big w">Sesión ${n}</div>${L(s.title) ? `<h2 class="w">${esc(s.title)}</h2>` : ''}
@@ -329,6 +467,9 @@
         `<div class="fld"><label>🎯 Meta de la sesión</label>${campo('meta', s.meta, 'Lo que lograrán hoy', 1)}</div>`,
         `<div class="fld"><label>✅ Criterios de éxito</label>${[0, 1, 2].map(k => campo('criteria.' + k, (s.criteria || [])[k], 'Criterio ' + (k + 1))).join('')}</div>`,
         `<div class="fld"><label>📏 Lo que se evalúa</label>${campo('rubric', s.rubric, 'Rúbrica', 1)}</div>`);
+      const up = e.up || {}, tiene = c => up[c] ? (up[c].id ? '✅ ' + esc(up[c].info.name) + ' (se publica al guardar)' : up[c].err ? '⚠️ ' + esc(up[c].err) : '⏳ Subiendo…') : (() => { const f = Hojas._.fichaDe ? Hojas._.fichaDe(s, c) : {}; return f.url || f.id ? '✅ Ya tiene' : 'Sin archivo'; })();
+      P.push(`<div class="fld"><label>📄 Ficha de la sesión (PDF)</label><input type="file" accept="application/pdf,.pdf" data-up="ficha"><small>${tiene('ficha')}</small>
+        <label>🏠 Tarea para la casa (PDF, opcional)</label><input type="file" accept="application/pdf,.pdf" data-up="tarea"><small>${tiene('tarea')}</small></div>`);
       [0, 1, 2].forEach(j => { const a = acts[j] || {};
         P.push(`<div class="fld act-ed"><label>🧪 Actividad ${j + 1} <select data-ed="activities.${j}.mode"><option value="individual"${a.mode !== 'group' ? ' selected' : ''}>👤 Individual</option><option value="group"${a.mode === 'group' ? ' selected' : ''}>👥 En equipo</option></select></label>
           ${campo(`activities.${j}.title`, a.title, 'Título de la actividad')}${campo(`activities.${j}.desc`, a.desc, 'Qué harán', 1)}
@@ -345,6 +486,10 @@
     }
     const setPath = (o, path, v) => { const k = path.split('.'); let x = o; k.slice(0, -1).forEach((p, i) => { if (x[p] == null) x[p] = /^\d+$/.test(k[i + 1]) ? [] : {}; x = x[p]; }); x[k[k.length - 1]] = v; };
     F.alPintar = el => { if (el._ed) return; el._ed = 1;
+      el.addEventListener('change', async ev => { const t = ev.target, c = t.dataset && t.dataset.up, f = t.files && t.files[0]; if (!c || !f || !F.ed) return;
+        const e = F.ed; e.up = e.up || {}; e.up[c] = {}; F.libro.pinta(false);
+        try { e.up[c] = await MD.subirArchivo(f); } catch (x) { e.up[c] = { err: x.message === 'GRANDE' ? 'El PDF pesa más de 12 MB.' : x.message === 'AUTH' ? 'Conecta tu cuenta de docente.' : 'No se pudo subir. Revisa tu internet.' }; }
+        F.libro.pinta(false); });
       el.addEventListener('input', ev => { const t = ev.target, p = t.dataset && t.dataset.ed; if (!p || !F.ed) return; setPath(F.ed.s, p, t.type === 'radio' ? +t.value : t.value); });
       el.addEventListener('change', ev => { const t = ev.target, p = t.dataset && t.dataset.ed; if (!p || !F.ed) return; setPath(F.ed.s, p, t.type === 'radio' ? +t.value : t.value); }); };
     F.act2 = async (a, ds, el) => {
@@ -353,6 +498,17 @@
       if (a === 'pdf') return Hojas._.abrirFicha(F.u, +ds.n, ds.c, el);
       if (a === 'udoc') return Hojas._.abrirDocU(F.u, ds.k, el);
       if (a === 'impficha') return Tarjetas.imprimirFicha(F.u, +ds.n);   // la ficha con su cierre y la tarjeta del Exit ticket   // tarjetas del Exit ticket para escanear
+      if (a === 'unew') { const box = el.closest('.box'), num = box.querySelector('.un-n').value, tit = box.querySelector('.un-t').value; F.uerr = '';
+        if (!String(num).trim()) { F.uerr = 'Escribe el número de la unidad.'; return F.libro.pinta(false); }
+        el.disabled = true; el.textContent = 'Creando…';
+        try { await MD.nuevaUnidad(num, tit); const u = MD.unidades().find(x => x.key === MD.esp() + 'unit' + String(num).replace(/[^0-9a-z]/gi, '').toLowerCase());
+          if (u) return F.libro.pasar(1, () => { F.u = u; F.i = 0; F.pestana = '📚 Unidades'; F.recargar(); }); }
+        catch (x) { F.uerr = x.message === 'YA' ? 'Ya existe una unidad con ese número.' : pubTxt(x); }
+        return F.libro.pinta(false); }
+      if (a === 'snew') { F.creando = true; F.libro.pinta(false);
+        try { await MD.nuevaSesion(F.u.key); F.u = MD.unidades().find(x => x.key === F.u.key) || F.u; const S = MD.sesionesDe(F.u); F.creando = false;
+          return F.act2('editar', { n: S[S.length - 1].n }); }
+        catch (x) { F.creando = false; alert(x.message === 'MUCHAS' ? 'La unidad ya tiene 30 sesiones.' : pubTxt(x)); return F.libro.pinta(false); } }
       if (a === 'editar') { const n = +ds.n; F.ed = { n, s: {}, estado: 'cargando' }; F.libro.pasar(1, () => { F.i = 0; });
         try { const s = await MD.sesionCruda(F.u.key, n); F.ed = { n, s: s || {}, estado: '' }; } catch (x) { F.ed = null; alert(errTxt(x)); }
         return F.libro.pinta(true); }
@@ -365,8 +521,13 @@
           x.mode = x.mode || 'individual'; x.title = x.title || ''; x.desc = x.desc || ''; });
         s.criteria = (s.criteria || []).map(c => c || ''); if (s.flipped) s.flipped.enabled = L(s.flipped.title) || L(s.flipped.desc);
         if (s.ticket && s.ticket.questions) s.ticket.questions = s.ticket.questions.filter(q => L(q.q)).map(q => ({ ...q, options: (q.options || []).map(o => o || ''), answer: +q.answer || 0 }));
+        const up = e.up || {}, arch = {};
+        if (up.ficha && up.ficha.id) { s.activities = s.activities || []; s.activities.forEach(x => { if (x) delete x.file; }); s.activities[0] = s.activities[0] || { title: '', desc: '', mode: 'individual' };
+          s.activities[0].file = up.ficha.id; delete s.pdf; arch[up.ficha.id] = up.ficha.info; }
+        if (up.tarea && up.tarea.id) { s.flipped = { ...(s.flipped || {}), file: up.tarea.id, enabled: true }; if (!L(s.flipped.title)) s.flipped.title = 'Tarea para la casa'; delete s.tareaPdf; arch[up.tarea.id] = up.tarea.info; }
+        if (Object.values(up).some(x => x && !x.id && !x.err)) { e.err = 'Espera a que termine de subir el PDF.'; return F.libro.pinta(false); }
         e.estado = 'guardando'; e.err = ''; F.libro.pinta(false);
-        try { await MD.guardarSesion(F.u.key, e.n, s); e.estado = 'listo'; F.libro.pasar(1, () => { F.i = 0; }); }
+        try { await MD.guardarSesion(F.u.key, e.n, s, Object.keys(arch).length ? arch : null); e.estado = 'listo'; F.libro.pasar(1, () => { F.i = 0; }); }
         catch (x) { e.estado = ''; e.err = x.message === 'AUTH' ? 'Conecta tu cuenta de docente (fotocheck → Conectar mi cuenta).' : x.message === 'GRANDE' ? 'El contenido es muy grande.' : 'No se pudo publicar. Revisa tu internet.'; F.libro.pinta(false); }
       }
     };
@@ -384,7 +545,7 @@
       const tot = Object.values(MD.LAB).reduce((a, b) => a + b, 0);
       host.innerHTML = `<div class="labd"><div class="labd-h"><img src="img/moli/feliz.webp" alt=""><div><b>🧪 Laboratorio de Molí</b><span>Avance de tus estudiantes</span></div>
         <button class="bt gr" data-l="jugar">▶ Abrir el laboratorio</button></div>
-        <div class="secs">${SECS.map(x => `<button class="sec${sec === x ? ' on' : ''}" data-l="sec" data-k="${x}">6° ${x}</button>`).join('')}</div>
+        <div class="secs">${SECS.map(x => `<button class="sec${sec === x ? ' on' : ''}" data-l="sec" data-k="${x}">${GN()} ${x}</button>`).join('')}</div>
         <div class="labd-t">${err ? `<p>${err}</p>` : !D ? '<p>Trayendo el avance…</p>' : !D.length ? '<p>No hay estudiantes en esta sección.</p>' : D.map(e => { const p = e.lab || {}, h = Object.keys(MD.LAB).reduce((a, k) => a + Math.min(MD.LAB[k], +p[k] || 0), 0);
           return `<div class="labd-r"><span class="rg-n">${esc(nomCorto(e.name))}</span><span class="qb"><i style="width:${pct(h, tot)}%"></i></span><b>${pct(h, tot)}%</b><span class="labd-j">${Object.keys(MD.LAB).map(k => `<i class="${(+p[k] || 0) >= MD.LAB[k] ? 'ok' : p[k] ? 'mid' : ''}" title="${JUEGOS[k]}: ${+p[k] || 0}/${MD.LAB[k]}">${JUEGOS[k].split(' ')[0]}</i>`).join('')}</span></div>`; }).join('')}</div>
         <p class="labd-p">⭐ Completo · ◐ empezado · los íconos son los 16 juegos del laboratorio.</p></div>`;

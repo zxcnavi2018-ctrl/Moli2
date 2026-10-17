@@ -6,7 +6,7 @@
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const L = t => MD.lleno(t);
   // ---- 🔒 candados de la docente: bloquea una unidad entera o una sesión (cuaderno, Exit tickets y misiones). Se guarda en files/fbloq-0 ----
-  const BQ = { u: {}, s: {} }, BQF = 'fbloq-0', LIBROS = [];
+  const BQ = { u: {}, s: {} }, BQF = MD.fid('fbloq'), LIBROS = [];
   const BQURL = () => `https://firestore.googleapis.com/v1/projects/${MD.FB.projectId}/databases/(default)/documents/files/${BQF}?key=${MD.FB.apiKey}`;
   const bqOn = (k, n) => n == null ? !!BQ.u[k] : !!BQ.s[k + ':' + n];
   const cerrado = (k, n) => !MD.esDocente() && (!!BQ.u[k] || (n != null && !!BQ.s[k + ':' + n]));     // sólo los estudiantes ven el candado cerrado
@@ -150,7 +150,7 @@
   // ---- elegir la unidad ----
   const hojaUnidades = (titulo, icono, frase, me) => {
     const U = MD.unidades();
-    return { l: `<img class="moli w" src="${IMG('feliz')}" alt=""><div class="crumb w">${me ? esc(me.name) + (me.docente ? ' · Docente' : ' · 6° ' + esc(me.section)) : 'Ciencia y Tecnología · 6°'}</div><h1 class="w">${icono} ${esc(titulo)}</h1><p class="hand w">${frase}</p>`,
+    return { l: `<img class="moli w" src="${IMG('feliz')}" alt=""><div class="crumb w">${me ? esc(me.name) + (me.docente ? ' · Docente' : ' · ' + MD.espInfo().gn + ' ' + esc(me.section)) : 'Ciencia y Tecnología · ' + MD.espInfo().gn}</div><h1 class="w">${icono} ${esc(titulo)}</h1><p class="hand w">${frase}</p>`,
       r: `<h2 class="w">📚 Elige tu unidad</h2>${U.length ? U.map(u => { const c = cerrado(u.key); return `<button class="row w${c ? ' off' : ''}" ${c ? 'disabled' : `data-a="unidad" data-k="${esc(u.key)}"`}><span class="ico" style="font-size:1.6em">${esc(u.icon || '📘')}</span><span class="rt"><b>Unidad ${esc(u.num)}</b><small>${c ? '🔒 Bloqueada por tu profe' : esc(u.title)}</small></span>${lk(u.key)}<span>${c ? '🔒' : '›'}</span></button>`; }).join('') : '<p class="hand w">Todavía no hay unidades visibles.</p>'}` };
   };
 
@@ -254,7 +254,7 @@
       if (!F.listo) return [{ l: cargando(), r: '' }];
       if (!F.u) return [hojaUnidades('Mis sesiones de unidad', '📗', `¡Hola${F.me ? ' ' + esc(nom1(F.me)) : ''}! Aquí está todo lo que aprendemos en cada clase. Elige tu unidad y pasa las hojas. ✏️`, F.me)];
       const u = F.u, S0 = MD.sesionesDe(u), S = S0.filter(x => !cerrado(u.key, x.n));
-      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · 6°</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Mi cuaderno de sesiones</p><p class="hand w">${S.length} ${S.length === 1 ? 'sesión' : 'sesiones'} · pasa la hoja ›</p>${docsUnidad(u)}`,
+      const H = [{ l: `<div class="crumb w">Ciencia y Tecnología · ${MD.espInfo().gn}</div><div class="ico w">${esc(u.icon || '📘')}</div><div class="big w">Unidad ${esc(u.num)}</div><h1 class="w">${esc(u.title)}</h1><p class="hand w">📗 Mi cuaderno de sesiones</p><p class="hand w">${S.length} ${S.length === 1 ? 'sesión' : 'sesiones'} · pasa la hoja ›</p>${docsUnidad(u)}`,
         r: `<h2 class="w">📑 Índice</h2>${S0.map(({ s, n }) => { const c = cerrado(u.key, n); return `<button class="row w${c ? ' off' : ''}" ${c ? 'disabled' : `data-a="ir" data-i="${S.findIndex(x => x.n === n) + 1}"`}><b class="lv" style="background:#dbeafe;color:#1d4ed8">${n}</b><span class="rt"><b>Sesión ${n}</b><small>${c ? '🔒 Bloqueada por tu profe' : esc(temaDe(s, n))}</small></span>${lk(u.key, n)}${c ? '🔒' : ''}</button>`; }).join('')}` }];
       S.forEach(({ s, n }) => {
         const cr = (s.criteria || []).filter(L), acts = actsDe(u, s).slice(0, 3).filter(a => L(a.title) || L(a.desc)), q = MD.preguntas(s).length, bb = esBebras(u, s);
@@ -392,7 +392,7 @@
         ${(tg => fila('🛠️', 'Trabajo en clase', 'El promedio de tu trabajo en equipo.', tg ? G(tg) : sin))(MD.promedio(S.map(({ n }) => T[MD.TRAB + n]).filter(Boolean)))}
         ${fila('🙋', 'Participación', 'Todas tus participaciones.', pq ? `<span class="lv" style="background:#e0f2fe;color:#075985">${pq}</span>` : sin)}
         ${cf ? fila('🤝', 'Conducta de la unidad', 'Cómo viviste las normas en la unidad.', conducta(cf)) : ''}`);
-      const H = [{ l: `<img class="moli w" src="${IMG('orgullosa')}" alt=""><div class="crumb w">${esc(F.me.name)} · 6° ${esc(F.me.section)}</div><h1 class="w">📂 Mis notas</h1><h2 class="w">${esc(u.icon || '📘')} Unidad ${esc(u.num)}: ${esc(u.title)}</h2>
+      const H = [{ l: `<img class="moli w" src="${IMG('orgullosa')}" alt=""><div class="crumb w">${esc(F.me.name)} · ${MD.espInfo().gn} ${esc(F.me.section)}</div><h1 class="w">📂 Mis notas</h1><h2 class="w">${esc(u.icon || '📘')} Unidad ${esc(u.num)}: ${esc(u.title)}</h2>
           <p class="hand w">Se llenan solas: tu Exit ticket al responderlo y lo que tu profe registra en clase.</p>
           <div class="box w"><small><b>🎟️ Exit ticket por sesión</b></small><br>${S.map(({ n }) => `<span title="Sesión ${n}" style="display:inline-flex;flex-direction:column;align-items:center;margin:.15em;font-size:.8em;color:#64748b">S${n}${T[n] ? nivelChip(T[n]) : '<span class="lv" style="background:#f1f5f9;color:#94a3b8">–</span>'}</span>`).join('')}</div>`, r: pags[0] || '' }];
       for (let k = 1; k < pags.length; k += 2) H.push({ l: pags[k], r: pags[k + 1] || `<p class="hand w" style="margin-top:40%">📂 Fin de tu folder de notas.</p>` });
@@ -553,7 +553,7 @@
   const cacheIA = k => { const C = MD.LS.get(k, null); return C ? limpiarIA(C) : null; };
   const hashQ = it => { const t = JSON.stringify([it.u.title, it.s.title, it.s.meta, actsDe(it.u, it.s).slice(0, 3).map(x => x && [x.title, x.desc]), it.prev && [it.prev.s.title, it.prev.s.meta]]); let h = 5381; for (let i = 0; i < t.length; i++) h = (h * 33 ^ t.charCodeAt(i)) >>> 0; return 'moli2:cv:' + h.toString(36); };
   // ---- 🎬 diapositivas de video que la docente añade entre las demás (botón + al pasar el mouse). Se guardan en files/fcvvid-0 ----
-  const CVF = 'fcvvid-0', CVV = { L: [], ok: false };
+  const CVF = MD.fid('fcvvid'), CVV = { L: [], ok: false };
   const CVURL = () => `https://firestore.googleapis.com/v1/projects/${MD.FB.projectId}/databases/(default)/documents/files/${CVF}?key=${MD.FB.apiKey}`;
   const cargarVideos = () => fetch(CVURL(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue;
     if (v) { const x = JSON.parse(decodeURIComponent(escape(atob(v)))); CVV.L = Array.isArray(x.L) ? x.L : []; } CVV.ok = true; }).catch(() => { CVV.ok = true; });
@@ -642,7 +642,7 @@
     async function pedirIA(it) {                                         // Molí piensa sus preguntas, la palabra nueva y el dato curioso (una vez por sesión)
       const k = hashQ(it); if (P.pide.has(k) || MD.LS.get(k, null)) return; P.pide.add(k);
       const s = it.s, acts = actsDe(it.u, s).slice(0, 3), A = { type: 'ARRAY', items: { type: 'STRING' } };
-      const pr = `Eres Molí, un robot amigable que acompaña a una docente de Ciencia y Tecnología de 6.° grado de primaria en Perú. Escribe preguntas que tú, Molí, harás en voz alta a las niñas y niños en una diapositiva gigante. Cada pregunta: corta (máximo 14 palabras), clara, abierta, en primera persona del plural («¿Qué observamos…?»), sin la respuesta dentro, con signos ¿?.
+      const pr = `Eres Molí, un robot amigable que acompaña a una docente de Ciencia y Tecnología de ${MD.espInfo().txt} en Perú. Escribe preguntas que tú, Molí, harás en voz alta a las niñas y niños en una diapositiva gigante. Cada pregunta: corta (máximo 14 palabras), clara, abierta, en primera persona del plural («¿Qué observamos…?»), sin la respuesta dentro, con signos ¿?.
 Unidad ${it.u.num}: «${it.u.title}».
 Sesión ${it.n}: «${s.title || ''}». Meta: «${s.meta || ''}».
 Criterios de éxito: ${(s.criteria || []).filter(L).map((c, i) => `${i + 1}) ${c}`).join(' | ') || '(no hay)'}.
@@ -668,7 +668,7 @@ Devuelve JSON:
     async function pedirSync(it) {
       const k = SYK(it); if (P.pide.has(k) || MD.LS.get(k, null)) return; P.pide.add(k);
       const s = it.s, acts = actsDe(it.u, s).slice(0, 3), tq = ((s.ticket && s.ticket.questions) || []).map(x => x && x.q).filter(L);
-      const pr = `Eres Molí, un robot amigable que acompaña a una docente de Ciencia y Tecnología de 6.° grado de primaria en Perú. Vas a jugar con las niñas y niños a «mano izquierda o mano derecha»: en una diapositiva gigante sale una pregunta y dos respuestas, una a cada lado, y levantan la mano del lado de la respuesta correcta.
+      const pr = `Eres Molí, un robot amigable que acompaña a una docente de Ciencia y Tecnología de ${MD.espInfo().txt} en Perú. Vas a jugar con las niñas y niños a «mano izquierda o mano derecha»: en una diapositiva gigante sale una pregunta y dos respuestas, una a cada lado, y levantan la mano del lado de la respuesta correcta.
 Unidad ${it.u.num}: «${it.u.title}». Sesión ${it.n}: «${s.title || ''}». Meta: «${s.meta || ''}».
 Actividades de hoy:
 ${acts.map((x, j) => x && (L(x.title) || L(x.desc)) ? `${j + 1}) «${x.title || ''}»: ${x.desc || ''}` : `${j + 1}) (no hay)`).join('\n')}
@@ -831,7 +831,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       const tema = { cuaderno: 'ses', folder: 'exit', docente: 'notas', mision: 'mis' }[kind];
       Libro(host, tema, F); actual = F; F.iniciar && F.iniciar();
     },
-    _: { lk, docsUnidad, abrirDocU, actsDe, fotoHtml, esBebras, Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha },
+    _: { lk, docsUnidad, abrirDocU, actsDe, fotoHtml, esBebras, Libro, esc, L, IMG, cargando, nivelChip, temaDe, temaCorto, MODOS, hojaUnidades, fichaHtml, pdfs, abrirFicha, fichaDe },
     cerrar() { if (actual) { actual.libro && actual.libro.ro && actual.libro.ro.disconnect(); actual.cerrar && actual.cerrar(); actual = null; } }
   };
 })();

@@ -167,15 +167,15 @@
       let res;
       try { res = await Docente.crearTicket(x.u, x.n, e, ans); } catch (z) { return fin({ kind: 'warn', name: e.name, info: '📶 No se pudo guardar. Vuelve a pasar la tarjeta.' }, 3000); }
       const base = { key: e.key, name: e.name, sk: `${x.u.key}|${x.n}` };
-      if (res === 'dup') return fin({ kind: 'dup', ...base, info: `6° ${e.section} · U${x.u.num} S${x.n} · ya tenía este Exit ticket (no se cambió)${extra}` });
-      fin({ kind: 'ok', ...base, info: `6° ${e.section} · U${x.u.num} S${x.n} · nota guardada${extra}`, score: `${score}/${total}` });
+      if (res === 'dup') return fin({ kind: 'dup', ...base, info: `${MD.espInfo().gn} ${e.section} · U${x.u.num} S${x.n} · ya tenía este Exit ticket (no se cambió)${extra}` });
+      fin({ kind: 'ok', ...base, info: `${MD.espInfo().gn} ${e.section} · U${x.u.num} S${x.n} · nota guardada${extra}`, score: `${score}/${total}` });
     }
     function elegir(L, tres) { return new Promise(res => { const d = document.createElement('div'); d.className = 'sc-pick';
-      d.innerHTML = `<p><b>Hay ${L.length} estudiantes con DNI terminado en ${esc(tres)}.</b> ¿De quién es esta tarjeta?</p>${L.map((e, i) => `<button data-k="${i}">${esc(e.name)} · 6° ${esc(e.section)}</button>`).join('')}<button data-k="-1">Ninguno</button>`;
+      d.innerHTML = `<p><b>Hay ${L.length} estudiantes con DNI terminado en ${esc(tres)}.</b> ¿De quién es esta tarjeta?</p>${L.map((e, i) => `<button data-k="${i}">${esc(e.name)} · ${MD.espInfo().gn} ${esc(e.section)}</button>`).join('')}<button data-k="-1">Ninguno</button>`;
       d.addEventListener('click', ev => { const k = ev.target.closest('[data-k]'); if (!k) return; ev.stopPropagation(); d.remove(); res(L[+k.dataset.k] || null); });
       b.querySelector('.sc-ult').before(d); }); }
     function elegirTodos(T, tres, secL) { return new Promise(res => { const d = document.createElement('div'); d.className = 'sc-pick';
-      const fila = e => `<button data-k="${e.key}">${esc(e.name)} · 6° ${esc(e.section)} <small>DNI ••${esc(String(e.dni || '').slice(-3) || '???')}</small></button>`;
+      const fila = e => `<button data-k="${e.key}">${esc(e.name)} · ${MD.espInfo().gn} ${esc(e.section)} <small>DNI ••${esc(String(e.dni || '').slice(-3) || '???')}</small></button>`;
       const pinta = q => { const n = String(q || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''), L = T.filter(e => (!secL || n || e.section === secL) && (!n || String(e.name).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(n)));
         d.querySelector('.sc-pl').innerHTML = L.slice(0, 60).map(fila).join('') || '<small>Nadie con ese nombre.</small>'; };
       d.innerHTML = `<p><b>No encontré un DNI terminado en ${esc(tres)}${secL ? ` (sección ${esc(secL)})` : ''}.</b> Puede que el estudiante pintó mal un número. ¿De quién es esta tarjeta?</p><input class="sc-q" placeholder="🔎 Escribe su nombre…" autocomplete="off"><div class="sc-pl"></div><button data-k="-1">Ninguno (no guardar)</button>`;

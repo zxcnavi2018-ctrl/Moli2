@@ -112,7 +112,7 @@
   function fichaDoc(u, n, cual = 'ficha', conBoton = true) {
     const s = u.sessions[n - 1], fx = cual === 'tarea' ? s.tarea || (s.fx && s.fx.tarea) : s.fx; if (!fx) return '';
     const cr = (s.criteria || []).filter(x => String(x || '').trim()), hayT = cual === 'ficha' && MD.preguntas(s).length;
-    const uni = `Unidad ${u.num}${u.title ? ': ' + u.title : ''}`, cabI = `Ciencia y Tecnología · 6.° grado · ${uni}`, cabD = `Sesión ${n}${cual === 'tarea' ? ' · Tarea flipped' : ''}`;
+    const uni = `Unidad ${u.num}${u.title ? ': ' + u.title : ''}`, cabI = `Ciencia y Tecnología · ${MD.espInfo().gn.replace('°', '.°')} grado · ${uni}`, cabD = `Sesión ${n}${cual === 'tarea' ? ' · Tarea flipped' : ''}`;
     const q = t => '"' + String(t).replace(/["\\]/g, '') + '"';
     return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${e2(`U${u.num} S${n} · ${fx.t || 'Ficha'}`)}</title><style>@page { size: A4; margin: 11mm 12mm 14mm 12mm;
         @bottom-left { content: ${q(cabI + ' · ' + cabD)}; font: 8pt Arial, sans-serif; color: #333; }

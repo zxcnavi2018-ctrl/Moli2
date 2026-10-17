@@ -89,7 +89,7 @@
       const e = box.querySelector('.rc-est'); e.innerHTML = `<i class="${R.vivo ? 'on' : ''}"></i>${R.vivo ? 'Laptop conectada' : 'Buscando tu laptop… (ábrela y elige «💻 Laptop»)'}`;
       box.querySelectorAll('[data-rc="ir"]').forEach(b => b.classList.toggle('on', +b.dataset.v === st.i));
       box.querySelectorAll('[data-rc="g"] small').forEach((x, k) => { x.textContent = p[k] || 0; });
-      box.querySelectorAll('[data-rc="srs"]').forEach(b => b.classList.toggle('on', b.dataset.v === sec)); box.querySelector('.rc-go').textContent = `¡Sortear en 6° ${sec}!`;
+      box.querySelectorAll('[data-rc="srs"]').forEach(b => b.classList.toggle('on', b.dataset.v === sec)); box.querySelector('.rc-go').textContent = `¡Sortear en ${MD.espInfo().gn} ${sec}!`;
       return;
     }
     box.innerHTML = `<p class="rc-est"><i class="${R.vivo ? 'on' : ''}"></i>${R.vivo ? 'Laptop conectada' : 'Buscando tu laptop… (ábrela y elige «💻 Laptop»)'}</p>
@@ -97,7 +97,7 @@
       <div class="rc-card"><b>📽️ Proyección</b><div class="rc-pad"><button data-rc="pv">◀</button><button data-rc="fs">⛶ Pantalla</button><button data-rc="nx">▶</button></div>
         <div class="rc-tm">⏱️ ${[5, 10, 15, 20].map(m => `<button data-rc="tm" data-v="${m}">${m} min</button>`).join('')}<button data-rc="tm" data-v="0">✕</button></div></div>
       <div class="rc-card"><b>🏅 Grupos · +1 punto</b><div class="rc-gp">${GC.map((c, k) => `<button data-rc="g" data-v="${k}" style="--c:${c}">G${k + 1}<small>${p[k] || 0}</small></button>`).join('')}</div></div>
-      <div class="rc-card"><b>🎲 Sorteo</b><div class="rc-sr">${['A', 'B', 'C', 'D'].map(x => `<button data-rc="srs" data-v="${x}" class="${sec === x ? 'on' : ''}">6° ${x}</button>`).join('')}<button data-rc="sr" class="rc-go">¡Sortear en 6° ${sec}!</button></div></div>
+      <div class="rc-card"><b>🎲 Sorteo</b><div class="rc-sr">${['A', 'B', 'C', 'D'].map(x => `<button data-rc="srs" data-v="${x}" class="${sec === x ? 'on' : ''}">${MD.espInfo().gn} ${x}</button>`).join('')}<button data-rc="sr" class="rc-go">¡Sortear en ${MD.espInfo().gn} ${sec}!</button></div></div>
       <div class="rc-card"><b>🤖 Animaciones de Molí</b><div class="rc-an">${ANIM.map(([k, i, t]) => `<button data-rc="an" data-v="${k}"><i>${i}</i>${t}</button>`).join('')}</div>
         <div class="rc-mx">${['feliz', 'estrellas', 'sorpresa', 'guiño', 'pensativo', 'triste', 'enojado', 'normal'].map(x => `<button data-rc="mx" data-v="${x}">${{ feliz: '😊', estrellas: '🤩', sorpresa: '😮', 'guiño': '😉', pensativo: '🤔', triste: '😢', enojado: '😠', normal: '🙂' }[x]}</button>`).join('')}</div></div>
       <p class="rc-pie"><button data-rc="off">⏻ Apagar el control</button></p>`;
@@ -105,7 +105,7 @@
   async function sortear() {
     const sec = LS.get('moli2:rc:srs', 'A'); let E = [];
     try { E = (await Docente.estudiantes()).filter(e => e.section === sec); } catch (e) { return aviso('🔐 Conecta tu cuenta de docente para el sorteo.'); }
-    if (!E.length) return aviso('No hay estudiantes en 6° ' + sec + '.');
+    if (!E.length) return aviso('No hay estudiantes en ' + MD.espInfo().gn + ' ' + sec + '.');
     const k = 'moli2:rc:sr:' + sec; let ya = LS.get(k, []); let libres = E.filter(e => !ya.includes(e.key)); if (!libres.length) { ya = []; libres = E; }
     const w = libres[Math.floor(Math.random() * libres.length)]; ya.push(w.key); LS.set(k, ya);
     enviar('sr', sec + '|' + w.key); aviso('🎲 Salió: ' + w.name);
@@ -224,7 +224,7 @@
     try { E = (await Docente.estudiantes()).filter(e => e.section === sec); } catch (e) {}
     const w = E.find(e => e.key === key); if (!w) return;
     molí3d('sorpresa');
-    mostrar(`<div class="an-st an-sr"><img class="an-m flota" src="${IMG('curiosa')}" alt=""><h2>🎲 Sorteo · 6° ${esc(sec)}</h2><div class="an-nom"><span></span></div></div>`, 20000, 'azul');
+    mostrar(`<div class="an-st an-sr"><img class="an-m flota" src="${IMG('curiosa')}" alt=""><h2>🎲 Sorteo · ${MD.espInfo().gn} ${esc(sec)}</h2><div class="an-nom"><span></span></div></div>`, 20000, 'azul');
     const sp = capa.querySelector('.an-nom span'), otros = E.filter(e => e !== w).sort(() => Math.random() - .5).slice(0, 14); let d = 60, i = 0;
     const gira = () => { if (!sp.isConnected) return; if (d < 420) { sp.textContent = (otros.length ? otros[i++ % otros.length] : w).name; tono(500 + Math.random() * 300, 0, .05, 'square', .08); d *= 1.13; setTimeout(gira, d); }
       else { sp.textContent = w.name; capa.querySelector('.an-sr').classList.add('win'); [523, 659, 784, 1047].forEach((f, j) => tono(f, j * .12, .4, 'triangle', .3)); molí3d('estrellas', 'saltar'); } };

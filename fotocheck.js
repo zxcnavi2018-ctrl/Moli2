@@ -25,7 +25,7 @@
     card.innerHTML = `<i class="fc-clip"></i><div class="fc-top">CIENCIA Y TECNOLOGÍA</div>
       <div class="fc-ph" style="--c:${doc ? '#7c3aed' : COL[sec] || '#2563eb'}">${esc(iniciales(me.name))}</div>
       <b class="fc-n">${esc(String(me.name || '').split(' ').slice(0, 2).join(' '))}</b>
-      <span class="fc-s">${doc ? '👩‍🏫 Docente · 6° grado' : '6° ' + esc(sec) + ' · Estudiante'}</span><div class="fc-bar"></div>`;
+      <span class="fc-s">${doc ? '👩‍🏫 Docente · ' + MD.espInfo().gn + ' grado' : MD.espInfo().gn + ' ' + esc(sec) + ' · Estudiante'}</span><div class="fc-bar"></div>`;
   }
 
   // ---- ventanitas ----
@@ -40,6 +40,7 @@
   const HERR = [
     ['editar', '✏️', 'Editar aula', 'Mueve mesas, sillas y más'],
     ['corcho', '📌', 'Editar corcho', 'Unidad y propósito'],
+    ['docentes', '👩‍🏫', 'Docentes y corchos', 'Otro docente con su propio corcho'],
     ['cuenta', '🤖', 'Crear cuenta con Molí', 'Cuentas de tus estudiantes'],
     ['trabajar', '✨', 'Trabajar con Molí', 'Crea la ficha de tu sesión'],
     ['preparadas', '📦', 'Sesiones preparadas', 'Unidad 7 lista para publicar'],
@@ -53,6 +54,9 @@
   let infoDoc = null;
   function pedirClave(info) {
     infoDoc = info;
+    if (info.tipo === 'gmail') return abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
+      <div class="fp-h"><img src="img/moli/decidida.webp" alt=""><div><b>👩‍🏫 Modo docente</b><span>Hola, ${esc(String(info.name).split(' ')[0])}. Entra con tu cuenta de Google <b>${esc(info.email)}</b>.</span></div></div>
+      <div class="fp-err"></div><button class="fp-ok" data-f="gtch">Entrar con Google ✓</button>`);
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
       <div class="fp-h"><img src="img/moli/decidida.webp" alt=""><div><b>👩‍🏫 Modo docente</b><span>Hola, ${esc(String(info.name).split(' ')[0])}. Escribe tu <b>clave</b>.</span></div></div>
       <form data-f="clave"><input name="pin" type="password" inputmode="${info.tipo === 'owner' ? 'text' : 'numeric'}" autocomplete="off" placeholder="Clave"><div class="fp-err"></div><button class="fp-ok" type="submit">Entrar ✓</button></form>`);
@@ -60,7 +64,7 @@
   }
   function pedirCuenta() {
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
-      <div class="fp-h"><img src="img/moli/idea.webp" alt=""><div><b>🔐 Conecta tu cuenta</b><span>Así veo y guardo lo de tus estudiantes de 6° A, B, C y D.</span></div></div>
+      <div class="fp-h"><img src="img/moli/idea.webp" alt=""><div><b>🔐 Conecta tu cuenta</b><span>Así veo y guardo lo de tus estudiantes de ${MD.espInfo().gn} A, B, C y D.</span></div></div>
       <form data-f="cuenta"><input name="email" type="email" autocomplete="username" placeholder="Correo" value="${esc(Docente.OWNER_EMAIL)}" style="font-size:16px;letter-spacing:0">
         <input name="pass" type="password" autocomplete="current-password" placeholder="Contraseña" style="font-size:16px;letter-spacing:0"><div class="fp-err"></div>
         <button class="fp-ok" type="submit">Conectar ✓</button></form>
@@ -69,7 +73,7 @@
   function menuEstudiante() {
     const me = MD.yo();
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
-      <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || '').split(' ')[0])}! 👋</b><span>${esc(me.name)} · 6° ${esc(me.section || '')}</span></div></div>
+      <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || '').split(' ')[0])}! 👋</b><span>${esc(me.name)} · ${MD.espInfo().gn} ${esc(me.section || '')}</span></div></div>
       ${window.Revista && Revista.esRevisor() ? '<button class="fp-ok" data-f="h" data-k="bandeja">📥 Mi bandeja de Revisor</button>' : ''}
       <button class="fp-out" data-f="salir1">🚪 Salir de cuenta</button>`);
   }
@@ -78,10 +82,10 @@
       <div class="fp-dos"><button class="fp-no" data-f="x">Cancelar</button><button class="fp-out" data-f="salir">🚪 Sí, salir</button></div>`);
   }
   function menuDocente() {
-    const me = MD.yo();
+    const me = MD.yo(), dueña = me.tipo === 'owner', H = HERR.filter(([k]) => (k !== 'docentes' || dueña) && (k !== 'editar' || me.tipo !== 'gmail') && (k !== 'preparadas' || !MD.esp()));   // el aula es una sola: la edita la dueña
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
       <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || 'profe').split(' ')[0])}! 👩‍🏫</b><span>Tus herramientas de docente.</span></div></div>
-      <div class="fp-g">${HERR.map(([k, ic, t, d]) => `<button data-f="h" data-k="${k}"><i>${ic}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div>
+      ${dueña && MD.esp() ? `<p class="fp-me">👀 Estás viendo el corcho de <b>${esc(MD.espInfo().area)} ${MD.espInfo().gn}</b> · <button data-f="h" data-k="docentes">Cambiar</button></p>` : ''}<div class="fp-g">${H.map(([k, ic, t, d]) => `<button data-f="h" data-k="${k}"><i>${ic}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div>
       <p class="fp-me">${Docente.conectado() ? '✅ Cuenta conectada · ' + esc(Docente.correo()) : '<button data-f="conectar">🔌 Conectar mi cuenta</button>'}<br>${esc(me.name)} · <button data-f="salir1">🚪 Salir de cuenta</button></p>`);
   }
   card.addEventListener('click', e => {
@@ -103,6 +107,10 @@
     if (f === 'h') { cerrar(); window.dispatchEvent(new CustomEvent('moli2:herramienta', { detail: b.dataset.k })); }
     if (f === 'conectar') return pedirCuenta();
     if (f === 'despues') return menuDocente();
+    if (f === 'gtch') { const err = panel.querySelector('.fp-err'); b.disabled = true; b.textContent = 'Un momento…';
+      Docente.conGmail(infoDoc).then(() => { window.dispatchEvent(new Event('moli2:me')); pintar(); menuDocente(); })
+        .catch(x => { b.disabled = false; b.textContent = 'Entrar con Google ✓'; if (err) err.textContent = x.message === 'CORREO' ? `Esa no es la cuenta ${infoDoc.email}. Elige la correcta.` : /unauthorized-domain/.test(x.code || x.message) ? 'Falta autorizar este sitio en Firebase.' : 'No se pudo entrar con Google.'; });
+      return; }
     if (f === 'google') { const err = panel.querySelector('.fp-err'); Docente.conGoogle().then(() => { window.dispatchEvent(new Event('moli2:me')); menuDocente(); })
       .catch(x => { if (err) err.textContent = /unauthorized-domain/.test(x.code || x.message) ? 'Falta autorizar este sitio en Firebase (Authentication → Dominios autorizados).' : 'No se pudo entrar con Google.'; }); }
   });

@@ -63,6 +63,8 @@
       const a = String((site.tchA || {})[r] || ''), [s, area] = a.split('|');
       return { tipo: 'admin', rid: r, dni, s, area: area || '', name: (site.tchN || {})[r] || 'Docente' };
     }
+    const g = Object.entries((site && site.tchG) || {}).find(([, v]) => String(v).split('|')[2] === r);   // docente con su Gmail (lo agrega la dueña)
+    if (g) { const [esp, name] = String(g[1]).split('|'); return { tipo: 'gmail', rid: r, dni, email: g[0], esp, name: name || 'Docente' }; }
     return null;
   }
   async function conClave(info, pin) {                               // dueño: su código; otro docente: sus 4 números (con eso entra a Firebase)
@@ -73,8 +75,38 @@
       try { await conCorreo(`${info.rid}-${info.s}@${FB.authDomain}`, pass); } catch (e) { throw new Error(/TOO_MANY/.test(e.message) ? 'MUCHOS' : /INVALID|PASSWORD|EMAIL_NOT_FOUND|USER_DISABLED/.test(e.message) ? 'CLAVE' : 'RED'); }
     }
     const rcs = hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('moli2-rc|' + info.rid + '|' + pin))).slice(0, 32);   // canal del control remoto (celular y laptop con la misma cuenta)
-    const me = { key: await kid(info.dni), dni: info.dni, name: info.name, section: 'DOC', rid: info.rid, teacher: true, docente: true, tipo: info.tipo, area: info.area || '', rcs };
+    const esp = window.MD && MD.ESPS[info.area] ? info.area : '';
+    const me = { key: await kid(info.dni), dni: info.dni, name: info.name, section: 'DOC', rid: info.rid, teacher: true, docente: true, tipo: info.tipo, area: info.area || '', esp, rcs };
     LS.set(ME, me); return me;
+  }
+  async function conGmail(info) {                                    // docente con Gmail: entra con Google y debe ser el mismo correo que anotó la dueña
+    await conGoogle();
+    if (correo().toLowerCase() !== String(info.email).toLowerCase()) { LS.del(AUTH); throw new Error('CORREO'); }
+    const rcs = hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('moli2-rc|' + info.rid + '|' + info.email))).slice(0, 32);
+    const me = { key: await kid(info.dni), dni: info.dni, name: info.name, section: 'DOC', rid: info.rid, teacher: true, docente: true, tipo: 'gmail', area: '', esp: info.esp, email: info.email, rcs };
+    LS.set(ME, me); return me;
+  }
+  const correo = () => (LS.get(AUTH, null) || {}).email || '';
+  // 👩‍🏫 la dueña anota a otro docente: su Gmail, su nombre, su DNI y su corcho (config/site.tchG: correo → «espacio|nombre|cuenta»)
+  async function sitio() { const x = await fetch(`${BASE}/config/site?key=${FB.apiKey}`, { cache: 'no-store' }); if (!x.ok) throw new Error('RED'); return fromDoc(await x.json()); }
+  async function docentesGmail() { const st = await sitio(); return Object.entries(st.tchG || {}).map(([email, v]) => { const [esp, name] = String(v).split('|'); return { email, esp, name }; }); }
+  async function guardarTchG(cambiar) {
+    const st = await sitio(), G = { ...(st.tchG || {}) }; await cambiar(G);
+    await commit([{ update: { name: DOC('config', 'site'), fields: toF({ tchG: G, updatedAt: new Date() }) }, updateMask: { fieldPaths: ['tchG', 'updatedAt'] } }]);
+  }
+  async function agregarDocente(email, name, dni, esp) {
+    email = String(email || '').trim().toLowerCase(); if (!/^[^\s@|]+@[^\s@|]+\.[a-z]{2,}$/.test(email)) throw new Error('CORREO');
+    name = String(name || '').trim().replace(/[|]/g, ' ').replace(/\s+/g, ' ').slice(0, 60); if (name.length < 3) throw new Error('NOMBRE');
+    dni = String(dni || '').replace(/\D/g, ''); if (!/^\d{8}$/.test(dni)) throw new Error('DNI');
+    const r = await rid(dni); if (r === OWNER) throw new Error('DNI');
+    await guardarTchG(G => { Object.keys(G).forEach(k => { if (String(G[k]).split('|')[2] === r) delete G[k]; }); G[email] = `${esp}|${name}|${r}`; });
+  }
+  const quitarDocente = email => guardarTchG(G => { delete G[email]; });
+  // administradores antiguos de Molí 1 (entran con DNI y clave: config/site.tch, tchN, tchA). La dueña puede quitarlos.
+  async function adminsDni() { const st = await sitio(); return (st.tch || []).map(r => ({ rid: r, name: (st.tchN || {})[r] || 'Docente', area: String((st.tchA || {})[r] || '').split('|')[1] || '' })); }
+  async function quitarAdmin(rid) {
+    const st = await sitio(), tch = (st.tch || []).filter(r => r !== rid), tchN = { ...(st.tchN || {}) }, tchA = { ...(st.tchA || {}) }; delete tchN[rid]; delete tchA[rid];
+    await commit([{ update: { name: DOC('config', 'site'), fields: toF({ tch, tchN, tchA, updatedAt: new Date() }) }, updateMask: { fieldPaths: ['tch', 'tchN', 'tchA', 'updatedAt'] } }]);
   }
 
   // ---- lecturas y escrituras de docente ----
@@ -104,29 +136,30 @@
   // estudiantes (6° A-D), guardados un ratito para no pedirlos cada vez
   let est = null;
   async function estudiantes(forzar) {
-    const c = LS.get('moli2:tcache:est', null);
+    const EK = 'moli2:tcache:est' + MD.esp(), g = MD.espInfo().g, c = LS.get(EK, null);
     if (!forzar && est) return est;
     if (!forzar && c && Date.now() - c.at < 6 * 3600e3 && Array.isArray(c.L) && c.L.length && c.L.every(e => e.dni)) return (est = c.L);   // (una lista guardada sin DNI no sirve para el escáner)
-    const L = (await lista('students')).filter(s => /^[A-D]$/.test(s.section) && (!s.grade || s.grade === '6to'))
+    const L = (await lista('students')).filter(s => /^[A-D]$/.test(s.section) && (s.grade || '6to') === g)
       .map(s => ({ key: s.id, dni: String(s.dni == null ? '' : s.dni).replace(/\D/g, ''), name: s.name, section: s.section, area: s.area || '' })).sort((a, b) => a.name.localeCompare(b.name, 'es'));
-    LS.set('moli2:tcache:est', { at: Date.now(), L }); return (est = L);
+    LS.set(EK, { at: Date.now(), L }); return (est = L);
   }
   const ticketsUnidad = (unitKey, sec) => consulta('exitTickets', sec ? [['unit', 'EQUAL', unitKey], ['section', 'EQUAL', sec]] : [['unit', 'EQUAL', unitKey]]);
   async function misionesTodos() {
-    return (await lista('mision')).filter(d => /^m1-k/.test(d.id)).map(d => { let p = {}; try { p = JSON.parse(d.p || '{}'); } catch (e) {} return { key: d.id.slice(3), n: d.n || '', sec: d.sec || '', p, at: +d.at || 0 }; });
+    const pre = 'm1' + MD.esp() + '-';
+    return (await lista('mision')).filter(d => d.id.startsWith(pre + 'k')).map(d => { let p = {}; try { p = JSON.parse(d.p || '{}'); } catch (e) {} return { key: d.id.slice(pre.length), n: d.n || '', sec: d.sec || '', p, at: +d.at || 0 }; });
   }
   // una nota del registro (participación 30+n, conducta 60+n, producto 50, cuaderno 51): se borra la anterior y se crea la nueva
   async function guardarNota(u, n, s, score) {
     const id = `${u.key}-s${n}-${s.key}`, name = DOC('exitTickets', id);
     try { await commit([{ delete: name }]); } catch (e) { if (e.message === 'AUTH') throw e; }
     if (!score) return null;
-    const rec = { unit: u.key, unitNum: String(u.num), session: n, grade: '6to', section: s.section, name: s.name, student: s.key, dni: s.dni, score, total: 4, answers: [0, 1, 2, 3].map(i => i < score), createdAt: new Date() };
+    const rec = { unit: u.key, unitNum: String(u.num), session: n, grade: MD.espInfo().g, section: s.section, name: s.name, student: s.key, dni: s.dni, score, total: 4, answers: [0, 1, 2, 3].map(i => i < score), createdAt: new Date() };
     await commit([{ update: { name, fields: toF(rec) }, currentDocument: { exists: false } }]);
     return { ...rec, createdAt: Date.now() };
   }
   async function crearTicket(u, n, s, answers) {                    // Exit ticket leído con el escáner (se crea una sola vez, como en Molí)
     const id = `${u.key}-s${n}-${s.key}`, score = answers.filter(Boolean).length;
-    const rec = { unit: u.key, unitNum: String(u.num), session: n, grade: '6to', section: s.section, name: s.name, student: s.key, dni: s.dni, score, total: answers.length, answers, createdAt: new Date() };
+    const rec = { unit: u.key, unitNum: String(u.num), session: n, grade: MD.espInfo().g, section: s.section, name: s.name, student: s.key, dni: s.dni, score, total: answers.length, answers, createdAt: new Date() };
     const r = await fetch(`${BASE}:commit?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ writes: [{ update: { name: DOC('exitTickets', id), fields: toF(rec) }, currentDocument: { exists: false } }] }) });
     if (r.ok) return 'ok'; const j = await r.json().catch(() => ({})), st = j.error && j.error.status; if (st === 'ALREADY_EXISTS' || st === 'FAILED_PRECONDITION') return 'dup'; throw new Error(st || 'RED');
   }
@@ -134,12 +167,12 @@
     dni = String(dni || '').replace(/\D/g, ''); if (!/^\d{8}$/.test(dni)) throw new Error('DNI');
     name = String(name || '').trim().replace(/\s+/g, ' '); if (name.length < 3 || name.length > 60) throw new Error('NOMBRE');
     const k = await kid(dni);
-    try { await commit([{ update: { name: DOC('students', k), fields: toF({ dni, name, grade: '6to', section, createdAt: new Date() }) }, currentDocument: { exists: false } }]); }
+    try { await commit([{ update: { name: DOC('students', k), fields: toF({ dni, name, grade: MD.espInfo().g, section, createdAt: new Date() }) }, currentDocument: { exists: false } }]); }
     catch (e) { if (/ALREADY|FAILED_PRECONDITION/.test(e.message)) throw new Error('YAEXISTE'); throw e; }
-    est = null; LS.del('moli2:tcache:est'); return { key: k, dni, name, section };
+    est = null; LS.del('moli2:tcache:est' + MD.esp()); return { key: k, dni, name, section };
   }
 
-  window.Docente = { FB, BASE, DOC, toF, fromDoc, kid, quien, conClave, conCorreo, conGoogle, conectado, token, salirCuenta: () => LS.del(AUTH),
+  window.Docente = { conGmail, docentesGmail, agregarDocente, quitarDocente, adminsDni, quitarAdmin, quien, conClave, conCorreo, conGoogle, conectado, token, salirCuenta: () => LS.del(AUTH),
     lista, consulta, commit, estudiantes, ticketsUnidad, misionesTodos, guardarNota, crearEstudiante, crearTicket, OWNER_EMAIL,
-    correo: () => (LS.get(AUTH, null) || {}).email || '' };
+    FB, BASE, DOC, toF, fromDoc, kid, correo };
 })();

@@ -4,7 +4,7 @@
 //  Se guarda en Firebase (files/fcorcho-0, como el aula editada) y todos los estudiantes lo ven igual.
 // ===================================================================
 (function () {
-  const FILE = 'fcorcho-0', URL0 = `${Docente.BASE}/files/${FILE}?key=${Docente.FB.apiKey}`;
+  const FILE = MD.fid('fcorcho'), URL0 = `${Docente.BASE}/files/${FILE}?key=${Docente.FB.apiKey}`;
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const b64e = s => btoa(unescape(encodeURIComponent(s))), b64d = s => decodeURIComponent(escape(atob(s)));
   const cut = (t, n) => String(t == null ? '' : t).replace(/\s+/g, ' ').trim().slice(0, n);
@@ -16,6 +16,7 @@
     pintar();
   }
   function pintar() { const K = window.CORK; if (!K || typeof corkTex !== 'function') return; const old = K.mesh.material.map; K.mesh.material.map = corkTex(K.LL); K.mesh.material.needsUpdate = true; if (old) old.dispose(); }
+  if (MD.esp() && window.CORCHO) Object.assign(window.CORCHO, { head: '🔬 CIENCIA · ' + MD.espInfo().gn + ' GRADO', unidad: 'Unidad 1', prop: '' });   // corcho nuevo: hasta que su docente lo edite
   fetch(URL0, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue; if (v) aplicar(JSON.parse(b64d(v))); }).catch(() => {});
 
   function panel(msg) {

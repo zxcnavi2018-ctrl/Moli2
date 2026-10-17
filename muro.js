@@ -7,7 +7,7 @@
 // ===================================================================
 (function () {
   if (!window.Docente) return;
-  const IDX = 'fmuroidx-0', URL = id => `${Docente.BASE}/files/${id}?key=${Docente.FB.apiKey}`;
+  const IDX = MD.fid('fmuroidx'), URL = id => `${Docente.BASE}/files/${id}?key=${Docente.FB.apiKey}`;
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const b64e = s => btoa(unescape(encodeURIComponent(s))), b64d = s => decodeURIComponent(escape(atob(s)));
   const esDoc = () => !!(window.MD && MD.esDocente && MD.esDocente());

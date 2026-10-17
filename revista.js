@@ -92,8 +92,8 @@
     const rev = await revisores(true), L = filas(rev);
     const b = Herramientas.abrir('🧐 Revisores de la Revista', 'Estudiantes que publican o devuelven trabajos como tú.', 'pensativa', `
       <p class="hp-tip">Dale el título de <b>🧐 Revisor</b> a un estudiante: <b>búscalo por su nombre</b>, tócalo y ponle una <b>clave de 4 números</b>. Cuando un compañero envíe su trabajo a la <b>Revista Innovadora</b>, le llegará a su <b>📥 bandeja</b> (igual que a ti) para publicarlo o devolverlo con un consejo.</p>
-      <div class="hp-lista">${L.length ? `<ol>${L.map(r => `<li>🧐 <b>${esc(r.n)}</b>${r.c ? ` <small>6° ${esc(r.c)}</small>` : ''} <button data-rv="rm" data-h="${esc(r.h)}" class="rv-q">Quitar</button></li>`).join('')}</ol>` : '<small>Todavía no hay Revisores.</small>'}</div>
-      <form class="hp-f" data-rvf="1"><input type="hidden" name="dni"><div class="rv-bus"><div class="rv-secs">${['', 'A', 'B', 'C', 'D'].map(x => `<button type="button" data-rvsec="${x}" class="${x ? '' : 'on'}">${x ? '6° ' + x : 'Todos'}</button>`).join('')}</div>
+      <div class="hp-lista">${L.length ? `<ol>${L.map(r => `<li>🧐 <b>${esc(r.n)}</b>${r.c ? ` <small>${MD.espInfo().gn} ${esc(r.c)}</small>` : ''} <button data-rv="rm" data-h="${esc(r.h)}" class="rv-q">Quitar</button></li>`).join('')}</ol>` : '<small>Todavía no hay Revisores.</small>'}</div>
+      <form class="hp-f" data-rvf="1"><input type="hidden" name="dni"><div class="rv-bus"><div class="rv-secs">${['', 'A', 'B', 'C', 'D'].map(x => `<button type="button" data-rvsec="${x}" class="${x ? '' : 'on'}">${x ? MD.espInfo().gn + ' ' + x : 'Todos'}</button>`).join('')}</div>
         <input class="rv-q-in" placeholder="🔎 Escribe su nombre… (ej.: Yassel)" autocomplete="off"><div class="rv-res"><small>Cargando estudiantes…</small></div><p class="rv-sel" hidden></p></div>
         <div class="hp-row"><input name="pin" inputmode="numeric" maxlength="4" placeholder="Clave (4 números)" required></div>
         <button class="hp-ok" type="submit">🧐 Nombrar Revisor</button><p class="hp-msg">${msg || ''}</p></form>`);
@@ -101,13 +101,13 @@
     let EST = [], SEC = ''; const ya = new Set(L.map(r => norm(r.n)));
     const pintaRes = () => { const q = norm(b.querySelector('.rv-q-in').value), el = b.querySelector('.rv-res'); if (!el) return;
       const R = EST.filter(e => (!SEC || e.section === SEC) && (!q || norm(e.name).includes(q))).slice(0, 40);
-      el.innerHTML = R.length ? R.map(e => `<button type="button" data-rvk="${esc(e.key)}"${ya.has(norm(e.name)) ? ' disabled' : ''}>${esc(e.name)} <small>6° ${esc(e.section)}${ya.has(norm(e.name)) ? ' · ya es 🧐' : ''}</small></button>`).join('') : '<small>No encontré a nadie con ese nombre.</small>'; };
+      el.innerHTML = R.length ? R.map(e => `<button type="button" data-rvk="${esc(e.key)}"${ya.has(norm(e.name)) ? ' disabled' : ''}>${esc(e.name)} <small>${MD.espInfo().gn} ${esc(e.section)}${ya.has(norm(e.name)) ? ' · ya es 🧐' : ''}</small></button>`).join('') : '<small>No encontré a nadie con ese nombre.</small>'; };
     Docente.estudiantes().then(x => { EST = x || []; pintaRes(); }).catch(() => { const el = b.querySelector('.rv-res'); if (el) el.innerHTML = '<small>🔐 Conecta tu cuenta para ver a tus estudiantes.</small>'; });
     b.querySelector('.rv-q-in').addEventListener('input', pintaRes);
     b.addEventListener('click', e => {
       const sc = e.target.closest('[data-rvsec]'); if (sc) { SEC = sc.dataset.rvsec; b.querySelectorAll('[data-rvsec]').forEach(x => x.classList.toggle('on', x === sc)); pintaRes(); return; }
       const k = e.target.closest('[data-rvk]'); if (!k) return; const est = EST.find(x => x.key === k.dataset.rvk); if (!est) return;
-      const f = b.querySelector('[data-rvf]'); f.dni.value = est.dni || ''; const sel = b.querySelector('.rv-sel'); sel.hidden = false; sel.innerHTML = `✔ Elegiste a <b>${esc(est.name)}</b> · 6° ${esc(est.section)}`;
+      const f = b.querySelector('[data-rvf]'); f.dni.value = est.dni || ''; const sel = b.querySelector('.rv-sel'); sel.hidden = false; sel.innerHTML = `✔ Elegiste a <b>${esc(est.name)}</b> · ${MD.espInfo().gn} ${esc(est.section)}`;
       b.querySelectorAll('[data-rvk]').forEach(x => x.classList.toggle('on', x === k)); f.pin.focus();
     });
     b.addEventListener('submit', async e => {

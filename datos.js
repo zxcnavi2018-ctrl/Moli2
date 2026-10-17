@@ -6,7 +6,10 @@
   const FB = { projectId: 'ciencia6abcd', apiKey: 'AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM' };
   const BASE = `https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents`;
   const DOC = (col, id) => `projects/${FB.projectId}/databases/(default)/documents/${col}/${id}`;
-  const GRADE = '6to';
+  // ---- espacios: cada docente con su propio corcho (unidades, sesiones, Exit tickets, misiones y notas).
+  //  '' = Ciencia 6.° (el de siempre: config/content, mis1) · 'c7' = Ciencia 7.° (config/content-c7, mis1-c7). Lo común: el aula, los juegos y Molí.
+  const ESPS = { '': { g: '6to', gn: '6°', txt: '6.° grado de primaria', edad: '11 y 12 años', area: 'Ciencia y Tecnología' },
+    c7: { g: '7mo', gn: '7°', txt: '7.° grado', edad: '12 y 13 años', area: 'Ciencia y Tecnología' } };
   // códigos de Molí para las otras notas que registra la docente (en la misma colección de Exit tickets)
   const PART = 30, PROD = 50, CUAD = 51, COND = 60, TRAB = 80;            // TRAB + n: trabajo en clase de la sesión n (rúbrica)
 
@@ -51,24 +54,39 @@
     if (window.Docente) { const d = await Docente.quien(dni); if (d) { const e = new Error('DOCENTE'); e.info = d; throw e; } }   // DNI de docente: pide su clave
     const key = await idDeDni(dni), st = await get('students', key);
     if (!st) throw new Error('NOEXISTE');
-    const me = { key, dni, name: st.name, section: st.section, grade: st.grade || GRADE };
+    const me = { key, dni, name: st.name, section: st.section, grade: st.grade || '6to' };
     LS.set(ME_KEY, me); return me;
   }
   function salir() { try { localStorage.removeItem(ME_KEY); } catch (e) {} if (window.Docente) Docente.salirCuenta(); }
   const esDocente = () => { const m = yo(); return !!(m && (m.docente || m.teacher)); };
+  function esp() {                                                     // el corcho de quien entró: docente → su espacio; estudiante → el de su grado
+    const m = yo();
+    if (m && (m.docente || m.teacher)) { const e = m.tipo === 'owner' ? LS.get('moli2:esp', '') : m.esp || ''; return ESPS[e] ? e : ''; }
+    return m && m.grade === '7mo' ? 'c7' : '';
+  }
+  const espInfo = () => ({ k: esp(), ...ESPS[esp()] });
+  ESPS[''].profe = 'Christian Quispe Llerena';                        // el nombre del docente de cada corcho (diplomas y artículos en PDF)
+  const profe = () => ESPS[esp()].profe || 'tu profe';
+  if (esp()) get('config', 'site').then(st => Object.entries((st && st.tchG) || {}).forEach(([, v]) => { const [k, n] = String(v).split('|'); if (ESPS[k] && n) ESPS[k].profe = n; })).catch(() => {});
+  const GRADE_ = () => ESPS[esp()].g;
+  const CONT = () => esp() ? 'content-' + esp() : 'content', MIS = () => esp() ? 'mis1-' + esp() : 'mis1';
+  const MISD = me => 'm1' + esp() + '-' + me.key;                     // avance de misiones del estudiante (m1-… en 6.°, m1c7-… en 7.°)
+  const fid = base => base + esp() + '-0';                             // archivos sueltos de cada corcho (candados, videos, corcho, muro)
+  const E0 = esp();                                                    // si al entrar o salir cambia de corcho, se vuelve a abrir el aula
+  addEventListener('moli2:me', () => { if (esp() !== E0) setTimeout(() => location.reload(), 300); });
 
   // ---- contenido: unidades y sesiones ----
   let contenido = null, misiones = null;
   async function cargar() {
     if (contenido) return contenido;
-    const c = await get('config', 'content');
+    const c = await get('config', CONT());
     const units = [];
     for (let i = 0; i < 24; i++) { const s = c && c['u' + i]; if (!s) continue; try { units.push(JSON.parse(s)); } catch (e) {} }
-    let files = {}; try { files = JSON.parse(c.data || '{}').files || {}; } catch (e) {}
-    try { const r = await fetch('data/ticket-u7s1.json', { cache: 'no-cache' }); if (r.ok) { const T = await r.json();      // Exit ticket nuevo de la Sesión 1 (Unidad 7), puesto directo
+    let files = {}; try { files = JSON.parse((c && c.data) || '{}').files || {}; } catch (e) {}
+    if (!esp()) try { const r = await fetch('data/ticket-u7s1.json', { cache: 'no-cache' }); if (r.ok) { const T = await r.json();      // Exit ticket nuevo de la Sesión 1 (Unidad 7), puesto directo
       const u = units.find(x => String(x.num) === String(T.unidad)), s = u && u.sessions && u.sessions[T.sesion - 1]; if (s && Array.isArray(T.questions) && T.questions.length) s.ticket = { ...(s.ticket || {}), questions: T.questions }; } } catch (e) {}
     contenido = { units, files };
-    LS.set('moli2:content', contenido);
+    LS.set('moli2:content' + esp(), contenido);
     return contenido;
   }
   async function abrirPdf(url, id, nombre) {                          // la ficha en PDF, para ver y descargar (como en Molí 1)
@@ -94,7 +112,8 @@
   const cH = e => { let t = 5381; for (let a = 0; a < e.length; a++) t = 33 * t + e.charCodeAt(a) | 0; return (t >>> 0).toString(36) + e.length.toString(36); };
   const cSplit = e => { const t = e.units.map(x => JSON.stringify(x)), a = t.map(cH), o = { data: JSON.stringify({ ...e, units: e.units.map((x, i) => ({ key: x.key, _s: i })), hs: a }), h: JSON.stringify(a) }; t.forEach((x, i) => o['u' + i] = x); return o; };
   async function crudo() {
-    const c = await get('config', 'content'); if (!c) throw new Error('VACIO');
+    const c = await get('config', CONT());
+    if (!c) { if (esp()) return { d: { files: {} }, units: [], savedAt: 0 }; throw new Error('VACIO'); }   // corcho nuevo: empieza vacío
     const d = JSON.parse(c.data || '{}'); let units = d.units || [];
     if (units.length && '_s' in units[0]) units = units.map(x => JSON.parse(c['u' + x._s]));
     return { d, units, savedAt: +c.savedAt || +d.savedAt || 0 };
@@ -105,10 +124,28 @@
     const n = Math.max(Date.now(), savedAt + 1), obj = { ...d, savedAt: n, units }; delete obj.hs;
     const full = JSON.stringify(obj); if (full.length > 9e5) throw new Error('GRANDE');
     const fields = units.length <= 24 ? { ...cSplit(obj), savedAt: n, updatedAt: new Date() } : { data: full, savedAt: n, updatedAt: new Date() };
-    await Docente.commit([{ update: { name: DOC('config', 'content'), fields: toF(fields) } }]);
-    contenido = null; LS.set('moli2:content', null); await cargar(); return true;
+    await Docente.commit([{ update: { name: DOC('config', CONT()), fields: toF(fields) } }]);
+    contenido = null; LS.set('moli2:content' + esp(), null); await cargar(); return true;
   }
-  const guardarSesion = (uKey, n, s) => publicar(units => { const u = units.find(x => x.key === uKey); if (!u || !u.sessions[n - 1]) throw new Error('NOSES'); u.sessions[n - 1] = s; });
+  const guardarSesion = (uKey, n, s, archivos) => publicar((units, d) => { const u = units.find(x => x.key === uKey); if (!u || !u.sessions[n - 1]) throw new Error('NOSES'); u.sessions[n - 1] = s;
+    if (archivos) d.files = { ...(d.files || {}), ...archivos }; });            // archivos: las fichas PDF que subió en esta sesión
+  const sesVacia = () => ({ title: '', meta: '', criteria: ['', '', ''], rubric: '', flipped: { enabled: false, title: '', desc: '', file: '' }, flipped2: { enabled: false, title: '', desc: '', file: '' }, activities: [], ticket: { questions: [] }, hidden: false });
+  // ➕ unidad nueva (clave con el espacio delante, para que no choque con las de otro corcho: c7unit1…)
+  const nuevaUnidad = (num, title, icon) => publicar(units => {
+    num = String(num || '').trim(); if (!num) throw new Error('NUM');
+    const key = esp() + 'unit' + num.replace(/[^0-9a-z]/gi, '').toLowerCase();
+    if (units.some(u => u.key === key)) throw new Error('YA');
+    units.push({ key, num, title: String(title || '').trim() || 'Unidad ' + num, icon: icon || '📘', sessions: [] });
+  });
+  const nuevaSesion = uKey => publicar(units => { const u = units.find(x => x.key === uKey); if (!u) throw new Error('NOSES'); u.sessions = u.sessions || []; if (u.sessions.length >= 30) throw new Error('MUCHAS'); u.sessions.push({ ...sesVacia(), title: 'Sesión ' + (u.sessions.length + 1) }); });
+  // 📄 ficha en PDF que sube la docente: va a files/<id>-<k> (en trozos) y queda anotada en el contenido
+  async function subirArchivo(file) {
+    if (!file || file.size > 12e6) throw new Error('GRANDE');
+    const buf = new Uint8Array(await file.arrayBuffer()); let bin = ''; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+    const b = btoa(bin), id = 'f' + (esp() || 'c6') + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), parts = Math.ceil(b.length / 880000);
+    for (let k = 0; k < parts; k++) await Docente.commit([{ update: { name: DOC('files', `${id}-${k}`), fields: toF({ b64: b.slice(k * 880000, (k + 1) * 880000), updatedAt: new Date() }) } }]);
+    return { id, info: { name: String(file.name || 'ficha.pdf').slice(0, 80), type: file.type || 'application/pdf', parts } };
+  }
   const sesionCruda = async (uKey, n) => { const { units } = await crudo(); const u = units.find(x => x.key === uKey); return u && JSON.parse(JSON.stringify(u.sessions[n - 1] || null)); };
 
   // ---- Exit tickets ----
@@ -116,7 +153,7 @@
   async function ticket(unit, n, me) { const t = await get('exitTickets', ticketId(unit, n, me.key)); return t && (!t.dni || t.dni === me.dni) ? t : null; }
   async function guardarTicket(me, u, n, answers) {
     const score = answers.filter(Boolean).length, total = answers.length;
-    const res = { unit: u.key, unitNum: String(u.num), session: n, grade: GRADE, section: me.section, name: me.name, student: me.key, dni: me.dni, score, total, answers, createdAt: new Date() };
+    const res = { unit: u.key, unitNum: String(u.num), session: n, grade: GRADE_(), section: me.section, name: me.name, student: me.key, dni: me.dni, score, total, answers, createdAt: new Date() };
     if (me.demo) { LS.set('moli2:demo:' + ticketId(u.key, n, me.key), { ...res, createdAt: Date.now() }); return { ...res, createdAt: Date.now() }; }
     const body = { writes: [{ update: { name: DOC('exitTickets', ticketId(u.key, n, me.key)), fields: toF(res) }, currentDocument: { exists: false } }] };
     const r = await fetch(`${BASE}:commit?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -149,16 +186,24 @@
   // ---- misiones de refuerzo ----
   async function cargarMisiones() {
     if (misiones) return misiones;
-    const c = await get('config', 'mis1'); let d = null; try { d = JSON.parse(c.data || 'null'); } catch (e) {}
+    const c = await get('config', MIS()); let d = null; try { d = JSON.parse(c.data || 'null'); } catch (e) {}
     misiones = d && Array.isArray(d.ms) ? d.ms : [];
     return misiones;
+  }
+  async function publicarMisiones(cambiar) {                          // 💪 la docente crea o borra misiones: se trae lo último, se cambia y se guarda
+    const c = await get('config', MIS()); let d = null; try { d = JSON.parse((c && c.data) || 'null'); } catch (e) {}
+    d = d && typeof d === 'object' ? d : {}; d.ms = Array.isArray(d.ms) ? d.ms : [];
+    await cambiar(d.ms);
+    const data = JSON.stringify(d); if (data.length > 4e5) throw new Error('GRANDE');
+    await Docente.commit([{ update: { name: DOC('config', MIS()), fields: toF({ data, updatedAt: new Date() }) } }]);
+    misiones = null; return cargarMisiones();
   }
   const misionesDe = uKey => (misiones || []).filter(m => m.acts && m.acts.length && m.ses && m.ses.u === uKey && (() => {
     const u = (contenido ? contenido.units : []).find(x => x.key === uKey), s = u && u.sessions[m.ses.n - 1]; return u && !u.hidden && s && !s.hidden; })());
   const progKey = me => 'moli2:mis:' + (me ? me.key : 'anon');
   async function avance(me) {
     let p = LS.get(progKey(me), {});
-    if (me && !me.demo) try { const d = await get('mision', 'm1-' + me.key); if (d && d.p) { const r = JSON.parse(d.p); Object.entries(r).filter(([k, v]) => Array.isArray(v)).forEach(([k, [err, last, n]]) => { if (!p[k] || (p[k].n || 0) < n) p[k] = { err, last, n }; }); } } catch (e) {}
+    if (me && !me.demo) try { const d = await get('mision', MISD(me)); if (d && d.p) { const r = JSON.parse(d.p); Object.entries(r).filter(([k, v]) => Array.isArray(v)).forEach(([k, [err, last, n]]) => { if (!p[k] || (p[k].n || 0) < n) p[k] = { err, last, n }; }); } } catch (e) {}
     LS.set(progKey(me), p); return p;
   }
   let subirT = 0;
@@ -170,7 +215,7 @@
     clearTimeout(subirT); subirT = setTimeout(async () => {
       const q = {}; Object.entries(LS.get(progKey(me), {})).forEach(([k, v]) => q[k] = [v.err, v.last, v.n]);
       const lab = labDe(me); if (Object.keys(lab).length) q._lab = lab;                  // también el avance del laboratorio (lo ve la docente)
-      try { await fetch(`${BASE}/mision/m1-${me.key}?key=${FB.apiKey}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      try { await fetch(`${BASE}/mision/${MISD(me)}?key=${FB.apiKey}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fields: toF({ p: JSON.stringify(q), n: String(me.name).slice(0, 60), sec: me.section, at: new Date() }) }) }); } catch (e) {}
     }, 1500);
   }
@@ -224,6 +269,6 @@
     throw new Error('IA');
   }
 
-  window.MD = { abrirPdf, pensarCon, _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
+  window.MD = { profe, esp, espInfo, ESPS, fid, CONT, MIS, nuevaUnidad, nuevaSesion, subirArchivo, publicarMisiones, abrirPdf, pensarCon, _c: { crudo: () => crudo(), cSplit: e => cSplit(e) }, FB, get, yo, publicar, guardarSesion, sesionCruda, LAB, labDe, subirLab, entrar, salir, esDocente, cargar, unidades, sesionesDe, preguntas, ticket, guardarTicket, ticketsDe, nivel, partic, promedio, CONDUCTA, NIVEL,
     PART, PROD, CUAD, COND, TRAB, RFF, refuerzoManual, cargarMisiones, misionesDe, avance, marcarActividad, misionCompleta, pensar, LS, lleno, contenido: () => contenido };
 })();

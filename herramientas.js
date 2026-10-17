@@ -36,7 +36,7 @@
       try { const E = (await Docente.estudiantes(true)).filter(e => e.section === sec); ls.innerHTML = E.length ? `<small>${E.length} estudiantes</small><ol>${E.map(e => `<li>${esc(e.name)} <small>••••${esc(String(e.dni).slice(-4))}</small></li>`).join('')}</ol>` : '<small>Sin estudiantes todavía.</small>'; }
       catch (e) { ls.innerHTML = `<small>${errTxt(e)}</small>`; } };
     b.addEventListener('submit', async e => { e.preventDefault(); const f = e.target, m = f.querySelector('.hp-msg'), bt = f.querySelector('button'); bt.disabled = true; m.textContent = 'Creando…';
-      try { const s = await Docente.crearEstudiante(f.dni.value, f.nom.value, f.sec.value); m.innerHTML = `✅ Cuenta de <b>${esc(s.name)}</b> (6° ${s.section}) creada. Ya puede entrar con su DNI.`; f.dni.value = ''; f.nom.value = ''; ver(s.section); }
+      try { const s = await Docente.crearEstudiante(f.dni.value, f.nom.value, f.sec.value); m.innerHTML = `✅ Cuenta de <b>${esc(s.name)}</b> (${MD.espInfo().gn} ${s.section}) creada. Ya puede entrar con su DNI.`; f.dni.value = ''; f.nom.value = ''; ver(s.section); }
       catch (x) { m.textContent = x.message === 'DNI' ? 'El DNI debe tener 8 números.' : x.message === 'NOMBRE' ? 'Escribe el nombre completo (3 a 60 letras).' : x.message === 'YAEXISTE' ? 'Ese DNI ya tiene cuenta.' : errTxt(x); }
       bt.disabled = false; });
     b.addEventListener('click', async e => { const k = e.target.closest('[data-h]'); if (!k) return;
@@ -58,7 +58,7 @@
 - ESPACIO Y TEXTO: la información va primero y bien desarrollada; las preguntas van después. Cada pregunta abierta es corta y clara.
 - FICHA O PAPELOTE: en las actividades en equipo, si construyen un producto para presentar lo hacen en un PAPELOTE y la ficha solo indica «En equipo, en un papelote…»; si es un trabajo corto se hace en la ficha.
 - UNA FICHA POR SESIÓN: cada sesión lleva UNA sola ficha que sirve para sus 3 actividades.
-- Todo en español sencillo para niñas y niños de 11 y 12 años de Perú; cuida la seguridad en los experimentos.
+- Todo en español sencillo para niñas y niños de ${MD.espInfo().edad} de Perú; cuida la seguridad en los experimentos.
 `;
   const S_TXT = { type: 'STRING' }, S_ARR = { type: 'ARRAY', items: { type: 'STRING' } };
   const ESQ_PLAN = { type: 'OBJECT', required: ['units', 'aviso'], properties: { aviso: S_TXT, units: { type: 'ARRAY', items: { type: 'OBJECT', required: ['num', 'title', 'product', 'rubric', 'sessions'],
@@ -108,7 +108,8 @@
 
   const trabajar = () => MD.cargar().then(trabajarUI).catch(() => abrir('✨ Trabajar con Molí', '', 'pensativa', '<p>📶 No pude cargar las unidades. Revisa tu internet.</p>'));
   function trabajarUI() {
-    const U = (MD.contenido() ? MD.contenido().units : []).filter(u => /^unit\d+$/.test(u.key));
+    const U = (MD.contenido() ? MD.contenido().units : []).filter(u => new RegExp('^' + MD.esp() + 'unit\\w+$').test(u.key));
+    if (!U.length) return abrir('✨ Trabajar con Molí', '', 'pensativa', '<p>📗 Primero crea tu unidad: abre el <b>cuaderno de sesiones</b> y toca <b>«➕ Nueva unidad»</b>. Luego vuelve aquí y Molí la arma con tus materiales.</p>');
     const W = { files: [], stop: false, run: false };
     const b = abrir('✨ Trabajar con Molí', 'Molí arma tu unidad con tus fotos, PDF o Word y la pone tal cual en el cuaderno.', 'idea', `
       <div class="hp-f"><label>📘 Unidad</label><select class="tw-u">${U.map(u => `<option value="${esc(u.key)}">Unidad ${esc(u.num)}${L(u.title) ? ' · ' + esc(u.title) : ''}${(u.sessions || []).some(s => L(s.meta)) ? ' (se reemplaza)' : ''}</option>`).join('')}</select>
@@ -139,7 +140,7 @@
         prog('Molí está leyendo tus materiales…', `${W.files.length} archivo(s)`, .03);
         const P = await partes(W.files);
         prog('Molí arma el plan de la unidad…', 'Metas, criterios y rúbrica de cada sesión', .08);
-        const plan = await MD.pensarCon(P, `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú. Vas a armar la UNIDAD ${unit.num}${L(unit.title) ? ` («${unit.title}»)` : ''} completa (pon "num": "${unit.num}").
+        const plan = await MD.pensarCon(P, `Eres una docente experta de Ciencia y Tecnología de ${MD.espInfo().txt} en Perú. Vas a armar la UNIDAD ${unit.num}${L(unit.title) ? ` («${unit.title}»)` : ''} completa (pon "num": "${unit.num}").
 ${ESTILO}CÓMO ARMAR LA UNIDAD COMPLETA:
 1) Lee TODOS los materiales adjuntos y las indicaciones del profesor. Las indicaciones del profesor mandan sobre todo lo demás. Si un archivo dice «(Sesión N)», es material de la sesión N.
 2) Identifica el propósito, el producto final y la rúbrica con sus criterios.
@@ -165,7 +166,7 @@ IMPORTANTE: en cada sesión pon también "mat": un resumen (máximo 1500 caracte
           const o = U0.sessions[s]; prog(`Sesión ${s + 1} de ${N}: actividades y Exit ticket…`, o.meta, .1 + .88 * hecho / pasos);
           const lista = U0.sessions.map((x, k) => `${k + 1}. ${x.meta}${k === s ? '  ← ESTA SESIÓN' : ''}`).join('\n');
           const SP = deSesion(s + 1);
-          const r = await MD.pensarCon(SP.P, `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú.${SP.nota}
+          const r = await MD.pensarCon(SP.P, `Eres una docente experta de Ciencia y Tecnología de ${MD.espInfo().txt} en Perú.${SP.nota}
 ${ESTILO}Unidad ${U0.num}: «${U0.title}». Producto: «${U0.product}». Rúbrica: ${(U0.rubric || []).join(' · ')}.
 Sesiones de la unidad:
 ${lista}
@@ -186,7 +187,7 @@ RESPETA LA FICHA DEL COLEGIO: si los materiales de esta sesión traen sus activi
             if (W.stop) throw new Error('STOP');
             prog(`Sesión ${s + 1} de ${N}: la ficha…`, ses.activities.map(a => a.title).join(' · '), .1 + .88 * hecho / pasos);
             try {
-              const fx = await MD.pensarCon(SP.P, `Eres una docente experta de Ciencia y Tecnología de 6.° grado en Perú. Arma la FICHA de la sesión ${s + 1} que los estudiantes verán dentro de su cuaderno (y que también se imprime).${SP.nota}
+              const fx = await MD.pensarCon(SP.P, `Eres una docente experta de Ciencia y Tecnología de ${MD.espInfo().txt} en Perú. Arma la FICHA de la sesión ${s + 1} que los estudiantes verán dentro de su cuaderno (y que también se imprime).${SP.nota}
 Meta: «${o.meta}». Criterios: ${o.criteria.filter(L).join(' | ')}. Enfoque: ${r.enf || 'andamios'}.${o.mat ? `\nLo que dicen los materiales del colegio sobre esta sesión: «${o.mat}»` : ''}
 Actividades:
 ${ses.activities.map((a, k) => `${k + 1}) (${a.mode === 'group' ? 'en equipos' : 'individual'}) «${a.title}»: ${a.desc}`).join('\n')}
@@ -291,7 +292,41 @@ Devuelve "sections" en orden; cada una con "kind": "texto" (información: "headi
   }
 
   // ---- qué abre cada botón del fotocheck ----
-  const H = { cuenta: crearCuenta, trabajar, preparadas };
+  // =================================================================
+  //  👩‍🏫 DOCENTES Y CORCHOS (sólo la dueña): otro docente con su Gmail y su propio corcho; y ver cada corcho
+  // =================================================================
+  function docentes(msg) {
+    const E = MD.ESPS, nom = k => `${E[k].area} ${E[k].gn}`, ahora = MD.esp();
+    const b = abrir('👩‍🏫 Docentes y corchos', 'Cada docente tiene su propio corcho: sus unidades, sesiones, Exit tickets, refuerzos y notas. El aula, los juegos y Molí son de todos.', 'feliz', `
+      <div class="hp-lista"><b>👀 Ver el corcho de</b><div class="hp-secs">${Object.keys(E).map(k => `<button data-dc="ver" data-k="${k}"${k === ahora ? ' class="on" disabled' : ''}>${nom(k)}${k ? '' : ' (el tuyo)'}</button>`).join('')}</div></div>
+      <div class="hp-lista"><b>👩‍🏫 Docentes con su Gmail</b><div class="dc-ls"><p>Cargando…</p></div></div>
+      <div class="hp-lista"><b>🔑 Administradores con DNI y clave</b><div class="dc-ad"><p>Cargando…</p></div></div>
+      <form class="hp-f" data-dcf="1"><label>➕ Agregar docente</label>
+        <input name="nom" maxlength="60" placeholder="Nombre completo" required>
+        <div class="hp-row"><input name="dni" inputmode="numeric" maxlength="8" placeholder="Su DNI (8 números)" required><select name="esp">${Object.keys(E).filter(k => k).map(k => `<option value="${k}">${nom(k)}</option>`).join('')}</select></div>
+        <input name="email" type="email" placeholder="Su Gmail (con ese entra)" required style="letter-spacing:0">
+        <button class="hp-ok" type="submit">➕ Agregar</button><p class="hp-msg">${msg || 'Entra con su DNI en el fotocheck y luego con su cuenta de Google.'}</p></form>`);
+    const ls = b.querySelector('.dc-ls');
+    Docente.docentesGmail().then(L => { ls.innerHTML = L.length ? L.map(d => `<p>🧑‍🏫 <b>${esc(d.name)}</b> · ${esc(E[d.esp] ? nom(d.esp) : d.esp)}<br><small>${esc(d.email)}</small> <button data-dc="rm" data-e="${esc(d.email)}" class="rv-q">Quitar</button></p>`).join('') : '<p>Todavía no agregas a nadie.</p>'; })
+      .catch(() => { ls.innerHTML = '<p>📶 No pude traer la lista.</p>'; });
+    const ad = b.querySelector('.dc-ad');
+    Docente.adminsDni().then(L => { ad.innerHTML = L.length ? L.map(d => `<p>🔑 <b>${esc(d.name)}</b>${d.area ? ' · ' + esc(d.area) : ''} <button data-dc="rmad" data-r="${esc(d.rid)}" data-n="${esc(d.name)}" class="rv-q">Quitar</button></p>`).join('') : '<p>Ninguno.</p>'; })
+      .catch(() => { ad.innerHTML = '<p>📶 No pude traer la lista.</p>'; });
+    b.addEventListener('click', async e => {
+      const x = e.target.closest('[data-dc]'); if (!x) return;
+      if (x.dataset.dc === 'ver') { MD.LS.set('moli2:esp', x.dataset.k); x.textContent = 'Abriendo…'; return location.reload(); }
+      if (x.dataset.dc === 'rmad' && confirm('¿Quitar a ' + x.dataset.n + '? Ya no podrá entrar como docente.')) {
+        x.disabled = true; try { await Docente.quitarAdmin(x.dataset.r); docentes('✅ Quitado.'); } catch (y) { x.disabled = false; alert(errTxt(y)); } }
+      if (x.dataset.dc === 'rm' && confirm('¿Quitar a ' + x.dataset.e + '? Ya no podrá editar su corcho (lo que hizo se queda guardado).')) {
+        x.disabled = true; try { await Docente.quitarDocente(x.dataset.e); docentes('✅ Quitado.'); } catch (y) { x.disabled = false; alert(errTxt(y)); } }
+    });
+    b.querySelector('[data-dcf]').addEventListener('submit', async e => {
+      e.preventDefault(); const f = e.target, m = f.querySelector('.hp-msg'), k = f.querySelector('button'); k.disabled = true; m.textContent = 'Guardando…';
+      try { await Docente.agregarDocente(f.email.value, f.nom.value, f.dni.value, f.esp.value); docentes(`✅ Listo: ${esc(f.nom.value)} ya puede entrar con su DNI y su Gmail.`); }
+      catch (y) { k.disabled = false; m.textContent = y.message === 'CORREO' ? 'Revisa el Gmail.' : y.message === 'NOMBRE' ? 'Escribe su nombre.' : y.message === 'DNI' ? 'Revisa el DNI (8 números).' : errTxt(y); }
+    });
+  }
+  const H = { cuenta: crearCuenta, trabajar, preparadas, docentes };
   addEventListener('moli2:herramienta', e => { const f = H[e.detail] || (window.Herramientas && window.Herramientas.extra && window.Herramientas.extra[e.detail]); if (f) f(); });
   window.Herramientas = { abrir, cerrar, esc, extra: {}, set cerrarActual(f) { cerrarActual = f; } };
 })();

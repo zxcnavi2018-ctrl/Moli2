@@ -5,7 +5,6 @@
 // ===================================================================
 (function () {
   const { esc, L, IMG, temaDe } = Hojas._;
-  const PROFE = 'Christian Quispe Llerena';
   const SELLOS = [
     { k: 'exit', i: '🎟️', t: 'Exit AD', c: '#b91c1c', d: 'Logras AD en tu Exit ticket' },
     { k: 'part', i: '🙋', t: 'Participación +4', c: '#1d4ed8', d: 'Tu profe te pone +4 en participación' },
@@ -40,7 +39,7 @@
       if (it.k === 'tapa') return `<div class="pp-sl pp-tapa"><div class="pp-oro"><small>REPÚBLICA DE LA CIENCIA</small><div class="pp-em">${esc(u.icon || '🔬')}</div><h1>Pasaporte<span>científico</span></h1>
         <p class="pp-un">Unidad ${esc(u.num)} · ${esc(u.title)}</p><p class="pp-nm">${esc(P.me.name)}</p><small>Desliza o toca › para abrir</small></div></div>`;
       if (it.k === 'datos') return `<div class="pp-sl pp-papel"><h2>🆔 Datos del viajero</h2><div class="pp-id"><div class="pp-ph"><img src="${IMG('feliz')}" alt=""></div><dl>
-        <dt>Nombre</dt><dd>${esc(P.me.name)}</dd><dt>Grado</dt><dd>6° ${esc(P.me.section)}</dd><dt>Área</dt><dd>Ciencia y Tecnología</dd><dt>Unidad</dt><dd>${esc(u.num)} · ${esc(u.title)}</dd><dt>Sellos</dt><dd><b>${it.got}</b> de ${it.tot}</dd></dl></div>
+        <dt>Nombre</dt><dd>${esc(P.me.name)}</dd><dt>Grado</dt><dd>${MD.espInfo().gn} ${esc(P.me.section)}</dd><dt>Área</dt><dd>Ciencia y Tecnología</dd><dt>Unidad</dt><dd>${esc(u.num)} · ${esc(u.title)}</dd><dt>Sellos</dt><dd><b>${it.got}</b> de ${it.tot}</dd></dl></div>
         <div class="pp-mrz">P&lt;PER&lt;${esc(String(P.me.name).toUpperCase().replace(/\s+/g, '<'))}&lt;&lt;&lt;<br>${esc(String(P.me.dni || '').replace(/\d(?=\d{3})/g, '•'))}&lt;CIENCIA&lt;MOLI&lt;&lt;&lt;</div>${pie}</div>`;
       if (it.k === 'reglas') return `<div class="pp-sl pp-papel"><div class="pp-mq"><img class="pp-mol" src="${IMG('decidida')}" alt=""><div class="pp-bub"><b>¡Hola, ${esc(String(P.me.name).split(' ')[0])}! Soy Molí.</b> En cada sesión puedes ganar <b>4 sellos</b>. Si los juntas todos, ¡recibes un <b>Diploma de felicitaciones</b> que puedes descargar! 🏅</div></div>
         <ul class="pp-ins">${SELLOS.map(s => `<li><span class="pp-st on" style="--c:${s.c};--r:-6deg"><i>${s.i}</i><b>${s.t}</b></span><span>${s.d}</span></li>`).join('')}</ul>${pie}</div>`;
@@ -111,7 +110,7 @@
         x.font = '600 22px system-ui,sans-serif'; x.fillStyle = '#5b6785'; x.fillText('Tu robot de Ciencia', 380, 1046);
         x.save(); x.translate(W / 2, 900); const sg = x.createRadialGradient(0, 0, 10, 0, 0, 95); sg.addColorStop(0, '#ffe08a'); sg.addColorStop(1, '#c8961e'); x.fillStyle = sg; x.beginPath();
         for (let k = 0; k < 24; k++) { const R = k % 2 ? 78 : 95, A = k * Math.PI / 12; x.lineTo(Math.cos(A) * R, Math.sin(A) * R); } x.closePath(); x.fill(); x.fillStyle = '#fff'; x.font = '900 64px system-ui'; x.fillText('★', 0, 22); x.restore();
-        x.fillStyle = '#12224a'; x.font = '62px "Moli Script","Great Vibes",cursive'; x.fillText(PROFE, W - 420, 975);
+        x.fillStyle = '#12224a'; x.font = '62px "Moli Script","Great Vibes",cursive'; x.fillText(MD.profe(), W - 420, 975);
         x.strokeStyle = '#94a3b8'; x.lineWidth = 2; x.beginPath(); x.moveTo(W - 640, 995); x.lineTo(W - 200, 995); x.stroke();
         x.font = '600 22px system-ui,sans-serif'; x.fillStyle = '#5b6785'; x.fillText('Docente de Ciencia', W - 420, 1030);
         x.font = 'italic 22px Georgia,serif'; x.fillText(new Date().toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }), W / 2, 1030);

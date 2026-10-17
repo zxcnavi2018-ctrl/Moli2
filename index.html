@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Molí 2 · Aula de sexto grado</title>
+<script>
+// el grado del corcho de quien entra (igual que MD.esp en datos.js): 6.° o 7.°
+window.GR7 = (() => { try { const m = JSON.parse(localStorage.getItem('moli2:me') || 'null'); if (!m) return false;
+  if (m.docente || m.teacher) return (m.tipo === 'owner' ? JSON.parse(localStorage.getItem('moli2:esp') || '""') : m.esp) === 'c7'; return m.grade === '7mo'; } catch (e) { return false; } })();
+window.GRADO = GR7 ? { gn: '7°', pal: 'séptimo' } : { gn: '6°', pal: 'sexto' };
+if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
+</script>
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #000; touch-action: none; font-family: system-ui, sans-serif; user-select: none; -webkit-user-select: none; }
   canvas { display: block; }
@@ -177,8 +184,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hojas.css?v=202610161340">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610170500"></script><script src="sincro.js?v=202610170330"></script><script src="guion.js?v=202610170500"></script><script src="datos.js?v=202610161340"></script><script src="docente.js?v=202610161340"></script>
-<script src="hojas.js?v=202610170330"></script><script src="hojas-docente.js?v=202610161340"></script><script src="diplomas.js?v=202610161340"></script><script src="fotocheck.js?v=202610161340"></script><script src="herramientas.js?v=202610161340"></script><script src="remoto.js?v=202610170500"></script><script src="escaner.js?v=202610161340"></script><script src="tarjetas.js?v=202610161340"></script>
+<script src="moli3d.js?v=202610170500"></script><script src="sincro.js?v=202610170330"></script><script src="guion.js?v=202610170500"></script><script src="datos.js?v=202610171300"></script><script src="docente.js?v=202610171300"></script>
+<script src="hojas.js?v=202610171300"></script><script src="hojas-docente.js?v=202610171300"></script><script src="diplomas.js?v=202610171300"></script><script src="fotocheck.js?v=202610171300"></script><script src="herramientas.js?v=202610171300"></script><script src="remoto.js?v=202610171300"></script><script src="escaner.js?v=202610171300"></script><script src="tarjetas.js?v=202610171300"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -218,7 +225,7 @@
 <body>
 <div id="splash" role="status" aria-label="Cargando Molí 2">
   <h1 class="sw" aria-label="Molí 2"><b>M</b><b>O</b><b>L</b><b>Í</b><span class="bot"><span class="fl"><img class="e0" src="img/moli3d/s0.webp" alt=""><img class="e2" src="img/moli3d/s2.webp" alt=""><img class="e1" src="img/moli3d/s1.webp" alt=""><img class="e3" src="img/moli3d/s3.webp" alt=""><span class="dos">2</span></span></span></h1>
-  <div class="lema">Tu aula de sexto grado ✨</div>
+  <div class="lema">Tu aula de sexto grado ✨</div><script>if (GR7) document.currentScript.previousElementSibling.textContent = 'Tu aula de séptimo grado ✨';</script>
   <div class="bar"><i></i></div>
 </div>
 <script>window.SPLASH = new Promise(r => setTimeout(() => { const s = document.getElementById('splash'); s.classList.add('out'); setTimeout(() => s.remove(), 700); r(); }, -performance.now() + (navigator.webdriver && !/splash=1/.test(location.search) ? 1200 : 10000)));</script>
@@ -829,7 +836,7 @@ function repoScreenTex() {                                          // lo que se
   const c = document.createElement('canvas'); c.width = 512; c.height = 320; const g = c.getContext('2d');
   g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, 512, 320);
   const gr = g.createLinearGradient(0, 0, 512, 0); gr.addColorStop(0, '#0b2e4f'); gr.addColorStop(0.65, '#0a6aa1'); gr.addColorStop(1, '#1a8bc9'); g.fillStyle = gr; g.fillRect(0, 0, 512, 78);
-  g.fillStyle = '#cfe8a7'; g.font = 'bold 13px "Trebuchet MS", sans-serif'; g.fillText('INNOVA SCHOOLS · 6.° GRADO', 22, 26);
+  g.fillStyle = '#cfe8a7'; g.font = 'bold 13px "Trebuchet MS", sans-serif'; g.fillText('INNOVA SCHOOLS · ' + GRADO.gn.replace('°', '.°') + ' GRADO', 22, 26);
   g.fillStyle = '#fff'; g.font = 'bold 30px Georgia, serif'; g.fillText('Repositorio Educativo', 22, 60);
   [['📰 Revista', '#0b2e4f'], ['🔎 Fuentes', '#fff'], ['📤 Enviar', '#fff']].forEach(([t, bg], i) => { rrect(g, 18 + i * 128, 92, 118, 34, 12); g.fillStyle = bg; g.fill(); g.strokeStyle = '#d9e4ee'; g.lineWidth = 2; g.stroke(); g.fillStyle = bg === '#fff' ? '#4b6075' : '#fff'; g.font = 'bold 15px "Trebuchet MS", sans-serif'; g.fillText(t, 30 + i * 128, 115); });
   [['#e7f2fa', '🔬'], ['#eef8e3', '🛠️'], ['#fff4d6', '🧩']].forEach(([bg, ic], i) => { const x = 18 + i * 162; rrect(g, x, 142, 150, 160, 16); g.fillStyle = '#fff'; g.fill(); g.strokeStyle = '#d9e4ee'; g.stroke();
@@ -860,7 +867,7 @@ function drawLocker26(mine, name) {                             // placas con el
 }
 const locker26Tex = drawLocker26(0, '');
 // textos del corcho: la docente los edita (fotocheck → 📌 Editar corcho); se guardan en Firebase (files/fcorcho-0)
-window.CORCHO = { head: '🔬 CIENCIA · 6° GRADO', l1: 'La unidad a trabajar es:', unidad: 'Unidad 7 · Microorganismos en acción', l2: 'El propósito de la unidad es:', prop: '',
+window.CORCHO = { head: '🔬 CIENCIA · ' + GRADO.gn + ' GRADO', l1: 'La unidad a trabajar es:', unidad: 'Unidad 7 · Microorganismos en acción', l2: 'El propósito de la unidad es:', prop: '',
   normasT: 'NORMAS DEL AULA', normas: ['✋ Levanto la mano', '🤝 Trabajo en equipo', '👂 Escucho a todos', '🧹 Cuido mi aula'], cientT: '¡SOMOS CIENTÍFICOS!', pasos: ['Observo', 'Me pregunto', 'Experimento', 'Concluyo'] };
 function corkTex(LL) {                                            // mural de corcho: carteles blancos con letras azules, chinches, cinta y stickers
   const H = 420, W = Math.min(4096, Math.round(H * LL / 1.22)), c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
@@ -2157,7 +2164,7 @@ const titleEl = document.getElementById('title'); let titleT = 0, titleT2 = 0, t
 function showTitle(text, n) {                                       // nombre de la escena: franja, "ESCENA n", título grande con líneas doradas; luego se desvanece
   clearTimeout(titleT); clearTimeout(titleT2);
   titleEl.className = ''; titleEl.style.display = 'block';
-  titleEl.innerHTML = '<div class="card"><div class="band"></div><div class="sub">Escena ' + (n + 1) + ' · Aula de sexto grado</div><div class="main">' + text + '<div class="shine"></div></div><br><div class="deco"><i class="l"></i><b></b><i class="r"></i></div></div>';
+  titleEl.innerHTML = '<div class="card"><div class="band"></div><div class="sub">Escena ' + (n + 1) + ' · Aula de ' + GRADO.pal + ' grado</div><div class="main">' + text + '<div class="shine"></div></div><br><div class="deco"><i class="l"></i><b></b><i class="r"></i></div></div>';
   titleOpen(); titleGate = new Promise(r => { titleOpen = r; });
   titleT = setTimeout(() => { titleEl.classList.add('out'); titleOpen(); }, 2300);                  // se queda un ratito y se va
   titleT2 = setTimeout(() => { titleEl.style.display = 'none'; }, 3150);
@@ -2320,7 +2327,7 @@ moli.root.scale.setScalar(MSC);
 const moliFloor = moli.root.children.find((c, i) => i > 0 && c.isGroup);   // su aro de luz (va en el piso o la mesa que tiene debajo)
 const nombre = firstName();
 const GUIA = [
-  '¡Hola' + (nombre ? ' <b>' + nombre + '</b>' : '') + '! 👋 Soy <b>Molí</b>, tu guía. Esta es tu <b>aula de sexto grado</b>. Toca <b>▶</b> o la derecha de la pantalla y te muestro cada lugar.',
+  '¡Hola' + (nombre ? ' <b>' + nombre + '</b>' : '') + '! 👋 Soy <b>Molí</b>, tu guía. Esta es tu <b>aula de ' + GRADO.pal + ' grado</b>. Toca <b>▶</b> o la derecha de la pantalla y te muestro cada lugar.',
   'Esta es <b>tu mesa</b>. Aquí está tu <b>cuaderno verde</b> con tus <b>sesiones de unidad</b>: lo que aprendes en cada clase. 📗',
   'Este es <b>tu locker</b>. Adentro está tu <b>portafolio verde</b> con tus <b>Exit tickets</b>: lo que respondes al final de cada clase. 🎒',
   'Este es el mueble de la <b>Biblioteca de Temas</b> 📚: cada <b>disco</b> es un juego de ciencia. Elige uno con las flechitas y toca <b>🎮 Jugar</b>. ¡Y abre las <b>puertitas</b> para conocer a <b>Plantancio</b>! 🌱',
@@ -2466,7 +2473,7 @@ function menuMoli() {                                                // la venta
   const me = MD.yo(), b = (k, ic, t) => `<button data-ir="${k}"><i>${ic}</i>${t}</button>`;
   menuEl.innerHTML = `<div class="mm-c"><div class="mm-h"><img src="img/moli/hola.webp" alt=""><div><b>¡Hola${me ? ', ' + String(me.name).split(' ')[0] : ''}! 👋</b><span>Soy Molí. ¿A dónde vamos?</span></div><button class="mm-x" data-ir="x" aria-label="Cerrar">✕</button></div>
     <div class="mm-g">${b(1, '📗', 'Mis sesiones')}${b(2, '🎟️', 'Mis Exit tickets')}${b(3, '🧪', 'Laboratorio')}${b(5, '📂', 'Mis notas')}${b(6, '💪', 'Mis misiones')}${MD.esDocente() ? b(7, '📽️', 'Mi presentación') : b(7, '🏅', 'Mis diplomas')}</div>
-    ${me ? `<p class="mm-me">👤 ${me.name} · 6° ${me.section} <button data-ir="salir">Salir</button></p>` : ''}</div>`;
+    ${me ? `<p class="mm-me">👤 ${me.name} · ${GRADO.gn} ${me.section} <button data-ir="salir">Salir</button></p>` : ''}</div>`;
   menuEl.classList.add('on');
 }
 menuEl.addEventListener('click', e => { const b = e.target.closest('[data-ir]'); if (e.target === menuEl || b) menuEl.classList.remove('on'); if (!b) return;
@@ -2491,7 +2498,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202610161340"></script><script src="corcho.js?v=202610161340"></script><script src="mando.js?v=202610170500"></script><script src="anuncio.js?v=202610161340"></script><script src="muro.js?v=202610161340"></script>
+<script src="revista.js?v=202610171300"></script><script src="corcho.js?v=202610171300"></script><script src="mando.js?v=202610170500"></script><script src="anuncio.js?v=202610161340"></script><script src="muro.js?v=202610171300"></script>
 <script src="archivos.js?v=202610161340"></script><script src="editor.js?v=202610161340"></script>
 </body>
 </html>
