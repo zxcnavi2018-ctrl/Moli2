@@ -350,6 +350,7 @@ main{flex:1;overflow:auto;padding:18px 20px 40px;scroll-behavior:smooth}
 @media (max-width:820px){.tr-r{grid-template-columns:30px 1fr}.tr-r .tr-slots,.tr-r .tr-st{grid-column:2}}
   .btn.word{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border:0;border-radius:16px;background:linear-gradient(135deg,#1d4ed8,#2563eb 50%,#0ea5e9);color:#fff;font-weight:900;font-size:17px;letter-spacing:.04em;box-shadow:0 6px 0 #1e3a8a,0 14px 26px -10px rgba(37,99,235,.7);cursor:pointer;transition:transform .15s}
   .btn.word:hover{transform:translateY(-2px)}.btn.word:active{transform:translateY(3px);box-shadow:0 2px 0 #1e3a8a}
+  #hoja [data-may], #eT { text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -752,13 +753,13 @@ function abrirHojaDoc(id) {
     for (let q = 0; q < P.length - 1; q++) { const a = P[q], b = P[q + 1], H = M.filter(m => m.a <= a && m.b >= b), cl = [...new Set(H.map(m => m.t === 's' ? 'rvs' : m.t === 'o' ? 'rvo' : 'rvm'))], ti = H.map(m => m.c ? '💬 ' + m.c : m.t === 'o' ? 'Ortografía: ' + (m.msg || '') : m.t === 's' ? 'Igualito a un librito de la Biblioteca: escríbelo con tus palabras' : '').filter(Boolean), nn = H.find(m => m.n && m.b === b);
       o += cl.length ? `<span class="${cl.join(' ')}" title="${esc(ti.join(' · '))}"${nn ? ` data-n="${nn.n}"` : ''}>${esc(t.slice(a, b))}</span>` : esc(t.slice(a, b)); }
     return o.replace(/\n/g, '<br>'); };
-  const ta = (id, ph, r = 3) => `<div class="wd-ed" data-k="${id}" data-ed data-ph="${esc(ph || '')}" style="min-height:${(Math.max(1, r) * 1.55 + .8).toFixed(2)}em" contenteditable="${ro ? 'false' : 'true'}" spellcheck="true" lang="es">${conMarcas(id) || (v[id + '_h'] ? limpiaH(v[id + '_h']) : esc(v[id] || '').replace(/\n/g, '<br>'))}</div>`;
+  const ta = (id, ph, r = 3) => `<div class="wd-ed" data-k="${id}"${qIds(G).has(id) ? ' data-may' : ''} data-ed data-ph="${esc(ph || '')}" style="min-height:${(Math.max(1, r) * 1.55 + .8).toFixed(2)}em" contenteditable="${ro ? 'false' : 'true'}" spellcheck="true" lang="es">${conMarcas(id) || (v[id + '_h'] ? limpiaH(v[id + '_h']) : esc(v[id] || '').replace(/\n/g, '<br>'))}</div>`;
   const inp = (id, ph, ex = '') => `<input data-k="${id}" ${ex} placeholder="${esc(ph || '')}" value="${esc(v[id] || '')}"${dis}>`;
   d.innerHTML = `<div class="wd-bar"><span class="wd-w">W</span><b>${esc(h.t || 'Mi ' + t[2].toLowerCase())} - Word de Molí</b><span class="wd-sv" id="wdSv">${ro ? '📨 Enviado' : '💾 Guardado'}</span>${ro ? '<button type="button" class="wd-ok" data-hcopia>✏️ Hacer una copia para corregir</button>' : '<button type="button" class="wd-ok" data-hok>💾 Guardar trabajito</button>'}<button type="button" class="wd-x" data-hx aria-label="Cerrar">✕</button></div>
   <div class="wd-rib">${ro ? '' : '<button type="button" class="wd-fm" data-fmt="bold" title="Negrita"><b>N</b> Negrita</button><button type="button" class="wd-fm mk" data-fmt="mark" title="Marcador"><span>🖍️</span> Marcador</button><i></i>'}<span class="wd-np">🚫📋 Pegar desactivado · sólo en Link</span></div>
   ${dv ? '<div class="rv-gr">' : ''}<div class="wd-sc"><div class="wd-pg">${ro ? `<p class="wd-ro">📨 Esta guía ya la enviaste el ${fecha(h.env)}. Sólo puedes leerla. Si te la devolvieron, toca «Hacer una copia para corregir».</p>` : ''}
     <p class="wd-k">REVISTA INNOVADORA · GUÍA PASO A PASO</p><h1>${t[1]} ${esc(t[2])}</h1><p class="wd-sub">${esc(G.sub)} Usa mínimo 3 citas parafraseadas dentro de tu trabajo y escribe sus fuentes al final.</p>
-    <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
+    <div class="wd-tt"><label>Título de mi trabajo</label><input data-k="_t" data-may maxlength="100" value="${esc(h.t || '')}" placeholder="Escribe aquí tu título"${dis}></div>
     <div class="wd-tt wd-kw"><label>Palabras clave <small>(de 3 a 5, separadas por comas: con ellas te encontrarán en el 🔍 Buscador)</small></label><input data-k="_kw" maxlength="200" value="${esc(h.kw || '')}" placeholder="Ej.: levadura, pan, hongos"${dis}></div>
     ${G.pasos.map((p, i) => `<section class="wd-ps"><h2><span>PASO ${i + 1}</span> ${esc(p.t)}</h2><p class="wd-h">${esc(p.h)}</p>
       ${(p.c || []).map(c => c.pre ? `<div class="wd-pre"><b>${esc(c.pre)}</b>${ta(c.id, c.ph || '…', c.r || 1)}</div>` : c.uno ? `<div class="wd-pre"><b>${esc(c.lab)}:</b>${inp(c.id, 'la idea de este párrafo', 'maxlength="160"')}</div>` : `${c.lab ? `<h3>${esc(c.lab)}</h3>` : ''}${ta(c.id, c.ph, c.r)}${c.min ? `<div class="wd-cnt" data-cnt="${c.id}" data-min="${c.min}"></div>` : ''}`).join('')}
@@ -798,9 +799,11 @@ document.addEventListener('click', e => {
 const crecer = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; };
 const HPREV = new WeakMap();
 let hojaT = 0;
+// 🔠 el título y la pregunta de investigación se escriben en MAYÚSCULAS (se ven así al escribir y se guardan así)
+const qIds = G => new Set(G.pasos.filter(p => /pregunta|tema/i.test(p.t || '')).flatMap(p => (p.c || []).map(c => c.id)));
 function hojaGuardar() {
   const d = $('#hoja'); if (!d || d.hidden) return; const h = hojaDoc(d.dataset.id); if (!h || h.st === 'env') return;
-  d.querySelectorAll('[data-k]').forEach(x => { const k = x.dataset.k; if (k === '_t') h.t = x.value; else if (k === '_kw') h.kw = x.value; else if (x.hasAttribute('data-ed')) { h.v[k] = valDe(x); h.v[k + '_h'] = limpiaH(x.innerHTML); } else h.v[k] = x.type === 'checkbox' ? x.checked : x.value; });
+  d.querySelectorAll('[data-k]').forEach(x => { const k = x.dataset.k; if (k === '_t') h.t = x.value.toLocaleUpperCase('es'); else if (k === '_kw') h.kw = x.value; else if (x.hasAttribute('data-ed')) { h.v[k] = x.hasAttribute('data-may') ? valDe(x).toLocaleUpperCase('es') : valDe(x); h.v[k + '_h'] = limpiaH(x.innerHTML); } else h.v[k] = x.type === 'checkbox' ? x.checked : x.value; });
   h.np = hojaPal(h); hojaPut(h); const s = $('#wdSv'), n = $('#wdN'); if (s) s.textContent = '💾 Guardado'; if (n) n.textContent = hojaPal(h) + ' palabras';
 }
 function noPegar(x) { toast('🚫 Aquí no se puede pegar: escríbelo con tus propias palabras. Sólo puedes pegar en «Link».', 3600); if (x) { x.classList.remove('wd-no'); void x.offsetWidth; x.classList.add('wd-no'); } }
@@ -955,7 +958,7 @@ function pintaWord() { const fd = $('#fDoc'); if (fd) fd.hidden = sinWord(); doc
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'fEnv') return; e.preventDefault();
   if (!ME) return avisoDni();
-  const hj = sinWord() && FORM.hid && hojaDoc(FORM.hid), kw = String(hj ? hj.kw || '' : $('#eK').value).replace(/\s+/g, ' ').trim(), t = String(hj ? hj.t || '' : $('#eT').value).replace(/\s+/g, ' ').trim(), d = hj ? hojaTexto(hj) : FORM.txt, f = '', link = '';
+  const hj = sinWord() && FORM.hid && hojaDoc(FORM.hid), kw = String(hj ? hj.kw || '' : $('#eK').value).replace(/\s+/g, ' ').trim(), t = String(hj ? hj.t || '' : $('#eT').value).replace(/\s+/g, ' ').trim().toLocaleUpperCase('es'), d = hj ? hojaTexto(hj) : FORM.txt, f = '', link = '';
   if (sinWord() && (!hj || hj.st !== 'por')) { toast('📤 Primero elige qué investigación vas a enviar.'); return elegirParaEnviar(); }
   if (t.length < 4) return toast('✏️ Escribe un título un poquito más largo.');
   if (hj && hj.ty !== FORM.ty) FORM.ty = hj.ty;
