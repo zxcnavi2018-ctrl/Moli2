@@ -40,7 +40,7 @@
     const P = partes(w), q = P.S.find(s => s.k === 'q'), r = P.S.find(s => s.k === 'r'), su = P.S.find(s => s.k === 's'), ab = P.S.find(s => s.k === 'a'), rest = P.S.filter(s => s !== q && s !== r && s !== su && s !== ab);
     const kws = String(w.kw || '').split(',').map(x => x.trim()).filter(Boolean), A = [w.img, w.img2, w.img3].filter(Boolean), y = anio(w);
     const ref = x => `${esc(x.a || 'Autor desconocido')}. (${esc(x.y || 's. f.')}). <i>${esc(x.t || 'Sin título')}</i>.${x.l ? ` Recuperado de <span class="url">${esc(x.l)}</span>` : ''}`;
-    const fx = !su && FIJO[w.id], abT = ab ? ab.p.join(' ') : fx ? fx.a : '';
+    const fx = !su && FIJO[w.id];                                     // (sin Abstract: el PDF sólo lleva el Resumen)
     const res0 = (fx ? fx.s : su ? su.p.join(' ') : [q && q.p.join(' '), r && r.p.join(' ')].filter(Boolean).join(' ')).split(/\s+/).filter(Boolean), resumen = !su && !fx && res0.length > 70 ? res0.slice(0, 70).join(' ').replace(/[,;:.]?$/, '…') : res0.join(' ');   // como en las revistas: corto
     let n = 0; const sec = (t, ps) => `<h2>${++n}. ${esc(t)}</h2>${ps.map(x => `<p>${lnk(esc(x))}</p>`).join('')}`;
     const cuerpo = (q ? sec('Pregunta de investigación', q.p) : '') + rest.map(s => sec(s.k === 'h' ? (rest.length === 1 ? 'Desarrollo' : s.t) : s.t || 'Desarrollo', s.p)).join('') + (r ? sec('Conclusión', r.p) : '');
@@ -55,7 +55,7 @@ h2 { font: 700 12pt "Times New Roman", "Liberation Serif", serif; margin: 16px 0
 .ft { margin-top: 24px; border-top: 1px solid #999; padding-top: 4px; font: 9pt Arial, "Liberation Sans", sans-serif; color: #555; display: flex; justify-content: space-between; gap: 10px; }</style></head><body>
 <div class="hd"><span>REVISTA INNOVADORA · Repositorio Educativo</span><span>${esc(TIPO[w.ty] || 'Trabajo')} · Vol. 1 · ${y}</span></div>
 <h1>${esc(w.t || 'Trabajo')}</h1><div class="au">${esc(autorDe(w))}</div><div class="af">${w.sec ? `${grado(w)}.° grado «${esc(w.sec)}» · ` : ''}Ciencia y Tecnología · Innova Schools · Tacna</div>
-${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}${abT ? `<br><br><b>Abstract.</b> <i>${esc(abT)}</i>` : ''}</div>` : ''}
+${resumen || kws.length ? `<div class="abs">${resumen ? `<b>Resumen.</b> ${esc(resumen)}` : ''}${kws.length ? `${resumen ? '<br>' : ''}<b>Palabras clave:</b> ${esc(kws.join(', '))}.` : ''}</div>` : ''}
 ${cuerpo || '<p>Este trabajo no trae texto.</p>'}
 ${P.F.length ? `<div class="refs"><h2>Referencias</h2>${P.F.map(x => `<p>${ref(x)}</p>`).join('')}</div>` : w.f ? `<div class="refs"><h2>Referencias</h2><p>${lnk(esc(w.f))}</p></div>` : ''}
 ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc(x)}" alt=""><small>Anexo ${i + 1}</small></div>`).join('')}` : ''}
