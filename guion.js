@@ -177,5 +177,5 @@
   }
   function finSec() { const q = Q; if (!q) return; Q = null; q.T.forEach(clearTimeout); if (q.a) { try { q.a.pause(); } catch (e) {} } q.nav.querySelectorAll('.rt-b').forEach(b => b.classList.remove('guia')); if (q.x) q.x.parar(); q.box.remove(); }
   function dato(t) { if (!S || S.tipo !== 'sab') return; S.D = { t }; const p = S.el.querySelector('.gu-dato p'); if (p) p.textContent = limpiaSab(t); }
-  window.Guion = { html, montar, avanzar, parar, dato, secuencia, finSec, activo: () => !!S && document.body.contains(S.el), tipo: () => S && S.tipo, SUB, ACU, ROL, huella, limpiaSab };
+  window.Guion = { tres, html, montar, avanzar, parar, dato, secuencia, finSec, activo: () => !!S && document.body.contains(S.el), tipo: () => S && S.tipo, SUB, ACU, ROL, huella, limpiaSab };
 })();

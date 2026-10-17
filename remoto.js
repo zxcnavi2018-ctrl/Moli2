@@ -68,7 +68,7 @@
   }
   const escenas = () => { const B = [...document.querySelectorAll('#dots button')]; return B.length ? B.map(b => { const t = b.textContent.trim(), i = t.split(' ')[0]; return [i, t.slice(i.length).trim()]; }) : ESC; };   // las escenas reales del aula (incluye las nuevas)
   const ESC = [['🏫', 'Mi aula'], ['📗', 'Sesiones'], ['🎟️', 'Exit tickets'], ['💻', 'Laboratorio'], ['📌', 'Corcho'], ['📂', 'Notas'], ['💪', 'Misiones'], ['📽️', 'Pizarra']];
-  const ANIM = [['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
+  const ANIM = [['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
   const GC = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
   let cuerpo = null;
   function abrirControl() {
@@ -158,6 +158,7 @@
   const golpe = t0 => { tono(90, t0, .25, 'sine', .7); ruido(t0, .08, 180, .5); };
   function animar(k) {
     try { A().resume && A().resume(); } catch (e) {}
+    if (k === 'palmas') return palmas();
     if (k === 'shh') { molí3d('guiño'); [0, 1.4, 2.8].forEach(t => ruido(t, 1.1, 3500, .35));
       return mostrar(`<div class="an-st an-shh"><div class="an-ondas"><i></i><i></i><i></i></div><img class="an-m flota" src="${IMG('decidida')}" alt=""><div class="an-big">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7000, 'azul'); }
     if (k === 'drum') { molí3d('feliz', 'saltar'); for (let i = 0; i < 16; i++) golpe(i * .14); golpe(2.6); tono(55, 2.6, 1.2, 'triangle', .5);
@@ -185,6 +186,37 @@
       return mostrar(`<div class="an-st an-fin"><div class="an-tel l"></div><div class="an-tel r"></div><div class="an-luz"></div><h2 class="an-quien">¿Quién ganó? 🥁</h2>
         <div class="an-win"><img class="an-m bota" src="${IMG(gan.length ? 'estrellas' : 'pensativa')}" alt="">${gan.length ? `<b>🏆 ${gan.length > 1 ? '¡Empate! ' : ''}${gan.map(j => 'Grupo ' + (j + 1)).join(' y ')}</b><span>${mx} puntos</span>` : '<b>Aún no hay puntos</b>'}
         <div class="an-rk">${GC.map((c, j) => [j, p[j] || 0]).sort((a, b) => b[1] - a[1]).map(([j, v], r) => `<span style="--c:${GC[j]}">${r + 1}.º G${j + 1} · ${v}</span>`).join('')}</div></div>${gan.length ? '<div class="an-conf">' + '<i></i>'.repeat(22) + '</div>' : ''}</div>`, 16000, 'oscuro'); }
+  }
+  // ---- 👏 palmas: Molí aplaude «palma … palma palma palma palma» y los niños responden «palma palma» (dos veces) ----
+  let PAL = null;
+  function palmas() {
+    if (PAL) PAL.parar();
+    const B = [{ t: 0, q: 'm' }, { t: .9, q: 'm' }, { t: 1.14, q: 'm' }, { t: 1.38, q: 'm' }, { t: 1.62, q: 'm' }, { t: 2.35, q: 'n' }, { t: 2.65, q: 'n' }];   // un compás
+    const R = 3.6, VUELTAS = 2, golpes = [];
+    for (let v = 0; v < VUELTAS; v++) B.forEach(b => golpes.push({ ...b, t: 1.8 + v * R + b.t, v }));
+    const fin = 1.8 + VUELTAS * R + .6;
+    mostrar(`<div class="an-st an-pal"><div class="pal-mo"><canvas></canvas><img class="an-m bota" src="${IMG('feliz')}" alt="" hidden></div>
+      <div class="pal-txt"><b class="pal-q">👏 ¡Aplaudimos con Molí!</b></div>
+      <div class="pal-rit">${B.map((b, j) => `${j === 1 ? '<span class="pal-sep"></span>' : j === 5 ? '<span class="pal-sep g"></span>' : ''}<i class="${b.q}" data-j="${j}">👏</i>`).join('')}</div>
+      <div class="pal-et"><span class="m">MOLÍ</span><span class="n">¡USTEDES!</span></div></div>`, (fin + 2.4) * 1000, 'naranja');
+    const st = capa.querySelector('.an-pal'), cv = st.querySelector('canvas'), x = window.Guion && Guion.tres ? Guion.tres(cv) : null;
+    if (!x) { cv.hidden = true; st.querySelector('img').hidden = false; }
+    const M = x && x.m, T = [], t0 = performance.now(), q = st.querySelector('.pal-q');
+    const en = (s, f) => T.push(setTimeout(f, s * 1000));
+    PAL = { parar() { T.forEach(clearTimeout); if (x) x.parar(); if (PAL && PAL.st === st) PAL = null; }, st };
+    try { A().resume && A().resume(); } catch (e) {}
+    const aplauso = (t, v) => { ruido(t, .05, 1700, v); ruido(t, .03, 3200, v * .6); };   // el «clap» (sin archivos)
+    if (M) { M.expr('feliz'); M.accion('saludar'); }
+    en(.9, () => { q.textContent = '👀 ¡Miren y escuchen!'; if (M) M.palma(0); });
+    golpes.forEach(g => {
+      const j = B.findIndex(b => Math.abs(b.t - (g.t - 1.8 - g.v * R)) < 1e-6), el = () => st.querySelector(`.pal-rit i[data-j="${j}"]`);
+      if (g.q === 'm') { en(g.t - .07, () => M && M.palma(1)); en(g.t + .06, () => M && M.palma(0)); en(g.t, () => aplauso(0, .7)); }   // el sonido sale junto con el golpe de manos
+      en(g.t, () => { const e = el(); if (!e) return; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); });
+      if (j === 0) en(g.t - .15, () => { q.textContent = g.v ? '🔁 ¡Otra vez!' : '👏 Molí aplaude…'; st.classList.remove('turno'); st.querySelectorAll('.pal-rit i').forEach(i => i.classList.remove('on')); if (M) { M.palma(0); M.expr('feliz'); } });
+      if (j === 5) en(g.t - .45, () => { q.textContent = '🙌 ¡Ahora ustedes!'; st.classList.add('turno'); if (M) { M.palma(null); M.expr('estrellas'); M.accion('señalar', 1); } });
+    });
+    en(fin, () => { q.textContent = '🌟 ¡Muy bien! ¡Estamos atentos!'; st.classList.remove('turno'); st.classList.add('fin'); if (M) { M.palma(null); M.expr('estrellas'); M.accion('saltar'); } [523, 659, 784].forEach((f, k) => tono(f, k * .12, .3, 'triangle', .3)); });
+    en(fin + 2.3, () => PAL && PAL.st === st && PAL.parar());
   }
   // ---- sorteo: los nombres giran y se detiene en el elegido ----
   async function sorteo(arg) {

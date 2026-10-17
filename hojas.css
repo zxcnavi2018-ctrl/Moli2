@@ -636,3 +636,17 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 #rtMoli .rm-x { position: absolute; top: -8px; left: -8px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2b2547; background: #fff; font-weight: 900; cursor: pointer; }
 
 .sy-nv { margin: 0 auto -.4em; padding: .2em .9em; border-radius: 999px; background: #ef4444; color: #fff; font-weight: 900; font-size: 1.1em; box-shadow: 0 .15em 0 rgba(0,0,0,.2); }
+
+/* 👏 palmas (remoto.js) */
+.an-pal { justify-content: flex-start; gap: 1vh; height: 100vh; width: 100vw; padding-top: 1vh; }
+.pal-mo { position: relative; width: min(56vh, 520px); height: min(62vh, 560px); flex: none; margin-top: -2vh; }
+.pal-mo canvas { position: absolute; inset: 0; width: 100%; height: 100%; } .pal-mo img { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); }
+.pal-q { display: inline-block; padding: .35em 1em; border-radius: 999px; background: #fff; color: #7c2d12; font: 900 clamp(22px, 3.6vh, 40px) "Trebuchet MS", system-ui; box-shadow: 0 .2em 0 rgba(0,0,0,.2); }
+.pal-rit { display: flex; align-items: center; gap: clamp(6px, 1.2vw, 16px); }
+.pal-rit i { font-style: normal; display: grid; place-items: center; width: clamp(48px, 8vh, 84px); aspect-ratio: 1; border-radius: 50%; font-size: clamp(24px, 4.4vh, 46px); background: rgba(255,255,255,.35); border: 4px solid rgba(255,255,255,.6); filter: grayscale(.6); opacity: .65; }
+.pal-rit i.m { border-color: #facc15; } .pal-rit i.n { border-color: #4ade80; }
+.pal-rit i.on { opacity: 1; filter: none; animation: palGolpe .35s cubic-bezier(.3,1.6,.5,1); } .pal-rit i.m.on { background: #fde047; } .pal-rit i.n.on { background: #86efac; }
+@keyframes palGolpe { 0% { transform: scale(1.5); } 100% { transform: scale(1); } }
+.pal-sep { width: clamp(20px, 4vw, 60px); } .pal-sep.g { width: clamp(28px, 5vw, 80px); border-left: 4px dashed rgba(255,255,255,.7); height: 7vh; }
+.pal-et { display: flex; gap: 10vw; font: 900 clamp(16px, 2.6vh, 28px) "Trebuchet MS", system-ui; color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.25); } .pal-et .n { color: #bbf7d0; }
+.an-pal.turno .pal-et .n { animation: palLate .5s ease-in-out infinite alternate; } @keyframes palLate { to { transform: scale(1.25); } }

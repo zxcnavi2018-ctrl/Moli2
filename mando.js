@@ -17,9 +17,9 @@
   const NOM = Object.fromEntries(BOT);
   // los joysticks: cada dirección hace algo (el izquierdo mueve las escenas)
   const STK = [['l<', 'Joystick izq. ←'], ['l>', 'Joystick izq. →'], ['l^', 'Joystick izq. ↑'], ['lv', 'Joystick izq. ↓'], ['r<', 'Joystick der. ←'], ['r>', 'Joystick der. →'], ['r^', 'Joystick der. ↑'], ['rv', 'Joystick der. ↓']];
-  const DEF = { v: 5, on: true, b: { 1: 'aceptar', 0: 'salir', 3: 'bib', 2: 'crono', 4: 'tabA', 5: 'tabS', 6: 'grupos', 7: 'revista', 8: 'zoomM', 9: 'zoomP', 11: 'vidGrande', 12: 'pagA', 13: 'pagS', 14: 'pagA', 15: 'pagS', 16: 'aula', 17: 'video' },
+  const DEF = { v: 6, on: true, b: { 1: 'aceptar', 0: 'salir', 3: 'bib', 2: 'crono', 4: 'tabA', 5: 'tabS', 6: 'grupos', 7: 'revista', 8: 'an:palmas', 9: 'zoomP', 11: 'vidGrande', 12: 'pagA', 13: 'pagS', 14: 'pagA', 15: 'pagS', 16: 'aula', 17: 'video' },
     s: { 'l<': 'escA', 'l>': 'escS', 'l^': 'escA', 'lv': 'escS', 'r^': 'an:shh', 'rv': 'an:drum', 'r<': 'an:angry', 'r>': 'an:acu' } };
-  let CFG = (c => c && c.b && c.v >= 5 && c.b[17] === 'video' ? { v: 5, on: c.on !== false, b: { ...c.b }, s: { ...DEF.s, ...(c.s || {}) } } : JSON.parse(JSON.stringify(DEF)))(LS.get(KEY, null));
+  let CFG = (c => c && c.b && c.v >= 5 && c.b[17] === 'video' ? { v: 6, on: c.on !== false, b: { ...c.b, ...(c.v < 6 && c.b[8] === 'zoomM' ? { 8: 'an:palmas' } : {}) }, s: { ...DEF.s, ...(c.s || {}) } } : JSON.parse(JSON.stringify(DEF)))(LS.get(KEY, null));   // v6: el «−» hace las palmas
   const guardar = () => LS.set(KEY, CFG);
   let P = null, SEL = null, btn = null, CR = null, GR = null, grBtn = -1;                     // panel, botón elegido, botón 🎮 y el selector del cronómetro
   const panelAbierto = () => !!(P && P.classList.contains('on'));
@@ -31,7 +31,7 @@
       A.push(['escS', '⏭ Escena siguiente'], ['escA', '⏮ Escena anterior'], ['abrir', '📖 Abrir o cerrar lo de la escena']);
       [...document.querySelectorAll('#dots button')].forEach((b, k) => A.push(['e:' + k, '➡ Ir a ' + b.textContent.trim()]));
       A.push(['crono', '⏱️ Cronómetro (elige el tiempo con las flechas)'], ['bib', '📚 Ir a la Biblioteca'], ['fs', '⛶ Pantalla completa'], ['moli', '🤖 Molí salta y saluda'],
-        ['an:shh', '🤫 Animación: Silencio'], ['an:drum', '🥁 Animación: Tambor'], ['an:angry', '😠 Animación: Atención'], ['an:acu', '🤝 Animación: Acuerdos'], ['an:rol', '👥 Animación: Roles'], ['an:fin', '🏆 Animación: Final'],
+        ['an:palmas', '👏 Animación: Palmas (Molí aplaude y los niños responden)'], ['an:shh', '🤫 Animación: Silencio'], ['an:drum', '🥁 Animación: Tambor'], ['an:angry', '😠 Animación: Atención'], ['an:acu', '🤝 Animación: Acuerdos'], ['an:rol', '👥 Animación: Roles'], ['an:fin', '🏆 Animación: Final'],
         ['panel', '🎮 Abrir este panel']);
       A.push(['tabS', '➡ Pestaña siguiente (en la Revista)'], ['tabA', '⬅ Pestaña anterior (en la Revista)'], ['revista', '📰 Abrir la Revista Innovadora'], ['grupos', '🏅 Grupos: mantén apretado y da +1 punto'], ['video', '🎬 Video: iniciar o pausar'], ['vidGrande', '🎬 Video: agrandar o achicar'], ['zoomP', '🔍 Acercar (zoom +)'], ['zoomM', '🔎 Alejar (zoom −)'], ['aula', '🏫 Volver al salón general']);
     } else A.push(['escS', '⏭ Estante siguiente (Biblioteca)'], ['escA', '⏮ Estante anterior (Biblioteca)'], ['tabS', '➡ Pestaña siguiente'], ['tabA', '⬅ Pestaña anterior'], ['revista', '📰 Abrir la Revista Innovadora'], ['zoomP', '🔍 Acercar (zoom +)'], ['zoomM', '🔎 Alejar (zoom −)'], ['aula', '🏫 Volver al aula'], ['fs', '⛶ Pantalla completa']);
