@@ -523,7 +523,7 @@ async function vEquipo() {
   const V = $('#view'); V.innerHTML = '<div class="load">Reuniendo al equipo…</div>';
   let L = [];
   try { const r = await fetch(`${BASE}/config/site?key=${F.apiKey}`, { cache: 'no-store' });
-    if (r.ok) L = Object.values(docOf(await r.json()).rev || {}).map(v => { const [, n, c] = String(v).split('|'); return { n: n || 'Revisor', c: String(c || '').toUpperCase() }; }).sort((a, b) => a.n.localeCompare(b.n, 'es')); } catch (e) {}
+    if (r.ok) L = Object.values(docOf(await r.json()).rev || {}).map(v => { const [, n, c] = String(v).split('|'); return { n: n || 'Revisor', c: String(c || '').toUpperCase() }; }).filter(r => r.n !== 'Chris').sort((a, b) => a.n.localeCompare(b.n, 'es')); } catch (e) {}
   try { if (!CACHE.ok) CACHE.ok = await query('ok', null, LIST_F); } catch (e) {}
   if (TAB !== 'equipo') return;
   const A = CACHE.ok || [], cuenta = n => A.filter(w => w.rv === n).length;
@@ -1540,6 +1540,6 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden
   if ((ROLE.t || ROLE.r) && TAB !== 'bandeja' && TAB !== 'similitud') { try { const a = await staffTok(); if (a) { CACHE.pend = await query('pend', a, ['st']); setCount(CACHE.pend.length); CACHE.pend = null; } } catch (e) {} }
 })();
 </script>
-<script src="pdftrabajo.js?v=202610172230"></script><script src="archivos.js?v=202610161340"></script><script src="mando.js?v=202610161340"></script>
+<script src="pdftrabajo.js?v=202610172300"></script><script src="archivos.js?v=202610161340"></script><script src="mando.js?v=202610161340"></script>
 </body>
 </html>

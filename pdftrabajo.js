@@ -9,7 +9,7 @@
   // el grado y el profe del trabajo (6.° → Christian; 7.° → el docente de 7.° anotado en config/site.tchG)
   const P7 = { n: '', rev: [] }; fetch('https://firestore.googleapis.com/v1/projects/ciencia6abcd/databases/(default)/documents/config/site?key=AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM')
     .then(r => r.ok ? r.json() : null).then(j => { const G = j && j.fields && j.fields.tchG && j.fields.tchG.mapValue.fields || {}; Object.values(G).forEach(v => { const [e, n] = String(v.stringValue).split('|'); if (e === 'c7' && n) P7.n = n; });
-      const RV = j && j.fields && j.fields.rev && j.fields.rev.mapValue.fields || {}; P7.rev = Object.values(RV).map(v => { const [, n, c, g] = String(v.stringValue).split('|'); return { n: n || 'Revisor', c: String(c || '').toUpperCase(), g: +g || 6 }; }).sort((a, b) => a.c.localeCompare(b.c) || a.n.localeCompare(b.n, 'es')); }).catch(() => {});
+      const RV = j && j.fields && j.fields.rev && j.fields.rev.mapValue.fields || {}; P7.rev = Object.values(RV).map(v => { const [, n, c, g] = String(v.stringValue).split('|'); return { n: n || 'Revisor', c: String(c || '').toUpperCase(), g: +g || 6 }; }).filter(r => r.n !== 'Chris').sort((a, b) => a.c.localeCompare(b.c) || a.n.localeCompare(b.n, 'es')); }).catch(() => {});
   const grado = w => +w.g === 7 || (!+w.g && window.MD && MD.espInfo && MD.espInfo().k === 'c7') ? 7 : 6;
   const profe = w => grado(w) === 7 ? P7.n || 'Docente de 7.° grado' : 'Christian Quispe Llerena';
   // ✨ Resumen y Abstract escritos aparte para trabajos ya publicados que llegaron en Word (antes de que Molí los escribiera solo)

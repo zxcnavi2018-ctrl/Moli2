@@ -163,4 +163,12 @@
   #rvWin .rv-x { position: absolute; top: 10px; right: 12px; z-index: 2; width: 42px; height: 42px; border-radius: 50%; border: 3px solid #2b2547; background: #fde68a; color: #2b2547; font: 900 18px system-ui; box-shadow: 0 3px 0 #2b2547; cursor: pointer; }
   .rv-q { margin-left: 6px; border: 0; background: none; color: #e2483d; font-weight: 900; cursor: pointer; }
   </style>`);
+  // 🧹 pedido de la docente: «Chris» ya no es Revisor. Se quita solo de config/site.rev la próxima vez que ella entre con su cuenta.
+  (async function quitarChris() {
+    try { const me = MD.yo(); if (!me || me.tipo !== 'owner' || !await Docente.token()) return;
+      const R = await revisores(true), k = Object.keys(R).find(h => String(R[h]).split('|')[1] === 'Chris'); if (!k) return;
+      const nuevo = { ...R }; delete nuevo[k];
+      await Docente.commit([{ update: { name: Docente.DOC('config', 'site'), fields: Docente.toF({ rev: nuevo, updatedAt: new Date() }) }, updateMask: { fieldPaths: ['rev', 'updatedAt'] } }]); REV = nuevo;
+    } catch (e) {}
+  })();
 })();
