@@ -965,7 +965,6 @@ document.addEventListener('submit', async e => {
   if (link && !safeUrl(link)) return toast('🔗 El link debe empezar con https://');
   const b = $('#eGo'); b.disabled = true; b.textContent = '⏳ Enviando…';
   let dFin = d;
-  if (!hj) { b.textContent = '✨ Molí escribe tu resumen…'; try { dFin = conResumen(d, await resumenIA(t, d)); } catch (x) {} b.textContent = '⏳ Enviando…'; }   // si Molí no puede ahora, se envía igual
   const id = ME.key + '-' + Date.now().toString(36);
   const w = { k: ME.key, n: String(ME.name || '').slice(0, 60), sec: String(ME.section || '').toUpperCase().slice(-1), u: 'rev', kw: kw.slice(0, 200), ty: FORM.ty, t: t.slice(0, 100), d: dFin.slice(0, 20000), f: f.slice(0, 600), link, th: FORM.th, img: FORM.img, st: 'pend', at: new Date() };
   if (!w.link) delete w.link; if (!w.f) delete w.f; delete w.img; if (FORM.fotos[0]) w.img = FORM.fotos[0]; if (FORM.fotos[1]) w.img2 = FORM.fotos[1]; if (FORM.fotos[2]) w.img3 = FORM.fotos[2]; if (!w.th) delete w.th;
