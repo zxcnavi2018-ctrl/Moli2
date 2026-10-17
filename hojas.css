@@ -590,3 +590,47 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .gu-q { margin: .2em auto 0; padding: .55em 1em; border-radius: .8em; background: #fef9c3; color: #713f12; font-weight: 900; font-size: 1.8em; line-height: 1.2; text-align: center; box-shadow: 0 .25em 0 rgba(0,0,0,.18); }
 .gu-q.in { animation: syIn .5s cubic-bezier(.2,.8,.3,1) both; }
 .cv-sl.gu > .gu-pan[hidden], .gu-q[hidden] { display: none; }
+
+/* 💡 la caja secreta del «¿Sabías que…?» y 🪞 la reflexión */
+.gu-sab .gu-caja { position: absolute; z-index: 3; left: 50%; top: 14%; width: 9em; height: 7em; transform: translateX(-50%) translateY(40%) scale(.4); opacity: 0; transition: transform .8s cubic-bezier(.3,1.5,.5,1), opacity .5s; pointer-events: none; }
+.gu-sab.caja .gu-caja { opacity: 1; transform: translateX(-50%); }
+.gu-caja i { position: absolute; display: block; }
+.gu-cuerpo { left: 0; right: 0; bottom: 0; height: 74%; border-radius: .5em; background: linear-gradient(135deg, #facc15, #f59e0b 55%, #d97706); box-shadow: inset 0 0 0 .25em #fde68a, 0 .4em 0 #92400e; color: #7c2d12; font-style: normal; font-weight: 900; font-size: 3em; line-height: 1.75; text-align: center; }
+.gu-cuerpo::before { content: ''; position: absolute; left: 44%; width: 12%; top: 0; bottom: 0; background: #ef4444; }
+.gu-tapa { left: -6%; right: -6%; top: 6%; height: 28%; border-radius: .45em; background: linear-gradient(135deg, #fde047, #f59e0b); box-shadow: 0 .25em 0 #b45309; transition: transform .6s cubic-bezier(.3,1.4,.5,1), opacity .6s; }
+.gu-tapa::before { content: ''; position: absolute; left: 44%; width: 12%; top: 0; bottom: 0; background: #ef4444; }
+.gu-tapa::after { content: '🎀'; position: absolute; left: 50%; top: -55%; transform: translateX(-50%); font-size: 2em; }
+.gu-brillo { inset: -60%; border-radius: 50%; background: radial-gradient(circle, rgba(253,224,71,.75), rgba(253,224,71,0) 60%); z-index: -1; animation: guBrilla 1.6s ease-in-out infinite; }
+@keyframes guBrilla { 50% { transform: scale(1.15); opacity: .6; } }
+.gu-sab.tiembla .gu-caja { animation: guTiembla .12s linear infinite; } @keyframes guTiembla { 0%,100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-52%) rotate(-4deg); } 75% { transform: translateX(-48%) rotate(4deg); } }
+.gu-sab.pum .gu-tapa { transform: translateY(-260%) rotate(-25deg); opacity: 0; }
+.gu-sab.pum .gu-caja { transform: translateX(-50%) scale(1.25); opacity: 0; transition: transform .7s ease-out, opacity .7s ease-out .25s; }
+.gu-sab .gu-pum { position: absolute; z-index: 4; left: 50%; top: 24%; width: 1em; height: 1em; pointer-events: none; }
+.gu-sab.pum .gu-pum::before, .gu-sab.pum .gu-pum::after { content: '✨ ⭐ 💫 ✨ 🌟 ⭐ ✨'; position: absolute; left: 50%; top: 50%; white-space: nowrap; font-size: 2.4em; letter-spacing: .4em; transform: translate(-50%, -50%) scale(.2); opacity: 0; animation: guPum 1.4s ease-out forwards; }
+.gu-sab.pum .gu-pum::after { content: '💫 ✨ ⭐ 🌟 ✨'; animation-delay: .12s; } 
+@keyframes guPum { 15% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(2.6) rotate(8deg); opacity: 0; } }
+.gu-sab.pum::after { content: ''; position: absolute; inset: 0; z-index: 3; background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 45%); animation: guFlash .8s ease-out forwards; pointer-events: none; } @keyframes guFlash { from { opacity: 1; } to { opacity: 0; } }
+.gu-sab.abierta > .sy-mo { left: -1%; width: 30%; top: 20%; bottom: 6%; }
+.gu-sab.abierta > .sy-bub { left: 14.5%; top: 6%; max-width: 27%; font-size: 1em; }
+.gu-sab .gu-dato { position: absolute; z-index: 2; left: 30%; right: 9%; top: 12%; bottom: 16%; display: flex; flex-direction: column; justify-content: center; gap: .5em; padding: 1em 1.4em; border-radius: 1em; background: #fff; color: #1e1b4b; box-shadow: 0 0 0 .3em #fde047, 0 0 2.5em rgba(253,224,71,.6); }
+.gu-dato b { font-size: 2em; color: #6d28d9; } .gu-dato p { margin: 0; font-size: 2em; font-weight: 800; line-height: 1.3; }
+.gu-dato.in { animation: syIn .7s cubic-bezier(.2,.8,.3,1) both; } .gu-sab .gu-dato[hidden] { display: none; }
+.gu-ref-l { list-style: none; margin: 0; padding: 0; display: grid; gap: .7em; counter-reset: q; }
+.gu-ref-l .gu-c { flex-direction: row; justify-content: flex-start; gap: .6em; padding: .7em 1em; text-align: left; counter-increment: q; }
+.gu-ref-l .gu-c::before { content: counter(q); display: grid; place-items: center; flex: none; width: 1.8em; height: 1.8em; border-radius: 50%; background: #f59e0b; color: #fff; font-weight: 900; font-size: 1.2em; }
+.gu-ref-l .gu-c b { font-size: 1.6em; }
+.gu-sab > .sy-mo { top: 24%; }
+.gu-sab .gu-caja { top: 1%; width: 7.5em; height: 5.8em; }
+.gu-sab > .sy-bub { left: 14.5%; top: 6%; max-width: 27%; font-size: 1.15em; }
+
+/* 🔢 «+» de la rutina: Molí pequeño cuenta la secuencia de la clase */
+#rutina .rt-mas { pointer-events: auto; flex: none; width: 34px; height: 34px; border-radius: 50%; border: 3px solid #2b2547; background: #facc15; color: #2b2547; font: 900 22px/1 system-ui; cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,.25); animation: syLate 1.6s ease-in-out infinite; }
+#rutina .rt-b.guia .rt-o { transform: scale(1.25); background: linear-gradient(135deg, var(--c1), var(--c2)); box-shadow: 0 0 0 4px #fff, 0 0 22px 6px var(--c2); }
+#rutina .rt-b.guia .rt-i { filter: none; opacity: 1; }
+#rtMoli { position: fixed; z-index: 27; display: flex; align-items: flex-start; gap: 6px; pointer-events: auto; opacity: 0; transform: translateX(-20px) scale(.8); transition: opacity .4s, transform .5s cubic-bezier(.3,1.5,.5,1); font-family: "Trebuchet MS", system-ui, sans-serif; }
+#rtMoli.in { opacity: 1; transform: none; }
+#rtMoli .rm-mo { position: relative; width: clamp(110px, 12vw, 190px); aspect-ratio: .8; }
+#rtMoli .rm-mo canvas, #rtMoli .rm-mo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+#rtMoli .rm-bub { max-width: clamp(160px, 22vw, 340px); margin-top: 8%; padding: .55em .9em; border-radius: 1em; background: #fff; color: #1e293b; font-weight: 900; font-size: clamp(14px, 1.5vw, 22px); line-height: 1.25; box-shadow: 0 4px 0 rgba(0,0,0,.2); border: 3px solid #2b2547; }
+#rtMoli .rm-bub:empty { display: none; }
+#rtMoli .rm-x { position: absolute; top: -8px; left: -8px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2b2547; background: #fff; font-weight: 900; cursor: pointer; }

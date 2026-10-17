@@ -593,17 +593,20 @@
     }
     R.montar = () => {
       R.el = document.createElement('nav'); R.el.id = 'rutina'; R.el.setAttribute('aria-label', 'Rutina de la clase');
-      R.el.innerHTML = RUT.map(([ic, t, c1, c2], i) => `${i === 3 ? '<i class="rt-esp"></i>' : ''}<button type="button" class="rt-b" data-rt="${i}" style="--c1:${c1};--c2:${c2}" title="${esc(t)}"><span class="rt-o"><span class="rt-i">${ic}</span><span class="rt-ok">✓</span></span><small>${esc(t)}</small></button>`).join('') ;
+      R.el.innerHTML = '<button type="button" class="rt-mas" data-rtmas title="Molí nos cuenta nuestra secuencia de clase" aria-label="Molí nos cuenta nuestra secuencia de clase">+</button>' + RUT.map(([ic, t, c1, c2], i) => `${i === 3 ? '<i class="rt-esp"></i>' : ''}<button type="button" class="rt-b" data-rt="${i}" style="--c1:${c1};--c2:${c2}" title="${esc(t)}"><span class="rt-o"><span class="rt-i">${ic}</span><span class="rt-ok">✓</span></span><small>${esc(t)}</small></button>`).join('') ;
       document.body.appendChild(R.el);
-      R.el.addEventListener('click', e => { const b = e.target.closest('[data-rt]'); if (!b) return; e.stopPropagation(); const i = +b.dataset.rt;
+      R.el.addEventListener('click', e => { if (e.target.closest('[data-rtmas]')) { e.stopPropagation(); if (window.Guion) Guion.secuencia(R.el); return; }
+        const b = e.target.closest('[data-rt]'); if (!b) return; e.stopPropagation(); const i = +b.dataset.rt;
         if (i < R.n) { if (i === R.n - 1) { R.n--; guardar(); pinta(); } return; }     // tocar la última coloreada la despinta (por si fue sin querer)
         R.n = i + 1; guardar(); pinta(i); ding(); if (R.n >= RUT.length) setTimeout(() => { const t = window.toast || window.aviso; t && t('🎉 ¡Rutina completa! ¡Excelente clase!', 3.5); }, 500); });
       R.el.addEventListener('pointerdown', e => e.stopPropagation()); R.el.addEventListener('pointerup', e => e.stopPropagation());
       ubicar(); R.t = setInterval(ubicar, 300); addEventListener('resize', ubicar);
     };
-    R.quitar = () => { clearInterval(R.t); removeEventListener('resize', ubicar); if (R.el) R.el.remove(); R.el = null; R.k = ''; };
+    R.quitar = () => { if (window.Guion) Guion.finSec(); clearInterval(R.t); removeEventListener('resize', ubicar); if (R.el) R.el.remove(); R.el = null; R.k = ''; };
     R.sesion = sesion; return R;
   }
+  const GU = new Set(['rol', 'acu', 'sab', 'ref']);                  // diapositivas que Molí hace con su voz (guion.js)
+  const sabDe = it => { const f = it.s && it.s.fx; return f && L(f.sb) ? f.sb : (cacheIA(hashQ(it)) || {}).s || ''; };   // el «¿Sabías que…?»: el de la ficha de la sesión o el que pensó Molí
   function flujoPresentacion(host) {
     const P = { L: [], i: 0, ia: {}, pide: new Set() }, RT = rutina(host);
     const actOk = x => x && (L(x.title) || L(x.desc));
@@ -613,13 +616,13 @@
         const ss = MD.sesionesDe(u).filter(({ s }) => L(s.title) || L(s.meta) || (s.activities || []).some(actOk));
         Lst.push({ k: 'uni', u, ss });
         ss.forEach(({ s, n }, q) => {
-          const b = { u, s, n, prev: q ? ss[q - 1] : null }, C = cacheIA(hashQ(b)) || {};
+          const b = { u, s, n, prev: q ? ss[q - 1] : null }, C = cacheIA(hashQ(b)) || {}, SB = sabDe(b);
           Lst.push({ ...b, k: 'ses' }, { ...b, k: 'meta' }, { ...b, k: 'mq' });
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(C.s) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
-          if (L(C.s) && !sj) Lst.push({ ...b, k: 'sab' });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          if (L(SB) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
       });
@@ -710,7 +713,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       if (it.k === 'uni') return `<div class="cv-sl cv-c" ${st}><span class="cv-pill">UNIDAD ${esc(u.num)}</span><div class="cv-ico">${esc(u.icon || '📘')}</div><h2 class="cv-h1">${esc(u.title)}</h2><p class="cv-sub">${it.ss.length} ${it.ss.length === 1 ? 'sesión' : 'sesiones'}</p></div>`;
       if (it.k === 'ses') return `<div class="cv-sl cv-c" ${st}><span class="cv-pill">${esc(u.icon || '📘')} UNIDAD ${esc(u.num)} · ${esc(u.title).toUpperCase()}</span><div class="cv-big">Sesión ${it.n}</div><h2 class="cv-h1">${esc(tema(it))}</h2></div>`;
       if (it.k === 'meta') { const cr = (s.criteria || []).filter(L); return `<div class="cv-sl cv-meta" ${st}>${crumb(it)}<h2 class="cv-h2">🎯 Meta de la sesión</h2><p class="cv-lead">${L(s.meta) ? esc(s.meta) : 'Sin meta todavía'}</p>${cr.length ? `<h3>✅ Criterios de éxito</h3><ul class="cv-cards">${cr.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}${L(s.rubric) ? `<p class="cv-sub">📏 Criterio de la rúbrica: ${esc(s.rubric)}</p>` : ''}</div>`; }
-      if ((it.k === 'rol' || it.k === 'acu') && window.Guion) return Guion.html(it.k);   // Molí los explica con su voz (guion.js)
+      if (GU.has(it.k) && window.Guion) return Guion.html(it.k, { t: sabDe(it) });   // Molí los hace con su voz (guion.js)
       if (it.k === 'rol') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">👥 Roles de trabajo</h2><ul class="cv-cards cv-c4">${CV_ROL.map(([i, n, d]) => `<li class="cv-role"><span>${i}</span><b>${n}</b><small>${d}</small></li>`).join('')}</ul></div>`;
       if (it.k === 'acu') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">🤝 Acuerdos de convivencia</h2><ul class="cv-cards cv-c3">${CV_ACU.map(([i, t]) => `<li class="cv-role"><span>${i}</span><b>${t}</b></li>`).join('')}</ul></div>`;
       if (it.k === 'mq' || it.k === 'aq') { const Q = preguntasDe(it), tt = it.k === 'aq' ? `Sobre la actividad ${it.j}${L(it.x.title) ? ': ' + esc(it.x.title) : ''}` : it.prev ? `Recordamos la sesión ${it.prev.n}` : '¡Empezamos la unidad!';
@@ -749,7 +752,8 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       P.i = Math.max(0, Math.min(P.L.length - 1, P.i)); const it = P.L[P.i];
       const sk = it.k === 'sync' ? claveSl(it) : '';
       if (sk && P.syk === sk && Sincro.activo()) Sincro.actualizar(syncDe(it));   // ya está en pantalla (llegó lo que pensó Molí): no se reinicia la animación
-      else { if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.syk = sk; sl.innerHTML = slide(it); const gu = (it.k === 'rol' || it.k === 'acu') && window.Guion; if (!gu) ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); if (gu) Guion.montar(sl.firstChild, it.k); }
+      else if (GU.has(it.k) && window.Guion && P.guk === claveSl(it) + it.k && Guion.activo()) Guion.dato(sabDe(it));   // ya está en pantalla: no se reinicia
+      else { if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.syk = sk; sl.innerHTML = slide(it); const gu = GU.has(it.k) && window.Guion; P.guk = gu ? claveSl(it) + it.k : ''; if (!gu) ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); if (gu) Guion.montar(sl.firstChild, it.k, { t: sabDe(it) }); }
       if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });
       if (it.u && it.n != null) RT.sesion(it.u.key + ':' + it.n);                // Molí piensa las preguntas de la sesión desde antes
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
@@ -805,7 +809,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
       Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
-    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.syk = ''; RT.quitar(); };
+    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.guk = ''; P.syk = ''; RT.quitar(); };
     return P;
   }
 
