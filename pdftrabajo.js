@@ -101,8 +101,9 @@ ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc
     const portada = `<section class="cv">
       <div class="cv-top"><span>Innova Schools · Tacna</span><span>Ciencia y Tecnología</span><span>Vol. 1 · ${hoy.getFullYear()}</span></div>
       <div class="cv-mast"><small>Revista Innovadora</small><h1>REPOSITORIO<br>EDUCATIVO</h1><div class="cv-sub">Revista de investigación escolar</div></div>
-      <div class="cv-bar"><span>${esc(ED)}</span><span>${esc(fechaTx)}</span></div><div class="cv-uni">${esc(UNI)}</div>
+      <div class="cv-bar"><span>${esc(ED)}</span><span>${esc(fechaTx)}</span></div>
       <div class="cv-mid">${ARTE}<div><h2>${GR}</h2><p>Investigaciones de nuestros estudiantes, leídas y aprobadas por el Equipo de la Revista.</p></div></div>
+      <div class="cv-uni">${(m => m ? `<small>${esc(m[1])}</small>${esc(m[2])}` : esc(UNI))(/^(Unidad\s*\d+)\s*[·:\-–]\s*(.+)$/i.exec(UNI))}</div>
       <div class="cv-en"><b>En esta edición</b>${L.slice(0, 4).map((w, i) => `<p><i>${i + 1}</i>${esc(preguntaDe(w))}</p>`).join('')}${L.length > 4 ? `<p class="mas">… y ${L.length - 4} ${L.length - 4 > 1 ? 'investigaciones' : 'investigación'} más.</p>` : ''}</div>
       <div class="cv-pie"><span>${L.length} artículo${L.length > 1 ? 's' : ''}</span><span>Dirección: ${esc(DIR)}</span></div></section>`;
     const caja = (cl, rol, n, sub) => `<div class="eq-c ${cl}"><small>${rol}</small><b>${esc(n)}</b>${sub ? `<i>${esc(sub)}</i>` : ''}</div>`, SECS = [...new Set(RV.map(r => r.c).filter(Boolean))].sort();
@@ -137,7 +138,7 @@ ${A.length ? `<h2>Anexos</h2>${A.map((x, i) => `<div class="anx"><img src="${esc
 .cv { height: 282mm; display: flex; flex-direction: column; border: 3px double #111; padding: 9mm 10mm; break-after: page; color: #111; }
 .cv-top { display: flex; justify-content: space-between; font: 700 8.5pt Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; border-bottom: 1px solid #111; padding-bottom: 3mm; }
 .cv-mast { text-align: center; padding: 9mm 0 5mm; border-bottom: 4px solid #111; } .cv-mast small { font: italic 15pt "Times New Roman", serif; letter-spacing: .08em; }
-.cv-uni { text-align: center; padding: 3.5mm 2mm; border-bottom: 1px solid #111; font: italic 700 16pt/1.25 "Times New Roman", serif; }
+.cv-uni { text-align: center; padding: 0 4mm 7mm; font: italic 700 25pt/1.2 "Times New Roman", serif; } .cv-uni small { display: block; margin-bottom: 1.5mm; font: 700 10pt Arial, sans-serif; font-style: normal; letter-spacing: .35em; text-transform: uppercase; }
 .cv-mast h1 { margin: 2mm 0 0; font: 900 54pt/0.95 "Times New Roman", "Liberation Serif", serif; letter-spacing: .06em; } .cv-sub { margin-top: 3mm; font: 700 9pt Arial, sans-serif; letter-spacing: .35em; text-transform: uppercase; }
 .cv-bar { display: flex; justify-content: space-between; padding: 2mm 1mm; border-bottom: 1px solid #111; font: 700 10.5pt "Times New Roman", serif; letter-spacing: .12em; text-transform: uppercase; }
 .cv-mid { flex: 1; display: flex; align-items: center; gap: 9mm; padding: 6mm 4mm; } .cv-mid h2 { margin: 0 0 3mm; font: 900 30pt/1 "Times New Roman", serif; text-transform: uppercase; letter-spacing: .04em; } .cv-mid p { margin: 0; font: italic 13pt/1.45 "Times New Roman", serif; text-indent: 0; text-align: left; }
