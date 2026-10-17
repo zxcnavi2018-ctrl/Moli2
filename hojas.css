@@ -634,3 +634,5 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 #rtMoli .rm-bub { max-width: clamp(160px, 22vw, 340px); margin-top: 8%; padding: .55em .9em; border-radius: 1em; background: #fff; color: #1e293b; font-weight: 900; font-size: clamp(14px, 1.5vw, 22px); line-height: 1.25; box-shadow: 0 4px 0 rgba(0,0,0,.2); border: 3px solid #2b2547; }
 #rtMoli .rm-bub:empty { display: none; }
 #rtMoli .rm-x { position: absolute; top: -8px; left: -8px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2b2547; background: #fff; font-weight: 900; cursor: pointer; }
+
+.sy-nv { margin: 0 auto -.4em; padding: .2em .9em; border-radius: 999px; background: #ef4444; color: #fff; font-weight: 900; font-size: 1.1em; box-shadow: 0 .15em 0 rgba(0,0,0,.2); }

@@ -393,6 +393,11 @@
     raf = requestAnimationFrame(leer);
   }
   const arrancar = () => { if (!raf) raf = requestAnimationFrame(leer); };
+  // ⏰ el mando se apaga solo si pasa varios minutos sin usarse: cada 90 s le mandamos una señal mínima (una vibración casi imperceptible) para que siga conectado
+  setInterval(() => { if (!esDocente()) return;
+    nativos().forEach(g => { const v = g.vibrationActuator; if (v && v.playEffect) v.playEffect('dual-rumble', { duration: 40, weakMagnitude: 0.02, strongMagnitude: 0 }).catch(() => {}); });
+    if (HID.dev) ordenHID(HID.dev, 0x02, []).catch(() => {});        // conexión directa: le pedimos sus datos (no hace nada visible)
+  }, 90000);
   addEventListener('gamepadconnected', e => { arrancar(); pintaEstado(); if (esDocente()) avisar('🎮 Mando conectado: ' + nombreMando(e.gamepad)); });
   addEventListener('gamepaddisconnected', () => { pintaEstado(); if (esDocente()) avisar('🎮 Se desconectó el mando'); });
   if (mandos().length) arrancar();

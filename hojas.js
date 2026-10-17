@@ -662,7 +662,7 @@ Devuelve JSON:
       } catch (e) { MD.LS.set(k, { _fallo: Date.now() }); pinta(false); }
     }
     // ---- 🚩 «Molí nos sincroniza»: una pregunta por actividad con 2 respuestas (izquierda / derecha), que Molí piensa según la sesión ----
-    const SYK = it => 'moli2:sy:' + hashQ(it).slice(9);
+    const SYK = it => 'moli2:sy2:' + hashQ(it).slice(9);                 // sy2: 3 preguntas por actividad, de la más fácil a la más difícil
     const hs = t => { let h = 7; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0; return h; };
     const aLados = (x, wait) => hs(x.q) % 2 ? { q: x.q, i: x.ok, d: x.mal, ok: 'i', wait } : { q: x.q, i: x.mal, d: x.ok, ok: 'd', wait };   // la correcta cae a veces a la izquierda y a veces a la derecha
     async function pedirSync(it) {
@@ -673,25 +673,28 @@ Unidad ${it.u.num}: «${it.u.title}». Sesión ${it.n}: «${s.title || ''}». Me
 Actividades de hoy:
 ${acts.map((x, j) => x && (L(x.title) || L(x.desc)) ? `${j + 1}) «${x.title || ''}»: ${x.desc || ''}` : `${j + 1}) (no hay)`).join('\n')}
 ${tq.length ? `No repitas estas preguntas del Exit ticket: ${tq.map(q => `«${q}»`).join(' ')}` : ''}
-Devuelve JSON con "p": 3 preguntas, una para DESPUÉS de cada actividad (en orden), sobre lo que se trabaja en la sesión y en esa actividad. Cada una:
+Devuelve JSON con "p": 3 elementos, uno para DESPUÉS de cada actividad (en orden). Cada elemento tiene "n": 3 preguntas sobre lo que se trabaja en la sesión y en esa actividad, de la más fácil a la más difícil: la 1.ª fácil (recordar), la 2.ª media (comprender o comparar) y la 3.ª difícil (razonar, aplicar a un caso nuevo o predecir). Cada pregunta:
 - "q": la pregunta, clara y corta (máximo 16 palabras), con signos ¿?, sin la respuesta dentro.
 - "ok": la respuesta correcta y científicamente cierta (máximo 8 palabras).
 - "mal": una respuesta incorrecta pero creíble, parecida en largo a la correcta (máximo 8 palabras).
 Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       try {
-        const R = await MD.pensar(pr, { type: 'OBJECT', properties: { p: { type: 'ARRAY', items: { type: 'OBJECT', properties: { q: { type: 'STRING' }, ok: { type: 'STRING' }, mal: { type: 'STRING' } }, required: ['q', 'ok', 'mal'] } } }, required: ['p'] });
-        const p = (R && Array.isArray(R.p) ? R.p : []).slice(0, 3).map(x => { const q = limpio(x && x.q, 170), ok = limpio(x && x.ok, 90), mal = limpio(x && x.mal, 90); return q && /\?\s*$/.test(q) && ok && mal && ok.toLowerCase() !== mal.toLowerCase() ? { q, ok, mal } : null; });
-        MD.LS.set(k, p.some(Boolean) ? { p } : { _fallo: Date.now() });
+        const PQ = { type: 'OBJECT', properties: { q: { type: 'STRING' }, ok: { type: 'STRING' }, mal: { type: 'STRING' } }, required: ['q', 'ok', 'mal'] };
+        const R = await MD.pensar(pr, { type: 'OBJECT', properties: { p: { type: 'ARRAY', items: { type: 'OBJECT', properties: { n: { type: 'ARRAY', items: PQ } }, required: ['n'] } } }, required: ['p'] });
+        const una = x => { const q = limpio(x && x.q, 170), ok = limpio(x && x.ok, 90), mal = limpio(x && x.mal, 90); return q && /\?\s*$/.test(q) && ok && mal && ok.toLowerCase() !== mal.toLowerCase() ? { q, ok, mal } : null; };
+        const p = (R && Array.isArray(R.p) ? R.p : []).slice(0, 3).map(x => (x && Array.isArray(x.n) ? x.n : []).slice(0, 3).map(una).filter(Boolean));
+        MD.LS.set(k, p.some(x => x.length) ? { p } : { _fallo: Date.now() });
       } catch (e) { MD.LS.set(k, { _fallo: Date.now() }); }
       const cur = P.L[P.i]; if (cur && cur.k === 'sync' && SYK(cur) === k && window.Sincro) Sincro.actualizar(syncDe(cur));
     }
     function syncDe(it) {
       const C = MD.LS.get(SYK(it), null), x = C && Array.isArray(C.p) && C.p[it.j - 1];
-      if (x && x.q) return aLados(x);
+      if (Array.isArray(x) && x.length) return { ...aLados(x[0]), mas: x.slice(1).map(z => aLados(z)) };   // con A, la siguiente más difícil
       if (!C) { pedirSync(it); return { wait: true }; }
       const qs = ((it.s.ticket && it.s.ticket.questions) || []).filter(z => z && L(z.q) && Array.isArray(z.options)), t = qs.length && qs[(it.j - 1) % qs.length];   // si Molí no pudo pensarla: una del Exit ticket
       const ok = t && t.options[t.answer], mal = t && t.options.find((o, k) => k !== t.answer && L(o));
-      return ok && mal ? aLados({ q: t.q, ok, mal }) : { q: '¿Estamos listos para seguir aprendiendo?', i: '¡Sí, listos!', d: 'Todavía no', ok: 'i' };
+      const otra = (z) => { const o = z.options[z.answer], m = z.options.find((v, k) => k !== z.answer && L(v)); return o && m ? aLados({ q: z.q, ok: o, mal: m }) : null; };
+      return ok && mal ? { ...aLados({ q: t.q, ok, mal }), mas: qs.filter(z => z !== t).slice(0, 2).map(otra).filter(Boolean) } : { q: '¿Estamos listos para seguir aprendiendo?', i: '¡Sí, listos!', d: 'Todavía no', ok: 'i' };
     }
     const preguntasDe = it => { const C = cacheIA(hashQ(it)), key = it.k === 'aq' ? 'a' + it.j : 'r'; if (C && Array.isArray(C[key]) && C[key].length) return { q: C[key] }; pedirIA(it); return { q: plantilla(it), wait: P.pide.has(hashQ(it)) && !C }; };
     const tema = it => { if (L(it.s.title)) return it.s.title; const C = cacheIA(hashQ(it)); return C && L(C.t) ? C.t : temaDe(it.s, it.n); };

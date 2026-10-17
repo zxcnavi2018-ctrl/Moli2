@@ -15,6 +15,8 @@
   const DUR = { silbato: 1.6, hola: 2.2, der: 1.8, izq: 2.1, n3: 0.6, n2: 0.6, n1: 0.6, bien: 0.8, rapido: 1.3, d: 0.8, i: 0.8, listos: 2.2, expl1: 2.1, expl2: 3.4, expl3: 3, lee: 2.5, arriba1: 1.2, arriba: 0.7, correcta: 1.7, ding: 0.6 };
   const AUD = {}, audio = k => AUD[k] || (AUD[k] = Object.assign(new Audio('audio/sync/' + k + '.mp3'), { preload: 'auto' }));
   const BOT = ['', 'Ⓐ Mostrar la pregunta', 'Ⓐ ¡Manos arriba!', 'Ⓐ Ver la respuesta', ''];
+  const cur = () => S && (S.k ? (S.Q && S.Q.mas || [])[S.k - 1] : S.Q);            // la pregunta que está en pantalla (la 1.ª o una más difícil)
+  const hayMas = () => !!(S && S.Q && S.Q.mas && (S.k || 0) < S.Q.mas.length);
   const COL = { i: '#2563eb', d: '#f97316' };
   let S = null;
 
@@ -25,8 +27,8 @@
       <div class="sy-pre" hidden>${preHtml(Q)}</div>
       <div class="sy-bt"><button type="button" class="sy-rep" data-syrep title="Repetir la sincronización">🔁</button><button type="button" class="sy-a" data-sync hidden></button></div></div>`;
   }
-  const preHtml = Q => !Q || !Q.q ? '<p class="sy-q">✨ Molí está pensando la pregunta…</p>'
-    : `<p class="sy-q">${esc(Q.q)}</p><div class="sy-ops"><div class="sy-op i"><span class="sy-lado">✋ IZQUIERDA</span><b>${esc(Q.i)}</b></div><div class="sy-op d"><span class="sy-lado">DERECHA ✋</span><b>${esc(Q.d)}</b></div></div>`;
+  const preHtml = (Q, nv) => !Q || !Q.q ? '<p class="sy-q">✨ Molí está pensando la pregunta…</p>'
+    : `${nv ? `<p class="sy-nv">${nv === 1 ? '🔥 ¡Más difícil!' : '🔥🔥 ¡La más difícil!'}</p>` : ''}<p class="sy-q">${esc(Q.q)}</p><div class="sy-ops"><div class="sy-op i"><span class="sy-lado">✋ IZQUIERDA</span><b>${esc(Q.i)}</b></div><div class="sy-op d"><span class="sy-lado">DERECHA ✋</span><b>${esc(Q.d)}</b></div></div>`;
 
   // ---- Molí 3D con sus dos banderas (si no hay 3D, su foto con banderitas de CSS) ----
   function tres(cv) {
@@ -89,7 +91,8 @@
   }
   function fase(n) {
     if (!S) return; S.f = n; const el = S.el, b = el.querySelector('[data-sync]');
-    el.classList.toggle('izq', n >= 1); b.hidden = !BOT[n]; b.textContent = BOT[n];
+    const tx = n === 4 && hayMas() ? 'Ⓐ Otra pregunta más difícil' : BOT[n];
+    el.classList.toggle('izq', n >= 1); b.hidden = !tx; b.textContent = tx;
     if (n === 1) { burbuja(''); numero(''); }
     if (n >= 2) { const p = el.querySelector('.sy-pre'); if (p.hidden) { p.hidden = false; p.classList.add('in'); } }
   }
@@ -100,7 +103,9 @@
       if (S.f === 1) { fase(2); decir('ding', false); await espera(350); ok(); M.expr('pensativo'); await decir('lee'); ok(); burbuja(''); M.expr('normal'); return; }
       if (S.f === 2) { fase(3); await decir('arriba1'); ok(); for (const n of ['n3', 'n2', 'n1']) { numero(n[1]); await Promise.all([decir(n, false), espera(900)]); ok(); }
         numero(''); bandera(1, true); bandera(-1, true); M.expr('feliz'); await decir('arriba'); ok(); await espera(900); ok(); bandera(1, false); bandera(-1, false); M.expr('normal'); burbuja(''); return; }
-      if (S.f === 3) { const Q = S.Q, lado = Q && Q.ok === 'd' ? 1 : -1; fase(4);
+      if (S.f === 4) { S.k = (S.k || 0) + 1; const p = el.querySelector('.sy-pre'); p.innerHTML = preHtml(cur(), S.k); p.classList.remove('in'); void p.offsetWidth; p.classList.add('in');   // A: otra pregunta, más difícil
+        bandera(1, false); bandera(-1, false); fase(2); decir('ding', false); await espera(350); ok(); M.expr('pensativo'); await decir('lee'); ok(); burbuja(''); M.expr('normal'); return; }
+      if (S.f === 3) { const Q = cur(), lado = Q && Q.ok === 'd' ? 1 : -1; fase(4);
         el.querySelectorAll('.sy-op').forEach(o => o.classList.add(o.classList.contains(Q && Q.ok === 'd' ? 'd' : 'i') ? 'ok' : 'no'));
         bandera(lado, true); M.expr('estrellas'); M.accion('saltar'); decir('ding', false); await espera(300); ok(); await decir('correcta'); ok(); await espera(1200); ok(); bandera(lado, false); M.expr('feliz'); }
     } catch (e) {}
@@ -116,10 +121,10 @@
     Object.keys(DUR).forEach(audio);                                   // que no se trabe la primera vez
     const g = ++S.g; setTimeout(() => S && S.g === g && intro(g), 500);
   }
-  function repetir() { if (!S) return; const { el, Q } = S; el.classList.remove('izq'); const p = el.querySelector('.sy-pre'); p.hidden = true; p.classList.remove('in'); p.innerHTML = preHtml(Q);
+  function repetir() { if (!S) return; S.k = 0; const { el, Q } = S; el.classList.remove('izq'); const p = el.querySelector('.sy-pre'); p.hidden = true; p.classList.remove('in'); p.innerHTML = preHtml(Q);
     cortar(); bandera(1, false); bandera(-1, false); S.f = 0; fase(0); el.classList.remove('izq'); const g = ++S.g; intro(g); }
-  function avanzar() { if (S && S.f < 4) paso(); }
-  function actualizar(Q) { if (!S) return; S.Q = Q; if (S.f < 4) { const p = S.el.querySelector('.sy-pre'); p.innerHTML = preHtml(Q); } }
+  function avanzar() { if (S && (S.f < 4 || hayMas())) paso(); }
+  function actualizar(Q) { if (!S) return; S.Q = Q; if (!S.k && S.f < 4) { const p = S.el.querySelector('.sy-pre'); p.innerHTML = preHtml(Q); } }
   function parar() { if (!S) return; cortar(); S.g++; if (S.x) S.x.parar(); S = null; }
   // ⌨️ la tecla A (sin escribir en un cuadro de texto) hace el siguiente paso
   addEventListener('keydown', e => { if (!S || e.repeat || e.ctrlKey || e.metaKey || e.altKey || (e.key || '').toLowerCase() !== 'a' || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || '') || (e.target && e.target.isContentEditable)) return;
