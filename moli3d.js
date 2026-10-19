@@ -131,8 +131,8 @@ function crearMoli(THREE, opt = {}) {
   const sp = (v, p) => Math.sign(v) * Math.pow(Math.abs(v), p);
   const sdRR = (x, y) => { const qx = Math.abs(x) - VI.bx + VI.r, qy = Math.abs(y - VI.y) - VI.by + VI.r; return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - VI.r; };
   const HW = 96, HH = 72;                                             // resolución del casco (borde del visor bien liso)
-  const helmet = () => {
-    const g = new THREE.SphereGeometry(1, HW, HH); g.rotateY(-Math.PI / 2);      // la costura queda atrás
+  const helmet = (ws = HW, hs = HH) => {
+    const g = new THREE.SphereGeometry(1, ws, hs); g.rotateY(-Math.PI / 2);      // la costura queda atrás
     const q = g.attributes.position;
     for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), yy = sp(y, 0.7), k = 1 - 0.13 * Math.max(0, yy) ** 2 - 0.04 * Math.max(0, -yy) ** 2;
       q.setXYZ(i, sp(x, 0.6) * k * HS[0], yy * HS[1], sp(z, 0.62) * k * HS[2]); }
@@ -214,7 +214,7 @@ function crearMoli(THREE, opt = {}) {
       g.fillStyle = '#5c4222'; g.fillRect(0, 0, w, h);
       for (let y = 0; y < h; y += 8) for (let x = 0; x < w; x += 8) {
         const arriba = ((x + y) / 8) % 2, l = 0.8 + Math.random() * 0.34;
-        g.fillStyle = `rgb(${178 * l | 0},${140 * l | 0},${86 * l | 0})`;
+        g.fillStyle = `rgb(${176 * l | 0},${148 * l | 0},${92 * l | 0})`;
         if (arriba) g.fillRect(x, y + 1, 8, 5); else g.fillRect(x + 1, y, 5, 8);
       }
       for (let k = 0; k < 600; k++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(255,236,196,.3)' : 'rgba(60,36,12,.3)'; g.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 4, 1); }
@@ -273,27 +273,45 @@ function crearMoli(THREE, opt = {}) {
       for (let y = -0.27; y <= 0.0; y += 0.054) cruz(A.sh, V(A.sx * (rb((y + 0.39) / 0.44) + 0.004) + 0.008 * A.sx, y, 0), V(0, 1, 0), V(A.sx, 0, 0), 0.04);
       part(new THREE.TorusGeometry(rb((-0.325 + 0.39) / 0.44) + 0.006, 0.017, 8, 36), SOGA, A.sh, [0.008 * A.sx, -0.325, 0], [Math.PI / 2, 0, 0]);
     });
-    // ---- gorro de costal: el casco forrado de yute, fruncido arriba y amarrado con soga (la punta se dobla) ----
-    const HY = z => 0.25 - 0.22 * sstep(0.0, -0.42, z);              // borde: encima del visor adelante, más abajo atrás (las orejas quedan libres)
-    const def = (x, y, z) => { const k = sstep(0.33, 0.5, y), th = Math.atan2(x, z), f = 1.065 * (1 - 0.84 * k) * (1 + 0.1 * k * Math.sin(th * 11)); return V(x * f, y * 1.065 + 0.2 * k, z * f); };
-    const gorro = helmet(); let sr = 0, sy = 0, sn = 0;
-    { const q = gorro.attributes.position, keep = new Uint8Array(q.count);
-      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), p = def(x, y, z); keep[i] = y > HY(z) ? 1 : 0;
+    // ---- capucha de costal: toda la cabeza (la cara y los audífonos también) forrada de yute, fruncida arriba y amarrada con
+    //      soga; huecos cosidos para los ojitos (se siguen viendo sus expresiones), boca cosida y una costura en la frente ----
+    const OJ = [-1, 1].map(sx => ({ x: 0.225 * sx, y: VI.y + 0.035, rx: 0.14, ry: 0.195 }));
+    const BW = 0.26, bocaA = x => -0.222 - 0.035 * (1 - (x / BW) ** 2), bocaB = x => -0.222 - 0.13 * Math.pow(Math.max(0, 1 - (x / BW) ** 2), 0.7);   // labio de arriba y de abajo
+    const hueco = (x, y, z) => z > 0.2 && (OJ.some(o => ((x - o.x) / o.rx) ** 2 + ((y - o.y) / o.ry) ** 2 < 1) || (Math.abs(x) < BW && y < bocaA(x) && y > bocaB(x)));
+    const defH = (x, y, z) => {                                         // del casco a la capucha: más grande, un bulto en cada audífono y fruncida arriba
+      const k = sstep(0.33, 0.5, y), th = Math.atan2(x, z), f = 1.065 * (1 - 0.84 * k) * (1 + 0.1 * k * Math.sin(th * 11) + 0.01 * Math.sin(th * 7 + y * 9));
+      const d = Math.hypot(y - VI.y - 0.02, z + 0.04), b = 0.13 * (1 - sstep(0.17, 0.29, d)) * sstep(0.25, 0.5, Math.abs(x));
+      return V(x * f + Math.sign(x) * b, y * 1.065 + 0.2 * k, z * f); };
+    const capucha = helmet(180, 132), frente = []; let sr = 0, sy = 0, sn = 0;
+    { const q = capucha.attributes.position;
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), p = defH(x, y, z);
         if (y > 0.445 && y < 0.456) { sr += Math.hypot(p.x, p.z); sy += p.y; sn++; } q.setXYZ(i, p.x, p.y, p.z); }
-      const src = gorro.index.array, out = []; for (let i = 0; i < src.length; i += 3) if (keep[src[i]] && keep[src[i + 1]] && keep[src[i + 2]]) out.push(src[i], src[i + 1], src[i + 2]);
-      gorro.setIndex(out); }
-    part(soldar(gorro), SACO, head);
+      soldar(capucha); const n = capucha.attributes.normal;
+      for (let i = 0; i < q.count; i++) if (q.getZ(i) > 0.3) frente.push([q.getX(i), q.getY(i), q.getZ(i), n.getX(i), n.getY(i), n.getZ(i)]);
+      const src = capucha.index.array, out = [], c3 = (a, b, c, f) => (f(a) + f(b) + f(c)) / 3;
+      for (let i = 0; i < src.length; i += 3) { const a = src[i], b = src[i + 1], c = src[i + 2];
+        if (!hueco(c3(a, b, c, j => q.getX(j)), c3(a, b, c, j => q.getY(j)), c3(a, b, c, j => q.getZ(j)))) out.push(a, b, c); }
+      capucha.setIndex(out); }
+    part(capucha, SACO, head);
+    ears.forEach(e => { e.halo.visible = false; });                      // los audífonos quedan adentro de la capucha
+    const sobre = (x, y, off = 0.006) => { let f = frente[0], bd = 1e9;  // punto de la cara de la capucha (delante de x, y)
+      for (const v of frente) { const d = (v[0] - x) ** 2 + (v[1] - y) ** 2; if (d < bd) { bd = d; f = v; } }
+      const n = V(f[3], f[4], f[5]); return { p: V(x, y, f[2]).addScaledVector(n, off), n }; };
+    const ribete = pts => part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([x, y]) => sobre(x, y, 0.004).p), true), 96, 0.017, 6, true), HILO, head);
+    OJ.forEach(o => { const P = Array.from({ length: 48 }, (_, i) => { const a = i / 48 * Math.PI * 2; return [o.x + Math.cos(a) * o.rx, o.y + Math.sin(a) * o.ry]; }); ribete(P);
+      for (let i = 0; i < 12; i++) { const a = (i + 0.5) / 12 * Math.PI * 2, e = sobre(o.x + Math.cos(a) * o.rx, o.y + Math.sin(a) * o.ry, 0.012);   // puntadas alrededor del ojo
+        puntada(head, e.p, V(Math.cos(a) / o.rx, Math.sin(a) / o.ry, 0), e.n, 0.065); } });
+    ribete([...Array.from({ length: 25 }, (_, i) => { const x = BW * (2 * i / 24 - 1); return [x, bocaA(x)]; }), ...Array.from({ length: 23 }, (_, i) => { const x = BW * (1 - 2 * (i + 1) / 24); return [x, bocaB(x)]; })]);
+    [-0.18, -0.12, -0.06, 0, 0.06, 0.12, 0.18].forEach(x => { const a = sobre(x, bocaA(x) + 0.022, 0.012), b = sobre(x, bocaB(x) - 0.022, 0.012), m = sobre(x, (bocaA(x) + bocaB(x)) / 2, 0.012);   // boca cosida
+      puntada(head, m.p, b.p.clone().sub(a.p), m.n, a.p.distanceTo(b.p)); });
     const casco = (th, s) => { const c = Math.sqrt(Math.max(0, 1 - s * s)), yy = sp(s, 0.7), k = 1 - 0.13 * Math.max(0, yy) ** 2 - 0.04 * Math.max(0, -yy) ** 2;
       return V(sp(Math.sin(th) * c, 0.6) * k * HS[0], yy * HS[1], sp(Math.cos(th) * c, 0.62) * k * HS[2]); };
-    const borde = th => { let a = -0.3, b = 0.95; for (let i = 0; i < 24; i++) { const m = (a + b) / 2, p = casco(th, m); if (p.y > HY(p.z)) b = m; else a = m; } return b + 0.012; };
-    const enGorro = (th, s, off = 0.006) => { const p0 = casco(th, s), p = def(p0.x, p0.y, p0.z), n = V(p.x, p.y * 0.35, p.z).normalize(); return { p: p.addScaledVector(n, off), n }; };
-    for (let k = 0; k < 44; k++) { const th = k / 44 * Math.PI * 2, s = borde(th), a = enGorro(th, s), b = enGorro(th + 0.02, borde(th + 0.02));   // pasadas en el borde
-      puntada(head, a.p, b.p.clone().sub(a.p), a.n, 0.045); }
-    { const th = 0.95; for (let s = borde(th) + 0.06; s < 0.84; s += 0.07) { const a = enGorro(th, s, 0.008), b = enGorro(th, s + 0.02, 0.008); cruz(head, a.p, b.p.clone().sub(a.p), a.n, 0.05); } }   // costura de lado
-    { const th = -1.25, s0 = 0.55, a = enGorro(th, s0, 0.004), pg = new THREE.PlaneGeometry(0.15, 0.13, 6, 6), q = pg.attributes.position;   // parchecito naranja en el gorro
-      for (let i = 0; i < q.count; i++) { const e = enGorro(th + q.getX(i) / 0.52, s0 + q.getY(i) * 1.7, 0.009); q.setXYZ(i, e.p.x, e.p.y, e.p.z); }
+    const enCap = (th, s, off = 0.006) => { const p0 = casco(th, s), p = defH(p0.x, p0.y, p0.z), n = V(p.x, p.y * 0.35, p.z).normalize(); return { p: p.addScaledVector(n, off), n }; };
+    { const th = -0.55; for (let s = 0.36; s < 0.84; s += 0.07) { const a = enCap(th, s, 0.008), b = enCap(th, s + 0.02, 0.008); cruz(head, a.p, b.p.clone().sub(a.p), a.n, 0.05); } }   // costura en la frente
+    { const th = 1.35, s0 = 0.48, pg = new THREE.PlaneGeometry(0.15, 0.13, 6, 6), q = pg.attributes.position;   // parchecito naranja al costado
+      for (let i = 0; i < q.count; i++) { const e = enCap(th + q.getX(i) / 0.52, s0 + q.getY(i) * 1.7, 0.009); q.setXYZ(i, e.p.x, e.p.y, e.p.z); }
       pg.computeVertexNormals(); part(pg, PARCHE, head);
-      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([i, j]) => { const e = enGorro(th + i * 0.06 / 0.52, s0 + j * 0.05 * 1.7, 0.013); cruz(head, e.p, V(0, 1, 0), e.n, 0.03); }); }
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([i, j]) => { const e = enCap(th + i * 0.06 / 0.52, s0 + j * 0.05 * 1.7, 0.013); cruz(head, e.p, V(0, 1, 0), e.n, 0.03); }); }
     const ry = sy / Math.max(1, sn), rrg = sr / Math.max(1, sn) + 0.02;  // soga del gorro y la punta de tela que sale arriba
     part(new THREE.TorusGeometry(rrg, 0.024, 10, 40), SOGA, head, [0, ry, 0], [Math.PI / 2, 0, 0]);
     const punta = new THREE.Group(); punta.position.set(0, ry + 0.005, 0); punta.rotation.set(0.15, 0, -0.42); head.add(punta);

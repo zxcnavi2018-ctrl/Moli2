@@ -184,7 +184,7 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hojas.css?v=202610161340">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610192030"></script><script src="sincro.js?v=202610170330"></script><script src="guion.js?v=202610170500"></script><script src="datos.js?v=202610171300"></script><script src="docente.js?v=202610171300"></script>
+<script src="moli3d.js?v=202610192130"></script><script src="sincro.js?v=202610170330"></script><script src="guion.js?v=202610170500"></script><script src="datos.js?v=202610171300"></script><script src="docente.js?v=202610171300"></script>
 <script src="hojas.js?v=202610171300"></script><script src="hojas-docente.js?v=202610171300"></script><script src="diplomas.js?v=202610171300"></script><script src="fotocheck.js?v=202610171300"></script><script src="herramientas.js?v=202610171300"></script><script src="remoto.js?v=202610171300"></script><script src="escaner.js?v=202610171300"></script><script src="tarjetas.js?v=202610171300"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
@@ -1257,7 +1257,7 @@ function halloween6B({ P, Wc, Dp, fy, rotU, svec, F6 }) {
   telarana(L(-0.6, TOP, 0.48), L(-1.6, TOP, 0.48), L(-1.1, RH - 0.48, 0));
   ANIM.push((t, dt) => { for (const W of webs) {
     W.w += (viento(W.wp) - W.w) * Math.min(1, dt * 1.5);
-    const a = 0.035 + 0.11 * W.w, p = W.g.attributes.position.array, b = W.base;
+    const a = 0.02 + 0.13 * W.w, p = W.g.attributes.position.array, b = W.base;   // sin ventiladores apenas se mece; con ellos, harto
     for (let i = 0, k = 0; i < W.bar.length; i++, k += 3) {
       const d = W.bar[i] * a * (Math.sin(t * 2.2 + W.ph + W.ux[i] * 1.8) + 0.45 * Math.sin(t * 5.3 + W.ph * 2 - W.ux[i] * 2.5) * W.w + 0.35 * Math.sin(t * 0.9 + W.ph));
       p[k] = b[k] + W.n.x * d; p[k + 1] = b[k + 1] + W.n.y * d - Math.abs(d) * 0.25; p[k + 2] = b[k + 2] + W.n.z * d; }
