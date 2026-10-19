@@ -1,4 +1,16 @@
 // Molí 3D compartido (aula y Biblioteca)
+// 🎃 Halloween: los adornos del aula y el disfraz de Molí salen solos en octubre (fecha del aparato) y se van el 1 de noviembre.
+//    Para probar en otro mes: ?halloween=1 (siempre) o ?halloween=0 (nunca).
+window.esHalloween = function () { const q = new URLSearchParams(location.search).get('halloween'); return q === '1' || q === '0' ? q === '1' : new Date().getMonth() === 9; };
+// en octubre, los dibujos de Molí (img/moli/<cara>.webp) pasan a ser los de Molí con su disfraz de costal (img/moli-hw/<cara>.webp)
+window.moliDibujo = n => (window.esHalloween() ? 'img/moli-hw/' : 'img/moli/') + n + '.webp';
+if (window.esHalloween()) {
+  const disfrazar = el => { const s = el.tagName === 'IMG' && el.getAttribute('src'); if (s && /(^|\/)img\/moli\/\w+\.webp/.test(s)) el.setAttribute('src', s.replace('img/moli/', 'img/moli-hw/')); };
+  const todo = r => { if (r.nodeType !== 1) return; disfrazar(r); r.querySelectorAll('img').forEach(disfrazar); };
+  new MutationObserver(ms => ms.forEach(m => m.type === 'attributes' ? disfrazar(m.target) : m.addedNodes.forEach(todo)))
+    .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
+  todo(document.documentElement);
+}
 // ===================================================================
 //  MOLÍ 3D: robotito de plástico blanco satinado, con el visor azul noche hundido en el casco (borde blanco
 //  alrededor), ojos ovalados celestes que brillan y boquita cuando habla, audífonos azul noche con aro de luz,
@@ -35,10 +47,8 @@ function crearMoli(THREE, opt = {}) {
 
   // ---- juntar piezas (mismo material y mismo grupo) en una sola malla: pocas llamadas de dibujo ----
   const batches = new Map();
-  const part = (geo, mat, parent, pos, rot, scl) => {
-    const m4 = new THREE.Matrix4().compose(V(...(pos || [0, 0, 0])), new THREE.Quaternion().setFromEuler(new THREE.Euler(...(rot || [0, 0, 0]))), V(...(scl || [1, 1, 1])));
-    const k = parent.uuid + mat.uuid; let b = batches.get(k); if (!b) batches.set(k, b = { parent, mat, list: [] }); b.list.push({ geo, m4 });
-  };
+  const partM = (geo, mat, parent, m4) => { const k = parent.uuid + mat.uuid; let b = batches.get(k); if (!b) batches.set(k, b = { parent, mat, list: [] }); b.list.push({ geo, m4 }); };
+  const part = (geo, mat, parent, pos, rot, scl) => partM(geo, mat, parent, new THREE.Matrix4().compose(V(...(pos || [0, 0, 0])), new THREE.Quaternion().setFromEuler(new THREE.Euler(...(rot || [0, 0, 0]))), V(...(scl || [1, 1, 1]))));
   const merge = (list) => {
     let nv = 0, ni = 0; list.forEach(({ geo }) => { nv += geo.attributes.position.count; ni += geo.index ? geo.index.count : geo.attributes.position.count; });
     const pos = new Float32Array(nv * 3), nor = new Float32Array(nv * 3), uv = new Float32Array(nv * 2), idx = nv > 65535 ? new Uint32Array(ni) : new Uint16Array(ni);
@@ -197,6 +207,102 @@ function crearMoli(THREE, opt = {}) {
     part(new THREE.SphereGeometry(0.04, 14, 12), NAVY, hand, [-0.068 * sx, -0.03, 0.06], [0, 0, -0.6 * sx], [1, 1.35, 1]);
     return { sh, hand, sx, a: 0.42, v: 0, f: 0 };
   });
+  // ---- 🎃 disfraz de Halloween (sólo en octubre): Molí se mete en un costal de yute con costuras gruesas,
+  //      gorro de costal amarrado con soga arriba, mangas de costal con puño de soga y un parche naranja ----
+  if (opt.disfraz !== false && window.esHalloween && window.esHalloween()) {
+    const yute = canvasTex(256, 256, (g, w, h) => {                   // tejido de yute: hilos gruesos que pasan por arriba y por abajo
+      g.fillStyle = '#5c4222'; g.fillRect(0, 0, w, h);
+      for (let y = 0; y < h; y += 8) for (let x = 0; x < w; x += 8) {
+        const arriba = ((x + y) / 8) % 2, l = 0.8 + Math.random() * 0.34;
+        g.fillStyle = `rgb(${178 * l | 0},${140 * l | 0},${86 * l | 0})`;
+        if (arriba) g.fillRect(x, y + 1, 8, 5); else g.fillRect(x + 1, y, 5, 8);
+      }
+      for (let k = 0; k < 600; k++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(255,236,196,.3)' : 'rgba(60,36,12,.3)'; g.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 4, 1); }
+    });
+    yute.wrapS = yute.wrapT = THREE.RepeatWrapping; yute.repeat.set(7, 3);
+    const sogaT = canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#c49a5e'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(92,60,24,.75)'; g.lineWidth = 5;
+      for (let k = -2; k < 4; k++) { g.beginPath(); g.moveTo(k * 22, 0); g.lineTo(k * 22 + 40, h); g.stroke(); } });
+    sogaT.wrapS = sogaT.wrapT = THREE.RepeatWrapping; sogaT.repeat.set(18, 1);
+    const SACO = PM({ color: 0xe8dcc4, map: yute, roughness: 0.95, envMapIntensity: 0.12, side: THREE.DoubleSide });
+    const PARCHE = PM({ color: 0xff8f3a, map: yute, roughness: 0.95, envMapIntensity: 0.12 });
+    const HILO = PM({ color: 0x3a2312, roughness: 0.85, envMapIntensity: 0.08 });
+    const SOGA = PM({ color: 0xffffff, map: sogaT, roughness: 0.9, envMapIntensity: 0.12 });
+    const soldar = (g) => {                                            // normales suaves también donde se juntan los bordes
+      g.computeVertexNormals(); const P = g.attributes.position, N = g.attributes.normal, mapa = new Map(), v = V(0, 0, 0), r = x => Math.round(x * 1e4);
+      for (let i = 0; i < P.count; i++) { const k = r(P.getX(i)) + ',' + r(P.getY(i)) + ',' + r(P.getZ(i)); let a = mapa.get(k); if (!a) mapa.set(k, a = []); a.push(i); }
+      mapa.forEach(a => { if (a.length < 2) return; v.set(0, 0, 0); a.forEach(i => { v.x += N.getX(i); v.y += N.getY(i); v.z += N.getZ(i); }); v.normalize(); a.forEach(i => N.setXYZ(i, v.x, v.y, v.z)); });
+      return g;
+    };
+    // puntadas: cajitas de hilo oscuro pegadas a la tela (p: dónde, d: hacia dónde va el hilo, n: hacia afuera de la tela)
+    const BX = new THREE.BoxGeometry(1, 1, 1);
+    const puntada = (parent, p, d, n, largo = 0.05, gr = 0.013) => { const b = V(0, 0, 0).crossVectors(n, d).normalize(), nn = V(0, 0, 0).crossVectors(d, b);
+      partM(BX, HILO, parent, new THREE.Matrix4().makeBasis(d.clone().normalize(), b, nn).scale(V(largo, gr, gr)).setPosition(p)); };
+    const cruz = (parent, p, t, n, tam = 0.05) => { const tt = t.clone().addScaledVector(n, -n.dot(t)).normalize(), b = V(0, 0, 0).crossVectors(n, tt).normalize();
+      [1, -1].forEach(sg => puntada(parent, p, tt.clone().add(b.clone().multiplyScalar(sg)).normalize(), n, tam)); };
+    // ---- el costal del cuerpo: más ancho que la pancita, fruncido en el cuello y con el borde de abajo ondulado ----
+    const perfil = new THREE.SplineCurve([[0.385, 0.25], [0.41, 0.29], [0.432, 0.37], [0.448, 0.46], [0.452, 0.55], [0.437, 0.63], [0.398, 0.69], [0.33, 0.745], [0.235, 0.786], [0.172, 0.808], [0.155, 0.828], [0.17, 0.858]].map(([r, y]) => new THREE.Vector2(r, y))).getPoints(44);
+    const rDe = y => { for (let i = 1; i < perfil.length; i++) if (perfil[i].y >= y) { const a = perfil[i - 1], b = perfil[i], k = (y - a.y) / Math.max(1e-6, b.y - a.y); return a.x + (b.x - a.x) * k; } return perfil[perfil.length - 1].x; };
+    const pliegue = (th, y) => 1 + (0.016 + 0.07 * sstep(0.66, 0.8, y) + 0.028 * sstep(0.34, 0.26, y)) * Math.sin(th * 9 + y * 7);
+    const R = (th, y) => rDe(y) * pliegue(th, y);
+    const saco = new THREE.LatheGeometry(perfil, 72, Math.PI, Math.PI * 2);   // la costura de la tela queda atrás
+    { const q = saco.attributes.position;
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), th = Math.atan2(x, z), f = pliegue(th, y);
+        q.setXYZ(i, x * f, y + 0.014 * Math.sin(th * 5) * sstep(0.3, 0.25, y), z * f); } }
+    part(soldar(saco), SACO, body);
+    const sup = (th, y, off = 0.005) => { const r = R(th, y) + off; return V(Math.sin(th) * r, y, Math.cos(th) * r); };
+    const nor = (th, y) => { const d = (R(th, y + 0.005) - R(th, y - 0.005)) / 0.01; return V(Math.sin(th), -d, Math.cos(th)).normalize(); };
+    for (let y = 0.3; y <= 0.735; y += 0.044) cruz(body, sup(0, y), V(0, 1, 0), nor(0, y), 0.056);                     // costura grande al frente
+    for (let k = 0; k < 40; k++) { const th = k / 40 * Math.PI * 2; if (Math.abs(Math.sin(th / 2)) < 0.06) continue;   // costura de la cintura (pasadas)
+      puntada(body, sup(th, 0.46, 0.004), V(Math.cos(th), 0, -Math.sin(th)), nor(th, 0.46), 0.042); }
+    { const th0 = -0.78, y0 = 0.575, W = 0.16, H = 0.14, pg = new THREE.PlaneGeometry(W, H, 8, 8), q = pg.attributes.position;    // parche naranja cosido
+      for (let i = 0; i < q.count; i++) { const th = th0 + q.getX(i) / rDe(y0), y = y0 + q.getY(i) + 0.006 * Math.sin(q.getX(i) * 40); const p = sup(th, y, 0.007); q.setXYZ(i, p.x, p.y, p.z); }
+      pg.computeVertexNormals(); part(pg, PARCHE, body);
+      for (let k = 0; k < 4; k++) { const u = -W / 2 + (k + 0.5) * W / 4; [-1, 1].forEach(sg => { const th = th0 + u / rDe(y0), y = y0 + sg * H / 2; cruz(body, sup(th, y, 0.011), V(Math.cos(th), 0, -Math.sin(th)), nor(th, y), 0.034); }); }
+      for (let k = 0; k < 3; k++) { const y = y0 - H / 2 + (k + 0.5) * H / 3; [-1, 1].forEach(sg => { const th = th0 + sg * W / 2 / rDe(y0); cruz(body, sup(th, y, 0.011), V(0, 1, 0), nor(th, y), 0.034); }); } }
+    { const yr = 0.8, rr = rDe(yr) * 1.05 + 0.012;                    // soga del cuello con su nudo y dos puntas deshilachadas
+      part(new THREE.TorusGeometry(rr, 0.026, 10, 56), SOGA, body, [0, yr, 0], [Math.PI / 2, 0, 0]);
+      const th = 0.55, kp = V(Math.sin(th) * (rr + 0.02), yr - 0.005, Math.cos(th) * (rr + 0.02));
+      part(new THREE.SphereGeometry(0.045, 16, 12), SOGA, body, [kp.x, kp.y, kp.z], [0, th, 0], [1.25, 0.9, 0.95]);
+      [-1, 1].forEach(sg => { const a = sg * 0.32, L = 0.13, c = V(kp.x + Math.sin(a) * L / 2 * 0.6 + Math.sin(th) * 0.01, kp.y - L / 2, kp.z + Math.cos(th) * 0.012);
+        part(new THREE.CylinderGeometry(0.016, 0.017, L, 10), SOGA, body, [c.x, c.y, c.z], [0, 0, a]);
+        part(new THREE.ConeGeometry(0.028, 0.05, 10), SOGA, body, [c.x + Math.sin(a) * L / 2, c.y - L / 2 - 0.018, c.z], [0, 0, a]); }); }
+    // ---- mangas de costal con puño de soga y una costura por fuera ----
+    arms.forEach(A => {
+      part(armGeo, SACO, A.sh, [0.008 * A.sx, 0, 0], null, [1.15, 1.02, 1.15]);
+      const rb = k => 0.135 * Math.pow(Math.sin(Math.PI * k), 0.4) * (0.8 + 0.2 * k) * 1.15;
+      for (let y = -0.27; y <= 0.0; y += 0.054) cruz(A.sh, V(A.sx * (rb((y + 0.39) / 0.44) + 0.004) + 0.008 * A.sx, y, 0), V(0, 1, 0), V(A.sx, 0, 0), 0.04);
+      part(new THREE.TorusGeometry(rb((-0.325 + 0.39) / 0.44) + 0.006, 0.017, 8, 36), SOGA, A.sh, [0.008 * A.sx, -0.325, 0], [Math.PI / 2, 0, 0]);
+    });
+    // ---- gorro de costal: el casco forrado de yute, fruncido arriba y amarrado con soga (la punta se dobla) ----
+    const HY = z => 0.25 - 0.22 * sstep(0.0, -0.42, z);              // borde: encima del visor adelante, más abajo atrás (las orejas quedan libres)
+    const def = (x, y, z) => { const k = sstep(0.33, 0.5, y), th = Math.atan2(x, z), f = 1.065 * (1 - 0.84 * k) * (1 + 0.1 * k * Math.sin(th * 11)); return V(x * f, y * 1.065 + 0.2 * k, z * f); };
+    const gorro = helmet(); let sr = 0, sy = 0, sn = 0;
+    { const q = gorro.attributes.position, keep = new Uint8Array(q.count);
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), p = def(x, y, z); keep[i] = y > HY(z) ? 1 : 0;
+        if (y > 0.445 && y < 0.456) { sr += Math.hypot(p.x, p.z); sy += p.y; sn++; } q.setXYZ(i, p.x, p.y, p.z); }
+      const src = gorro.index.array, out = []; for (let i = 0; i < src.length; i += 3) if (keep[src[i]] && keep[src[i + 1]] && keep[src[i + 2]]) out.push(src[i], src[i + 1], src[i + 2]);
+      gorro.setIndex(out); }
+    part(soldar(gorro), SACO, head);
+    const casco = (th, s) => { const c = Math.sqrt(Math.max(0, 1 - s * s)), yy = sp(s, 0.7), k = 1 - 0.13 * Math.max(0, yy) ** 2 - 0.04 * Math.max(0, -yy) ** 2;
+      return V(sp(Math.sin(th) * c, 0.6) * k * HS[0], yy * HS[1], sp(Math.cos(th) * c, 0.62) * k * HS[2]); };
+    const borde = th => { let a = -0.3, b = 0.95; for (let i = 0; i < 24; i++) { const m = (a + b) / 2, p = casco(th, m); if (p.y > HY(p.z)) b = m; else a = m; } return b + 0.012; };
+    const enGorro = (th, s, off = 0.006) => { const p0 = casco(th, s), p = def(p0.x, p0.y, p0.z), n = V(p.x, p.y * 0.35, p.z).normalize(); return { p: p.addScaledVector(n, off), n }; };
+    for (let k = 0; k < 44; k++) { const th = k / 44 * Math.PI * 2, s = borde(th), a = enGorro(th, s), b = enGorro(th + 0.02, borde(th + 0.02));   // pasadas en el borde
+      puntada(head, a.p, b.p.clone().sub(a.p), a.n, 0.045); }
+    { const th = 0.95; for (let s = borde(th) + 0.06; s < 0.84; s += 0.07) { const a = enGorro(th, s, 0.008), b = enGorro(th, s + 0.02, 0.008); cruz(head, a.p, b.p.clone().sub(a.p), a.n, 0.05); } }   // costura de lado
+    { const th = -1.25, s0 = 0.55, a = enGorro(th, s0, 0.004), pg = new THREE.PlaneGeometry(0.15, 0.13, 6, 6), q = pg.attributes.position;   // parchecito naranja en el gorro
+      for (let i = 0; i < q.count; i++) { const e = enGorro(th + q.getX(i) / 0.52, s0 + q.getY(i) * 1.7, 0.009); q.setXYZ(i, e.p.x, e.p.y, e.p.z); }
+      pg.computeVertexNormals(); part(pg, PARCHE, head);
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([i, j]) => { const e = enGorro(th + i * 0.06 / 0.52, s0 + j * 0.05 * 1.7, 0.013); cruz(head, e.p, V(0, 1, 0), e.n, 0.03); }); }
+    const ry = sy / Math.max(1, sn), rrg = sr / Math.max(1, sn) + 0.02;  // soga del gorro y la punta de tela que sale arriba
+    part(new THREE.TorusGeometry(rrg, 0.024, 10, 40), SOGA, head, [0, ry, 0], [Math.PI / 2, 0, 0]);
+    const punta = new THREE.Group(); punta.position.set(0, ry + 0.005, 0); punta.rotation.set(0.15, 0, -0.42); head.add(punta);
+    { const pp = new THREE.SplineCurve([[0.06, -0.02], [0.08, 0.04], [0.115, 0.1], [0.14, 0.15], [0.128, 0.162]].map(([r, y]) => new THREE.Vector2(r, y))).getPoints(14);
+      const g = new THREE.LatheGeometry(pp, 40), q = g.attributes.position;
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), th = Math.atan2(x, z), f = 1 + 0.16 * sstep(0.02, 0.15, y) * Math.sin(th * 7); q.setXYZ(i, x * f, y + 0.012 * Math.sin(th * 9) * sstep(0.1, 0.16, y), z * f); }
+      part(soldar(g), SACO, punta);
+      for (let k = 0; k < 16; k++) { const th = k / 16 * Math.PI * 2, r = 0.135; part(new THREE.CylinderGeometry(0.004, 0.003, 0.05, 4), SOGA, punta, [Math.sin(th) * r, 0.17, Math.cos(th) * r], [Math.cos(th) * 0.7, 0, -Math.sin(th) * 0.7]); } }
+  }
   flush();
 
   // ---- la luz azul de abajo: aro en el piso que respira, ondas suaves que salen y un brillo ----
