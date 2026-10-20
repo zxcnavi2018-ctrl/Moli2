@@ -42,6 +42,7 @@
     ['corcho', '📌', 'Editar corcho', 'Unidad y propósito'],
     ['docentes', '👩‍🏫', 'Docentes y corchos', 'Otro docente con su propio corcho'],
     ['cuenta', '🤖', 'Crear cuenta con Molí', 'Cuentas de tus estudiantes'],
+    ['comunicado', '📢', 'Enviar comunicado', 'Mensaje o foto a tus estudiantes'],
     ['trabajar', '✨', 'Trabajar con Molí', 'Crea la ficha de tu sesión'],
     ['preparadas', '📦', 'Sesiones preparadas', 'Unidad 7 lista para publicar'],
     ['escanear', '📷', 'Escanear', 'Exit tickets en papel'],
@@ -74,6 +75,7 @@
     const me = MD.yo();
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
       <div class="fp-h"><img src="img/moli/feliz.webp" alt=""><div><b>¡Hola, ${esc(String(me.name || '').split(' ')[0])}! 👋</b><span>${esc(me.name)} · ${MD.espInfo().gn} ${esc(me.section || '')}</span></div></div>
+      ${window.Comunicado && Comunicado.hay() ? '<button class="fp-ok" data-f="comu" style="display:block;width:100%;margin-bottom:8px;background:#f59e0b;box-shadow:0 4px 0 #b45309">📢 Comunicados de tu profe</button>' : ''}
       ${window.Revista && Revista.esRevisor() ? '<button class="fp-ok" data-f="h" data-k="bandeja">📥 Mi bandeja de Revisor</button>' : ''}
       <button class="fp-out" data-f="salir1">🚪 Salir de cuenta</button>`);
   }
@@ -105,6 +107,7 @@
     if (f === 'salir1') return confirmarSalir();
     if (f === 'salir') { MD.salir(); cerrar(); pintar(); window.dispatchEvent(new Event('moli2:me')); return; }
     if (f === 'h') { cerrar(); window.dispatchEvent(new CustomEvent('moli2:herramienta', { detail: b.dataset.k })); }
+    if (f === 'comu') { cerrar(); return window.Comunicado && Comunicado.ver(); }
     if (f === 'conectar') return pedirCuenta();
     if (f === 'despues') return menuDocente();
     if (f === 'gtch') { const err = panel.querySelector('.fp-err'); b.disabled = true; b.textContent = 'Un momento…';
