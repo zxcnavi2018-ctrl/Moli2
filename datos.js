@@ -48,10 +48,12 @@
     const m1 = LS.get(ME_MOLI1, null);                                      // si ya entró en Molí en este mismo sitio, también vale
     return m1 && m1.key && !m1.teacher && !m1.demo ? m1 : null;
   }
-  async function entrar(dni) {
+  const claveDe = dni => '000000' + dni.slice(-3);                    // contraseña del estudiante: 000000 y los 3 últimos números de su DNI
+  async function entrar(dni, clave) {
     dni = String(dni || '').replace(/\D/g, '').slice(0, 8);
     if (dni.length !== 8) throw new Error('DNI');
     if (window.Docente) { const d = await Docente.quien(dni); if (d) { const e = new Error('DOCENTE'); e.info = d; throw e; } }   // DNI de docente: pide su clave
+    if (String(clave || '').replace(/\D/g, '') !== claveDe(dni)) throw new Error('CLAVE');
     const key = await idDeDni(dni), st = await get('students', key);
     if (!st) throw new Error('NOEXISTE');
     const me = { key, dni, name: st.name, section: st.section, grade: st.grade || '6to' };

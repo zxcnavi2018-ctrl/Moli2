@@ -24,7 +24,7 @@
   //  🤖 CREAR CUENTA CON MOLÍ
   // =================================================================
   function crearCuenta() {
-    const b = abrir('🤖 Crear cuenta con Molí', 'Tus estudiantes entran con su DNI (como en Molí 1).', 'feliz', `
+    const b = abrir('🤖 Crear cuenta con Molí', 'Tus estudiantes entran con su DNI y su contraseña: 000000 y los 3 últimos números de su DNI.', 'feliz', `
       <form class="hp-f" data-f="uno"><div class="hp-row"><input name="dni" inputmode="numeric" maxlength="8" placeholder="DNI (8 números)" required>
         <select name="sec">${['A', 'B', 'C', 'D'].map(x => `<option>${x}</option>`).join('')}</select></div>
         <input name="nom" maxlength="60" placeholder="Nombre completo" required><button class="hp-ok" type="submit">➕ Crear cuenta</button><p class="hp-msg"></p></form>
@@ -36,7 +36,7 @@
       try { const E = (await Docente.estudiantes(true)).filter(e => e.section === sec); ls.innerHTML = E.length ? `<small>${E.length} estudiantes</small><ol>${E.map(e => `<li>${esc(e.name)} <small>••••${esc(String(e.dni).slice(-4))}</small></li>`).join('')}</ol>` : '<small>Sin estudiantes todavía.</small>'; }
       catch (e) { ls.innerHTML = `<small>${errTxt(e)}</small>`; } };
     b.addEventListener('submit', async e => { e.preventDefault(); const f = e.target, m = f.querySelector('.hp-msg'), bt = f.querySelector('button'); bt.disabled = true; m.textContent = 'Creando…';
-      try { const s = await Docente.crearEstudiante(f.dni.value, f.nom.value, f.sec.value); m.innerHTML = `✅ Cuenta de <b>${esc(s.name)}</b> (${MD.espInfo().gn} ${s.section}) creada. Ya puede entrar con su DNI.`; f.dni.value = ''; f.nom.value = ''; ver(s.section); }
+      try { const s = await Docente.crearEstudiante(f.dni.value, f.nom.value, f.sec.value); m.innerHTML = `✅ Cuenta de <b>${esc(s.name)}</b> (${MD.espInfo().gn} ${s.section}) creada. Entra con su DNI y la contraseña <b>000000${esc(String(s.dni).slice(-3))}</b>.`; f.dni.value = ''; f.nom.value = ''; ver(s.section); }
       catch (x) { m.textContent = x.message === 'DNI' ? 'El DNI debe tener 8 números.' : x.message === 'NOMBRE' ? 'Escribe el nombre completo (3 a 60 letras).' : x.message === 'YAEXISTE' ? 'Ese DNI ya tiene cuenta.' : errTxt(x); }
       bt.disabled = false; });
     b.addEventListener('click', async e => { const k = e.target.closest('[data-h]'); if (!k) return;

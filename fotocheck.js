@@ -33,8 +33,8 @@
   function cerrar() { panel.classList.remove('on'); }
   function pedirDni() {
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
-      <div class="fp-h"><img src="img/moli/hola.webp" alt=""><div><b>¡Hola! 👋</b><span>Escribe tu <b>DNI</b> para tu fotocheck. Sólo lo haces una vez.</span></div></div>
-      <form data-f="dni"><input name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="DNI (8 números)"><div class="fp-err"></div><button class="fp-ok" type="submit">Entrar ✓</button></form>`);
+      <div class="fp-h"><img src="img/moli/hola.webp" alt=""><div><b>¡Hola! 👋</b><span>Escribe tu <b>DNI</b> y tu <b>contraseña</b> para tu fotocheck. Sólo lo haces una vez.</span></div></div>
+      <form data-f="dni"><input name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="DNI (8 números)"><input name="pass" type="password" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contraseña"><small style="display:block;margin-top:4px;opacity:.7">👩‍🏫 Docente: sólo tu DNI.</small><div class="fp-err"></div><button class="fp-ok" type="submit">Entrar ✓</button></form>`);
     setTimeout(() => { const i = panel.querySelector('input'); i && i.focus(); }, 250);
   }
   const HERR = [
@@ -128,13 +128,13 @@
       return;
     }
     try {
-      await MD.entrar(i.value);
+      await MD.entrar(i.value, f.pass.value);
       window.dispatchEvent(new Event('moli2:me')); pintar();
       if (MD.esDocente()) menuDocente(); else { cerrar(); el.classList.remove('meneo'); void el.offsetWidth; el.classList.add('meneo'); }
     } catch (x) {
       if (x.message === 'DOCENTE') return pedirClave(x.info);
       b.disabled = false; b.textContent = 'Entrar ✓';
-      err.textContent = x.message === 'DNI' ? 'Escribe los 8 números de tu DNI.' : x.message === 'NOEXISTE' ? 'No encuentro ese DNI. Pide a tu profe que cree tu cuenta.' : x.message === 'CLAVE' ? 'Clave incorrecta.' : 'No pude conectarme. Revisa tu internet.';
+      err.textContent = x.message === 'DNI' ? 'Escribe los 8 números de tu DNI.' : x.message === 'NOEXISTE' ? 'No encuentro ese DNI. Pide a tu profe que cree tu cuenta.' : x.message === 'CLAVE' ? 'Contraseña incorrecta. Pídela a tu profe.' : 'No pude conectarme. Revisa tu internet.';
     }
   });
   addEventListener('moli2:me', pintar);

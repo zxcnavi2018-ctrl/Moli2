@@ -138,14 +138,14 @@
 
   // ---- entrar con DNI (lo usan el portafolio, las notas y las misiones) ----
   const hojaEntrar = (para) => ({
-    l: `<img class="moli w" src="${IMG('hola')}" alt=""><div class="crumb w">Molí 2</div><h1 class="w">¡Hola! 👋</h1><p class="hand w">Para ver ${para}, escribe tu <b>DNI</b>. Es el mismo con el que entras a Molí.</p><p class="hand w">Así guardo todo en tu cuenta. 📝</p>`,
-    r: `<form data-a="entrar" class="center"><h2 class="w">🔑 Mi cuenta</h2><input class="dni" name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="DNI"><div class="err"></div><button class="bt gr" type="submit">Entrar ✓</button></form>`
+    l: `<img class="moli w" src="${IMG('hola')}" alt=""><div class="crumb w">Molí 2</div><h1 class="w">¡Hola! 👋</h1><p class="hand w">Para ver ${para}, escribe tu <b>DNI</b> y tu <b>contraseña</b>. Son los mismos con los que entras a Molí.</p><p class="hand w">Así guardo todo en tu cuenta. 📝</p>`,
+    r: `<form data-a="entrar" class="center"><h2 class="w">🔑 Mi cuenta</h2><input class="dni" name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="DNI"><input class="dni" name="pass" type="password" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contraseña"><div class="err"></div><button class="bt gr" type="submit">Entrar ✓</button></form>`
   });
   async function entrarCon(flujo, f) {
-    const inp = f.querySelector('input'), err = f.querySelector('.err'), b = f.querySelector('button');
+    const err = f.querySelector('.err'), b = f.querySelector('button');
     b.disabled = true; b.textContent = 'Un momento…'; err.textContent = '';
-    try { flujo.me = await MD.entrar(inp.value); window.dispatchEvent(new Event('moli2:me')); flujo.alEntrar ? flujo.alEntrar() : flujo.libro.pasar(1, () => { flujo.i = 0; }); }
-    catch (e) { b.disabled = false; b.textContent = 'Entrar ✓'; err.textContent = e.message === 'DNI' ? 'Escribe los 8 números de tu DNI.' : e.message === 'NOEXISTE' ? 'No encuentro ese DNI. Pide a tu profe que cree tu cuenta.' : 'No pude conectarme. Revisa tu internet.'; }
+    try { flujo.me = await MD.entrar(f.dni.value, f.pass.value); window.dispatchEvent(new Event('moli2:me')); flujo.alEntrar ? flujo.alEntrar() : flujo.libro.pasar(1, () => { flujo.i = 0; }); }
+    catch (e) { b.disabled = false; b.textContent = 'Entrar ✓'; err.textContent = e.message === 'DNI' ? 'Escribe los 8 números de tu DNI.' : e.message === 'NOEXISTE' ? 'No encuentro ese DNI. Pide a tu profe que cree tu cuenta.' : e.message === 'CLAVE' ? 'Contraseña incorrecta. Pídela a tu profe.' : e.message === 'DOCENTE' ? 'Ese DNI es de docente: entra por tu fotocheck.' : 'No pude conectarme. Revisa tu internet.'; }
   }
   // ---- elegir la unidad ----
   const hojaUnidades = (titulo, icono, frase, me) => {
