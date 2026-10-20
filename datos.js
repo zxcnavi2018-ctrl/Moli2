@@ -63,10 +63,10 @@
     if (num.length !== 8) throw new Error('DNI');
     if (window.Docente) { const d = await Docente.quien(num); if (d) { const e = new Error('DOCENTE'); e.info = d; throw e; } }   // DNI de docente: pide su clave
     let key = await idDeDni(num), st = await get('students', key);
-    if (!st && /^00000\d{3}$/.test(num)) {                             // su código
-      const C = await candidatos(num.slice(-3)), c = elegido ? C.find(x => x.k === elegido) : C.length === 1 ? C[0] : null;
-      if (!c && C.length > 1) { const e = new Error('VARIOS'); e.lista = C; throw e; }
-      if (c && /^k[0-9a-f]{20}$/.test(c.k)) { key = c.k; st = await get('students', key); }
+    if (/^00000\d{3}$/.test(num)) {                                    // su código (o una cuenta creada con ese DNI falso)
+      const C = await candidatos(num.slice(-3)), c = elegido ? C.find(x => x.k === elegido) : !st && C.length === 1 ? C[0] : null;
+      if (!c && C.length > 1) { const e = new Error('VARIOS'); e.lista = C; throw e; }   // el número es de varios: elige su nombre
+      if (c && /^k[0-9a-f]{20}$/.test(c.k) && c.k !== key) { key = c.k; st = await get('students', key); }
     }
     if (!st) throw new Error('NOEXISTE');
     const me = { key, dni: String(st.dni || num), name: st.name, section: st.section, grade: st.grade || '6to' };   // (el DNI de verdad: con él se guardan sus Exit tickets)
