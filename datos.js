@@ -53,9 +53,9 @@
     dni = String(dni || '').replace(/\D/g, '').slice(0, 8);
     if (dni.length !== 8) throw new Error('DNI');
     if (window.Docente) { const d = await Docente.quien(dni); if (d) { const e = new Error('DOCENTE'); e.info = d; throw e; } }   // DNI de docente: pide su clave
-    if (String(clave || '').replace(/\D/g, '') !== claveDe(dni)) throw new Error('CLAVE');
     const key = await idDeDni(dni), st = await get('students', key);
     if (!st) throw new Error('NOEXISTE');
+    if (String(clave || '').replace(/\D/g, '') !== claveDe(dni)) throw new Error('CLAVE');   // (sin contraseña todavía: el fotocheck la pide en el paso 2)
     const me = { key, dni, name: st.name, section: st.section, grade: st.grade || '6to' };
     LS.set(ME_KEY, me); return me;
   }

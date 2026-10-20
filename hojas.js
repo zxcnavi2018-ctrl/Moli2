@@ -139,7 +139,7 @@
   // ---- entrar con DNI (lo usan el portafolio, las notas y las misiones) ----
   const hojaEntrar = (para) => ({
     l: `<img class="moli w" src="${IMG('hola')}" alt=""><div class="crumb w">Molí 2</div><h1 class="w">¡Hola! 👋</h1><p class="hand w">Para ver ${para}, escribe tu <b>DNI</b> y tu <b>contraseña</b>. Son los mismos con los que entras a Molí.</p><p class="hand w">Así guardo todo en tu cuenta. 📝</p>`,
-    r: `<form data-a="entrar" class="center"><h2 class="w">🔑 Mi cuenta</h2><input class="dni" name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="DNI"><input class="dni" name="pass" type="password" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contraseña"><div class="err"></div><button class="bt gr" type="submit">Entrar ✓</button></form>`
+    r: `<form data-a="entrar" class="center"><h2 class="w">🔑 Mi cuenta</h2><input class="dni" name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="DNI"><input class="dni" name="pass" type="password" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contraseña"><small class="w" style="display:block;opacity:.75">🔑 000000 y los 3 últimos números de tu DNI</small><div class="err"></div><button class="bt gr" type="submit">Entrar ✓</button></form>`
   });
   async function entrarCon(flujo, f) {
     const err = f.querySelector('.err'), b = f.querySelector('button');
