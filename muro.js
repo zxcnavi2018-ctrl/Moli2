@@ -67,7 +67,7 @@
   #muro .hd { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; } #muro h2 { margin: 0; flex: 1; font: 900 30px "Trebuchet MS", sans-serif; color: #7c2d12; }
   #muro .x { width: 44px; height: 44px; border-radius: 50%; border: 0; background: #7c2d12; color: #fff; font-size: 20px; cursor: pointer; }
   #muro .sub { margin: 4px 0 14px; color: #92400e; font-weight: 700; }
-  #muro .btn { border: 0; border-radius: 999px; padding: 10px 16px; font: 900 15px "Trebuchet MS", sans-serif; cursor: pointer; background: #16a34a; color: #fff; box-shadow: 0 4px 0 #15803d; }
+  #muro .btn { position: static; display: inline-block; width: auto; height: auto; touch-action: auto; border: 0; border-radius: 999px; padding: 10px 16px; font: 900 15px "Trebuchet MS", sans-serif; cursor: pointer; background: #16a34a; color: #fff; box-shadow: 0 4px 0 #15803d; }
   #muro .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; }
   #muro .tr { position: relative; background: #fff; border-radius: 16px; padding: 10px 10px 12px; box-shadow: 0 8px 18px rgba(124,45,18,.18); border: 1px solid #f1d9a8; cursor: zoom-in; }
   #muro .tr:nth-child(odd) { transform: rotate(-.6deg); } #muro .tr:nth-child(even) { transform: rotate(.5deg); }
