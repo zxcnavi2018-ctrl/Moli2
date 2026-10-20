@@ -58,6 +58,13 @@ body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 5
 .over .big{font-size:60px}
 .over button{padding:12px 22px;border-radius:14px;border:0;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font:inherit;font-weight:900;font-size:16px;cursor:pointer}
 .mini{display:flex;gap:4px;flex-wrap:wrap}
+.med{align-self:flex-start;padding:7px 14px;border-radius:999px;border:0;background:linear-gradient(135deg,#22c55e,#0ea5e9);color:#fff;font:inherit;font-weight:900;font-size:14px;cursor:pointer;animation:medp 1.2s infinite}
+.med[hidden]{display:none}
+@keyframes medp{0%{box-shadow:0 0 0 0 rgba(34,197,94,.75)}70%{box-shadow:0 0 0 14px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.over ul{margin:8px 0 12px;padding:10px 12px 10px 30px;border-radius:14px;background:#f0fdf4;text-align:left;font-size:14px;font-weight:700;line-height:1.4;color:#14532d}
+.over ul li{margin:4px 0}
+.over .two{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.over button.verde{background:linear-gradient(135deg,#16a34a,#0ea5e9)}
 .mini .mi{font-size:11.5px;padding:5px 9px}
 @media (max-width:640px){.board{padding-bottom:10px}.side.me{flex-direction:column;align-items:stretch}.side.me .nm{max-width:none!important}.side .backs{display:none}.moli-say{display:none}.nm b{font-size:14px}.res{font-size:13px}}
 </style>
@@ -67,7 +74,7 @@ body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 5
 <div class="board">
   <div class="side foe" id="foe"><div class="who"><svg viewBox="0 0 160 160" id="villain"><g><g fill="#65a30d">${''}</g></g></svg><div class="nm"><b>Bacterius 😈</b><div class="hp"><i id="fH" style="background:linear-gradient(90deg,#a3e635,#65a30d)"></i></div><small id="fT">Infección 12/12</small></div></div><div class="backs" id="backs"></div></div>
   <div class="arena" id="arena"><div id="aSlot"></div><span class="vs">VS</span><div id="dSlot"><div class="slot">Arrastra aquí tu carta de defensa</div></div><div id="res"></div></div>
-  <div class="side me"><div class="nm" style="max-width:260px"><b>❤️ Tu cuerpo</b><div class="hp"><i id="pH" style="background:linear-gradient(90deg,#f87171,#ef4444)"></i></div><small id="pT">Salud 10/10</small><div class="mini" id="mis"></div></div><div class="hand wait" id="hand"></div></div>
+  <div class="side me"><div class="nm" style="max-width:260px"><b>❤️ Tu cuerpo</b><div class="hp"><i id="pH" style="background:linear-gradient(90deg,#f87171,#ef4444)"></i></div><small id="pT">Salud 10/10</small><button type="button" class="med" id="med" hidden>💊 ¡Toma tu medicina!</button><div class="mini" id="mis"></div></div><div class="hand wait" id="hand"></div></div>
 </div>
 <div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
 <div class="over" id="over"><div><div class="big">🦠⚔️🛡️</div><h2>¡Defiende tu cuerpo!</h2><p><b>Bacterius</b> quiere enfermarte con microbios. Él tiene 4 cartas y tú también. Cuando él ataque, <b>arrastra</b> la carta de defensa correcta al centro. ¡Gana quien deje al otro sin energía!</p><button type="button" id="go">▶ Empezar el duelo</button></div></div>
@@ -104,9 +111,10 @@ const DEF={
 const WHY={bac:'bacterias',vir:'virus',bat:'un batallón de virus',hon:'hongos',par:'parásitos'};
 // ---------- estado ----------
 let G;const shuffle=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
-function newGame(){G={fh:12,ph:10,fd:shuffle(['bac','sal','vir','bat','hon','par','vir','bac','bat','par','hon','sal']),fhand:[],pd:shuffle(Object.keys(DEF).flatMap(k=>[k,k])),phand:[],atk:null,busy:1};for(let i=0;i<4;i++){G.fhand.push(G.fd.pop());G.phand.push(G.pd.pop())}draw();setTimeout(foeTurn,900)}
+function newGame(){G={med:0,hist:[],fh:12,ph:10,fd:shuffle(['bac','sal','vir','bat','hon','par','vir','bac','bat','par','hon','sal']),fhand:[],pd:shuffle(Object.keys(DEF).flatMap(k=>[k,k])),phand:[],atk:null,busy:1};for(let i=0;i<4;i++){G.fhand.push(G.fd.pop());G.phand.push(G.pd.pop())}draw();setTimeout(foeTurn,900)}
 function card(k,cls,i){const c=cls==='atk'?ATK[k]:DEF[k];return`<button type="button" class="card ${cls} ${c.pv?'pv':''}" data-k="${k}" data-i="${i??''}"><span class="tg">${cls==='atk'?'ATAQUE':c.t}</span><span class="ic">${c.ic}</span><b>${c.n}</b><small>${cls==='atk'?c.t:''}</small></button>`}
 function draw(){$('fH').style.width=G.fh/12*100+'%';$('fT').textContent=`Infección ${Math.max(0,G.fh)}/12`;$('pH').style.width=Math.max(0,G.ph)/10*100+'%';$('pT').textContent=`Salud ${Math.max(0,G.ph)}/10`;
+ $('med').hidden=!(G.med===0&&G.ph>0&&G.ph<=4);                      // 💊 aparece cuando la salud está baja (una vez por partida)
  $('backs').innerHTML=G.fhand.map(()=>'<i></i>').join('');$('hand').innerHTML=G.phand.map((k,i)=>card(k,'def',i)).join('');$('hand').classList.toggle('wait',!!G.busy);mis()}
 function foeTurn(){if(G.fh<=0||G.ph<=0)return;const i=Math.floor(Math.random()*G.fhand.length),k=G.fhand.splice(i,1)[0];if(G.fd.length)G.fhand.push(G.fd.pop());G.atk=k;G.busy=0;
  $('aSlot').innerHTML=card(k,'atk').replace('class="card atk','class="card atk flip');$('dSlot').innerHTML='<div class="slot">Arrastra aquí tu carta de defensa</div>';$('res').innerHTML='';
@@ -118,15 +126,36 @@ function play(i){if(G.busy||G.atk==null)return;G.busy=1;const k=G.phand.splice(i
  if(lv===2){fd=3;cls='good';txt=`<b class="t">✅ ¡Defensa perfecta!</b>${di}`;if(k==='nk'&&a.k==='vir'&&!MI.nk){MI.nk=1;save(KEY,MI)}if(k==='lt'&&a.k==='bat'&&!MI.lt){MI.lt=1;save(KEY,MI)}}
  else if(lv===1){fd=1;pd=Math.ceil(a.d/2);cls='mid';txt=`<b class="t">⚠️ Ayuda un poco</b>${di}${di===d.i?` Contra ${wy} hay una defensa mejor.`:''}`}
  else{pd=a.d;cls='bad';txt=`<b class="t">❌ No funciona contra ${wy}</b>${di}`}
- G.fh-=fd;G.ph-=pd;
+ G.fh-=fd;G.ph-=pd;G.hist.push({a:G.atk,ak:a.k,k,lv});
  if(fd){$('foe').classList.remove('hit');void $('foe').offsetWidth;$('foe').classList.add('hit');pop($('foe'),'-'+fd,'#a3e635');boom(660,.2,'triangle');setTimeout(()=>boom(990,.2,'triangle'),120)}
  if(pd){pop($('pH'),'-'+pd+' ❤️','#f87171');boom(160,.35,'square')}
  setTimeout(()=>{draw();$('res').innerHTML=`<div class="res ${cls}">${txt}<br><button type="button" id="nx">${G.fh<=0||G.ph<=0?'Ver resultado ➜':'Siguiente turno ➜'}</button></div>`;
   say.innerHTML=cls==='good'?'¡Así se hace! 💪 Tu sistema inmune trabaja en equipo.':cls==='mid'?'Bien, pero busca una carta que sea <b>especialista</b> contra ese microbio.':'¡Ay! Esa carta no sirve contra ese microbio. Lee la explicación 👇';
+  if(!$('med').hidden)say.innerHTML+='<br>🤒 Tu salud está baja: toca <b>💊 Toma tu medicina</b> (una vez por partida).';
   $('nx').onclick=()=>{if(G.fh<=0)return end(1);if(G.ph<=0)return end(0);foeTurn()}},450)}
 function end(win){const o=$('over');o.hidden=false;if(win&&!MI.win){MI.win=1;save(KEY,MI)}
+ if(!win&&G.med===0){o.innerHTML=`<div><div class="big">🤒</div><h2>Te enfermaste…</h2><p>Bacterius te ganó este duelo. Pero aún puedes <b>ir al médico</b>: te da la medicina correcta y vuelves con la <b>mitad de tu salud</b>. Solo una vez por partida.</p><div class="two"><button type="button" class="verde" id="md">💊 Ir al médico y seguir</button><button type="button" id="go">🔄 Empezar de nuevo</button></div></div>`;
+  boom(130,.6,'sawtooth');$('md').onclick=()=>medicina(true);$('go').onclick=()=>{o.hidden=true;newGame()};mis();return}
  o.innerHTML=win?`<div><div class="big">🏆🛡️</div><h2>¡Tu sistema inmune venció!</h2><p>Venciste a <b>Bacterius</b>. Tu cuerpo tiene <b>barreras</b> (piel, moco), <b>glóbulos blancos</b> (fagocitos, linfocitos, NK) y te ayudan la <b>vacunas</b>, la higiene y las medicinas correctas.</p><button type="button" id="go">🔄 Jugar otra vez</button></div>`:`<div><div class="big">🤒</div><h2>Te enfermaste…</h2><p>Bacterius ganó esta vez. Recuerda: cada microbio tiene su defensa. Contra <b>virus</b>: NK, linfocitos T o vacunas. Contra <b>bacterias</b>: piel, fagocitos o antibióticos. Contra <b>parásitos</b>: eosinófilos y lavarse las manos.</p><button type="button" id="go">🔄 Intentar otra vez</button></div>`;
  win?party():boom(130,.6,'sawtooth');$('go').onclick=()=>{o.hidden=true;newGame()};mis()}
+// ---------- 💊 medicina del médico: una vez por partida, la salud vuelve a la mitad y Molí da consejos según cómo jugaste ----------
+const MEJOR={bac:'contra <b>bacterias</b>: <b>piel</b>, <b>fagocitos</b>, <b>linfocitos B</b>, <b>antibiótico</b> o <b>vacuna</b>',sal:'contra <b>bacterias de la comida</b>: <b>ácido del estómago</b>, <b>fagocitos</b>, <b>linfocitos B</b> o <b>antibiótico</b>',vir:'contra <b>virus</b>: <b>células NK</b>, <b>linfocitos T o B</b> o la <b>vacuna</b>',bat:'contra un <b>batallón de virus</b>: <b>linfocitos T</b> o la <b>vacuna</b>',hon:'contra <b>hongos</b>: los <b>fagocitos</b> (y mantener la piel <b>limpia y seca</b>)',par:'contra <b>parásitos</b>: <b>eosinófilos</b> o <b>lavarse las manos</b>'};
+function consejos(){const H=G.hist,T=[],bien=H.filter(h=>h.lv===2),cu={},ya=new Set();
+ if(H.some(h=>h.k==='anti'&&(h.ak==='vir'||h.ak==='bat'))){ya.add('vir');ya.add('bat');T.push('💊 Usaste <b>antibiótico contra virus</b>: el antibiótico solo mata <b>bacterias</b>. Contra virus: <b>células NK</b>, <b>linfocitos T</b> o la <b>vacuna</b>.')}
+ if(H.some(h=>h.a==='sal'&&(h.k==='piel'||h.k==='moco'))){ya.add('sal');T.push('🍗 Si el microbio viene en la <b>comida</b>, ya está adentro y la piel no lo detiene. Usa el <b>ácido del estómago</b> o los <b>fagocitos</b>.')}
+ if(H.some(h=>h.k==='eos'&&h.ak!=='par'))T.push('🔱 Los <b>eosinófilos</b> son especialistas en <b>parásitos</b>: guárdalos para las lombrices.');
+ if(H.filter(h=>h.k==='fie').length>=2)T.push('🌡️ La <b>fiebre</b> ayuda un poco, pero sola no elimina a los microbios. Busca cartas <b>especialistas</b>.');
+ H.filter(h=>h.lv<2).forEach(h=>{const t=h.a==='sal'?'sal':h.ak;cu[t]=(cu[t]||0)+(h.lv?1:2)});const pe=Object.entries(cu).filter(([t])=>!ya.has(t)).sort((a,b)=>b[1]-a[1])[0];   // lo que más le costó (sin repetir un consejo)
+ if(pe&&T.length<2)T.push(`🎯 Lo que más te costó: ${MEJOR[pe[0]]}.`);
+ if(bien.length)T.push(`💪 ¡Bien! ${bien.length===1?'Hiciste una defensa perfecta':'Hiciste '+bien.length+' defensas perfectas'} con ${[...new Set(bien.map(h=>DEF[h.k].n))].slice(0,2).join(' y ')}.`);
+ if(T.length<2)T.push('📖 Antes de usar una carta, <b>tócala</b> para leer contra qué microbio sirve.');
+ return T.slice(0,3)}
+function medicina(perdio){if(G.med)return;G.med=1;const antes=Math.max(0,G.ph);G.ph=Math.max(G.ph,5);const o=$('over');o.hidden=false;$('med').hidden=true;
+ o.innerHTML=`<div><div class="big">🩺💊</div><h2>¡El médico te ayudó!</h2><p>Te revisó y te dio la <b>medicina correcta</b>: tu salud vuelve a <b>5/10</b>. Recuerda: solo se toman las medicinas que <b>receta el médico</b>.</p><b style="color:#14532d">🤖 Consejos de Molí según tu juego:</b><ul>${consejos().map(t=>`<li>${t}</li>`).join('')}</ul><button type="button" class="verde" id="sg">▶ Seguir defendiéndome</button></div>`;
+ [523,659,784].forEach((f,i)=>setTimeout(()=>boom(f,.25,'sine'),i*120));setTimeout(()=>pop($('pH'),'+'+(G.ph-antes)+' ❤️','#4ade80'),250);draw();
+ say.innerHTML='¡Ya te sientes mejor! 💪 Lee los consejos y elige bien tu próxima carta.';
+ $('sg').onclick=()=>{o.hidden=true;if(perdio)foeTurn()}}
+$('med').onclick=()=>medicina(false);
 function mis(){$('mis').innerHTML=`<span class="mi ${MI.win?'ok':''}">Gana un duelo<em>${MI.win?'✅':'Falta'}</em></span><span class="mi ${MI.nk?'ok':''}">NK vs virus<em>${MI.nk?'✅':'Falta'}</em></span><span class="mi ${MI.lt?'ok':''}">Linfocitos T vs batallón<em>${MI.lt?'✅':'Falta'}</em></span>`}
 function pop(el,t,c){const r=el.getBoundingClientRect(),d=document.createElement('div');d.className='dmg';d.textContent=t;d.style.color=c;d.style.left=r.left+r.width/2-20+'px';d.style.top=r.top+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1300)}
 // ---------- arrastrar ----------
