@@ -24,7 +24,7 @@
   //  🤖 CREAR CUENTA CON MOLÍ
   // =================================================================
   function crearCuenta() {
-    const b = abrir('🤖 Crear cuenta con Molí', 'Tus estudiantes entran con su DNI y su contraseña: 000000 y los 3 últimos números de su DNI.', 'feliz', `
+    const b = abrir('🤖 Crear cuenta con Molí', 'Tus estudiantes entran con su DNI o con su código: 00000 y los 3 últimos números de su DNI.', 'feliz', `
       <form class="hp-f" data-f="uno"><div class="hp-row"><input name="dni" inputmode="numeric" maxlength="8" placeholder="DNI (8 números)" required>
         <select name="sec">${['A', 'B', 'C', 'D'].map(x => `<option>${x}</option>`).join('')}</select></div>
         <input name="nom" maxlength="60" placeholder="Nombre completo" required><button class="hp-ok" type="submit">➕ Crear cuenta</button><p class="hp-msg"></p></form>
@@ -33,10 +33,10 @@
         <textarea rows="6" placeholder="71234567	Ana Pérez Ríos	A&#10;72345678	Bruno Díaz Soto	B"></textarea><button class="hp-ok" data-h="varios">➕ Crear todas</button><p class="hp-msg2"></p></details>
       <div class="hp-lista"><b>👥 Estudiantes</b><div class="hp-secs">${['A', 'B', 'C', 'D'].map(x => `<button data-h="ver" data-k="${x}">6° ${x}</button>`).join('')}</div><div class="hp-ls"></div></div>`);
     const ver = async sec => { const ls = b.querySelector('.hp-ls'); b.querySelectorAll('[data-h="ver"]').forEach(x => x.classList.toggle('on', x.dataset.k === sec)); ls.innerHTML = '<small>Cargando…</small>';
-      try { const E = (await Docente.estudiantes(true)).filter(e => e.section === sec); ls.innerHTML = E.length ? `<small>${E.length} estudiantes</small><ol>${E.map(e => `<li>${esc(e.name)} <small>••••${esc(String(e.dni).slice(-4))}</small></li>`).join('')}</ol>` : '<small>Sin estudiantes todavía.</small>'; }
+      try { const E = (await Docente.estudiantes(true)).filter(e => e.section === sec); ls.innerHTML = E.length ? `<small>${E.length} estudiantes</small><ol>${E.map(e => `<li>${esc(e.name)} <small>código 00000${esc(String(e.dni).slice(-3))}</small></li>`).join('')}</ol>` : '<small>Sin estudiantes todavía.</small>'; }
       catch (e) { ls.innerHTML = `<small>${errTxt(e)}</small>`; } };
     b.addEventListener('submit', async e => { e.preventDefault(); const f = e.target, m = f.querySelector('.hp-msg'), bt = f.querySelector('button'); bt.disabled = true; m.textContent = 'Creando…';
-      try { const s = await Docente.crearEstudiante(f.dni.value, f.nom.value, f.sec.value); m.innerHTML = `✅ Cuenta de <b>${esc(s.name)}</b> (${MD.espInfo().gn} ${s.section}) creada. Entra con su DNI y la contraseña <b>000000${esc(String(s.dni).slice(-3))}</b>.`; f.dni.value = ''; f.nom.value = ''; ver(s.section); }
+      try { const s = await Docente.crearEstudiante(f.dni.value, f.nom.value, f.sec.value); m.innerHTML = `✅ Cuenta de <b>${esc(s.name)}</b> (${MD.espInfo().gn} ${s.section}) creada. Entra con su DNI o con su código <b>00000${esc(String(s.dni).slice(-3))}</b>.`; f.dni.value = ''; f.nom.value = ''; ver(s.section); Docente.publicarCodigos().catch(() => {}); }
       catch (x) { m.textContent = x.message === 'DNI' ? 'El DNI debe tener 8 números.' : x.message === 'NOMBRE' ? 'Escribe el nombre completo (3 a 60 letras).' : x.message === 'YAEXISTE' ? 'Ese DNI ya tiene cuenta.' : errTxt(x); }
       bt.disabled = false; });
     b.addEventListener('click', async e => { const k = e.target.closest('[data-h]'); if (!k) return;
@@ -45,6 +45,7 @@
         let ok = 0, mal = []; k.disabled = true;
         for (const [d, n, s] of filas) { m.textContent = `Creando ${ok + mal.length + 1} de ${filas.length}…`; const sec = String(s).toUpperCase().replace(/[^A-D]/g, '').slice(-1);
           try { if (!sec) throw new Error('SEC'); await Docente.crearEstudiante(d, n, sec); ok++; } catch (x) { mal.push(`${d} (${x.message === 'YAEXISTE' ? 'ya existe' : x.message === 'DNI' ? 'DNI' : x.message === 'SEC' ? 'sección' : x.message === 'AUTH' ? 'cuenta' : 'error'})`); if (x.message === 'AUTH') break; } }
+        if (ok) Docente.publicarCodigos().catch(() => {});
         m.innerHTML = `✅ ${ok} creadas.${mal.length ? ' ⚠️ No se crearon: ' + esc(mal.join(', ')) : ''}`; k.disabled = false; } });
     ver('A');
   }

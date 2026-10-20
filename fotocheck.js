@@ -33,18 +33,17 @@
   function cerrar() { panel.classList.remove('on'); }
   function pedirDni() {
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
-      <div class="fp-h"><img src="img/moli/hola.webp" alt=""><div><b>¡Hola! 👋</b><span>Escribe tu <b>DNI</b> para tu fotocheck. Sólo lo haces una vez.</span></div></div>
-      <form data-f="dni"><input name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="DNI (8 números)"><div class="fp-err"></div><button class="fp-ok" type="submit">Entrar ✓</button></form>`);
+      <div class="fp-h"><img src="img/moli/hola.webp" alt=""><div><b>¡Hola! 👋</b><span>Escribe tu <b>DNI</b> o tu código: <b>00000</b> y los <b>3 últimos números</b> de tu DNI. Sólo lo haces una vez.</span></div></div>
+      <form data-f="dni"><input name="dni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="8 números"><div class="fp-err"></div><button class="fp-ok" type="submit">Entrar ✓</button></form>`);
     setTimeout(() => { const i = panel.querySelector('input'); i && i.focus(); }, 250);
   }
-  let dniPend = '';
-  function pedirPass(dni) {                                          // paso 2 (sólo estudiantes): su contraseña 000000 + los 3 últimos números del DNI
-    dniPend = dni;
+  let numPend = '';
+  function elegirNombre(num, lista) {                                  // el código es de varios estudiantes: toca tu nombre
+    numPend = num;
     abrir(`<button class="fp-x" data-f="x" aria-label="Cerrar">✕</button>
-      <div class="fp-h"><img src="img/moli/idea.webp" alt=""><div><b>🔑 Tu contraseña</b><span>Son 9 números: <b>000000</b> y los <b>3 últimos números</b> de tu DNI.</span></div></div>
-      <form data-f="pass"><input name="pass" type="password" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contraseña"><div class="fp-err"></div><button class="fp-ok" type="submit">Entrar ✓</button></form>
-      <p class="fp-me"><button data-f="otro">← Cambiar DNI</button></p>`);
-    setTimeout(() => { const i = panel.querySelector('input'); i && i.focus(); }, 250);
+      <div class="fp-h"><img src="img/moli/curiosa.webp" alt=""><div><b>¿Quién eres? 🤔</b><span>Ese número es de ${lista.length} estudiantes. Toca tu nombre.</span></div></div>
+      <div class="fp-g">${lista.map(c => `<button data-f="soy" data-k="${esc(c.k)}"><i>🧒</i><b>${esc(c.n)}</b><small>${esc(c.g || '')} ${esc(c.s || '')}</small></button>`).join('')}</div>
+      <div class="fp-err"></div><p class="fp-me"><button data-f="otro">← Cambiar número</button></p>`);
   }
   const HERR = [
     ['editar', '✏️', 'Editar aula', 'Mueve mesas, sillas y más'],
@@ -117,6 +116,8 @@
     if (f === 'salir') { MD.salir(); cerrar(); pintar(); window.dispatchEvent(new Event('moli2:me')); return; }
     if (f === 'h') { cerrar(); window.dispatchEvent(new CustomEvent('moli2:herramienta', { detail: b.dataset.k })); }
     if (f === 'otro') return pedirDni();
+    if (f === 'soy') { b.disabled = true; MD.entrar(numPend, b.dataset.k).then(() => { window.dispatchEvent(new Event('moli2:me')); pintar(); cerrar(); el.classList.remove('meneo'); void el.offsetWidth; el.classList.add('meneo'); })
+      .catch(() => { b.disabled = false; const er = panel.querySelector('.fp-err'); if (er) er.textContent = 'No pude conectarme. Revisa tu internet.'; }); return; }
     if (f === 'comu') { cerrar(); return window.Comunicado && Comunicado.ver(); }
     if (f === 'conectar') return pedirCuenta();
     if (f === 'despues') return menuDocente();
@@ -140,16 +141,15 @@
       catch (x) { b.disabled = false; b.textContent = 'Conectar ✓'; err.textContent = /INVALID|PASSWORD|EMAIL/.test(x.message) ? 'Correo o contraseña incorrectos.' : /TOO_MANY/.test(x.message) ? 'Muchos intentos. Espera unos minutos.' : 'No pude conectarme.'; }
       return;
     }
-    const paso2 = f.dataset.f === 'pass';
     try {
-      await MD.entrar(paso2 ? dniPend : i.value, paso2 ? i.value : '');
+      await MD.entrar(i.value);
       window.dispatchEvent(new Event('moli2:me')); pintar();
       if (MD.esDocente()) menuDocente(); else { cerrar(); el.classList.remove('meneo'); void el.offsetWidth; el.classList.add('meneo'); }
     } catch (x) {
       if (x.message === 'DOCENTE') return pedirClave(x.info);
-      if (x.message === 'CLAVE' && !paso2) return pedirPass(i.value.replace(/\D/g, ''));   // es estudiante: ahora su contraseña
+      if (x.message === 'VARIOS') return elegirNombre(i.value.replace(/\D/g, ''), x.lista);   // código repetido: elige su nombre
       b.disabled = false; b.textContent = 'Entrar ✓';
-      err.textContent = x.message === 'DNI' ? 'Escribe los 8 números de tu DNI.' : x.message === 'NOEXISTE' ? 'No encuentro ese DNI. Pide a tu profe que cree tu cuenta.' : x.message === 'CLAVE' ? 'Contraseña incorrecta. Son 000000 y los 3 últimos números de tu DNI.' : 'No pude conectarme. Revisa tu internet.';
+      err.textContent = x.message === 'DNI' ? 'Escribe los 8 números.' : x.message === 'NOEXISTE' ? 'No encuentro ese número. Escribe tu DNI o 00000 y los 3 últimos números de tu DNI.' : 'No pude conectarme. Revisa tu internet.';
     }
   });
   addEventListener('moli2:me', pintar);

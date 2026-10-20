@@ -48,15 +48,28 @@
     const m1 = LS.get(ME_MOLI1, null);                                      // si ya entró en Molí en este mismo sitio, también vale
     return m1 && m1.key && !m1.teacher && !m1.demo ? m1 : null;
   }
-  const claveDe = dni => '000000' + dni.slice(-3);                    // contraseña del estudiante: 000000 y los 3 últimos números de su DNI
-  async function entrar(dni, clave) {
-    dni = String(dni || '').replace(/\D/g, '').slice(0, 8);
-    if (dni.length !== 8) throw new Error('DNI');
-    if (window.Docente) { const d = await Docente.quien(dni); if (d) { const e = new Error('DOCENTE'); e.info = d; throw e; } }   // DNI de docente: pide su clave
-    const key = await idDeDni(dni), st = await get('students', key);
+  // ---- entrar: con su DNI o con su código de 8 números (00000 y los 3 últimos de su DNI). Si el código es de varios, elige su nombre ----
+  async function candidatos(t) {                                       // índices que publica la docente: files/fcod-0 (6.°) y files/fcodc7-0 (7.°)
+    const L = [];
+    for (const e of Object.keys(ESPS)) {
+      try { const r = await fetch(`${BASE}/files/fcod${e}-0?key=${FB.apiKey}`, { cache: 'no-store' }); if (!r.ok) continue;
+        const j = await r.json(), v = j.fields && j.fields.b64 && j.fields.b64.stringValue, x = v ? JSON.parse(decodeURIComponent(escape(atob(v)))) : null;
+        ((x && x.codes && x.codes[t]) || []).forEach(c => L.push(c)); } catch (er) {}
+    }
+    return L;
+  }
+  async function entrar(num, elegido) {
+    num = String(num || '').replace(/\D/g, '').slice(0, 8);
+    if (num.length !== 8) throw new Error('DNI');
+    if (window.Docente) { const d = await Docente.quien(num); if (d) { const e = new Error('DOCENTE'); e.info = d; throw e; } }   // DNI de docente: pide su clave
+    let key = await idDeDni(num), st = await get('students', key);
+    if (!st && /^00000\d{3}$/.test(num)) {                             // su código
+      const C = await candidatos(num.slice(-3)), c = elegido ? C.find(x => x.k === elegido) : C.length === 1 ? C[0] : null;
+      if (!c && C.length > 1) { const e = new Error('VARIOS'); e.lista = C; throw e; }
+      if (c && /^k[0-9a-f]{20}$/.test(c.k)) { key = c.k; st = await get('students', key); }
+    }
     if (!st) throw new Error('NOEXISTE');
-    if (String(clave || '').replace(/\D/g, '') !== claveDe(dni)) throw new Error('CLAVE');   // (sin contraseña todavía: el fotocheck la pide en el paso 2)
-    const me = { key, dni, name: st.name, section: st.section, grade: st.grade || '6to' };
+    const me = { key, dni: String(st.dni || num), name: st.name, section: st.section, grade: st.grade || '6to' };   // (el DNI de verdad: con él se guardan sus Exit tickets)
     LS.set(ME_KEY, me); return me;
   }
   function salir() { try { localStorage.removeItem(ME_KEY); } catch (e) {} if (window.Docente) Docente.salirCuenta(); }

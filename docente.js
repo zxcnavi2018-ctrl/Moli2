@@ -172,7 +172,16 @@
     est = null; LS.del('moli2:tcache:est' + MD.esp()); return { key: k, dni, name, section };
   }
 
-  window.Docente = { conGmail, docentesGmail, agregarDocente, quitarDocente, adminsDni, quitarAdmin, quien, conClave, conCorreo, conGoogle, conectado, token, salirCuenta: () => LS.del(AUTH),
+  // 🔢 códigos para entrar (00000 y los 3 últimos números del DNI): índice público con sólo la clave, el nombre corto y la sección
+  async function publicarCodigos() {
+    const L = await estudiantes(true), codes = {}, g = MD.espInfo().gn;
+    L.forEach(e => { if (!/^\d{8}$/.test(e.dni)) return; const t = e.dni.slice(-3); (codes[t] = codes[t] || []).push({ k: e.key, n: String(e.name || '').split(/\s+/).slice(0, 2).join(' '), s: e.section, g }); });
+    await commit([{ update: { name: DOC('files', MD.fid('fcod')), fields: toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, codes })))), updatedAt: new Date() }) } }]);
+    return L.length;
+  }
+  addEventListener('load', () => setTimeout(() => { if (window.MD && MD.esDocente() && conectado()) publicarCodigos().catch(() => {}); }, 6000));   // al entrar la docente, se actualiza solo
+
+  window.Docente = { conGmail, publicarCodigos, docentesGmail, agregarDocente, quitarDocente, adminsDni, quitarAdmin, quien, conClave, conCorreo, conGoogle, conectado, token, salirCuenta: () => LS.del(AUTH),
     lista, consulta, commit, estudiantes, ticketsUnidad, misionesTodos, guardarNota, crearEstudiante, crearTicket, OWNER_EMAIL,
     FB, BASE, DOC, toF, fromDoc, kid, correo };
 })();
