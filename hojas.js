@@ -6,22 +6,23 @@
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const L = t => MD.lleno(t);
   // ---- 🔒 candados de la docente: bloquea una unidad entera o una sesión (cuaderno, Exit tickets y misiones). Se guarda en files/fbloq-0 ----
-  const BQ = { u: {}, s: {} }, BQF = MD.fid('fbloq'), LIBROS = [];
+  const BQ = { u: {}, s: {}, j: {} }, BQF = MD.fid('fbloq'), LIBROS = [];
   const BQURL = () => `https://firestore.googleapis.com/v1/projects/${MD.FB.projectId}/databases/(default)/documents/files/${BQF}?key=${MD.FB.apiKey}`;
   const bqOn = (k, n) => n == null ? !!BQ.u[k] : !!BQ.s[k + ':' + n];
   const cerrado = (k, n) => !MD.esDocente() && (!!BQ.u[k] || (n != null && !!BQ.s[k + ':' + n]));     // sólo los estudiantes ven el candado cerrado
   const lk = (k, n) => MD.esDocente() ? `<span class="lk${bqOn(k, n) ? ' on' : ''}" data-a="candado" data-k="${esc(k)}"${n == null ? '' : ` data-n="${n}"`} title="${bqOn(k, n) ? 'Bloqueado: toca para desbloquear' : 'Abierto: toca para bloquear'}">${bqOn(k, n) ? '🔒' : '🔓'}</span>` : '';
-  const repintar = () => LIBROS.forEach(b => { if (!b.ocupado && document.body.contains(b.el || document.body)) b.pinta(false); });
+  const repintar = () => { LIBROS.forEach(b => { if (!b.ocupado && document.body.contains(b.el || document.body)) b.pinta(false); }); dispatchEvent(new Event('moli2:candados')); };
   fetch(BQURL(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue; if (!v) return;
-    const x = JSON.parse(decodeURIComponent(escape(atob(v)))); BQ.u = x.u || {}; BQ.s = x.s || {}; repintar(); }).catch(() => {});
+    const x = JSON.parse(decodeURIComponent(escape(atob(v)))); BQ.u = x.u || {}; BQ.s = x.s || {}; BQ.j = x.j || {}; repintar(); }).catch(() => {});
   async function candado(ds) {
-    const key = ds.n == null ? ds.k : ds.k + ':' + ds.n, M = ds.n == null ? BQ.u : BQ.s, antes = !!M[key];
+    const key = ds.j != null ? ds.j : ds.n == null ? ds.k : ds.k + ':' + ds.n, M = ds.j != null ? BQ.j : ds.n == null ? BQ.u : BQ.s, antes = !!M[key];
     if (antes) delete M[key]; else M[key] = true; repintar();
     try { if (!window.Docente || !await Docente.token()) throw new Error('AUTH');
-      await Docente.commit([{ update: { name: Docente.DOC('files', BQF), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, u: BQ.u, s: BQ.s, at: Date.now() })))), updatedAt: new Date() }) } }]);
+      await Docente.commit([{ update: { name: Docente.DOC('files', BQF), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, u: BQ.u, s: BQ.s, j: BQ.j, at: Date.now() })))), updatedAt: new Date() }) } }]);
     } catch (e) { if (antes) M[key] = true; else delete M[key]; repintar();
       alert(e.message === 'AUTH' ? '🔐 Conecta tu cuenta: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No se pudo guardar el candado. Revisa tu internet.'); }
   }
+  window.Candados = { juego: f => !!BQ.j[f], cambiarJuego: f => candado({ j: f }) };   // 🔒 juegos de la Biblioteca de Temas que la docente bloquea
   const mezcla = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const nom1 = me => String(me && me.name || '').split(' ')[0].toLowerCase().replace(/^./, c => c.toUpperCase());
   const MODOS = { individual: '👤 Individual', group: '👥 En equipo', grupo: '👥 En equipo', pair: '👫 En pareja', pairs: '👫 En pareja', pareja: '👫 En pareja', whole: '🏫 Toda la clase', clase: '🏫 Toda la clase' };

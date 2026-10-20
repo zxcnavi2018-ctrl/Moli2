@@ -1,0 +1,11 @@
+// 🔒 candados de la docente para los juegos: si bloqueó este juego, los estudiantes ven el candado (la docente sí entra).
+//    Se lee de files/fbloq-0 (el mismo archivo de los candados de unidades y sesiones).
+(()=>{let me=null;try{me=JSON.parse(localStorage.getItem('moli2:me'))}catch(e){}
+ if(me&&(me.docente||me.teacher))return;
+ const esp=me&&me.grade==='7mo'?'c7':'',pag=location.pathname.split('/').pop()||'index.html',U=new URLSearchParams(location.search).get('u')||'anon';
+ const url=`https://firestore.googleapis.com/v1/projects/ciencia6abcd/databases/(default)/documents/files/fbloq${esp}-0?key=AIzaSyB3IlHEFGkCGtZhPZxV5-a47Pg2mAaIjSM`;
+ const css=document.createElement('style');css.textContent='a.bloq{position:relative;filter:grayscale(.85) brightness(.7)}a.bloq::after{content:"🔒 Bloqueado";position:absolute;top:8px;right:8px;padding:3px 10px;border-radius:999px;background:#dc2626;color:#fff;font:900 12px Nunito,sans-serif}.bloqueo{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(8,12,30,.92);color:#fff;font-family:Nunito,sans-serif;text-align:center}.bloqueo div{padding:24px;border-radius:22px;background:#13245a;max-width:90%}.bloqueo b{display:block;font-size:56px}.bloqueo a{display:inline-block;margin-top:12px;padding:10px 18px;border-radius:12px;background:#2f6fed;color:#fff;font-weight:900;text-decoration:none}';document.head.appendChild(css);
+ fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{const v=j&&j.fields&&j.fields.b64&&j.fields.b64.stringValue;if(!v)return;const J=(JSON.parse(decodeURIComponent(escape(atob(v)))).j)||{};
+  if(pag==='index.html'){const marca=()=>document.querySelectorAll('a[href]').forEach(a=>{const f=a.getAttribute('href').split('?')[0];if(J[f]&&!a.classList.contains('bloq')){a.classList.add('bloq');a.addEventListener('click',e=>{e.preventDefault();alert('🔒 Tu profe bloqueó este juego por ahora. ¡Elige otro!')})}});marca();new MutationObserver(marca).observe(document.body,{childList:true,subtree:true});return}
+  if(J[pag]){const d=document.createElement('div');d.className='bloqueo';d.innerHTML=`<div><b>🔒</b><h2>Este juego está bloqueado</h2><p>Tu profe lo cerró por ahora. ¡Elige otro juego!</p><a href="index.html?u=${encodeURIComponent(U)}">‹ Volver al Laboratorio</a></div>`;document.body.appendChild(d)}
+ }).catch(()=>{});})();

@@ -160,8 +160,8 @@
 <div id="mGlobo" role="dialog" aria-label="Molí te ayuda a buscar"></div>
 <div id="libro"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610201813"></script>
-<script src="pdftrabajo.js?v=202610201813"></script>
+<script src="moli3d.js?v=202610201832"></script>
+<script src="pdftrabajo.js?v=202610201832"></script>
 <script>
 (function () {
 'use strict';
@@ -895,6 +895,6 @@ addEventListener('pointerup', e => { if (!MOLI || modo === 'intro' || $('#libro'
 Promise.race([listo, wait(2500)]).then(() => { aplicarTX(); try { renderer.compile(scene, camera); } catch (e) {} cargarTX(); cargarTrabajos(); requestAnimationFrame(frame); intro(); });
 })();
 </script>
-<script src="mando.js?v=202610201813"></script>
+<script src="mando.js?v=202610201832"></script>
 </body>
 </html>

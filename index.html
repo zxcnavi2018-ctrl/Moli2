@@ -179,13 +179,15 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #sheet.biblio .bibx { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); border: 3px solid #2b2547; border-radius: 999px; padding: 5px 18px; background: #fde68a; color: #2b2547; font: 900 14px "Trebuchet MS", system-ui, sans-serif; box-shadow: 0 3px 0 #2b2547; }
   @media (max-height: 520px) { #bibBar { top: 6px; padding: 5px 8px; gap: 6px; } #bibBar > button { width: 38px; height: 38px; font-size: 15px; } #bibName b { font-size: 14px; } }
   #bibBar #bibAv { background: linear-gradient(180deg, #7dd3fc, #0a6aa1); color: #fff; } #bibBar #bibAv[hidden] { display: none; }
+  #bibBar #bibLock { width: auto; padding: 0 16px; border-radius: 999px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); color: #0f172a; font: 900 15px "Trebuchet MS", system-ui, sans-serif; } #bibBar #bibLock.on { background: linear-gradient(180deg, #fca5a5, #dc2626); color: #fff; } #bibBar #bibLock[hidden] { display: none; }
+  #bibName .bq { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #dc2626; color: #fff; font-size: 12px; }
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hojas.css?v=202610201813">
+<link rel="stylesheet" href="hojas.css?v=202610201832">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610201813"></script><script src="sincro.js?v=202610201813"></script><script src="guion.js?v=202610201813"></script><script src="datos.js?v=202610201813"></script><script src="docente.js?v=202610201813"></script>
-<script src="hojas.js?v=202610201813"></script><script src="hojas-docente.js?v=202610201813"></script><script src="diplomas.js?v=202610201813"></script><script src="fotocheck.js?v=202610201813"></script><script src="herramientas.js?v=202610201813"></script><script src="remoto.js?v=202610201813"></script><script src="escaner.js?v=202610201813"></script><script src="tarjetas.js?v=202610201813"></script>
+<script src="moli3d.js?v=202610201832"></script><script src="sincro.js?v=202610201832"></script><script src="guion.js?v=202610201832"></script><script src="datos.js?v=202610201832"></script><script src="docente.js?v=202610201832"></script>
+<script src="hojas.js?v=202610201832"></script><script src="hojas-docente.js?v=202610201832"></script><script src="diplomas.js?v=202610201832"></script><script src="fotocheck.js?v=202610201832"></script><script src="herramientas.js?v=202610201832"></script><script src="remoto.js?v=202610201832"></script><script src="escaner.js?v=202610201832"></script><script src="tarjetas.js?v=202610201832"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -249,7 +251,7 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
 <button id="omitirTut" type="button" aria-label="Omitir tutorial">⏭ Omitir tutorial</button>
 <div id="tourBar"><button id="prevBtn" aria-label="Anterior">◀</button><div id="stopName"><div id="dots"></div></div><button id="nextBtn" aria-label="Siguiente">▶</button></div>
 <a id="bibLink" href="biblioteca.html" aria-label="Ir a La Biblioteca Educativa"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 14 q0-6 6-6 h34 v40 H16 q-6 0-6 6z" fill="#3b82f6" stroke="#2b2547" stroke-width="3" stroke-linejoin="round"/><path d="M10 54 q0-6 6-6 h34 v8 H16 q-6 0-6-2z" fill="#f8fafc" stroke="#2b2547" stroke-width="3" stroke-linejoin="round"/><path d="M18 8 v40" stroke="#1d4ed8" stroke-width="3"/><rect x="24" y="16" width="20" height="8" rx="2" fill="#dbeafe" stroke="#2b2547" stroke-width="2"/><path d="M14 52 h34" stroke="#cbd5e1" stroke-width="2"/></svg><span>BIBLIOTECA</span></a>
-<div id="bibBar"><button type="button" id="bibPrev" aria-label="Disco anterior">◀</button><div id="bibName"></div><button type="button" id="bibNext" aria-label="Disco siguiente">▶</button><button type="button" id="bibPlay">🎮 Jugar</button><button type="button" id="bibAv" hidden>📊 Avance</button></div>
+<div id="bibBar"><button type="button" id="bibPrev" aria-label="Disco anterior">◀</button><div id="bibName"></div><button type="button" id="bibNext" aria-label="Disco siguiente">▶</button><button type="button" id="bibPlay">🎮 Jugar</button><button type="button" id="bibLock" hidden>🔓 Abierto</button><button type="button" id="bibAv" hidden>📊 Avance</button></div>
 <div id="sheet"></div>
 <div id="title"></div>
 <div id="moliTalk"></div>
@@ -2439,46 +2441,57 @@ renderer.domElement.addEventListener('pointerup', e => { if (!TOUR.started) retu
 const BIB = { i: -1, last: 0, busy: false, open: false, doors: false, watering: false, here: false };
 const bibBar = document.getElementById('bibBar'), bibName = document.getElementById('bibName');
 const bibStop = () => STOPS.findIndex(s => s.kind === 'biblio');
-function bibLabel(i) { const j = JUEGOS[i]; bibName.innerHTML = `<small>Disco ${i + 1} de ${JUEGOS.length}</small><b>${j[0]} ${j[1]}</b><span>${j[2]}</span>`; }
+const bibBloq = i => !!(window.Candados && Candados.juego(JUEGOS[i][3]));
+function bibLabel(i) { const j = JUEGOS[i], bq = bibBloq(i), L = document.getElementById('bibLock'); bibName.innerHTML = `<small>Disco ${i + 1} de ${JUEGOS.length}</small><b>${j[0]} ${j[1]}</b><span>${j[2]}${bq ? '<i class="bq">🔒 Bloqueado</i>' : ''}</span>`;
+  if (L) { L.hidden = !MD.esDocente(); L.classList.toggle('on', bq); L.textContent = bq ? '🔒 Bloqueado' : '🔓 Abierto'; L.title = bq ? 'Los estudiantes no pueden jugarlo: toca para abrirlo' : 'Toca para bloquearlo a los estudiantes'; } }
+addEventListener('moli2:candados', () => bibLabel(BIB.i >= 0 ? BIB.i : BIB.last));
 function bibBarOn(on) { BIB.here = on; bibBar.classList.toggle('on', on && !BIB.open); document.getElementById('bibAv').hidden = !MD.esDocente(); }
-async function bibTakeOut(i) {                                       // sale de la repisa, vuela hacia ti mostrando la portada y se abre
+async function bibTakeOut(i, rap) {                                  // rap: al cambiar de disco va rapidito                                       // sale de la repisa, vuela hacia ti mostrando la portada y se abre
   const B = FOCUS.biblio.bib.userData, c = B.cases[i], h = B.slots[i], u = c.userData; bibLabel(i);
   const z0 = h.pos.z, p1 = h.pos.clone(); p1.z += 0.19;
-  await tween(320, k => { c.position.z = z0 + (p1.z - z0) * k; }, outCubic);
+  const R = rap ? 0.32 : 0.6;
+  await tween(320 * R, k => { c.position.z = z0 + (p1.z - z0) * k; }, outCubic);
   const p2 = new THREE.Vector3(0.06, 1.2, 0.5), r0 = c.rotation.y, cam = FOCUS.biblio.bib.worldToLocal(FOCUS.biblio.from.clone()), r1 = Math.atan2(cam.x - p2.x, cam.z - p2.z);
-  await tween(720, k => { c.position.lerpVectors(p1, p2, k); c.position.y += Math.sin(Math.PI * k) * 0.1; c.rotation.y = r0 + (r1 - r0) * k; c.scale.setScalar(1 + 1.1 * k); }, outBack);
-  await wait(1000); await tween(560, k => { u.hinge.rotation.y = -1.95 * k; }, outBack);
-  await tween(260, k => { u.discG.position.z = 0.012 * k; }, outCubic);
+  await tween(720 * R, k => { c.position.lerpVectors(p1, p2, k); c.position.y += Math.sin(Math.PI * k) * 0.1; c.rotation.y = r0 + (r1 - r0) * k; c.scale.setScalar(1 + 1.1 * k); }, outBack);
+  await wait(rap ? 0 : 250); await tween(560 * R, k => { u.hinge.rotation.y = -1.95 * k; }, outBack);
+  await tween(260 * R, k => { u.discG.position.z = 0.012 * k; }, outCubic);
   BIB.i = i;
 }
-async function bibPutBack() {                                        // se cierra y vuelve a su sitio en la repisa
+async function bibPutBack(rap) {                                        // se cierra y vuelve a su sitio en la repisa
   const i = BIB.i; if (i < 0) return; BIB.i = -1;
   const B = FOCUS.biblio.bib.userData, c = B.cases[i], h = B.slots[i], u = c.userData;
-  await tween(200, k => { u.discG.position.z = 0.012 * (1 - k); });
-  await tween(300, k => { u.hinge.rotation.y = -1.95 * (1 - k); }, inCubic);
+  const R = rap ? 0.32 : 0.7;
+  await tween(200 * R, k => { u.discG.position.z = 0.012 * (1 - k); });
+  await tween(300 * R, k => { u.hinge.rotation.y = -1.95 * (1 - k); }, inCubic);
   const p0 = c.position.clone(), p1 = h.pos.clone(); p1.z += 0.19; const s0 = c.scale.x;
-  await tween(560, k => { c.position.lerpVectors(p0, p1, k); c.position.y += Math.sin(Math.PI * k) * 0.06; c.rotation.y = h.rotY * k; c.scale.setScalar(s0 + (1 - s0) * k); }, ease);
-  await tween(260, k => { c.position.z = p1.z + (h.pos.z - p1.z) * k; }, inCubic);
+  await tween(560 * R, k => { c.position.lerpVectors(p0, p1, k); c.position.y += Math.sin(Math.PI * k) * 0.06; c.rotation.y = h.rotY * k; c.scale.setScalar(s0 + (1 - s0) * k); }, ease);
+  await tween(260 * R, k => { c.position.z = p1.z + (h.pos.z - p1.z) * k; }, inCubic);
   c.position.copy(h.pos); c.rotation.y = h.rotY; c.scale.setScalar(1);
 }
+const bibBase = () => BIB.pend != null ? BIB.pend : BIB.busy ? BIB.tgt : BIB.i >= 0 ? BIB.i : BIB.last;
 async function bibShow(i) {
-  if (BIB.busy || BIB.open) return; BIB.busy = true;
-  try { i = (i + JUEGOS.length) % JUEGOS.length; bibLabel(i); if (BIB.i >= 0) await bibPutBack(); if (BIB.here) await bibTakeOut(i); BIB.last = i; }
+  i = (i + JUEGOS.length) % JUEGOS.length;
+  if (BIB.open) return; if (BIB.busy) { BIB.pend = i; bibLabel(i); BIB.last = i; return; }   // si aprietan varias veces, salta directo al último que eligieron
+  BIB.busy = true; BIB.tgt = i; const rap = BIB.i >= 0;
+  try { bibLabel(i); if (BIB.i >= 0) await bibPutBack(true); if (BIB.here) await bibTakeOut(i, rap); BIB.last = i; }
   finally { BIB.busy = false; }
+  if (BIB.pend != null) { const p = BIB.pend; BIB.pend = null; if (p !== BIB.i) return bibShow(p); }
 }
 async function bibPlay() {                                           // el disco se agranda: se juega dentro del aula
-  if (BIB.busy || BIB.open || BIB.i < 0) return; BIB.open = true; bibBarOn(BIB.here);
+  if (BIB.busy || BIB.open || BIB.i < 0) return;
+  if (bibBloq(BIB.i) && !MD.esDocente()) return toast('🔒 Tu profe bloqueó este juego por ahora. ¡Elige otro disco!', 4); BIB.open = true; bibBarOn(BIB.here);
   const c = FOCUS.biblio.bib.userData.cases[BIB.i]; await expand('biblio', c);
 }
 async function bibCloseGame() {
   if (!BIB.open) return; try { MD.subirLab(MD.yo()); } catch (e) {} const c = BIB.i >= 0 ? FOCUS.biblio.bib.userData.cases[BIB.i] : FOCUS.biblio.bib;
   await shrink(c); BIB.open = false; bibBarOn(BIB.here);
 }
-document.getElementById('bibPrev').addEventListener('click', e => { e.stopPropagation(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) - 1); });
-document.getElementById('bibNext').addEventListener('click', e => { e.stopPropagation(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) + 1); });
+document.getElementById('bibPrev').addEventListener('click', e => { e.stopPropagation(); bibShow(bibBase() - 1); });
+document.getElementById('bibNext').addEventListener('click', e => { e.stopPropagation(); bibShow(bibBase() + 1); });
+document.getElementById('bibLock').addEventListener('click', e => { e.stopPropagation(); if (window.Candados && MD.esDocente()) Candados.cambiarJuego(JUEGOS[BIB.i >= 0 ? BIB.i : BIB.last][3]); });
 document.getElementById('bibPlay').addEventListener('click', e => { e.stopPropagation(); if (BIB.i < 0) bibShow(BIB.last).then(bibPlay); else bibPlay(); });
 sheet.addEventListener('click', e => { if (e.target.closest('.bibx')) { e.stopPropagation(); bibCloseGame(); } });
-addEventListener('keydown', e => { if (!BIB.here || BIB.open || moliWin.style.display === 'flex' || escribiendo(e)) return; if (e.code === 'ArrowUp') { e.preventDefault(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) + 1); } else if (e.code === 'ArrowDown') { e.preventDefault(); bibShow((BIB.i >= 0 ? BIB.i : BIB.last) - 1); } else if (e.code === 'Enter') { e.preventDefault(); bibPlay(); } }, true);
+addEventListener('keydown', e => { if (!BIB.here || BIB.open || moliWin.style.display === 'flex' || escribiendo(e)) return; if (e.code === 'ArrowUp') { e.preventDefault(); bibShow(bibBase() + 1); } else if (e.code === 'ArrowDown') { e.preventDefault(); bibShow(bibBase() - 1); } else if (e.code === 'Enter') { e.preventDefault(); bibPlay(); } }, true);
 // puertitas: se abren y se cierran al tocarlas (no es una escena)
 async function bibDoors(open) {
   const B = FOCUS.biblio.bib.userData; if (BIB.doorBusy) return; BIB.doorBusy = true; BIB.doors = open;
@@ -2721,7 +2734,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202610201813"></script><script src="corcho.js?v=202610201813"></script><script src="mando.js?v=202610201813"></script><script src="anuncio.js?v=202610201813"></script><script src="muro.js?v=202610201813"></script><script src="comunicado.js?v=202610201813"></script>
-<script src="archivos.js?v=202610201813"></script><script src="editor.js?v=202610201813"></script>
+<script src="revista.js?v=202610201832"></script><script src="corcho.js?v=202610201832"></script><script src="mando.js?v=202610201832"></script><script src="anuncio.js?v=202610201832"></script><script src="muro.js?v=202610201832"></script><script src="comunicado.js?v=202610201832"></script>
+<script src="archivos.js?v=202610201832"></script><script src="editor.js?v=202610201832"></script>
 </body>
 </html>

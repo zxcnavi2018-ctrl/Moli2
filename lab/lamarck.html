@@ -110,5 +110,6 @@ function finish(k){const a=AN[k];document.getElementById('out').innerHTML=`<div 
 const Q=document.getElementById('chk');Q.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(Q.dataset.d)return;if(b.dataset.i==='0'){b.classList.add('ok');Q.dataset.d=1;const d=load();d[k]=true;save(d);prog();snd(990,.3);const n=ORD[ORD.indexOf(k)+1];document.getElementById('fin').innerHTML=`${n?`<button class="btn y" id="nx">Siguiente: ${AN[n].e} ${AN[n].t} ›</button>`:''}<button class="btn g" id="mn">Elegir otro animal</button>`;n&&(document.getElementById('nx').onclick=()=>play(n));document.getElementById('mn').onclick=menu}else{b.classList.add('no');snd(180,.25)}});setTimeout(()=>document.querySelector('.learn')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
 prog();menu();
 </script>
+<script src="candado.js"></script>
 </body>
 </html>

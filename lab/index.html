@@ -195,5 +195,6 @@ document.getElementById('help').onclick=()=>{const games=C.filter(c=>c.href).map
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))modal.classList.remove('open')});
 </script>
-<script>(()=>{const l=document.querySelector(".list");if(!l)return;let t=0;l.addEventListener("scroll",()=>{l.classList.add("scrolling"),clearTimeout(t),t=setTimeout(()=>l.classList.remove("scrolling"),180)},{passive:!0})})()</script></body>
+<script>(()=>{const l=document.querySelector(".list");if(!l)return;let t=0;l.addEventListener("scroll",()=>{l.classList.add("scrolling"),clearTimeout(t),t=setTimeout(()=>l.classList.remove("scrolling"),180)},{passive:!0})})()</script><script src="candado.js"></script>
+</body>
 </html>
