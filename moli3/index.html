@@ -9,25 +9,25 @@
 <style>
 :root{--cian:#6ff3ff;--rojo:#ff3b4e;--navy:#0b1438}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:#eef2f7;color:#e8fbff;font-family:'Baloo 2',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100%;overflow:hidden;background:#050a1f;color:#e8fbff;font-family:'Baloo 2',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none}
 #vista{position:fixed;inset:0;overflow:hidden}
 
 /* Lo que Molí mira: carpetas */
-#escena{position:absolute;inset:-5%;animation:cabeza 8s ease-in-out infinite alternate}
-#escena svg{width:100%;height:100%;display:block}
-@keyframes cabeza{from{transform:translate(-1.2%,.5%) rotate(-.4deg)}to{transform:translate(1.2%,-.5%) rotate(.4deg)}}
+#c3d{position:absolute;inset:0;width:100%;height:100%;display:block}
 /* cristal del visor: tinte y reflejo */
 #cristal{position:absolute;inset:0;pointer-events:none;background:
   linear-gradient(115deg,transparent 18%,rgba(255,255,255,.22) 24%,transparent 31%,transparent 62%,rgba(255,255,255,.12) 66%,transparent 70%),
   radial-gradient(ellipse at 50% 50%,rgba(120,200,255,0) 55%,rgba(40,90,170,.22) 100%)}
 
+#grano{position:absolute;inset:0;pointer-events:none;opacity:.10;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#cristal::after{content:'';position:absolute;left:62%;top:8%;width:18vmin;height:18vmin;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),rgba(255,255,255,0) 65%);filter:blur(4px)}
 /* HUD */
 #hud{position:absolute;inset:0;pointer-events:none;font-family:Orbitron,sans-serif;color:var(--cian)}
 #hud .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(111,243,255,.045) 0 2px,transparent 2px 5px)}
 #hud .barrido{position:absolute;left:0;right:0;height:16%;background:linear-gradient(180deg,transparent,rgba(111,243,255,.10),transparent);animation:barrido 4.5s linear infinite}
 @keyframes barrido{from{top:-20%}to{top:110%}}
-.chip{position:absolute;top:calc(9% + 10px);font-size:clamp(10px,1.5vmin,14px);letter-spacing:.18em;padding:.35em 1em;border-radius:99px;background:rgba(8,20,48,.55);border:1px solid rgba(111,243,255,.55);box-shadow:0 0 12px rgba(111,243,255,.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:.4s}
-#tit{left:15%}#est{right:15%}
+.chip{position:absolute;top:calc(5% + 10px);font-size:clamp(10px,1.5vmin,14px);letter-spacing:.18em;padding:.35em 1em;border-radius:99px;background:rgba(8,20,48,.55);border:1px solid rgba(111,243,255,.55);box-shadow:0 0 12px rgba(111,243,255,.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:.4s}
+#tit{left:6%}#est{right:6%}
 #hud .mira{position:absolute;left:50%;top:50%;width:5vmin;height:5vmin;transform:translate(-50%,-50%);border:2px solid var(--cian);border-radius:50%;opacity:.45;filter:drop-shadow(0 0 3px rgba(0,30,60,.7))}
 #objetivo{position:absolute;left:32%;top:19%;width:36%;height:52%;opacity:0;transition:opacity .6s;filter:drop-shadow(0 0 3px rgba(0,30,60,.8))}
 #objetivo i{position:absolute;width:26px;height:26px;border:3px solid var(--cian);border-radius:6px}
@@ -41,37 +41,29 @@ body.alarma #objetivo{opacity:0}
 
 /* Alarma falsa */
 #peligro{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s}
-#peligro .rojo{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(255,40,70,.5) 100%);animation:latido 1.3s ease-in-out infinite}
-#peligro .banda{position:absolute;left:50%;top:17%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px}
-#peligro .txt{font-family:Orbitron,sans-serif;font-weight:800;font-size:clamp(18px,4.6vmin,48px);letter-spacing:.14em;color:#fff;white-space:nowrap;padding:.15em .8em;border-radius:16px;background:linear-gradient(rgba(255,59,78,.82),rgba(190,20,45,.82));border:2px solid #ffc2c8;box-shadow:0 0 24px rgba(255,59,78,.8);animation:parpa .65s steps(2) infinite}
-#peligro .sub{font-family:Orbitron,sans-serif;font-size:clamp(9px,1.5vmin,14px);letter-spacing:.3em;color:#fff;padding:.25em 1em;border-radius:99px;background:rgba(120,0,20,.6)}
+#peligro .rojo{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(255,40,70,.28) 100%);animation:latido 1.3s ease-in-out infinite}
+#peligro .franja{cursor:pointer;position:absolute;left:0;right:0;top:50%;height:clamp(48px,10vmin,100px);transform:translateY(-50%);background:linear-gradient(rgba(255,40,70,0),rgba(255,40,70,.26) 22%,rgba(255,40,70,.26) 78%,rgba(255,40,70,0));animation:latido 1.3s ease-in-out infinite}
+#peligro .franja::before,#peligro .franja::after{content:'';position:absolute;left:0;right:0;height:2px;background:rgba(255,120,135,.75);box-shadow:0 0 10px #ff2b3b}
+#peligro .franja::before{top:10%}#peligro .franja::after{bottom:10%}
+#peligro .cinta{position:absolute;inset:0;display:flex;align-items:center;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 39%,transparent 44%,transparent 56%,#000 61%,#000 100%);mask-image:linear-gradient(90deg,#000 0,#000 39%,transparent 44%,transparent 56%,#000 61%,#000 100%)}
+#peligro .cinta span{white-space:nowrap;font-family:Orbitron,sans-serif;font-weight:800;font-size:clamp(18px,4.4vmin,44px);letter-spacing:.22em;color:rgba(255,240,242,.85);text-shadow:0 0 10px #ff2b3b,0 0 22px rgba(255,43,59,.6);animation:corre 14s linear infinite}
+@keyframes corre{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#peligro .icono{cursor:pointer;pointer-events:auto;position:absolute;left:50%;top:50%;width:clamp(80px,17vmin,170px);transform:translate(-50%,-52%);animation:parpa .65s steps(2) infinite;overflow:visible}
 @keyframes latido{0%,100%{opacity:.2}50%{opacity:1}}
-@keyframes parpa{0%{opacity:1}100%{opacity:.45}}
+@keyframes parpa{0%{opacity:1}100%{opacity:.3}}
 body.alarma #peligro{opacity:1}
+body.alarma #peligro .franja{pointer-events:auto}
 body.alarma .chip{border-color:#ff8b97;color:#ffc2c8;box-shadow:0 0 12px rgba(255,59,78,.5)}
 body.alarma #borde{stroke:#ff5a6b;animation:latido 1.3s ease-in-out infinite}
-
-/* Brazo de Molí (blanco, redondito, 3 deditos) */
-#brazo{position:absolute;left:calc(6vw + 2vmin);bottom:-6vmin;width:60vmin;aspect-ratio:440/280;transform-origin:12% 60%;transform:translate(-30%,95%) rotate(-12deg);transition:transform 1.1s cubic-bezier(.2,.9,.25,1.12);pointer-events:none;filter:drop-shadow(8px 14px 16px rgba(20,40,80,.35))}
-#brazo svg{width:100%;height:100%;overflow:visible}
-body.brazo #brazo{transform:rotate(-36deg)}
-body.bajando #brazo{transition:transform .9s cubic-bezier(.55,0,.8,.4)}
-#luz{cursor:pointer;pointer-events:auto}
-#luz .parp{animation:luzOn .55s steps(2) infinite}
-body.ok #luz .parp{animation:none;opacity:0}
-body.ok #luz .tri{stroke:#8a94a6;filter:none}
-body.ok #luz .exc{fill:#8a94a6}
-body.ok #codoLuz{stroke:#8a94a6;filter:none}
-@keyframes luzOn{0%{opacity:1}100%{opacity:.2}}
 
 /* Marco del visor: casco blanco */
 #visor{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
 /* Párpados blancos */
 .parpado{position:absolute;left:-6%;right:-6%;height:53%;transition:transform .32s cubic-bezier(.6,0,.3,1);pointer-events:none;z-index:5}
-.parpado.arr{top:0;border-radius:0 0 50% 50%/0 0 26% 26%;background:linear-gradient(#ffffff 0%,#f2f5f9 70%,#d6dde8 100%)}
-.parpado.aba{bottom:0;border-radius:50% 50% 0 0/26% 26% 0 0;background:linear-gradient(#d6dde8 0%,#f2f5f9 30%,#ffffff 100%)}
-.parpado::before{content:'';position:absolute;left:0;right:0;height:14px;border-radius:50%;background:#b8c2d1;opacity:.8}
+.parpado.arr{top:0;border-radius:0 0 50% 50%/0 0 18% 18%;background:linear-gradient(#050a1f 0%,#0d1840 80%,#1a2a66 100%)}
+.parpado.aba{bottom:0;border-radius:50% 50% 0 0/18% 18% 0 0;background:linear-gradient(#1a2a66 0%,#0d1840 20%,#050a1f 100%)}
+.parpado::before{content:'';position:absolute;left:0;right:0;height:10px;border-radius:50%;background:#2c4392;opacity:.8}
 .parpado.arr::before{bottom:0}.parpado.aba::before{top:0}
 .parpado::after{content:'';position:absolute;left:8%;right:8%;height:4px;border-radius:99px;background:var(--cian);box-shadow:0 0 14px 2px var(--cian)}
 .parpado.arr::after{bottom:22px}.parpado.aba::after{top:22px}
@@ -86,17 +78,17 @@ body.abierto .parpado.aba{transform:translateY(106%)}
 @keyframes flota{50%{transform:translateX(-50%) translateY(-5px)}}
 
 /* Ventana holograma */
-#holo{position:absolute;left:50%;top:50%;width:min(520px,84vw);transform:translate(-50%,-50%) scaleY(.02);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .25s;z-index:6;padding:22px 26px 20px;border-radius:22px;background:linear-gradient(160deg,rgba(150,245,255,.30),rgba(40,120,220,.22));border:2px solid rgba(170,250,255,.9);box-shadow:0 0 34px rgba(111,243,255,.55),inset 0 0 40px rgba(111,243,255,.25);-webkit-backdrop-filter:blur(7px) saturate(1.2);backdrop-filter:blur(7px) saturate(1.2);color:#fff;text-shadow:0 1px 4px rgba(0,40,90,.6),0 0 8px rgba(111,243,255,.6)}
+#holo{position:absolute;left:50%;top:50%;width:min(680px,88vw);max-height:90vh;overflow:auto;transform:translate(-50%,-50%) scaleY(.02);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .25s;z-index:6;padding:28px 34px 26px;border-radius:26px;background:linear-gradient(160deg,rgba(18,60,120,.82),rgba(8,24,64,.86));border:2px solid rgba(170,250,255,.9);box-shadow:0 0 34px rgba(111,243,255,.55),inset 0 0 40px rgba(111,243,255,.25);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);color:#fff;text-shadow:0 1px 4px rgba(0,40,90,.6),0 0 8px rgba(111,243,255,.6)}
 #holo::before{content:'';position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(0deg,rgba(200,252,255,.10) 0 2px,transparent 2px 4px);pointer-events:none}
 #holo.ver{transform:translate(-50%,-50%) scaleY(1);opacity:1;pointer-events:auto;animation:titila 3s infinite}
 @keyframes titila{0%,96%,100%{opacity:1}97%{opacity:.8}98%{opacity:1}99%{opacity:.85}}
-#holo .cab{display:flex;align-items:center;gap:10px;font-family:Orbitron,sans-serif;font-size:clamp(14px,2.4vmin,20px);letter-spacing:.1em;border-bottom:1px dashed rgba(200,252,255,.8);padding-bottom:10px;margin-bottom:12px}
+#holo .cab{display:flex;align-items:center;gap:10px;font-family:Orbitron,sans-serif;font-size:clamp(15px,2.8vmin,24px);letter-spacing:.1em;border-bottom:1px dashed rgba(200,252,255,.8);padding-bottom:10px;margin-bottom:12px}
 #holo .cab span{font-size:1.5em}
-#holo .de{font-size:clamp(13px,2vmin,16px);opacity:.92}
-#holo h2{font-size:clamp(22px,4vmin,34px);line-height:1.1;margin:6px 0 12px}
-#holo ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:clamp(15px,2.4vmin,20px);margin-bottom:16px}
+#holo .de{font-size:clamp(14px,2.3vmin,19px);opacity:.92}
+#holo h2{font-size:clamp(24px,5vmin,44px);line-height:1.1;margin:6px 0 12px}
+#holo ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;font-size:clamp(17px,3vmin,26px);margin-bottom:16px}
 #holo li::before{content:'◆ ';color:var(--cian)}
-#ok{display:block;margin:0 auto;font:800 clamp(17px,2.8vmin,22px) 'Baloo 2',sans-serif;color:#03222a;background:linear-gradient(#c8fdff,#41dcef);border:0;border-radius:99px;padding:.45em 1.7em;cursor:pointer;box-shadow:0 0 18px rgba(111,243,255,.9);transition:transform .15s;text-shadow:none}
+#ok{display:block;margin:0 auto;font:800 clamp(18px,3.2vmin,26px) 'Baloo 2',sans-serif;color:#03222a;background:linear-gradient(#c8fdff,#41dcef);border:0;border-radius:99px;padding:.45em 1.7em;cursor:pointer;box-shadow:0 0 18px rgba(111,243,255,.9);transition:transform .15s;text-shadow:none}
 #ok:hover{transform:scale(1.06)}
 
 /* Pantalla de inicio */
@@ -114,56 +106,13 @@ body.abierto .parpado.aba{transform:translateY(106%)}
 </head>
 <body>
 <div id="vista">
-  <div id="escena"><svg id="cuarto" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-label="Un grupo de carpetas sobre la mesa"></svg></div>
+  <canvas id="c3d" aria-label="Lo que ve Molí: carpetas sobre la mesa"></canvas>
 
-  <div id="brazo">
-    <svg viewBox="0 0 440 280" aria-hidden="true">
-      <defs>
-        <linearGradient id="gBlanco" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#f4f6fa"/><stop offset=".85" stop-color="#d3dae5"/><stop offset="1" stop-color="#b9c3d2"/></linearGradient>
-        <linearGradient id="gNavy" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3a52a8"/><stop offset=".5" stop-color="#16246a"/><stop offset="1" stop-color="#0b1438"/></linearGradient>
-        <linearGradient id="gCodo" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2b3448"/><stop offset="1" stop-color="#0d121f"/></linearGradient>
-        <filter id="neon" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <!-- brazo de arriba (sale de abajo, fuera de la vista) -->
-      <path d="M-260 96 H40 Q58 96 58 116 V214 Q58 234 40 234 H-260 Z" fill="url(#gBlanco)"/>
-      <path d="M-260 106 H34" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".9"/>
-      <!-- codo oscuro con lucecita roja -->
-      <path d="M44 108 Q74 96 92 104 V226 Q74 236 44 226 Z" fill="url(#gCodo)"/>
-      <circle id="codoLuz" cx="66" cy="200" r="9" fill="none" stroke="#ff2b3b" stroke-width="4" filter="url(#neon)"/>
-      <!-- antebrazo cortito y abultado -->
-      <path d="M84 92 C 140 52 250 44 300 66 C 346 86 350 196 300 220 C 250 244 140 238 84 210 C 70 180 70 122 84 92 Z" fill="url(#gBlanco)"/>
-      <path d="M104 86 C 160 58 240 54 290 70" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
-      <path d="M230 54 C 214 100 214 190 232 236" fill="none" stroke="#b3bdcc" stroke-width="3"/>
-      <path d="M92 196 C 150 222 240 226 300 210" fill="none" stroke="#c3ccda" stroke-width="3"/>
-      <!-- muñeca -->
-      <path d="M316 92 Q350 96 352 156 Q350 214 316 220 Q332 156 316 92 Z" fill="url(#gBlanco)" stroke="#b3bdcc" stroke-width="3"/>
-      <!-- 3 deditos azules separados -->
-      <g>
-        <ellipse cx="384" cy="104" rx="40" ry="17" fill="url(#gNavy)" transform="rotate(-18 384 104)"/>
-        <ellipse cx="394" cy="158" rx="42" ry="17" fill="url(#gNavy)"/>
-        <ellipse cx="384" cy="212" rx="40" ry="17" fill="url(#gNavy)" transform="rotate(18 384 212)"/>
-        <ellipse cx="378" cy="98" rx="18" ry="5" fill="#fff" opacity=".45" transform="rotate(-18 378 98)"/>
-        <ellipse cx="388" cy="152" rx="19" ry="5" fill="#fff" opacity=".45"/>
-        <ellipse cx="378" cy="206" rx="18" ry="5" fill="#fff" opacity=".45" transform="rotate(18 378 206)"/>
-      </g>
-      <!-- luz de peligro triangular -->
-      <g id="luz" role="button" aria-label="Luz de mensaje">
-        <circle cx="170" cy="148" r="80" fill="transparent"/>
-        <circle class="parp" cx="170" cy="148" r="62" fill="#ff2b3b" opacity=".18" filter="url(#neon)"/>
-        <g class="parp" stroke="#ff2b3b" stroke-width="4" stroke-linecap="round" filter="url(#neon)">
-          <path d="M170 92 V76"/><path d="M128 106 L116 94"/><path d="M212 106 L224 94"/>
-          <path d="M112 162 H96"/><path d="M228 162 H244"/><path d="M134 196 L122 208"/><path d="M206 196 L218 208"/>
-        </g>
-        <path d="M170 100 Q178 100 182 108 L212 170 Q216 182 202 182 H138 Q124 182 128 170 L158 108 Q162 100 170 100 Z" fill="#141a2a" stroke="#c9d1dd" stroke-width="5"/>
-        <path class="tri" d="M170 116 L200 172 H140 Z" fill="none" stroke="#ff2b3b" stroke-width="5" stroke-linejoin="round" filter="url(#neon)"/>
-        <rect class="exc" x="166" y="134" width="8" height="22" rx="4" fill="#ff2b3b"/>
-        <circle class="exc" cx="170" cy="164" r="4.5" fill="#ff2b3b"/>
-      </g>
-    </svg>
-  </div>
-
-  <div id="cristal"></div>
-  <div id="peligro"><div class="rojo"></div><div class="banda"><div class="txt">⚠ DANGER · DANGER ⚠</div><div class="sub">ALERTA ENTRANTE</div></div></div>
+  <div id="cristal"></div><div id="grano"></div>
+  <div id="peligro"><div class="rojo"></div>
+    <div class="franja"><div class="cinta"><span>DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · DANGER · </span></div></div>
+    <svg class="icono" viewBox="0 0 120 110" aria-hidden="true"><defs><filter id="neon2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#neon2)"><path d="M60 10 L110 98 H10 Z" fill="none" stroke="#ff3b4e" stroke-width="7" stroke-linejoin="round"/><rect x="55" y="38" width="10" height="34" rx="5" fill="#ff3b4e"/><circle cx="60" cy="84" r="6" fill="#ff3b4e"/></g></svg></div>
 
   <div id="hud">
     <div class="scan"></div><div class="barrido"></div>
@@ -173,22 +122,20 @@ body.abierto .parpado.aba{transform:translateY(106%)}
     <div id="objetivo"><i></i><i></i><i></i><i></i><b>OBJETO: CARPETAS ×6</b></div>
   </div>
 
+  <div class="parpado arr"></div><div class="parpado aba"></div>
   <svg id="visor" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
     <defs>
-      <linearGradient id="gCasco" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#eef2f7"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
-      <clipPath id="soloMarco"><path clip-rule="evenodd" d="M-20 -20H1020V620H-20Z M140 42 Q500 18 860 42 Q985 300 860 558 Q500 582 140 558 Q15 300 140 42Z"/></clipPath>
-      <filter id="difu" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="10"/></filter>
+      <linearGradient id="gCasco" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0d1840"/><stop offset=".5" stop-color="#050a1f"/><stop offset="1" stop-color="#0d1840"/></linearGradient>
+      <clipPath id="soloMarco"><path clip-rule="evenodd" d="M-20 -20H1020V620H-20Z M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/></clipPath>
+      <clipPath id="soloVista"><path d="M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/></clipPath>
+      <filter id="difu" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="9"/></filter>
     </defs>
-    <path fill="url(#gCasco)" fill-rule="evenodd" d="M-20 -20H1020V620H-20Z M140 42 Q500 18 860 42 Q985 300 860 558 Q500 582 140 558 Q15 300 140 42Z"/>
-    <g clip-path="url(#soloMarco)">
-      <path fill="none" stroke="#7d8aa0" stroke-width="44" opacity=".55" filter="url(#difu)" d="M140 42 Q500 18 860 42 Q985 300 860 558 Q500 582 140 558 Q15 300 140 42Z"/>
-      <path fill="none" stroke="#c3ccda" stroke-width="2" vector-effect="non-scaling-stroke" d="M120 22 Q500 -4 880 22 Q1012 300 880 578 Q500 604 120 578 Q-12 300 120 22Z"/>
-    </g>
-    <path fill="none" stroke="#0b1438" stroke-width="9" vector-effect="non-scaling-stroke" opacity=".85" d="M140 42 Q500 18 860 42 Q985 300 860 558 Q500 582 140 558 Q15 300 140 42Z"/>
-    <path id="borde" fill="none" stroke="#6ff3ff" stroke-width="3" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 4px #5fd0ff)" d="M140 42 Q500 18 860 42 Q985 300 860 558 Q500 582 140 558 Q15 300 140 42Z"/>
+    <path fill="url(#gCasco)" fill-rule="evenodd" d="M-20 -20H1020V620H-20Z M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/>
+    <g clip-path="url(#soloVista)"><path fill="none" stroke="#020616" stroke-width="40" opacity=".75" filter="url(#difu)" d="M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/></g>
+    <g clip-path="url(#soloMarco)"><path fill="none" stroke="#3b5bbd" stroke-width="14" opacity=".35" filter="url(#difu)" d="M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/></g>
+    <path id="borde" fill="none" stroke="#6ff3ff" stroke-width="2.5" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 5px #5fd0ff)" d="M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/>
   </svg>
 
-  <div class="parpado arr"></div><div class="parpado aba"></div>
   <div id="sub"></div>
   <div id="pista"></div>
   <div id="holo" role="dialog" aria-label="Mensaje">
@@ -207,77 +154,18 @@ body.abierto .parpado.aba{transform:translateY(106%)}
   <button id="encender">▶ Encender a Molí</button>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="vision3d.js?v=202610211414"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
 const esperar=ms=>new Promise(r=>setTimeout(r,ms));
-
-/* ---------- Carpetas que mira Molí ---------- */
-(function cuarto(){
-  const svg=$('#cuarto');
-  const C=[['#ef4444','#f87171','CIENCIA'],['#f59e0b','#fbbf24','TAREAS'],['#10b981','#34d399','MISIONES'],['#3b82f6','#60a5fa','EXIT'],['#8b5cf6','#a78bfa','NOTAS'],['#ec4899','#f472b6','LAB']];
-  let h=`<defs>
-    <radialGradient id="pared" cx=".25" cy=".15" r="1.1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e3ecf6"/><stop offset="1" stop-color="#bccbdf"/></radialGradient>
-    <linearGradient id="mesa" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3d3ad"/><stop offset=".35" stop-color="#e2b07c"/><stop offset="1" stop-color="#b47a45"/></linearGradient>
-    <linearGradient id="cajaF" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e0ea"/></linearGradient>
-    <linearGradient id="vaso" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#e9eef5"/><stop offset="1" stop-color="#bfc9d7"/></linearGradient>
-    <linearGradient id="luzCarp" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient>
-    <filter id="sombra" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="6" dy="14" stdDeviation="12" flood-color="#284066" flood-opacity=".28"/></filter>
-    <filter id="desen" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter>
-    <filter id="suave"><feGaussianBlur stdDeviation="18"/></filter>
-  </defs>
-  <rect width="1600" height="900" fill="url(#pared)"/>
-  <g filter="url(#desen)" opacity=".9">
-    <rect x="120" y="70" width="380" height="250" rx="22" fill="#cfe6ff"/>
-    <rect x="135" y="85" width="350" height="220" rx="16" fill="#eaf5ff"/>
-    <line x1="310" y1="85" x2="310" y2="305" stroke="#cfe6ff" stroke-width="10"/>
-    <rect x="1130" y="100" width="300" height="200" rx="18" fill="#ffffff"/>
-    <circle cx="1200" cy="170" r="34" fill="#fcd34d"/><rect x="1260" y="150" width="130" height="16" rx="8" fill="#93c5fd"/><rect x="1260" y="182" width="100" height="16" rx="8" fill="#a7f3d0"/><rect x="1170" y="230" width="220" height="16" rx="8" fill="#fbcfe8"/>
-    <circle cx="760" cy="120" r="40" fill="#fff" opacity=".8"/><circle cx="900" cy="80" r="26" fill="#fff" opacity=".6"/>
-  </g>
-  <rect x="0" y="588" width="1600" height="312" fill="url(#mesa)"/>
-  <g stroke="#fff" opacity=".12" stroke-width="3" fill="none">
-    <path d="M0 640 C 400 630 900 655 1600 636"/><path d="M0 720 C 500 705 1000 735 1600 712"/><path d="M0 820 C 450 806 1100 832 1600 810"/>
-  </g>
-  <rect x="0" y="582" width="1600" height="12" fill="#fbe3c6"/>
-  <ellipse cx="815" cy="612" rx="340" ry="26" fill="#5b3b1c" opacity=".25" filter="url(#suave)"/>`;
-  C.forEach(([col,col2,txt],i)=>{
-    const x=528+i*96, y=214+(i%3)*14, r=[-4,2,-2,3,-3,4][i], tab=[12,46,26,54,16,40][i];
-    h+=`<g transform="rotate(${r} ${x+60} 560)" filter="url(#sombra)">
-      <rect x="${x+14}" y="${y-14}" width="92" height="60" rx="6" fill="#fff"/>
-      <rect x="${x+24}" y="${y-4}" width="60" height="6" rx="3" fill="#cbd5e1"/>
-      <path d="M${x+tab} ${y+4} q0 -26 14 -28 h28 q14 2 14 28 z" fill="${col2}"/>
-      <rect x="${x}" y="${y}" width="120" height="360" rx="14" fill="${col}"/>
-      <rect x="${x}" y="${y}" width="120" height="360" rx="14" fill="url(#luzCarp)"/>
-      <rect x="${x+3}" y="${y+3}" width="114" height="8" rx="4" fill="#fff" opacity=".35"/>
-      <rect x="${x+6}" y="${y+24}" width="86" height="38" rx="9" fill="#fff"/>
-      <text x="${x+49}" y="${y+50}" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="18" fill="#1f2937">${txt}</text>
-    </g>`;
-  });
-  h+=`<g filter="url(#sombra)">
-    <path d="M520 430 Q520 418 534 418 H1096 Q1110 418 1110 430 V590 Q1110 612 1088 612 H542 Q520 612 520 590 Z" fill="url(#cajaF)"/>
-    <rect x="520" y="418" width="590" height="14" rx="7" fill="#ffffff"/>
-    <rect x="520" y="432" width="590" height="5" fill="#c9d2df"/>
-    <rect x="718" y="482" width="194" height="60" rx="30" fill="#0b1438"/>
-    <circle cx="748" cy="512" r="9" fill="#5fd0ff"/><circle cx="882" cy="512" r="9" fill="#5fd0ff"/>
-    <text x="815" y="524" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="30" fill="#ffffff">6.° CyT</text>
-  </g>
-  <g filter="url(#sombra)">
-    <path d="M196 704 L470 692 Q486 692 494 704 L524 750 Q530 764 512 765 L238 776 Q224 776 218 764 Z" fill="#3b82f6"/>
-    <path d="M206 680 L480 670 Q496 670 504 682 L532 726 Q538 740 520 741 L248 750 Q234 750 228 738 Z" fill="#fbbf24"/>
-    <path d="M222 664 L486 656 L516 700 L252 708 Z" fill="#fff"/>
-    <path d="M214 656 L492 648 Q508 648 516 660 L542 702 Q548 716 530 716 L258 724 Q244 724 238 712 Z" fill="#10b981"/>
-  </g>
-  <g filter="url(#sombra)">
-    <rect x="1236" y="470" width="18" height="130" rx="9" fill="#f59e0b" transform="rotate(-12 1245 600)"/>
-    <rect x="1272" y="444" width="18" height="156" rx="9" fill="#ef4444"/>
-    <rect x="1306" y="474" width="18" height="126" rx="9" fill="#3b82f6" transform="rotate(12 1315 600)"/>
-    <path d="M1216 566 H1348 L1338 706 Q1336 722 1318 722 H1246 Q1228 722 1226 706 Z" fill="url(#vaso)"/>
-    <ellipse cx="1282" cy="566" rx="66" ry="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>
-    <circle cx="1282" cy="640" r="10" fill="#5fd0ff"/>
-  </g>`;
-  svg.innerHTML=h;
-})();
+let V3=null;
+(document.fonts&&document.fonts.load?Promise.all([document.fonts.load('800 40px "Baloo 2"')]).catch(()=>0):Promise.resolve()).then(()=>{
+  try{V3=Vision3D(THREE,$("#c3d")); window.__hit=(x,y)=>V3.hit(x,y); window.__v3=V3}catch(e){console.error(e)}
+  const caja=()=>{if(!V3)return; const r=V3.caja(), o=$('#objetivo'); Object.assign(o.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'})};
+  caja(); setInterval(caja,120);
+});
 
 /* ---------- Sonidos ---------- */
 let AC, mezcla, alarmaGan, alarmaT=null;
@@ -379,34 +267,33 @@ function alertar(){
 async function subirBrazo(){
   if(fase!=='alarma') return;
   fase='brazo'; pista('');
-  servo(.9,110,380,.18); B.classList.add('brazo');
-  await esperar(900);
+  servo(1.5,110,380,.16); B.classList.add('brazo'); V3&&V3.brazo(true); V3&&V3.luz(true);
+  await esperar(1500);
   await hablar('mensaje','Tienes un mensaje, usuario.');
   if(fase==='brazo') pista('👆 Toca la luz de mi brazo');
 }
 function abrirMensaje(e){
   e.stopPropagation();
   if(fase!=='brazo') return;
-  fase='mensaje'; pista(''); holoSon();
+  fase='mensaje'; pista(''); alarma(false); B.classList.remove('alarma'); estado('📨 MENSAJE'); holoSon();
   $('#holo').classList.add('ver');
 }
 async function confirmar(e){
   e.stopPropagation();
   if(fase!=='mensaje') return;
-  fase='listo'; campana(); alarma(false);
+  fase='listo'; campana();
   $('#holo').classList.remove('ver');
   B.classList.remove('alarma'); B.classList.add('ok'); estado('✔ TODO EN ORDEN');
   hablar('listo','Tarea confirmada. ¡Buen trabajo!');
   await esperar(700);
-  B.classList.add('bajando'); servo(.8,380,120,.15); B.classList.remove('brazo');
-  await esperar(1000);
-  B.classList.remove('bajando');
+  V3&&V3.luz(false); servo(1.5,380,120,.13); B.classList.remove('brazo'); V3&&V3.brazo(false);
+  await esperar(1600);
   await parpadear(true);
 }
 
 $('#encender').addEventListener('click',encender);
-$('#vista').addEventListener('click',subirBrazo);
-$('#luz').addEventListener('click',abrirMensaje);
+$('#vista').addEventListener('click',e=>{ if(fase==='brazo'){ if(V3&&V3.hit(e.clientX,e.clientY)) abrirMensaje(e); } else subirBrazo(); });
+$('#vista').addEventListener('pointermove',e=>{ $('#vista').style.cursor=(fase==='alarma'||(fase==='brazo'&&V3&&V3.hit(e.clientX,e.clientY)))?'pointer':'default'; });
 $('#ok').addEventListener('click',confirmar);
 $('#holo').addEventListener('click',e=>e.stopPropagation());
 })();
