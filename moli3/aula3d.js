@@ -86,7 +86,7 @@ function AulaMoli3(THREE, canvas) {
   const centro = new THREE.RingGeometry(0.13, 0.16, 48);
   const asiento = new THREE.CylinderGeometry(0.22, 0.2, 0.06, 32), cojin = new THREE.CylinderGeometry(0.19, 0.19, 0.02, 32);
   const respaldo = new THREE.CylinderGeometry(0.24, 0.23, 0.34, 32, 1, true, -1.1, 2.2);
-  const MESAS = [[-1.9, -1.6], [1.9, -1.6], [-1.9, 1.5], [1.9, 1.5]];
+  const MESAS = [[-1.95, -0.85], [1.95, -0.85], [-1.95, 2.15], [1.95, 2.15]];
   MESAS.forEach(([x, z], mi) => {
     const m = new THREE.Group(); m.position.set(x, 0, z); m.rotation.y = Math.PI / 6; S.add(m);
     malla(hexTop, BL, [0, 0.76, 0], null, m);
@@ -170,45 +170,50 @@ function AulaMoli3(THREE, canvas) {
     malla(new THREE.BoxGeometry(1.05, 0.82, 0.04), PM({ color: 0x1a2030, roughness: 0.3, metalness: 0.6 }), [0, 0, -0.01], null, f, false);
     const p = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.78), new THREE.MeshBasicMaterial({ map: marcoTex, toneMapped: false })); p.position.z = 0.012; f.add(p); });
 
-  // ---- pizarra blanca al frente + proyector en el techo que proyecta sobre ella ----
-  const piz = new THREE.Group(); piz.position.set(0, 1.6, -Z + 0.03); S.add(piz);
-  malla(new THREE.BoxGeometry(4.5, 1.9, 0.05), PLATA, [0, 0, 0], null, piz, false);                       // marco de aluminio
-  malla(new THREE.BoxGeometry(4.4, 1.8, 0.052), PM({ color: 0xfbfcfe, roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.04 }), [0, 0, 0.002], null, piz, false);
-  malla(new THREE.BoxGeometry(4.0, 0.035, 0.09), PLATA, [0, -0.97, 0.05], null, piz, false);              // bandeja de plumones
-  [[-1.4, 0x2563eb], [-1.25, 0xef4444], [-1.1, 0x16a34a]].forEach(([x, c]) => { const pl = malla(new THREE.CylinderGeometry(0.011, 0.011, 0.13, 12), PM({ color: c, roughness: 0.4 }), [x, -0.94, 0.06], [0, 0, Math.PI / 2], piz, false); });
-  const DIA = { w: 3.1, h: 1.6 };
-  const diaTex = lienzo(2048, 1056, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#0f2a66'); gr.addColorStop(1, '#081538'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-    g.strokeStyle = 'rgba(95,227,255,.10)'; g.lineWidth = 2; for (let x = 0; x < w; x += 80) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
-    g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = ORB(150); g.shadowColor = '#5fe3ff'; g.shadowBlur = 34; g.fillText('MOLÍ 3', w / 2, h / 2 - 20); g.shadowBlur = 0;
-    g.fillStyle = '#9ff0ff'; g.font = F(700, 68); g.fillText('Aula de Ciencia y Tecnología', w / 2, h / 2 + 100);
-    g.fillStyle = 'rgba(159,240,255,.85)'; g.font = ORB(34); g.fillText('6.° GRADO · INNOVA SCHOOLS', w / 2, h - 90); });
-  const dia = new THREE.Mesh(new THREE.PlaneGeometry(DIA.w, DIA.h), new THREE.MeshBasicMaterial({ map: diaTex, toneMapped: false, transparent: true, opacity: 0.96 }));
-  dia.position.set(0, 0.05, 0.03); piz.add(dia);
-  // el proyector: cuelga del techo, con su lente que brilla
-  const PRO = V(0, AL - 0.42, -Z + 2.7), pro = new THREE.Group(); pro.position.copy(PRO); S.add(pro);
-  malla(new THREE.CylinderGeometry(0.018, 0.018, 0.4, 12), PLATA, [0, 0.22, 0], null, pro);
-  malla(new THREE.BoxGeometry(0.44, 0.13, 0.36), BL, [0, 0, 0], null, pro);
-  malla(new THREE.BoxGeometry(0.44, 0.012, 0.36), NAVY, [0, -0.07, 0], null, pro);
-  malla(new THREE.CylinderGeometry(0.055, 0.06, 0.05, 32), PM({ color: 0x111827, roughness: 0.2, clearcoat: 1 }), [0.1, -0.005, -0.19], [Math.PI / 2, 0, 0], pro);
-  const lente = new THREE.Mesh(new THREE.CircleGeometry(0.045, 32), LUZ(0xe8fbff, 2)); lente.position.set(0.1, -0.005, -0.216); lente.rotation.y = Math.PI; pro.add(lente);
-  malla(new THREE.SphereGeometry(0.008, 12, 8), LUZ(0x5fe3ff, 2), [-0.15, 0.0, -0.181], null, pro, false);
-  // el haz de luz: de la lente a las 4 esquinas de la imagen, más fuerte cerca de la lente
-  const L0 = PRO.clone().add(V(0.1, -0.005, -0.216)), cz = piz.position.z + 0.03, cy = piz.position.y + 0.05;
-  const esq = [V(-DIA.w / 2, cy - DIA.h / 2, cz), V(DIA.w / 2, cy - DIA.h / 2, cz), V(DIA.w / 2, cy + DIA.h / 2, cz), V(-DIA.w / 2, cy + DIA.h / 2, cz)];
-  const hp = [], huv = []; for (let k = 0; k < 4; k++) { const a = esq[k], b = esq[(k + 1) % 4]; hp.push(L0.x, L0.y, L0.z, a.x, a.y, a.z, b.x, b.y, b.z); huv.push(0.5, 0, 0, 1, 1, 1); }
-  const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(hp, 3)); hg.setAttribute('uv', new THREE.Float32BufferAttribute(huv, 2));
-  const hazTex = lienzo(16, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,.12)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
-  const haz = new THREE.Mesh(hg, new THREE.MeshBasicMaterial({ color: C(0xbfefff), alphaMap: hazTex, transparent: true, opacity: 0.085, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false }));
-  S.add(haz);
-  // polvito flotando dentro del haz
-  const NP = 140, pp = new Float32Array(NP * 3), sem = [];
-  for (let k = 0; k < NP; k++) sem.push([Math.random(), Math.random(), Math.random(), Math.random() * 6.28]);
+  // ---- 💠 base de hologramas al frente (en vez de pizarra y proyector) ----
+  const HB = V(0, 0, -Z + 1.45), hb = new THREE.Group(); hb.position.copy(HB); S.add(hb);
+  malla(new THREE.CylinderGeometry(0.95, 1.02, 0.1, 64), BL, [0, 0.05, 0], null, hb);
+  malla(new THREE.CylinderGeometry(0.97, 0.97, 0.016, 64), NAVY, [0, 0.105, 0], null, hb);
+  malla(new THREE.CylinderGeometry(0.78, 0.8, 0.05, 64), PLATA, [0, 0.135, 0], null, hb);
+  const anilloL = (r, y, k = 1.6) => { const a = new THREE.Mesh(new THREE.TorusGeometry(r, 0.008, 8, 96), LUZ(0x5fe3ff, k)); a.rotation.x = Math.PI / 2; a.position.y = y; hb.add(a); return a; };
+  anilloL(1.0, 0.1); anilloL(0.79, 0.162); anilloL(0.55, 0.163, 2); anilloL(0.3, 0.163, 2.2);
+  const emisor = lienzo(256, 256, (g) => { const rg = g.createRadialGradient(128, 128, 6, 128, 128, 128); rg.addColorStop(0, 'rgba(230,252,255,1)'); rg.addColorStop(.35, 'rgba(95,227,255,.7)'); rg.addColorStop(1, 'rgba(95,227,255,0)'); g.fillStyle = rg; g.fillRect(0, 0, 256, 256); });
+  const em = new THREE.Mesh(new THREE.CircleGeometry(0.75, 64), new THREE.MeshBasicMaterial({ map: emisor, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  em.rotation.x = -Math.PI / 2; em.position.y = 0.164; hb.add(em);
+  // cono de luz que sube
+  const conoTex = lienzo(16, 256, (g, w, h) => { const gr = g.createLinearGradient(0, h, 0, 0); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.6, 'rgba(255,255,255,.25)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+  const haz = new THREE.Mesh(new THREE.CylinderGeometry(0.98, 0.62, 2.1, 64, 1, true), new THREE.MeshBasicMaterial({ color: C(0x1aa7e0), alphaMap: conoTex, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+  haz.position.y = 1.2; hb.add(haz);
+  // el holograma: panel flotante + átomo que gira
+  const holoP = lienzo(1600, 880, (g, w, h) => {
+    g.fillStyle = 'rgba(8,30,80,.72)'; rr(g, 10, 10, w - 20, h - 20, 50); g.fill();
+    g.strokeStyle = 'rgba(160,245,255,.95)'; g.lineWidth = 8; g.shadowColor = '#5fe3ff'; g.shadowBlur = 26; rr(g, 14, 14, w - 28, h - 28, 46); g.stroke();
+    g.shadowBlur = 0; g.fillStyle = 'rgba(160,245,255,.10)'; for (let y = 20; y < h; y += 8) g.fillRect(14, y, w - 28, 3);
+    g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = ORB(150); g.shadowColor = '#5fe3ff'; g.shadowBlur = 36; g.fillText('MOLÍ 3', w / 2, h / 2 - 10); g.shadowBlur = 0;
+    g.fillStyle = '#c8fbff'; g.font = F(700, 64); g.fillText('Aula de Ciencia y Tecnología', w / 2, h / 2 + 100);
+    g.fillStyle = 'rgba(200,251,255,.85)'; g.font = ORB(32); g.fillText('6.° GRADO · INNOVA SCHOOLS', w / 2, h - 80); });
+  const panelH = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.99), new THREE.MeshBasicMaterial({ map: holoP, transparent: true, opacity: 0.92, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+  panelH.position.y = 1.45; hb.add(panelH);
+  const atomo = new THREE.Group(); atomo.position.y = 2.28; hb.add(atomo);
+  const nucleo = new THREE.Mesh(new THREE.SphereGeometry(0.06, 24, 16), LUZ(0x22c3e6, 1.3)); atomo.add(nucleo);
+  const orbM = new THREE.MeshBasicMaterial({ color: C(0x0ea5e9), transparent: true, opacity: 0.95, depthWrite: false, toneMapped: false });
+  const ORB3 = [0, 1, 2].map(k => { const o = new THREE.Group(); o.rotation.set(Math.PI / 2 + 0.25, k * Math.PI / 3, 0); atomo.add(o);
+    const t = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.005, 8, 96), orbM); t.scale.set(1, 0.42, 1); o.add(t);
+    const e = new THREE.Mesh(new THREE.SphereGeometry(0.024, 12, 8), LUZ(0x1d4ed8, 1.2)); o.add(e); return { o, e, f: k * 2.1 }; });
+  const red = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 1), new THREE.MeshBasicMaterial({ color: C(0x0e86c4), wireframe: true, transparent: true, opacity: 0.45, depthWrite: false })); atomo.add(red);
+  // chispitas que suben por el cono
+  const NP = 120, pp = new Float32Array(NP * 3), sem = [];
+  for (let k = 0; k < NP; k++) sem.push([Math.random(), Math.random() * 6.28, Math.sqrt(Math.random()), Math.random()]);
   const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pp, 3));
-  const polvo = new THREE.Points(pg, new THREE.PointsMaterial({ color: C(0xe8fbff), size: 0.012, transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  const polvo = new THREE.Points(pg, new THREE.PointsMaterial({ color: C(0x22b8e8), size: 0.016, transparent: true, opacity: 0.85, depthWrite: false, toneMapped: false }));
   S.add(polvo);
-  const polvoVa = (t) => { for (let k = 0; k < NP; k++) { const [u, v, w, f] = sem[k], d = (u + t * 0.015) % 1, x = (v - 0.5) * DIA.w * d * 0.95, y = (w - 0.5) * DIA.h * d * 0.95;
-      pp[k * 3] = L0.x + x + Math.sin(t * 0.4 + f) * 0.02; pp[k * 3 + 1] = L0.y + (cy - L0.y) * d + y + Math.sin(t * 0.5 + f * 2) * 0.015; pp[k * 3 + 2] = L0.z + (cz - L0.z) * d; }
-    pg.attributes.position.needsUpdate = true; };
+  const polvoVa = (t) => {
+    for (let k = 0; k < NP; k++) { const [u, a, r, f] = sem[k], d = (u + t * 0.06) % 1, rad = (0.95 - 0.35 * d) * r, an = a + t * 0.25;
+      pp[k * 3] = HB.x + Math.cos(an) * rad; pp[k * 3 + 1] = 0.17 + d * 2.1; pp[k * 3 + 2] = HB.z + Math.sin(an) * rad; }
+    pg.attributes.position.needsUpdate = true;
+    panelH.position.y = 1.45 + Math.sin(t * 1.1) * 0.02; panelH.material.opacity = 0.88 + Math.sin(t * 7) * 0.04 + (Math.random() < 0.02 ? -0.25 : 0);
+    atomo.rotation.y = t * 0.5; ORB3.forEach(q => { q.o.rotation.z = t * 1.4 + q.f; const an = t * 2.6 + q.f; q.e.position.set(Math.cos(an) * 0.24, Math.sin(an) * 0.24 * 0.42, 0); });
+    red.rotation.x = t * 0.2; nucleo.scale.setScalar(1 + Math.sin(t * 3) * 0.08); };
   // sombritas de contacto bajo mesas y sillas (más realista)
   const somTex = lienzo(128, 128, (g) => { const rg = g.createRadialGradient(64, 64, 4, 64, 64, 64); rg.addColorStop(0, 'rgba(20,30,50,.55)'); rg.addColorStop(1, 'rgba(20,30,50,0)'); g.fillStyle = rg; g.fillRect(0, 0, 128, 128); });
   const somM = new THREE.MeshBasicMaterial({ map: somTex, transparent: true, depthWrite: false });
@@ -222,10 +227,10 @@ function AulaMoli3(THREE, canvas) {
   // ---- cámara (los ojos de Molí) y sus 4 lugares ----
   const cam = new THREE.PerspectiveCamera(55, 1, 0.05, 60); S.add(cam);
   const ESC = [
-    { n: '🏫 Aula', obj: 'AULA DE CIENCIA', from: V(0.4, 1.6, Z - 0.6), look: V(0, 1.0, -Z + 0.5) },
+    { n: '🏫 Aula', obj: 'AULA DE CIENCIA', from: V(0.4, 1.7, Z - 0.6), look: V(0, 1.15, -Z + 0.5) },
     { n: '📗 Cuaderno', obj: 'CUADERNO DE SESIONES', from: CU.clone().add(V(0.0, 0.62, 0.78)), look: CU.clone().add(V(0, 0.1, -0.06)) },
     { n: '📌 Corcho', obj: 'CORCHO DE UNIDAD', from: V(X - 2.55, 1.58, 0.6), look: PANT.c.clone() },
-    { n: '🧑‍🏫 Pizarra', obj: 'PIZARRA Y PROYECTOR', from: V(0.5, 1.7, -Z + 4.1), look: V(0, 1.6, -Z) },
+    { n: '💠 Holograma', obj: 'BASE DE HOLOGRAMAS', from: V(0.35, 1.72, -Z + 5.5), look: V(0, 1.4, -Z + 1.45) },
     { n: '🖼️ Muro', obj: 'MURO DEL AULA', from: V(0, 1.62, Z - 3.7), look: V(0, 1.78, Z) }
   ];
   const pos = ESC[0].from.clone(), look = ESC[0].look.clone();

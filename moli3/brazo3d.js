@@ -36,6 +36,7 @@ function BrazoMoli(THREE, renderer, cam) {
   const LA = 0.24;                                                   // antebrazo cortito
   const rA = u => (0.103 + 0.031 * Math.sin(Math.PI * Math.pow(u, 0.85))) * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 12)), 0.22);
   const ante = malla(torno(60, LA, rA), BL, [0, 0, 0], null, brazo);
+  { const r0 = rA(0.16), g = new THREE.CylinderGeometry(r0, r0 * 0.94, 0.5, 64, 1, true); g.rotateZ(Math.PI / 2); g.translate(-0.21, 0, 0); malla(g, BL, [0, 0, 0], null, brazo); }   // sigue hacia el codo, fuera de la vista
   const anillo = (x, r, t) => { const g = new THREE.TorusGeometry(r, t, 8, 64); g.rotateY(Math.PI / 2); return malla(g, UNION, [x, 0, 0], null, brazo); };
   anillo(LA * 0.13, rA(0.13) + 0.0004, 0.0016);
   // costura de arriba (panel)
@@ -48,8 +49,8 @@ function BrazoMoli(THREE, renderer, cam) {
   const dedo = new THREE.SphereGeometry(1, 40, 20);
   // 3 deditos azules que flotan separados de la muñeca (unidos por una fuerza invisible), cada uno con su brillito celeste
   const DEDOS = [], brillo = new THREE.MeshBasicMaterial({ color: 0x5fe3ff, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending });
-  [[0.084, 0.4], [0, 0.04], [-0.084, -0.32]].forEach(([y, r], i) => {
-    const g = new THREE.Group(); g.position.set(LA + 0.125 - (i === 1 ? 0 : 0.012), y, 0.012); g.rotation.z = r; brazo.add(g);
+  [[0.098, 0.42], [0, 0.04], [-0.098, -0.34]].forEach(([y, r], i) => {
+    const g = new THREE.Group(); g.position.set(LA + 0.165 - (i === 1 ? 0 : 0.014), y, 0.012); g.rotation.z = r; brazo.add(g);
     const d = malla(dedo, AZ, [0, 0, 0], null, g); d.scale.set(0.072, 0.029, 0.034);
     const b = new THREE.Mesh(new THREE.SphereGeometry(0.012, 16, 10), brillo); b.position.x = -0.07; g.add(b);
     DEDOS.push({ g, base: g.position.clone(), r, f: i * 1.9 }); });
@@ -76,10 +77,13 @@ function BrazoMoli(THREE, renderer, cam) {
   const baseTex = lienzo(512, 512, (g, w) => conGiro(g, w, () => {
     g.lineJoin = 'round'; hundido(g, () => triang(g, 256, 272, 165));
     g.save(); triang(g, 256, 272, 165); g.clip(); hundido(g, () => exc(g)); g.restore(); }));
+  // encendido: como un botón de neón (núcleo blanco y resplandor rojo fuerte), triángulo y signo de admiración
   const luzTex = lienzo(512, 512, (g, w) => conGiro(g, w, () => {
-    g.lineJoin = 'round'; g.shadowColor = '#ff1a3a';
-    for (const [bl, lw, c] of [[50, 16, 'rgba(255,26,58,.6)'], [22, 10, '#ff1f3d'], [6, 4, '#ffb3bd']]) {
-      g.shadowBlur = bl; g.strokeStyle = c; g.lineWidth = lw; triang(g, 256, 272, 168); g.stroke(); } }));
+    g.lineJoin = 'round'; g.lineCap = 'round'; g.shadowColor = '#ff1030';
+    const exP = () => { g.beginPath(); g.moveTo(256, 206); g.lineTo(256, 270); };
+    for (const [bl, lw, c] of [[70, 30, 'rgba(255,16,48,.75)'], [36, 22, '#ff1a3a'], [16, 14, '#ff5a6e'], [4, 7, '#fff3f5']]) {
+      g.shadowBlur = bl; g.strokeStyle = c; g.lineWidth = lw; triang(g, 256, 272, 168); g.stroke();
+      g.lineWidth = lw * 1.1; exP(); g.stroke(); g.fillStyle = c; g.beginPath(); g.arc(256, 318, lw * 0.75 + 4, 0, 7); g.fill(); } }));
   // resplandor rojo suave alrededor del símbolo (como una sombra que brilla), sin rayitas
   const rayosTex = lienzo(512, 512, (g) => { const rg = g.createRadialGradient(256, 256, 30, 256, 256, 250);
     rg.addColorStop(0, 'rgba(255,40,70,.34)'); rg.addColorStop(.45, 'rgba(255,30,60,.16)'); rg.addColorStop(1, 'rgba(255,30,60,0)'); g.fillStyle = rg; g.fillRect(0, 0, 512, 512); });
