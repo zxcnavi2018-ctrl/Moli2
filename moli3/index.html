@@ -13,7 +13,7 @@ html,body{height:100%;overflow:hidden;background:#050a1f;color:#e8fbff;font-fami
 #vista{position:fixed;inset:0;overflow:hidden}
 
 /* Lo que Molí mira: carpetas */
-#c3d{position:absolute;inset:0;width:100%;height:100%;display:block}
+#aula{position:absolute;inset:0;width:100%;height:100%;display:block;background:#050a1f}
 /* cristal del visor: tinte y reflejo */
 #cristal{position:absolute;inset:0;pointer-events:none;background:
   linear-gradient(115deg,transparent 18%,rgba(255,255,255,.22) 24%,transparent 31%,transparent 62%,rgba(255,255,255,.12) 66%,transparent 70%),
@@ -70,10 +70,18 @@ body.alarma #borde{stroke:#ff5a6b;animation:latido 1.3s ease-in-out infinite}
 body.abierto .parpado.arr{transform:translateY(-106%)}
 body.abierto .parpado.aba{transform:translateY(106%)}
 
+/* Escenas del aula (abajo) */
+#escenas{position:absolute;left:50%;bottom:calc(4% + 4px);transform:translateX(-50%);display:flex;gap:8px;z-index:4;opacity:0;pointer-events:none;transition:opacity .5s}
+body.on #escenas{opacity:1;pointer-events:auto}
+#escenas button{font:800 clamp(12px,2vmin,17px) 'Baloo 2',sans-serif;color:#dffcff;background:rgba(8,20,48,.62);border:1px solid rgba(111,243,255,.55);border-radius:99px;padding:.25em 1em;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:.2s}
+#escenas button:hover{background:rgba(20,50,100,.75)}
+#escenas button.on{background:linear-gradient(#c8fdff,#41dcef);color:#03222a;box-shadow:0 0 14px rgba(111,243,255,.8)}
+#escenas button:disabled{opacity:.55;cursor:default}
+#encender:disabled{animation:none;opacity:.7;cursor:wait}
 /* Subtítulos */
-#sub{position:absolute;left:50%;bottom:12%;transform:translateX(-50%) translateY(10px);max-width:80vw;padding:.35em 1.1em;border-radius:16px;background:rgba(8,20,48,.68);border:1px solid rgba(111,243,255,.6);box-shadow:0 0 16px rgba(111,243,255,.35);color:#fff;font-size:clamp(16px,3vmin,28px);font-weight:800;opacity:0;transition:.3s;pointer-events:none;z-index:4;text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#sub{position:absolute;left:50%;bottom:calc(5% + clamp(80px,12vmin,110px));transform:translateX(-50%) translateY(10px);max-width:80vw;padding:.35em 1.1em;border-radius:16px;background:rgba(8,20,48,.68);border:1px solid rgba(111,243,255,.6);box-shadow:0 0 16px rgba(111,243,255,.35);color:#fff;font-size:clamp(16px,3vmin,28px);font-weight:800;opacity:0;transition:.3s;pointer-events:none;z-index:4;text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 #sub.ver{opacity:1;transform:translateX(-50%)}
-#pista{position:absolute;left:50%;bottom:4.5%;transform:translateX(-50%);font-size:clamp(13px,2.2vmin,20px);font-weight:800;color:#0b1438;background:rgba(255,255,255,.9);padding:.2em 1em;border-radius:99px;box-shadow:0 4px 14px rgba(20,40,80,.3);opacity:0;transition:opacity .4s;pointer-events:none;z-index:4;white-space:nowrap;animation:flota 1.4s ease-in-out infinite}
+#pista{position:absolute;left:50%;bottom:calc(4% + clamp(40px,6.5vmin,56px));transform:translateX(-50%);font-size:clamp(13px,2.2vmin,20px);font-weight:800;color:#0b1438;background:rgba(255,255,255,.9);padding:.2em 1em;border-radius:99px;box-shadow:0 4px 14px rgba(20,40,80,.3);opacity:0;transition:opacity .4s;pointer-events:none;z-index:4;white-space:nowrap;animation:flota 1.4s ease-in-out infinite}
 #pista.ver{opacity:1}
 @keyframes flota{50%{transform:translateX(-50%) translateY(-5px)}}
 
@@ -106,7 +114,7 @@ body.abierto .parpado.aba{transform:translateY(106%)}
 </head>
 <body>
 <div id="vista">
-  <canvas id="c3d" aria-label="Lo que ve Molí: carpetas sobre la mesa"></canvas>
+  <canvas id="aula" aria-label="El aula de ciencia vista desde los ojos de Molí"></canvas>
 
   <div id="cristal"></div><div id="grano"></div>
   <div id="peligro"><div class="rojo"></div>
@@ -119,7 +127,7 @@ body.abierto .parpado.aba{transform:translateY(106%)}
     <div class="chip" id="tit">MOLÍ 3 · VISIÓN</div>
     <div class="chip" id="est">INICIANDO…</div>
     <div class="mira"></div>
-    <div id="objetivo"><i></i><i></i><i></i><i></i><b>OBJETO: CARPETAS ×6</b></div>
+    <div id="objetivo"><i></i><i></i><i></i><i></i><b>OBJETO: AULA DE CIENCIA</b></div>
   </div>
 
   <div class="parpado arr"></div><div class="parpado aba"></div>
@@ -136,6 +144,7 @@ body.abierto .parpado.aba{transform:translateY(106%)}
     <path id="borde" fill="none" stroke="#6ff3ff" stroke-width="2.5" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 5px #5fd0ff)" d="M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/>
   </svg>
 
+  <nav id="escenas" aria-label="Escenas del aula"></nav>
   <div id="sub"></div>
   <div id="pista"></div>
   <div id="holo" role="dialog" aria-label="Mensaje">
@@ -151,21 +160,45 @@ body.abierto .parpado.aba{transform:translateY(106%)}
   <div class="ojos"><i></i><i></i></div>
   <h1>MOLÍ 3</h1>
   <p>Mira el mundo con los ojos de Molí 🤖</p>
-  <button id="encender">▶ Encender a Molí</button>
+  <button id="encender" disabled>⏳ Cargando el aula…</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="vision3d.js?v=202610211414"></script>
+<script src="aula3d.js?v=202610211742"></script>
+<script src="brazo3d.js?v=202610211742"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
 const esperar=ms=>new Promise(r=>setTimeout(r,ms));
-let V3=null;
-(document.fonts&&document.fonts.load?Promise.all([document.fonts.load('800 40px "Baloo 2"')]).catch(()=>0):Promise.resolve()).then(()=>{
-  try{V3=Vision3D(THREE,$("#c3d")); window.__hit=(x,y)=>V3.hit(x,y); window.__v3=V3}catch(e){console.error(e)}
-  const caja=()=>{if(!V3)return; const r=V3.caja(), o=$('#objetivo'); Object.assign(o.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'})};
-  caja(); setInterval(caja,120);
-});
+/* ---------- El aula futurista, vista desde los ojos de Molí ---------- */
+let A=null, BR=null, ESC=[], escI=0, volando=false;
+function conectar(){
+  try{ A=AulaMoli3(THREE,$('#aula')); BR=BrazoMoli(THREE,A.renderer,A.camera); window.__br=BR; }catch(e){ console.error(e); return; }
+  ESC=A.ESC;
+  const nav=$('#escenas'); nav.innerHTML='';
+  ESC.forEach((e,n)=>{ if(!n) return; const b=document.createElement('button'); b.type='button'; b.textContent=e.n; b.dataset.n=n;
+    b.addEventListener('click',ev=>{ ev.stopPropagation(); volar(n); }); nav.appendChild(b); });
+  const bucle=()=>{ try{ BR&&BR.update(); A.update(); }catch(e){ console.error(e) } requestAnimationFrame(bucle); };
+  bucle();
+  const bt=$('#encender'); bt.disabled=false; bt.textContent='▶ Encender a Molí';
+}
+(document.fonts&&document.fonts.load?Promise.all([document.fonts.load('800 40px "Baloo 2"'),document.fonts.load('800 40px Orbitron')]).catch(()=>0):Promise.resolve()).then(conectar);
+const pintarEsc=()=>[...$('#escenas').children].forEach(b=>{ b.classList.toggle('on',+b.dataset.n===escI); b.disabled=volando; });
+function estadoBase(){ estado(fase==='alarma'?'⚠ ALERTA':fase==='mensaje'?'📨 MENSAJE':fase==='listo'?'✔ TODO EN ORDEN':'ESCANEANDO…'); }
+async function volar(n){
+  const e=ESC[n]; if(volando||!A||!e||n===escI) return;
+  volando=true; escI=n; pintarEsc(); B.classList.remove('on'); estado('DESPLAZANDO…');
+  const p0=A.pos.clone(), l0=A.look.clone(), p1=e.from, l1=e.look, d=p0.distanceTo(p1), ms=Math.min(2600,1200+d*220);
+  zumbido(ms/1000);
+  const t0=performance.now();
+  await new Promise(res=>{ const paso=()=>{ const k=Math.min(1,(performance.now()-t0)/ms), q=k*k*(3-2*k);
+    A.pos.lerpVectors(p0,p1,q); A.pos.y+=Math.sin(Math.PI*q)*Math.min(.3,d*.05); A.look.lerpVectors(l0,l1,q); A.roll=Math.sin(Math.PI*q)*.03;
+    if(k<1) requestAnimationFrame(paso); else { A.roll=0; res(); } }; paso(); });
+  $('#objetivo b').textContent='OBJETO: '+e.obj;
+  volando=false; pintarEsc(); B.classList.add('on'); estadoBase();
+}
+addEventListener('keydown',e=>{ if(!B.classList.contains('on')&&!volando) return;
+  const n=ESC.length-1, i=Math.max(escI,1); if(e.key==='ArrowRight') volar(i%n+1); if(e.key==='ArrowLeft') volar((i-2+n)%n+1); });
 
 /* ---------- Sonidos ---------- */
 let AC, mezcla, alarmaGan, alarmaT=null;
@@ -190,6 +223,16 @@ function servo(dur=.38,f0=170,f1=420,vol=.16){
   o.connect(bp); o2.connect(g2); g2.connect(bp); bp.connect(g); g.connect(mezcla);
   o.start(t); o2.start(t); o.stop(t+dur+.02); o2.stop(t+dur+.02);
   clic(t+dur);
+}
+// motorcito suave mientras Molí se mueve por el aula
+function zumbido(dur){
+  if(!AC) return; const t=AC.currentTime;
+  const o=AC.createOscillator(), o2=AC.createOscillator(), g=AC.createGain(), lp=AC.createBiquadFilter();
+  o.type='sawtooth'; o.frequency.setValueAtTime(70,t); o.frequency.linearRampToValueAtTime(120,t+dur*.5); o.frequency.linearRampToValueAtTime(65,t+dur);
+  o2.type='sine'; o2.frequency.setValueAtTime(240,t); o2.frequency.linearRampToValueAtTime(320,t+dur*.5); o2.frequency.linearRampToValueAtTime(220,t+dur);
+  lp.type='lowpass'; lp.frequency.value=600;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.05,t+.25); g.gain.setValueAtTime(.05,t+dur-.3); g.gain.linearRampToValueAtTime(0,t+dur);
+  o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(mezcla); o.start(t); o2.start(t); o.stop(t+dur+.05); o2.stop(t+dur+.05);
 }
 function clic(t){
   if(!AC) return; t=t||AC.currentTime;
@@ -257,7 +300,9 @@ async function encender(){
   await esperar(300);
   await hablar('saludo','Saludos, usuario.');
   fase='mirando'; estado('ESCANEANDO…');
-  await esperar(3200);
+  await esperar(500);
+  await volar(1);
+  await esperar(2800);
   alertar();
 }
 function alertar(){
@@ -267,7 +312,7 @@ function alertar(){
 async function subirBrazo(){
   if(fase!=='alarma') return;
   fase='brazo'; pista('');
-  servo(1.5,110,380,.16); B.classList.add('brazo'); V3&&V3.brazo(true); V3&&V3.luz(true);
+  servo(1.5,110,380,.16); B.classList.add('brazo'); BR&&BR.brazo(true); BR&&BR.luz(true);
   await esperar(1500);
   await hablar('mensaje','Tienes un mensaje, usuario.');
   if(fase==='brazo') pista('👆 Toca la luz de mi brazo');
@@ -286,14 +331,16 @@ async function confirmar(e){
   B.classList.remove('alarma'); B.classList.add('ok'); estado('✔ TODO EN ORDEN');
   hablar('listo','Tarea confirmada. ¡Buen trabajo!');
   await esperar(700);
-  V3&&V3.luz(false); servo(1.5,380,120,.13); B.classList.remove('brazo'); V3&&V3.brazo(false);
+  BR&&BR.luz(false); servo(1.5,380,120,.13); B.classList.remove('brazo'); BR&&BR.brazo(false);
   await esperar(1600);
   await parpadear(true);
 }
 
 $('#encender').addEventListener('click',encender);
-$('#vista').addEventListener('click',e=>{ if(fase==='brazo'){ if(V3&&V3.hit(e.clientX,e.clientY)) abrirMensaje(e); } else subirBrazo(); });
-$('#vista').addEventListener('pointermove',e=>{ $('#vista').style.cursor=(fase==='alarma'||(fase==='brazo'&&V3&&V3.hit(e.clientX,e.clientY)))?'pointer':'default'; });
+const tocaLuz=e=>!!(BR&&BR.hit(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1));
+window.__hit=(x,y)=>tocaLuz({clientX:x,clientY:y});
+$('#vista').addEventListener('click',e=>{ if(fase==='brazo'){ if(tocaLuz(e)) abrirMensaje(e); } else subirBrazo(); });
+$('#vista').addEventListener('pointermove',e=>{ $('#vista').style.cursor=(fase==='alarma'||(fase==='brazo'&&tocaLuz(e)))?'pointer':'default'; });
 $('#ok').addEventListener('click',confirmar);
 $('#holo').addEventListener('click',e=>e.stopPropagation());
 })();
