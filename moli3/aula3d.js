@@ -258,7 +258,7 @@ function AulaMoli3(THREE, canvas) {
   addEventListener('resize', tam); tam();
   const t00 = performance.now() / 1000; let roll = 0, fovMas = 0;
   return {
-    renderer: R, camera: cam, pos, look, ESC, DIAS: DIAT.length,
+    renderer: R, camera: cam, pos, look, ESC, DIAS: DIAT.length, HOLO: { c: V(HB.x, 1.5, HB.z), w: 2.3, h: 1.265 },
     dia(n) { n = (n + DIAT.length) % DIAT.length; if (n === diaI && !diaCambio) return diaI; diaI = n; diaCambio = { t0: performance.now() }; return diaI; },
     get diaI() { return diaI; },
     set roll(v) { roll = v; }, set fov(v) { fovMas = v; },

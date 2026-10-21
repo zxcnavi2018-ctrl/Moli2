@@ -80,6 +80,9 @@ body.vuela #hud .mira{opacity:.15}
 #dias{position:absolute;left:50%;bottom:calc(4% + clamp(46px,7.5vmin,64px));transform:translateX(-50%);display:flex;align-items:center;gap:10px;z-index:4;opacity:0;pointer-events:none;transition:opacity .4s}
 body.holo #dias{opacity:1;pointer-events:auto}
 #dias button{font:800 clamp(16px,2.6vmin,22px) 'Baloo 2',sans-serif;width:2.2em;height:2.2em;border-radius:50%;color:#03222a;background:linear-gradient(#c8fdff,#41dcef);border:0;cursor:pointer;box-shadow:0 0 14px rgba(111,243,255,.7)}
+#dias span,#dias button{white-space:nowrap}
+@media (max-aspect-ratio:1/1){#dias{bottom:calc(4% + 96px)}}
+#dias .zm{width:auto;border-radius:99px;padding:0 1em;font-size:clamp(13px,2.2vmin,18px)}
 #dias span{font:800 clamp(13px,2.2vmin,18px) Orbitron,sans-serif;color:#dffcff;background:rgba(8,20,48,.62);border:1px solid rgba(111,243,255,.55);border-radius:99px;padding:.3em .9em;letter-spacing:.1em}
 body.holo #pista{display:none}
 /* Escenas del aula (abajo) */
@@ -157,7 +160,7 @@ body.on #escenas{opacity:1;pointer-events:auto}
   </svg>
 
   <div id="rayas"></div>
-  <div id="dias"><button type="button" data-d="-1">◀</button><span id="diaN">1 / 5</span><button type="button" data-d="1">▶</button></div>
+  <div id="dias"><button type="button" data-d="-1">◀</button><span id="diaN">1 / 5</span><button type="button" data-d="1">▶</button><button type="button" id="zoom" class="zm">🔍 Acercar</button></div>
   <nav id="escenas" aria-label="Escenas del aula"></nav>
   <div id="sub"></div>
   <div id="pista"></div>
@@ -178,8 +181,8 @@ body.on #escenas{opacity:1;pointer-events:auto}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="aula3d.js?v=202610212220"></script>
-<script src="brazo3d.js?v=202610212220"></script>
+<script src="aula3d.js?v=202610212223"></script>
+<script src="brazo3d.js?v=202610212223"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
@@ -206,6 +209,11 @@ const suave=k=>k<.5?16*k**5:1-(-2*k+2)**5/2;                       // arranque y
 const mirada=k=>k<.5?4*k**3:1-(-2*k+2)**3/2;
 async function volar(n){
   const e=ESC[n]; if(volando||!A||!e||n===escI) return;
+  zoomOn=false; $('#zoom').textContent='🔍 Acercar';
+  await vuelo(e,n);
+}
+let zoomOn=false;
+async function vuelo(e,n){
   volando=true; escI=n; pintarEsc(); B.classList.remove('on','holo'); B.classList.add('vuela'); estado('DESPLAZANDO…');
   const brazoArriba=B.classList.contains('brazo');
   if(brazoArriba){ BR&&BR.brazo(false); servo(1.2,380,120,.1); await esperar(1300); }
@@ -234,7 +242,7 @@ async function volar(n){
   $('#rayas').style.opacity=0; B.classList.remove('vuela');
   $('#objetivo b').textContent='OBJETO: '+e.obj;
   volando=false; pintarEsc(); B.classList.add('on'); estadoBase();
-  B.classList.toggle('holo',/HOLOGRAMA/.test(e.obj));
+  B.classList.toggle('holo',/HOLOGRAMA/.test(e.obj)||zoomOn);
   if(brazoArriba&&B.classList.contains('brazo')&&(fase==='brazo'||fase==='mensaje')){ BR&&BR.brazo(true); servo(1.4,110,380,.12); }
 }
 addEventListener('keydown',e=>{ if(!B.classList.contains('on')&&!volando) return;
@@ -390,7 +398,16 @@ window.__hit=(x,y)=>tocaLuz({clientX:x,clientY:y});
 $('#vista').addEventListener('click',e=>{ if(fase==='brazo'){ if(tocaLuz(e)) abrirMensaje(e); } else subirBrazo(); });
 $('#vista').addEventListener('pointermove',e=>{ $('#vista').style.cursor=(fase==='alarma'||(fase==='brazo'&&tocaLuz(e)))?'pointer':'default'; });
 $('#ok').addEventListener('click',confirmar);
-$('#dias').addEventListener('click',e=>{ e.stopPropagation(); const b=e.target.closest('button'); if(!b||!A) return; const n=A.dia(A.diaI+ +b.dataset.d); $('#diaN').textContent=(n+1)+' / '+A.DIAS; holoSon(); });
+// 🔍 zoom: Molí se acerca volando hasta que el holograma le llena la vista (y vuelve)
+async function acercar(on){
+  if(volando||!A||on===zoomOn) return; zoomOn=on; $('#zoom').textContent=on?'🔍 Alejar':'🔍 Acercar';
+  const H=A.HOLO, cam=A.camera, tf=Math.tan((cam.aspect<1?72:55)*Math.PI/360);
+  const d=Math.max(H.h/2/tf, H.w/2/(tf*cam.aspect))*1.1;
+  const e=on?{from:new THREE.Vector3(H.c.x,H.c.y,H.c.z+d),look:H.c.clone(),obj:'HOLOGRAMA (CERCA)'}:ESC[escI];
+  await vuelo(e,escI);
+}
+addEventListener('keydown',e=>{ if(!B.classList.contains('holo')) return; if(e.key==='+'||e.key==='=') acercar(true); if(e.key==='-') acercar(false); });
+$('#dias').addEventListener('click',e=>{ e.stopPropagation(); const b=e.target.closest('button'); if(!b||!A) return; if(b.id==='zoom'){ acercar(!zoomOn); return; } const n=A.dia(A.diaI+ +b.dataset.d); $('#diaN').textContent=(n+1)+' / '+A.DIAS; holoSon(); });
 $('#holo').addEventListener('click',e=>e.stopPropagation());
 })();
 </script>
