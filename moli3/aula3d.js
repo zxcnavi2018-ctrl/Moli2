@@ -185,16 +185,32 @@ function AulaMoli3(THREE, canvas) {
   const haz = new THREE.Mesh(new THREE.CylinderGeometry(0.98, 0.62, 2.1, 64, 1, true), new THREE.MeshBasicMaterial({ color: C(0x1aa7e0), alphaMap: conoTex, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
   haz.position.y = 1.2; hb.add(haz);
   // el holograma: panel flotante + átomo que gira
-  const holoP = lienzo(1600, 880, (g, w, h) => {
-    g.fillStyle = 'rgba(8,30,80,.72)'; rr(g, 10, 10, w - 20, h - 20, 50); g.fill();
+  // 5 diapositivas de ejemplo que se proyectan en el holograma
+  const marcoH = (g, w, h) => { g.fillStyle = 'rgba(8,30,80,.72)'; rr(g, 10, 10, w - 20, h - 20, 50); g.fill();
     g.strokeStyle = 'rgba(160,245,255,.95)'; g.lineWidth = 8; g.shadowColor = '#5fe3ff'; g.shadowBlur = 26; rr(g, 14, 14, w - 28, h - 28, 46); g.stroke();
-    g.shadowBlur = 0; g.fillStyle = 'rgba(160,245,255,.10)'; for (let y = 20; y < h; y += 8) g.fillRect(14, y, w - 28, 3);
-    g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = ORB(150); g.shadowColor = '#5fe3ff'; g.shadowBlur = 36; g.fillText('MOLÍ 3', w / 2, h / 2 - 10); g.shadowBlur = 0;
-    g.fillStyle = '#c8fbff'; g.font = F(700, 64); g.fillText('Aula de Ciencia y Tecnología', w / 2, h / 2 + 100);
-    g.fillStyle = 'rgba(200,251,255,.85)'; g.font = ORB(32); g.fillText('6.° GRADO · INNOVA SCHOOLS', w / 2, h - 80); });
-  const panelH = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.99), new THREE.MeshBasicMaterial({ map: holoP, transparent: true, opacity: 0.92, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
-  panelH.position.y = 1.45; hb.add(panelH);
-  const atomo = new THREE.Group(); atomo.position.y = 2.28; hb.add(atomo);
+    g.shadowBlur = 0; g.fillStyle = 'rgba(160,245,255,.08)'; for (let y = 20; y < h; y += 8) g.fillRect(14, y, w - 28, 3); g.textAlign = 'center'; };
+  const titulo = (g, w, t, y = 150) => { g.fillStyle = '#9ff0ff'; g.font = ORB(56); g.shadowColor = '#5fe3ff'; g.shadowBlur = 20; g.fillText(t, w / 2, y); g.shadowBlur = 0; g.fillStyle = '#5fe3ff'; g.fillRect(w / 2 - 120, y + 26, 240, 6); };
+  const lista = (g, xs, y0, items, px = 58, dy = 120) => { g.textAlign = 'left'; items.forEach((t, k) => { const y = y0 + k * dy;
+    g.fillStyle = 'rgba(95,227,255,.16)'; rr(g, xs - 30, y - 62, 1600 - 2 * (xs - 30), 92, 24); g.fill(); g.fillStyle = '#ffffff'; cabe(g, t, xs, y, 1600 - 2 * xs, 700, px); }); g.textAlign = 'center'; };
+  const DIAS = [
+    (g, w, h) => { marcoH(g, w, h); g.fillStyle = 'rgba(200,251,255,.85)'; g.font = ORB(40); g.fillText('UNIDAD 7', w / 2, 200);
+      g.fillStyle = '#ffffff'; g.font = F(800, 120); g.shadowColor = '#5fe3ff'; g.shadowBlur = 30; g.fillText('Microorganismos', w / 2, 400); g.fillText('en acción', w / 2, 540); g.shadowBlur = 0;
+      g.font = '110px sans-serif'; g.fillText('🦠  🍄  🔬', w / 2, 730); },
+    (g, w, h) => { marcoH(g, w, h); titulo(g, w, '🎯 META DE LA SESIÓN');
+      g.fillStyle = '#ffffff'; g.font = F(700, 64); ['Identificar microorganismos', 'beneficiosos y dañinos', 'en nuestra vida diaria.'].forEach((t, k) => g.fillText(t, w / 2, 380 + k * 100)); },
+    (g, w, h) => { marcoH(g, w, h); titulo(g, w, '✅ CRITERIOS DE ÉXITO'); lista(g, 170, 340, ['1. Nombro 3 tipos de microorganismos.', '2. Doy un ejemplo útil y uno dañino.', '3. Explico cómo prevenir enfermedades.']); },
+    (g, w, h) => { marcoH(g, w, h); titulo(g, w, '🔬 ¿QUÉ SON?');
+      [['🦠', 'Bacterias'], ['🧫', 'Virus'], ['🍄', 'Hongos']].forEach(([e, t], k) => { const x = w / 2 + (k - 1) * 460;
+        g.fillStyle = 'rgba(95,227,255,.16)'; rr(g, x - 190, 280, 380, 420, 40); g.fill(); g.strokeStyle = 'rgba(160,245,255,.8)'; g.lineWidth = 4; rr(g, x - 190, 280, 380, 420, 40); g.stroke();
+        g.font = '150px sans-serif'; g.fillStyle = '#fff'; g.fillText(e, x, 480); g.font = F(800, 62); g.fillText(t, x, 620); }); },
+    (g, w, h) => { marcoH(g, w, h); titulo(g, w, '🚀 RETO DEL DÍA');
+      g.fillStyle = '#ffffff'; g.font = F(700, 66); ['En equipo, diseñen un afiche', 'para prevenir enfermedades', 'causadas por microorganismos.'].forEach((t, k) => g.fillText(t, w / 2, 370 + k * 100));
+      g.fillStyle = 'rgba(200,251,255,.85)'; g.font = ORB(36); g.fillText('⏱ 15 MINUTOS', w / 2, 760); }
+  ];
+  const DIAT = DIAS.map(f => lienzo(1600, 880, f)), holoP = DIAT[0]; let diaI = 0, diaCambio = null;
+  const panelH = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 1.265), new THREE.MeshBasicMaterial({ map: holoP, transparent: true, opacity: 0.92, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+  panelH.position.y = 1.5; hb.add(panelH);
+  const atomo = new THREE.Group(); atomo.position.y = 2.52; hb.add(atomo);
   const nucleo = new THREE.Mesh(new THREE.SphereGeometry(0.06, 24, 16), LUZ(0x22c3e6, 1.3)); atomo.add(nucleo);
   const orbM = new THREE.MeshBasicMaterial({ color: C(0x0ea5e9), transparent: true, opacity: 0.95, depthWrite: false, toneMapped: false });
   const ORB3 = [0, 1, 2].map(k => { const o = new THREE.Group(); o.rotation.set(Math.PI / 2 + 0.25, k * Math.PI / 3, 0); atomo.add(o);
@@ -211,7 +227,11 @@ function AulaMoli3(THREE, canvas) {
     for (let k = 0; k < NP; k++) { const [u, a, r, f] = sem[k], d = (u + t * 0.06) % 1, rad = (0.95 - 0.35 * d) * r, an = a + t * 0.25;
       pp[k * 3] = HB.x + Math.cos(an) * rad; pp[k * 3 + 1] = 0.17 + d * 2.1; pp[k * 3 + 2] = HB.z + Math.sin(an) * rad; }
     pg.attributes.position.needsUpdate = true;
-    panelH.position.y = 1.45 + Math.sin(t * 1.1) * 0.02; panelH.material.opacity = 0.88 + Math.sin(t * 7) * 0.04 + (Math.random() < 0.02 ? -0.25 : 0);
+    if (diaCambio) { const k = Math.min(1, (performance.now() - diaCambio.t0) / 650);
+      if (k < 0.4) { const q = k / 0.4; panelH.scale.set(1 + q * 0.04, Math.max(0.02, 1 - q * q), 1); }
+      else { if (panelH.material.map !== DIAT[diaI]) { panelH.material.map = DIAT[diaI]; panelH.material.needsUpdate = true; } const q = (k - 0.4) / 0.6, e = 1 - Math.pow(1 - q, 3); panelH.scale.set(1.04 - 0.04 * e, 0.02 + 0.98 * e + Math.sin(q * Math.PI) * 0.05, 1); }
+      if (k >= 1) { panelH.scale.set(1, 1, 1); diaCambio = null; } }
+    panelH.position.y = 1.5 + Math.sin(t * 1.1) * 0.02; panelH.material.opacity = 0.88 + Math.sin(t * 7) * 0.04 + (Math.random() < 0.02 ? -0.25 : 0);
     atomo.rotation.y = t * 0.5; ORB3.forEach(q => { q.o.rotation.z = t * 1.4 + q.f; const an = t * 2.6 + q.f; q.e.position.set(Math.cos(an) * 0.24, Math.sin(an) * 0.24 * 0.42, 0); });
     red.rotation.x = t * 0.2; nucleo.scale.setScalar(1 + Math.sin(t * 3) * 0.08); };
   // sombritas de contacto bajo mesas y sillas (más realista)
@@ -238,7 +258,9 @@ function AulaMoli3(THREE, canvas) {
   addEventListener('resize', tam); tam();
   const t00 = performance.now() / 1000; let roll = 0, fovMas = 0;
   return {
-    renderer: R, camera: cam, pos, look, ESC,
+    renderer: R, camera: cam, pos, look, ESC, DIAS: DIAT.length,
+    dia(n) { n = (n + DIAT.length) % DIAT.length; if (n === diaI && !diaCambio) return diaI; diaI = n; diaCambio = { t0: performance.now() }; return diaI; },
+    get diaI() { return diaI; },
     set roll(v) { roll = v; }, set fov(v) { fovMas = v; },
     update() {
       const t = performance.now() / 1000 - t00;
