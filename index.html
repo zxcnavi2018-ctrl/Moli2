@@ -69,6 +69,8 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #dots button { flex: none; width: auto; height: auto; border: 0; border-radius: 999px; padding: 7px 13px; background: transparent; color: #1e3a8a; font: 900 14px "Trebuchet MS", system-ui, sans-serif; white-space: nowrap; box-shadow: none; cursor: pointer; transition: background .2s, color .2s; }
   #dots button:hover { background: #fff1e6; }
   #dots button.on { background: linear-gradient(180deg, #ffb15c, #ff7a2f); color: #fff; box-shadow: 0 2px 0 #c2410c; }
+  #dots button[hidden] { display: none; } #dots button .ojo { margin-left: 5px; padding: 1px 3px; border-radius: 8px; font-style: normal; font-size: 13px; cursor: pointer; opacity: .75; } #dots button .ojo:hover { opacity: 1; background: rgba(255,255,255,.7); } #dots button .ojo[hidden] { display: none; }
+  #dots button.oculta { opacity: .5; text-decoration: line-through; } #dots button.oculta .ojo { opacity: 1; text-decoration: none; display: inline-block; }
   #dots button:active { transform: none; }
   body.tut #dots button { pointer-events: none; }
   @media (max-width: 700px) { #dots button { padding: 6px 10px; font-size: 12px; } #stopName { max-width: calc(100vw - 120px); } }
@@ -185,10 +187,10 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hojas.css?v=202610210239">
+<link rel="stylesheet" href="hojas.css?v=202610211219">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610210239"></script><script src="sincro.js?v=202610210239"></script><script src="guion.js?v=202610210239"></script><script src="datos.js?v=202610210239"></script><script src="docente.js?v=202610210239"></script>
-<script src="hojas.js?v=202610210239"></script><script src="hojas-docente.js?v=202610210239"></script><script src="diplomas.js?v=202610210239"></script><script src="fotocheck.js?v=202610210239"></script><script src="herramientas.js?v=202610210239"></script><script src="remoto.js?v=202610210239"></script><script src="escaner.js?v=202610210239"></script><script src="tarjetas.js?v=202610210239"></script>
+<script src="moli3d.js?v=202610211219"></script><script src="sincro.js?v=202610211219"></script><script src="guion.js?v=202610211219"></script><script src="datos.js?v=202610211219"></script><script src="docente.js?v=202610211219"></script>
+<script src="hojas.js?v=202610211219"></script><script src="hojas-docente.js?v=202610211219"></script><script src="diplomas.js?v=202610211219"></script><script src="fotocheck.js?v=202610211219"></script><script src="herramientas.js?v=202610211219"></script><script src="remoto.js?v=202610211219"></script><script src="escaner.js?v=202610211219"></script><script src="tarjetas.js?v=202610211219"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -317,7 +319,7 @@ scene.background = new THREE.Color(SKY_HORIZON);
 scene.fog = new THREE.Fog(SKY_HORIZON, 28, 95);                       // neblina suave: lo lejano se ve borroso
 const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 500);
 camera.rotation.order = 'YXZ';
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: !isTouch0 || devicePixelRatio < 2, powerPreference: 'high-performance' });   // ⚡ en celulares con pantalla fina no hace falta suavizar bordes (va más fluido); en laptops usa la tarjeta gráfica rápida
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch0 ? 1.5 : 2));   // en celular, un poco menos de resolución: más fluido
 const SHADOWS = !isTouch0 || /[?&]sombras/.test(location.search);       // en celulares van desactivadas (manchas negras); ?sombras las activa
@@ -2018,7 +2020,7 @@ const afterRender = [];                                              // lo que s
 let nLoop = 0;
 function loop(now) {
   requestAnimationFrame(loop);
-  const tapado = document.body.classList.contains('open'); if (tapado && nLoop++ % 2) return;   // con una hoja abierta, el salón de fondo se dibuja a la mitad
+  const tapado = document.body.classList.contains('open'); if (tapado && nLoop++ % (document.body.classList.contains('jugando') ? 30 : 3)) return;   // con una hoja abierta, el salón de fondo se dibuja menos (con un juego en pantalla, casi nada)
 
   const dt = Math.max(0, (now - last) / 1000); last = now;
   if (P.started && dt < 1 && !tapado) autoQuality(dt);
@@ -2384,9 +2386,17 @@ let baseFov = 55;
 function setFov() { baseFov = portrait() ? 70 : 55; camera.fov = baseFov; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize', () => { setFov(); if (!TOUR.busy) TOUR.pos.copy(fromOf(STOPS[TOUR.i])); if (sheet.style.display === 'block') place(bigRect(SHEETS[sheet.dataset.kind].ar, SHEETS[sheet.dataset.kind].big)); });
 const dotsEl = document.getElementById('dots');
+// 👁️ la docente oculta escenas: los estudiantes no ven su botón y las flechas las saltan (el Aula nunca se oculta)
+const escOculta = i => !!(i && window.Candados && STOPS[i] && Candados.escena(STOPS[i]._k));
+const escSalta = i => escOculta(i) && !MD.esDocente();
+function pintarEscenas() { [...dotsEl.children].forEach((b, i) => { const oc = escOculta(i); b.classList.toggle('oculta', oc); b.hidden = oc && !MD.esDocente(); const o = b.querySelector('.ojo'); if (o) { o.hidden = !MD.esDocente(); o.textContent = oc ? '🙈' : '👁️'; o.title = oc ? 'Oculta para los estudiantes: toca para mostrarla' : 'Visible para los estudiantes: toca para ocultarla'; } });
+  if (escSalta(TOUR.i) && !TOUR.busy) go(-TOUR.i); }
+addEventListener('moli2:candados', () => pintarEscenas()); setTimeout(pintarEscenas, 0);
+dotsEl.addEventListener('click', e => { const o = e.target.closest('.ojo'); if (!o) return; e.stopPropagation(); e.preventDefault(); if (MD.esDocente() && window.Candados) Candados.cambiarEscena(o.dataset.ojo); }, true);
 STOPS.forEach((st, k) => { const b = document.createElement('button'); b.type = 'button'; const CHIP = { profesor: 'Mis notas', aula: 'Aula', mesa: 'Sesiones', locker: 'Tickets', biblio: 'Juegos', laptop: 'Laptop', corcho: 'Corcho', muro: 'Producto', misiones: 'Misiones', diplomas: 'Mis diplomas', presentaci: 'Presentación' };
   const ic = (st.name.match(/^\S+/) || [''])[0], low = st.name.toLowerCase(), key = Object.keys(CHIP).find(k => low.includes(k) || (k === 'biblio' && st.kind === 'biblio'));
-  b.textContent = key ? ic + ' ' + CHIP[key] : st.name.replace(/^(\S+)\s+(El |La |Mi |Mis )/, '$1 '); b.title = st.title || st.name;
+  b.textContent = key ? ic + ' ' + CHIP[key] : st.name.replace(/^(\S+)\s+(El |La |Mi |Mis )/, '$1 '); b.title = st.title || st.name; st._k = key || 'k' + k; b.dataset.esc = st._k;
+  if (k) { const o = document.createElement('i'); o.className = 'ojo'; o.dataset.ojo = st._k; b.appendChild(o); }
   b.addEventListener('click', e => { e.stopPropagation(); if (document.body.classList.contains('tut')) return; if (TOUR.busy) { TOUR.q = k - TOUR.i; PRISA = true; if (MO.talking) MO.talking.skip(); return; } if (k !== TOUR.i) go(k - TOUR.i); }); dotsEl.appendChild(b); });
 const titleEl = document.getElementById('title'); let titleT = 0, titleT2 = 0, titleGate = Promise.resolve(), titleOpen = () => {};
 function showTitle(text, n) {                                       // nombre de la escena: franja, "ESCENA n", título grande con líneas doradas; luego se desvanece
@@ -2412,7 +2422,8 @@ async function go(dir) {
   TOUR.busy = true;
   try {
     const cur = STOPS[TOUR.i]; hideTitle(); if (cur.leave && cur.abierto) { cur.abierto = false; await cur.leave(); }
-    TOUR.i = (TOUR.i + dir + STOPS.length) % STOPS.length; showStop();
+    let ni = (TOUR.i + dir + STOPS.length) % STOPS.length; for (let q = 0, sg = Math.sign(dir) || 1; q < STOPS.length && escSalta(ni); q++) ni = (ni + sg + STOPS.length) % STOPS.length;   // salta las escenas ocultas
+    TOUR.i = ni; showStop();
     const st = STOPS[TOUR.i]; if (MO.tut) moliIr(st, Math.min(2000, 900 + TOUR.pos.distanceTo(fromOf(st)) * 150) * 1.08); await fly(st, dir); if (TOUR.q && !MO.tut) throw 'prisa'; if (!MO.tut && TOUR.i === 0) { const home = spotFor(STOPS[0]).pos; if (home.distanceTo(MO.target) > 0.3) moliIr(STOPS[0], 1400); moli.accion('saludar', -1); } if (st.title) showTitle(st.title, TOUR.i);
     if (TOUR.i === 0) setTimeout(() => Foto.mostrar(TOUR.i === 0), 700);   // el fotocheck cuelga sólo en «Mi aula»
     if (st.enter) { const k = TOUR.i, tut = MO.tut; await st.enter(); st.abierto = true;
@@ -2740,7 +2751,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202610210239"></script><script src="corcho.js?v=202610210239"></script><script src="mando.js?v=202610210239"></script><script src="anuncio.js?v=202610210239"></script><script src="muro.js?v=202610210239"></script><script src="comunicado.js?v=202610210239"></script>
-<script src="archivos.js?v=202610210239"></script><script src="editor.js?v=202610210239"></script>
+<script src="revista.js?v=202610211219"></script><script src="corcho.js?v=202610211219"></script><script src="mando.js?v=202610211219"></script><script src="anuncio.js?v=202610211219"></script><script src="muro.js?v=202610211219"></script><script src="comunicado.js?v=202610211219"></script>
+<script src="archivos.js?v=202610211219"></script><script src="editor.js?v=202610211219"></script>
 </body>
 </html>

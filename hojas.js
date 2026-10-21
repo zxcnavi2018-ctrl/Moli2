@@ -6,25 +6,26 @@
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const L = t => MD.lleno(t);
   // ---- 🔒 candados de la docente: bloquea una unidad entera o una sesión (cuaderno, Exit tickets y misiones). Se guarda en files/fbloq-0 ----
-  const BQ = { u: {}, s: {}, j: {} }, BQF = MD.fid('fbloq'), LIBROS = [];
+  const BQ = { u: {}, s: {}, j: {}, e: {} }, BQF = MD.fid('fbloq'), LIBROS = [];
   const BQURL = () => `https://firestore.googleapis.com/v1/projects/${MD.FB.projectId}/databases/(default)/documents/files/${BQF}?key=${MD.FB.apiKey}`;
   const bqOn = (k, n) => n == null ? !!BQ.u[k] : !!BQ.s[k + ':' + n];
   const cerrado = (k, n) => !MD.esDocente() && (!!BQ.u[k] || (n != null && !!BQ.s[k + ':' + n]));     // sólo los estudiantes ven el candado cerrado
   const lk = (k, n) => MD.esDocente() ? `<span class="lk${bqOn(k, n) ? ' on' : ''}" data-a="candado" data-k="${esc(k)}"${n == null ? '' : ` data-n="${n}"`} title="${bqOn(k, n) ? 'Bloqueado: toca para desbloquear' : 'Abierto: toca para bloquear'}">${bqOn(k, n) ? '🔒' : '🔓'}</span>` : '';
   const repintar = () => { LIBROS.forEach(b => { if (!b.ocupado && document.body.contains(b.el || document.body)) b.pinta(false); }); dispatchEvent(new Event('moli2:candados')); };
   fetch(BQURL(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue; if (!v) return;
-    const x = JSON.parse(decodeURIComponent(escape(atob(v)))); BQ.u = x.u || {}; BQ.s = x.s || {}; BQ.j = x.j || {}; repintar(); }).catch(() => {});
+    const x = JSON.parse(decodeURIComponent(escape(atob(v)))); BQ.u = x.u || {}; BQ.s = x.s || {}; BQ.j = x.j || {}; BQ.e = x.e || {}; repintar(); }).catch(() => {});
   async function candado(ds) {
-    const key = ds.j != null ? ds.j : ds.n == null ? ds.k : ds.k + ':' + ds.n, M = ds.j != null ? BQ.j : ds.n == null ? BQ.u : BQ.s, tenia = key in M, prev = M[key], antes = ds.j != null ? juegoBq(key) : !!M[key];
+    if (ds.e != null) ds = { j: ds.e, _e: 1 };                          // 👁️ escenas: igual que los juegos, pero en BQ.e
+    const key = ds.j != null ? ds.j : ds.n == null ? ds.k : ds.k + ':' + ds.n, M = ds._e ? BQ.e : ds.j != null ? BQ.j : ds.n == null ? BQ.u : BQ.s, tenia = key in M, prev = M[key], antes = ds._e ? !!BQ.e[key] : ds.j != null ? juegoBq(key) : !!M[key];
     if (ds.j != null) M[key] = !antes; else if (antes) delete M[key]; else M[key] = true; repintar();
     try { if (!window.Docente || !await Docente.token()) throw new Error('AUTH');
-      await Docente.commit([{ update: { name: Docente.DOC('files', BQF), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, u: BQ.u, s: BQ.s, j: BQ.j, at: Date.now() })))), updatedAt: new Date() }) } }]);
+      await Docente.commit([{ update: { name: Docente.DOC('files', BQF), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, u: BQ.u, s: BQ.s, j: BQ.j, e: BQ.e, at: Date.now() })))), updatedAt: new Date() }) } }]);
     } catch (e) { if (ds.j != null) { if (tenia) M[key] = prev; else delete M[key]; } else if (antes) M[key] = true; else delete M[key]; repintar();
       alert(e.message === 'AUTH' ? '🔐 Conecta tu cuenta: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No se pudo guardar el candado. Revisa tu internet.'); }
   }
   const ABIERTOS = ['enfermedades.html', 'enfermedades2.html'];         // juegos abiertos para los niños si la docente no dice otra cosa (los demás, con candado)
   const juegoBq = f => f in BQ.j ? !!BQ.j[f] : !ABIERTOS.includes(f);
-  window.Candados = { juego: juegoBq, cambiarJuego: f => candado({ j: f }) };   // 🔒 juegos de la Biblioteca de Temas que la docente bloquea
+  window.Candados = { juego: juegoBq, cambiarJuego: f => candado({ j: f }), escena: k => !!BQ.e[k], cambiarEscena: k => candado({ e: k }) };   // 👁️ escenas que la docente oculta a los estudiantes   // 🔒 juegos de la Biblioteca de Temas que la docente bloquea
   const mezcla = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const nom1 = me => String(me && me.name || '').split(' ')[0].toLowerCase().replace(/^./, c => c.toUpperCase());
   const MODOS = { individual: '👤 Individual', group: '👥 En equipo', grupo: '👥 En equipo', pair: '👫 En pareja', pairs: '👫 En pareja', pareja: '👫 En pareja', whole: '🏫 Toda la clase', clase: '🏫 Toda la clase' };
