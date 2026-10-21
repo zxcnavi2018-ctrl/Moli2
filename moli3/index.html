@@ -52,14 +52,16 @@ body.alarma .chip{border-color:#ff8b97;color:#ffc2c8;box-shadow:0 0 12px rgba(25
 body.alarma #borde{stroke:#ff5a6b;animation:latido 1.3s ease-in-out infinite}
 
 /* Brazo de Molí (blanco, redondito, 3 deditos) */
-#brazo{position:absolute;left:5%;bottom:0;height:82%;aspect-ratio:420/720;transform-origin:50% 100%;transform:translateY(95%) rotate(-30deg);transition:transform 1.1s cubic-bezier(.2,.9,.25,1.12);pointer-events:none;filter:drop-shadow(8px 14px 18px rgba(20,40,80,.35))}
+#brazo{position:absolute;left:calc(6vw + 2vmin);bottom:-6vmin;width:60vmin;aspect-ratio:440/280;transform-origin:12% 60%;transform:translate(-30%,95%) rotate(-12deg);transition:transform 1.1s cubic-bezier(.2,.9,.25,1.12);pointer-events:none;filter:drop-shadow(8px 14px 16px rgba(20,40,80,.35))}
 #brazo svg{width:100%;height:100%;overflow:visible}
-body.brazo #brazo{transform:translateY(-4%) rotate(13deg)}
+body.brazo #brazo{transform:rotate(-36deg)}
 body.bajando #brazo{transition:transform .9s cubic-bezier(.55,0,.8,.4)}
 #luz{cursor:pointer;pointer-events:auto}
 #luz .parp{animation:luzOn .55s steps(2) infinite}
 body.ok #luz .parp{animation:none;opacity:0}
-body.ok #luz .tri{fill:#6b7d99}
+body.ok #luz .tri{stroke:#8a94a6;filter:none}
+body.ok #luz .exc{fill:#8a94a6}
+body.ok #codoLuz{stroke:#8a94a6;filter:none}
 @keyframes luzOn{0%{opacity:1}100%{opacity:.2}}
 
 /* Marco del visor: casco blanco */
@@ -115,48 +117,47 @@ body.abierto .parpado.aba{transform:translateY(106%)}
   <div id="escena"><svg id="cuarto" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-label="Un grupo de carpetas sobre la mesa"></svg></div>
 
   <div id="brazo">
-    <svg viewBox="0 0 420 720" aria-hidden="true">
+    <svg viewBox="0 0 440 280" aria-hidden="true">
       <defs>
-        <linearGradient id="gBlanco" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#f6f8fb"/><stop offset=".8" stop-color="#dfe5ee"/><stop offset="1" stop-color="#c3ccda"/></linearGradient>
-        <radialGradient id="gDedo" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#eef2f7"/><stop offset="1" stop-color="#c7d0dd"/></radialGradient>
-        <radialGradient id="gPalma" cx=".38" cy=".32" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset=".65" stop-color="#edf1f6"/><stop offset="1" stop-color="#c3ccda"/></radialGradient>
-        <linearGradient id="gJunta" x1="0" x2="1"><stop offset="0" stop-color="#cfd6e1"/><stop offset="1" stop-color="#8e99ab"/></linearGradient>
-        <radialGradient id="gVidrio" cx=".4" cy=".3" r=".9"><stop offset="0" stop-color="#26346e"/><stop offset="1" stop-color="#070d27"/></radialGradient>
-        <radialGradient id="gBrillo"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".45" stop-color="#ff9d2a" stop-opacity=".9"/><stop offset="1" stop-color="#ff3b4e" stop-opacity="0"/></radialGradient>
+        <linearGradient id="gBlanco" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#f4f6fa"/><stop offset=".85" stop-color="#d3dae5"/><stop offset="1" stop-color="#b9c3d2"/></linearGradient>
+        <linearGradient id="gNavy" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3a52a8"/><stop offset=".5" stop-color="#16246a"/><stop offset="1" stop-color="#0b1438"/></linearGradient>
+        <linearGradient id="gCodo" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2b3448"/><stop offset="1" stop-color="#0d121f"/></linearGradient>
+        <filter id="neon" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
-      <!-- antebrazo: tubo suave y gordito -->
-      <path d="M104 770 C 100 610 122 480 142 392 C 154 346 266 346 278 392 C 298 480 320 610 316 770 Z" fill="url(#gBlanco)"/>
-      <path d="M124 750 C 122 610 140 490 158 404" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" opacity=".9"/>
-      <path d="M118 650 C 176 672 246 672 304 650" fill="none" stroke="#b8c2d1" stroke-width="4" stroke-linecap="round"/>
-      <!-- muñeca: articulación redonda -->
-      <ellipse cx="210" cy="372" rx="72" ry="30" fill="url(#gJunta)"/>
-      <g transform="translate(0 52)">
-      <!-- 3 deditos gorditos y separados -->
+      <!-- brazo de arriba (sale de abajo, fuera de la vista) -->
+      <path d="M-260 96 H40 Q58 96 58 116 V214 Q58 234 40 234 H-260 Z" fill="url(#gBlanco)"/>
+      <path d="M-260 106 H34" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".9"/>
+      <!-- codo oscuro con lucecita roja -->
+      <path d="M44 108 Q74 96 92 104 V226 Q74 236 44 226 Z" fill="url(#gCodo)"/>
+      <circle id="codoLuz" cx="66" cy="200" r="9" fill="none" stroke="#ff2b3b" stroke-width="4" filter="url(#neon)"/>
+      <!-- antebrazo cortito y abultado -->
+      <path d="M84 92 C 140 52 250 44 300 66 C 346 86 350 196 300 220 C 250 244 140 238 84 210 C 70 180 70 122 84 92 Z" fill="url(#gBlanco)"/>
+      <path d="M104 86 C 160 58 240 54 290 70" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+      <path d="M230 54 C 214 100 214 190 232 236" fill="none" stroke="#b3bdcc" stroke-width="3"/>
+      <path d="M92 196 C 150 222 240 226 300 210" fill="none" stroke="#c3ccda" stroke-width="3"/>
+      <!-- muñeca -->
+      <path d="M316 92 Q350 96 352 156 Q350 214 316 220 Q332 156 316 92 Z" fill="url(#gBlanco)" stroke="#b3bdcc" stroke-width="3"/>
+      <!-- 3 deditos azules separados -->
       <g>
-        <g transform="rotate(-38 210 250)"><rect x="176" y="64" width="68" height="130" rx="34" fill="url(#gDedo)"/><path d="M186 120 Q210 110 234 120" fill="none" stroke="#b8c2d1" stroke-width="4" stroke-linecap="round"/><ellipse cx="200" cy="86" rx="12" ry="8" fill="#fff"/></g>
-        <g><rect x="176" y="44" width="68" height="140" rx="34" fill="url(#gDedo)"/><path d="M186 104 Q210 94 234 104" fill="none" stroke="#b8c2d1" stroke-width="4" stroke-linecap="round"/><ellipse cx="200" cy="66" rx="12" ry="8" fill="#fff"/></g>
-        <g transform="rotate(38 210 250)"><rect x="176" y="64" width="68" height="130" rx="34" fill="url(#gDedo)"/><path d="M186 120 Q210 110 234 120" fill="none" stroke="#b8c2d1" stroke-width="4" stroke-linecap="round"/><ellipse cx="200" cy="86" rx="12" ry="8" fill="#fff"/></g>
+        <ellipse cx="384" cy="104" rx="40" ry="17" fill="url(#gNavy)" transform="rotate(-18 384 104)"/>
+        <ellipse cx="394" cy="158" rx="42" ry="17" fill="url(#gNavy)"/>
+        <ellipse cx="384" cy="212" rx="40" ry="17" fill="url(#gNavy)" transform="rotate(18 384 212)"/>
+        <ellipse cx="378" cy="98" rx="18" ry="5" fill="#fff" opacity=".45" transform="rotate(-18 378 98)"/>
+        <ellipse cx="388" cy="152" rx="19" ry="5" fill="#fff" opacity=".45"/>
+        <ellipse cx="378" cy="206" rx="18" ry="5" fill="#fff" opacity=".45" transform="rotate(18 378 206)"/>
       </g>
-      <!-- palma redondita -->
-      <path d="M112 262 C 100 196 146 160 210 158 C 274 160 320 196 308 262 C 296 330 124 330 112 262 Z" fill="url(#gPalma)"/>
-      <ellipse cx="176" cy="200" rx="40" ry="15" fill="#fff" opacity=".95"/>
-      <path d="M140 300 Q210 318 280 300" fill="none" stroke="#c3ccda" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="210" cy="252" r="11" fill="#5fd0ff" style="filter:drop-shadow(0 0 7px #5fd0ff)"/>
-      </g>
-      <!-- luz de peligro triangular en el antebrazo -->
+      <!-- luz de peligro triangular -->
       <g id="luz" role="button" aria-label="Luz de mensaje">
-        <circle cx="210" cy="510" r="130" fill="transparent"/>
-        <circle class="parp" cx="210" cy="512" r="118" fill="url(#gBrillo)"/>
-        <g class="parp" stroke="#ffcf3f" stroke-width="10" stroke-linecap="round">
-          <path d="M210 404 L210 378"/><path d="M128 440 L104 422"/><path d="M292 440 L316 422"/>
-          <path d="M112 540 L84 552"/><path d="M308 540 L336 552"/>
+        <circle cx="170" cy="148" r="80" fill="transparent"/>
+        <circle class="parp" cx="170" cy="148" r="62" fill="#ff2b3b" opacity=".18" filter="url(#neon)"/>
+        <g class="parp" stroke="#ff2b3b" stroke-width="4" stroke-linecap="round" filter="url(#neon)">
+          <path d="M170 92 V76"/><path d="M128 106 L116 94"/><path d="M212 106 L224 94"/>
+          <path d="M112 162 H96"/><path d="M228 162 H244"/><path d="M134 196 L122 208"/><path d="M206 196 L218 208"/>
         </g>
-        <ellipse cx="210" cy="512" rx="74" ry="66" fill="url(#gVidrio)" stroke="#aab4c4" stroke-width="6"/>
-        <path class="tri" d="M210 462 Q216 462 220 469 L254 530 Q258 540 248 540 H172 Q162 540 166 530 L200 469 Q204 462 210 462Z" fill="#ffb020"/>
-        <path class="parp" d="M210 462 Q216 462 220 469 L254 530 Q258 540 248 540 H172 Q162 540 166 530 L200 469 Q204 462 210 462Z" fill="#ffe27a" style="filter:drop-shadow(0 0 10px #ff9d2a)"/>
-        <rect x="204" y="484" width="12" height="32" rx="6" fill="#5a1d00"/>
-        <circle cx="210" cy="527" r="6.5" fill="#5a1d00"/>
-        <ellipse cx="186" cy="478" rx="22" ry="9" fill="#fff" opacity=".18"/>
+        <path d="M170 100 Q178 100 182 108 L212 170 Q216 182 202 182 H138 Q124 182 128 170 L158 108 Q162 100 170 100 Z" fill="#141a2a" stroke="#c9d1dd" stroke-width="5"/>
+        <path class="tri" d="M170 116 L200 172 H140 Z" fill="none" stroke="#ff2b3b" stroke-width="5" stroke-linejoin="round" filter="url(#neon)"/>
+        <rect class="exc" x="166" y="134" width="8" height="22" rx="4" fill="#ff2b3b"/>
+        <circle class="exc" cx="170" cy="164" r="4.5" fill="#ff2b3b"/>
       </g>
     </svg>
   </div>
