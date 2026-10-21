@@ -93,6 +93,21 @@ body.on #escenas{opacity:1;pointer-events:auto}
 #escenas button.on{background:linear-gradient(#c8fdff,#41dcef);color:#03222a;box-shadow:0 0 14px rgba(111,243,255,.8)}
 #escenas button:disabled{opacity:.55;cursor:default}
 #encender:disabled{animation:none;opacity:.7;cursor:wait}
+/* 🎙️ Hablar con Molí */
+#mic{position:absolute;right:calc(5% + 6px);bottom:calc(5% + 4px);z-index:5;width:clamp(48px,8vmin,66px);height:clamp(48px,8vmin,66px);border-radius:50%;border:2px solid rgba(160,245,255,.9);
+  background:radial-gradient(circle at 40% 35%,#1d3a8a,#0b1438);font-size:clamp(20px,3.6vmin,30px);cursor:pointer;box-shadow:0 0 16px rgba(111,243,255,.6);opacity:0;pointer-events:none;transition:opacity .4s,transform .15s}
+body.charla #mic{opacity:1;pointer-events:auto}
+#mic:hover{transform:scale(1.07)}
+body.oye #mic{border-color:#ff8b97;box-shadow:0 0 0 0 rgba(255,59,78,.7);animation:oye 1s infinite}
+@keyframes oye{0%{box-shadow:0 0 0 0 rgba(255,90,110,.75)}100%{box-shadow:0 0 0 22px rgba(255,90,110,0)}}
+#escribe{position:absolute;right:calc(5% + 6px);bottom:calc(5% + clamp(58px,9.5vmin,78px));z-index:5;display:none;gap:6px}
+body.texto #escribe{display:flex}
+#escribe input{font:700 clamp(14px,2.3vmin,18px) 'Baloo 2',sans-serif;width:min(260px,42vw);padding:.4em .9em;border-radius:99px;border:1px solid rgba(111,243,255,.7);background:rgba(8,20,48,.8);color:#fff;outline:none}
+#escribe button{font-size:18px;width:2.2em;border-radius:50%;border:0;background:linear-gradient(#c8fdff,#41dcef);color:#03222a;cursor:pointer}
+#tu{position:absolute;left:50%;bottom:calc(5% + clamp(130px,19vmin,170px));transform:translateX(-50%);max-width:78vw;padding:.3em 1em;border-radius:16px;background:rgba(255,255,255,.88);color:#0b1438;
+  font-size:clamp(14px,2.4vmin,22px);font-weight:800;opacity:0;transition:opacity .3s;pointer-events:none;z-index:4;text-align:center}
+#tu.ver{opacity:1}
+body.habla #borde{stroke:#bff8ff;filter:drop-shadow(0 0 9px #5fd0ff)!important}
 /* Subtítulos */
 #sub{position:absolute;left:50%;bottom:calc(5% + clamp(80px,12vmin,110px));transform:translateX(-50%) translateY(10px);max-width:80vw;padding:.35em 1.1em;border-radius:16px;background:rgba(8,20,48,.68);border:1px solid rgba(111,243,255,.6);box-shadow:0 0 16px rgba(111,243,255,.35);color:#fff;font-size:clamp(16px,3vmin,28px);font-weight:800;opacity:0;transition:.3s;pointer-events:none;z-index:4;text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 #sub.ver{opacity:1;transform:translateX(-50%)}
@@ -162,6 +177,9 @@ body.on #escenas{opacity:1;pointer-events:auto}
   <div id="rayas"></div>
   <div id="dias"><button type="button" data-d="-1">◀</button><span id="diaN">1 / 5</span><button type="button" data-d="1">▶</button><button type="button" id="zoom" class="zm">🔍 Acercar</button></div>
   <nav id="escenas" aria-label="Escenas del aula"></nav>
+  <button id="mic" type="button" aria-label="Hablar con Molí" title="Hablar con Molí (tecla M)">🎙️</button>
+  <form id="escribe" autocomplete="off"><input id="escribeT" type="text" placeholder="Escríbele a Molí…" aria-label="Escríbele a Molí"><button type="submit">➤</button></form>
+  <div id="tu"></div>
   <div id="sub"></div>
   <div id="pista"></div>
   <div id="holo" role="dialog" aria-label="Mensaje">
@@ -181,8 +199,9 @@ body.on #escenas{opacity:1;pointer-events:auto}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="aula3d.js?v=202610212223"></script>
-<script src="brazo3d.js?v=202610212223"></script>
+<script src="aula3d.js?v=202610212230"></script>
+<script src="saber.js?v=202610212230"></script>
+<script src="brazo3d.js?v=202610212230"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
@@ -245,7 +264,7 @@ async function vuelo(e,n){
   B.classList.toggle('holo',/HOLOGRAMA/.test(e.obj)||zoomOn);
   if(brazoArriba&&B.classList.contains('brazo')&&(fase==='brazo'||fase==='mensaje')){ BR&&BR.brazo(true); servo(1.4,110,380,.12); }
 }
-addEventListener('keydown',e=>{ if(!B.classList.contains('on')&&!volando) return;
+addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if(!B.classList.contains('on')&&!volando) return;
   const n=ESC.length; if(e.key==='ArrowRight') volar((escI+1)%n); if(e.key==='ArrowLeft') volar((escI-1+n)%n); });
 
 /* ---------- Sonidos ---------- */
@@ -356,7 +375,7 @@ async function encender(){
   B.classList.add('on'); estado('SISTEMA EN LÍNEA ✔');
   await esperar(300);
   await hablar('saludo','Saludos, usuario.');
-  fase='mirando'; estado('ESCANEANDO…');
+  fase='mirando'; estado('ESCANEANDO…'); B.classList.add('charla');
   await esperar(3200);
   alertar();
 }
@@ -398,6 +417,61 @@ window.__hit=(x,y)=>tocaLuz({clientX:x,clientY:y});
 $('#vista').addEventListener('click',e=>{ if(fase==='brazo'){ if(tocaLuz(e)) abrirMensaje(e); } else subirBrazo(); });
 $('#vista').addEventListener('pointermove',e=>{ $('#vista').style.cursor=(fase==='alarma'||(fase==='brazo'&&tocaLuz(e)))?'pointer':'default'; });
 $('#ok').addEventListener('click',confirmar);
+
+/* ---------- 🎙️ Conversar con Molí ---------- */
+const norm=t=>(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+function entender(txt){
+  const t=' '+norm(txt)+' '; if(!t.trim()) return SABER_NADA;
+  let mejor=null, pts=0;
+  for(const e of SABER){ let p=0; for(const k of e.claves) if(t.includes(' '+k+' ')) p+=k.split(' ').length; if(p>pts){ pts=p; mejor=e; } }
+  return mejor||SABER_FUERA;
+}
+let hablando=null;
+function decir(e){                                                   // su voz (audio grabado) o, si no hay, la voz del navegador
+  return new Promise(res=>{
+    if(hablando) hablando(); let fin=false; const listo=()=>{ if(fin) return; fin=true; hablando=null; B.classList.remove('habla'); setTimeout(()=>{ if(!hablando) $('#sub').classList.remove('ver'); },900); res(); };
+    hablando=()=>{ try{ a.pause(); speechSynthesis.cancel(); }catch(er){} listo(); };
+    $('#sub').textContent='🤖 '+e.resp; $('#sub').classList.add('ver'); B.classList.add('habla');
+    const a=new Audio('audio/s/'+e.id+'.mp3'); a.onended=listo;
+    const navegador=()=>{ try{ const u=new SpeechSynthesisUtterance(e.resp); u.lang='es-ES'; u.rate=1.02; u.pitch=1.15; u.onend=listo; speechSynthesis.speak(u); }catch(er){ setTimeout(listo,2500); } };
+    a.onerror=navegador; a.play().catch(navegador);
+    setTimeout(listo,12000);
+  });
+}
+const ESCN={aula:0,cuaderno:1,corcho:2,holograma:3,muro:4};
+async function responder(e){
+  if(e.ir){ const n=ESCN[e.ir]; if(n===escI&&!zoomOn){ await decir(SABER_ESCENA); return; } decir(e); await esperar(700); if(zoomOn&&n===escI) await acercar(false); else await volar(n); return; }
+  if(e.accion){
+    decir(e);
+    if(escI!==ESCN.holograma){ await esperar(600); await volar(ESCN.holograma); }
+    if(e.accion==='acercar') await acercar(true);
+    else if(e.accion==='alejar') await acercar(false);
+    else { const nn=A.dia(A.diaI+(e.accion==='siguiente'?1:-1)); $('#diaN').textContent=(nn+1)+' / '+A.DIAS; holoSon(); }
+    return; }
+  await decir(e);
+}
+let tuT=0; const tu=t=>{ const el=$('#tu'); el.textContent='🧑 '+t; el.classList.add('ver'); clearTimeout(tuT); tuT=setTimeout(()=>el.classList.remove('ver'),4500); };
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, oyendo=false;
+function bip(f){ if(!AC) return; const t=AC.currentTime; nota(f||880,t,.12,.08); }
+function escuchar(){
+  if(!SR){ B.classList.toggle('texto'); $('#escribeT').focus(); return; }      // Firefox: no tiene micrófono para voz → se escribe
+  if(oyendo){ rec.stop(); return; }
+  if(hablando) hablando();
+  rec=new SR(); rec.lang='es-PE'; rec.interimResults=true; rec.maxAlternatives=1;
+  let dicho='', error='';
+  rec.onresult=ev=>{ let s=''; for(const r of ev.results) s+=r[0].transcript; dicho=s; tu(s); };
+  rec.onerror=ev=>{ error=ev.error; };
+  rec.onend=()=>{ oyendo=false; B.classList.remove('oye'); bip(660);
+    if(error==='not-allowed'||error==='service-not-allowed'){ B.classList.add('texto'); tu('Permite el micrófono o escríbele a Molí'); return; }
+    responder(entender(dicho)); };
+  oyendo=true; B.classList.add('oye'); bip(880);
+  try{ rec.start(); }catch(er){ oyendo=false; B.classList.remove('oye'); }
+}
+$('#mic').addEventListener('click',e=>{ e.stopPropagation(); escuchar(); });
+$('#escribe').addEventListener('click',e=>e.stopPropagation());
+$('#escribe').addEventListener('submit',e=>{ e.preventDefault(); const t=$('#escribeT').value.trim(); if(!t) return; $('#escribeT').value=''; tu(t); responder(entender(t)); });
+addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if((e.key==='m'||e.key==='M')&&B.classList.contains('charla')) escuchar(); });
+window.__entender=entender; window.__responder=t=>responder(entender(t));
 // 🔍 zoom: Molí se acerca volando hasta que el holograma le llena la vista (y vuelve)
 async function acercar(on){
   if(volando||!A||on===zoomOn) return; zoomOn=on; $('#zoom').textContent=on?'🔍 Alejar':'🔍 Acercar';
@@ -406,7 +480,7 @@ async function acercar(on){
   const e=on?{from:new THREE.Vector3(H.c.x,H.c.y,H.c.z+d),look:H.c.clone(),obj:'HOLOGRAMA (CERCA)'}:ESC[escI];
   await vuelo(e,escI);
 }
-addEventListener('keydown',e=>{ if(!B.classList.contains('holo')) return; if(e.key==='+'||e.key==='=') acercar(true); if(e.key==='-') acercar(false); });
+addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if(!B.classList.contains('holo')) return; if(e.key==='+'||e.key==='=') acercar(true); if(e.key==='-') acercar(false); });
 $('#dias').addEventListener('click',e=>{ e.stopPropagation(); const b=e.target.closest('button'); if(!b||!A) return; if(b.id==='zoom'){ acercar(!zoomOn); return; } const n=A.dia(A.diaI+ +b.dataset.d); $('#diaN').textContent=(n+1)+' / '+A.DIAS; holoSon(); });
 $('#holo').addEventListener('click',e=>e.stopPropagation());
 })();
