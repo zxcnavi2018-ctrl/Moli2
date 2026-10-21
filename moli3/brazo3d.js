@@ -34,24 +34,28 @@ function BrazoMoli(THREE, renderer, cam) {
   const torno = (n, largo, radio) => { const pts = []; for (let i = 0; i <= n; i++) { const u = i / n; pts.push(new THREE.Vector2(Math.max(radio(u), 1e-4), u * largo)); }
     const g = new THREE.LatheGeometry(pts, 64); g.rotateZ(-Math.PI / 2); return g; };   // eje Y -> eje X
   const LA = 0.24;                                                   // antebrazo cortito
-  const rA = u => (0.084 + 0.026 * Math.sin(Math.PI * Math.pow(u, 0.85))) * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 12)), 0.22);
+  const rA = u => (0.103 + 0.031 * Math.sin(Math.PI * Math.pow(u, 0.85))) * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 12)), 0.22);
   const ante = malla(torno(60, LA, rA), BL, [0, 0, 0], null, brazo);
   const anillo = (x, r, t) => { const g = new THREE.TorusGeometry(r, t, 8, 64); g.rotateY(Math.PI / 2); return malla(g, UNION, [x, 0, 0], null, brazo); };
   anillo(LA * 0.13, rA(0.13) + 0.0004, 0.0016);
   // costura de arriba (panel)
   { const g = new THREE.TorusGeometry(rA(0.66) + 0.0004, 0.0014, 6, 32, 0.9); g.rotateY(Math.PI / 2); g.rotateX(Math.PI / 2 - 0.45); malla(g, UNION, [LA * 0.66, 0, 0], null, brazo); }
   // muñeca
-  const rM = u => 0.072 * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 8)), 0.28);
+  const rM = u => 0.088 * Math.pow(Math.max(0, 1 - Math.pow(2 * u - 1, 8)), 0.28);
   malla(torno(30, 0.06, rM), BL, [LA - 0.012, 0, 0], null, brazo);
-  anillo(LA - 0.004, 0.071, 0.003);
+  anillo(LA - 0.004, 0.087, 0.0035);
   // 3 deditos azules ovalados, separados
   const dedo = new THREE.SphereGeometry(1, 40, 20);
-  [[0.064, 0.38], [0, 0.04], [-0.064, -0.3]].forEach(([y, r], i) => {
-    const d = malla(dedo, AZ, [LA + 0.085 - (i === 1 ? 0 : 0.008), y, 0.012], [0, 0, r], brazo); d.scale.set(0.066, 0.025, 0.03); });
+  // 3 deditos azules que flotan separados de la muñeca (unidos por una fuerza invisible), cada uno con su brillito celeste
+  const DEDOS = [], brillo = new THREE.MeshBasicMaterial({ color: 0x5fe3ff, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending });
+  [[0.084, 0.4], [0, 0.04], [-0.084, -0.32]].forEach(([y, r], i) => {
+    const g = new THREE.Group(); g.position.set(LA + 0.125 - (i === 1 ? 0 : 0.012), y, 0.012); g.rotation.z = r; brazo.add(g);
+    const d = malla(dedo, AZ, [0, 0, 0], null, g); d.scale.set(0.072, 0.029, 0.034);
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.012, 16, 10), brillo); b.position.x = -0.07; g.add(b);
+    DEDOS.push({ g, base: g.position.clone(), r, f: i * 1.9 }); });
   // codo oscuro con lucecita roja + brazo de arriba
-  malla(new THREE.SphereGeometry(0.083, 40, 24), OSC, [-0.012, 0, 0], null, brazo);
   const codoLuz = new THREE.Mesh(new THREE.TorusGeometry(0.014, 0.0035, 10, 32), new THREE.MeshBasicMaterial({ color: 0xff2b3b }));
-  codoLuz.position.set(-0.03, 0.04, 0.066); codoLuz.rotation.set(-0.5, -0.4, 0); brazo.add(codoLuz);
+  codoLuz.visible = false;
   // brazo de arriba: va del codo hacia el hombro de Molí (abajo y cerca de sus ojos), así nunca se ve suelto
   const hombroG = new THREE.CylinderGeometry(1, 1, 1, 48, 1, true); hombroG.translate(0, 0.5, 0);
   const hombro = new THREE.Mesh(hombroG, BL); cam.add(hombro);
@@ -76,10 +80,9 @@ function BrazoMoli(THREE, renderer, cam) {
     g.lineJoin = 'round'; g.shadowColor = '#ff1a3a';
     for (const [bl, lw, c] of [[50, 16, 'rgba(255,26,58,.6)'], [22, 10, '#ff1f3d'], [6, 4, '#ffb3bd']]) {
       g.shadowBlur = bl; g.strokeStyle = c; g.lineWidth = lw; triang(g, 256, 272, 168); g.stroke(); } }));
-  const rayosTex = lienzo(512, 512, (g, w) => { g.lineCap = 'round'; g.shadowColor = '#ff1a3a'; g.shadowBlur = 16; g.strokeStyle = '#ff1f3d'; g.lineWidth = 11;
-    for (let k = 0; k < 9; k++) { const a = -Math.PI * 0.95 + k * Math.PI * 0.24 - 0.2 + Math.PI / 2 - 0.2, r0 = 175, r1 = 215 + (k % 2) * 20;
-      g.beginPath(); g.moveTo(256 + Math.cos(a) * r0, 256 + Math.sin(a) * r0); g.lineTo(256 + Math.cos(a) * r1, 256 + Math.sin(a) * r1); g.stroke(); }
-    const rg = g.createRadialGradient(256, 256, 40, 256, 256, 200); rg.addColorStop(0, 'rgba(255,30,60,.28)'); rg.addColorStop(1, 'rgba(255,30,60,0)'); g.shadowBlur = 0; g.fillStyle = rg; g.fillRect(0, 0, 512, 512); });
+  // resplandor rojo suave alrededor del símbolo (como una sombra que brilla), sin rayitas
+  const rayosTex = lienzo(512, 512, (g) => { const rg = g.createRadialGradient(256, 256, 30, 256, 256, 250);
+    rg.addColorStop(0, 'rgba(255,40,70,.34)'); rg.addColorStop(.45, 'rgba(255,30,60,.16)'); rg.addColorStop(1, 'rgba(255,30,60,0)'); g.fillStyle = rg; g.fillRect(0, 0, 512, 512); });
   const XT = LA * 0.55, RT = rA(0.55);
   const decal = new THREE.Mesh(curvo(0.15, 0.15, RT), new THREE.MeshPhysicalMaterial({ map: baseTex, transparent: true, roughness: 0.3, clearcoat: 1, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
   decal.position.set(XT, 0, 0.0008); brazo.add(decal);
@@ -94,7 +97,7 @@ function BrazoMoli(THREE, renderer, cam) {
       if (m.map) m.map.encoding = THREE.sRGBEncoding; else if (m.color) m.color.convertSRGBToLinear(); })); }
 
   // poses del brazo (abajo escondido / arriba mostrando la luz), pensadas para un ángulo de visión de 44° (72° en celular parado)
-  const POSE = { abajo: { p: V(-0.22, -0.52, -0.62), r: V(-0.3, 0.3, 0.3) }, arriba: { p: V(-0.22, -0.12, -0.62), r: V(-0.3, 0.3, 0.7) } };
+  const POSE = { abajo: { p: V(-0.22, -0.52, -0.62), r: V(-0.3, 0.3, 0.3) }, arriba: { p: V(-0.25, -0.235, -0.62), r: V(-0.3, 0.3, 0.74) } };
   let objetivo = 0, luzOn = false, vis = 0, desde = 0, t0 = 0;
   const t00 = performance.now() / 1000;
   function update() {
@@ -107,13 +110,14 @@ function BrazoMoli(THREE, renderer, cam) {
     brazo.rotation.z += (Math.sin(t * 1.25) * 0.022 + Math.sin(t * 2.1) * 0.008) * e;
     brazo.rotation.x += Math.sin(t * 0.9 + 1) * 0.02 * e;
     brazo.position.y += Math.sin(t * 1.6) * 0.005 * e; brazo.position.x += Math.sin(t * 0.8) * 0.003 * e;
+    DEDOS.forEach(o => { o.g.position.set(o.base.x + Math.sin(t * 2.2 + o.f) * 0.006, o.base.y + Math.sin(t * 1.7 + o.f * 1.3) * 0.005, o.base.z); o.g.rotation.z = o.r + Math.sin(t * 1.9 + o.f) * 0.06; });
     brazo.position.multiplyScalar(f); brazo.scale.setScalar((asp < 1 ? 0.46 : 0.6) * f);
     brazo.visible = k > 0.002;
     brazo.updateMatrix(); codoC.set(-0.012, 0, 0).applyMatrix4(brazo.matrix);
     const hb = HOMBRO.clone(); if (asp < 1) hb.x = -0.18; hb.multiplyScalar(f);
     dirC.subVectors(hb, codoC); const largo = dirC.length(); dirC.normalize();
     hombro.position.copy(codoC); hombro.quaternion.setFromUnitVectors(Y, dirC);
-    const rr = 0.078 * brazo.scale.x; hombro.scale.set(rr, largo, rr); hombro.visible = brazo.visible;
+    const rr = 0.078 * brazo.scale.x; hombro.scale.set(rr, largo, rr); hombro.visible = false;
     const on = luzOn && Math.floor(t * 3.4) % 2 === 0;
     neon.material.opacity = luzOn ? (on ? 1 : 0.1) : 0; rayos.material.opacity = luzOn ? (on ? 1 : 0) : 0;
     codoLuz.material.color.setHex(luzOn && !on ? 0x7a1820 : 0xff2b3b);

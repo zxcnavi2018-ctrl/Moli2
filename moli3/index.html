@@ -171,8 +171,8 @@ body.on #escenas{opacity:1;pointer-events:auto}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="aula3d.js?v=202610211747"></script>
-<script src="brazo3d.js?v=202610211747"></script>
+<script src="aula3d.js?v=202610212211"></script>
+<script src="brazo3d.js?v=202610212211"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
@@ -200,6 +200,8 @@ const mirada=k=>k<.5?4*k**3:1-(-2*k+2)**3/2;
 async function volar(n){
   const e=ESC[n]; if(volando||!A||!e||n===escI) return;
   volando=true; escI=n; pintarEsc(); B.classList.remove('on'); B.classList.add('vuela'); estado('DESPLAZANDO…');
+  const brazoArriba=B.classList.contains('brazo');
+  if(brazoArriba){ BR&&BR.brazo(false); servo(1.2,380,120,.1); await esperar(1300); }
   const T=THREE, p0=A.pos.clone(), l0=A.look.clone(), p1=e.from.clone(), l1=e.look.clone(), d=p0.distanceTo(p1);
   const ms=Math.min(3200,1500+d*260), up=new T.Vector3(0,1,0), m4=new T.Matrix4();
   const q0=new T.Quaternion().setFromRotationMatrix(m4.lookAt(p0,l0,up)), q1=new T.Quaternion().setFromRotationMatrix(m4.lookAt(p1,l1,up));
@@ -225,13 +227,14 @@ async function volar(n){
   $('#rayas').style.opacity=0; B.classList.remove('vuela');
   $('#objetivo b').textContent='OBJETO: '+e.obj;
   volando=false; pintarEsc(); B.classList.add('on'); estadoBase();
+  if(brazoArriba&&B.classList.contains('brazo')&&(fase==='brazo'||fase==='mensaje')){ BR&&BR.brazo(true); servo(1.4,110,380,.12); }
 }
 addEventListener('keydown',e=>{ if(!B.classList.contains('on')&&!volando) return;
   const n=ESC.length; if(e.key==='ArrowRight') volar((escI+1)%n); if(e.key==='ArrowLeft') volar((escI-1+n)%n); });
 
 /* ---------- Sonidos ---------- */
 let AC, mezcla, alarmaGan, alarmaT=null;
-const voz={saludo:new Audio('audio/saludo.mp3'),mensaje:new Audio('audio/mensaje.mp3'),listo:new Audio('audio/listo.mp3')};
+const voz={saludo:new Audio('audio/saludo.mp3'),mensaje:new Audio('audio/mensaje.mp3'),leer:new Audio('audio/leer.mp3'),listo:new Audio('audio/listo.mp3')};
 Object.values(voz).forEach(a=>{a.preload='auto'});
 function audioIni(){
   if(AC) return;
@@ -338,9 +341,7 @@ async function encender(){
   await esperar(300);
   await hablar('saludo','Saludos, usuario.');
   fase='mirando'; estado('ESCANEANDO…');
-  await esperar(500);
-  await volar(1);
-  await esperar(2800);
+  await esperar(3200);
   alertar();
 }
 function alertar(){
@@ -360,11 +361,12 @@ function abrirMensaje(e){
   if(fase!=='brazo') return;
   fase='mensaje'; pista(''); alarma(false); B.classList.remove('alarma'); estado('📨 MENSAJE'); holoSon();
   $('#holo').classList.add('ver');
+  setTimeout(()=>{ if(fase==='mensaje') hablar('leer','Tarea asignada. Traer materiales: cartulina, plumones, tijeras, goma, regla y lápiz.'); },500);   // Molí lee el mensaje
 }
 async function confirmar(e){
   e.stopPropagation();
   if(fase!=='mensaje') return;
-  fase='listo'; campana();
+  fase='listo'; campana(); voz.leer.pause();
   $('#holo').classList.remove('ver');
   B.classList.remove('alarma'); B.classList.add('ok'); estado('✔ TODO EN ORDEN');
   hablar('listo','Tarea confirmada. ¡Buen trabajo!');

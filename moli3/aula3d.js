@@ -170,14 +170,54 @@ function AulaMoli3(THREE, canvas) {
     malla(new THREE.BoxGeometry(1.05, 0.82, 0.04), PM({ color: 0x1a2030, roughness: 0.3, metalness: 0.6 }), [0, 0, -0.01], null, f, false);
     const p = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.78), new THREE.MeshBasicMaterial({ map: marcoTex, toneMapped: false })); p.position.z = 0.012; f.add(p); });
 
-  // ---- pizarra digital al frente ----
-  const pizTex = lienzo(2048, 900, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#0d1d4a'); gr.addColorStop(1, '#050b24'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-    g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = ORB(130); g.shadowColor = '#5fe3ff'; g.shadowBlur = 30; g.fillText('MOLÍ 3', w / 2, h / 2); g.shadowBlur = 0;
-    g.fillStyle = '#9ff0ff'; g.font = F(700, 60); g.fillText('Aula de Ciencia y Tecnología', w / 2, h / 2 + 110); });
-  const piz = new THREE.Group(); piz.position.set(0, 1.6, -Z + 0.05); S.add(piz);
-  malla(new THREE.BoxGeometry(4.3, 1.95, 0.06), PM({ color: 0x1a2030, roughness: 0.3, metalness: 0.6 }), [0, 0, 0], null, piz, false);
-  const pizM = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 1.85), new THREE.MeshBasicMaterial({ map: pizTex, toneMapped: false })); pizM.position.z = 0.032; piz.add(pizM);
-  malla(new THREE.BoxGeometry(4.34, 0.012, 0.012), CIAN, [0, -1.02, 0.03], null, piz, false);
+  // ---- pizarra blanca al frente + proyector en el techo que proyecta sobre ella ----
+  const piz = new THREE.Group(); piz.position.set(0, 1.6, -Z + 0.03); S.add(piz);
+  malla(new THREE.BoxGeometry(4.5, 1.9, 0.05), PLATA, [0, 0, 0], null, piz, false);                       // marco de aluminio
+  malla(new THREE.BoxGeometry(4.4, 1.8, 0.052), PM({ color: 0xfbfcfe, roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.04 }), [0, 0, 0.002], null, piz, false);
+  malla(new THREE.BoxGeometry(4.0, 0.035, 0.09), PLATA, [0, -0.97, 0.05], null, piz, false);              // bandeja de plumones
+  [[-1.4, 0x2563eb], [-1.25, 0xef4444], [-1.1, 0x16a34a]].forEach(([x, c]) => { const pl = malla(new THREE.CylinderGeometry(0.011, 0.011, 0.13, 12), PM({ color: c, roughness: 0.4 }), [x, -0.94, 0.06], [0, 0, Math.PI / 2], piz, false); });
+  const DIA = { w: 3.1, h: 1.6 };
+  const diaTex = lienzo(2048, 1056, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#0f2a66'); gr.addColorStop(1, '#081538'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(95,227,255,.10)'; g.lineWidth = 2; for (let x = 0; x < w; x += 80) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+    g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = ORB(150); g.shadowColor = '#5fe3ff'; g.shadowBlur = 34; g.fillText('MOLÍ 3', w / 2, h / 2 - 20); g.shadowBlur = 0;
+    g.fillStyle = '#9ff0ff'; g.font = F(700, 68); g.fillText('Aula de Ciencia y Tecnología', w / 2, h / 2 + 100);
+    g.fillStyle = 'rgba(159,240,255,.85)'; g.font = ORB(34); g.fillText('6.° GRADO · INNOVA SCHOOLS', w / 2, h - 90); });
+  const dia = new THREE.Mesh(new THREE.PlaneGeometry(DIA.w, DIA.h), new THREE.MeshBasicMaterial({ map: diaTex, toneMapped: false, transparent: true, opacity: 0.96 }));
+  dia.position.set(0, 0.05, 0.03); piz.add(dia);
+  // el proyector: cuelga del techo, con su lente que brilla
+  const PRO = V(0, AL - 0.42, -Z + 2.7), pro = new THREE.Group(); pro.position.copy(PRO); S.add(pro);
+  malla(new THREE.CylinderGeometry(0.018, 0.018, 0.4, 12), PLATA, [0, 0.22, 0], null, pro);
+  malla(new THREE.BoxGeometry(0.44, 0.13, 0.36), BL, [0, 0, 0], null, pro);
+  malla(new THREE.BoxGeometry(0.44, 0.012, 0.36), NAVY, [0, -0.07, 0], null, pro);
+  malla(new THREE.CylinderGeometry(0.055, 0.06, 0.05, 32), PM({ color: 0x111827, roughness: 0.2, clearcoat: 1 }), [0.1, -0.005, -0.19], [Math.PI / 2, 0, 0], pro);
+  const lente = new THREE.Mesh(new THREE.CircleGeometry(0.045, 32), LUZ(0xe8fbff, 2)); lente.position.set(0.1, -0.005, -0.216); lente.rotation.y = Math.PI; pro.add(lente);
+  malla(new THREE.SphereGeometry(0.008, 12, 8), LUZ(0x5fe3ff, 2), [-0.15, 0.0, -0.181], null, pro, false);
+  // el haz de luz: de la lente a las 4 esquinas de la imagen, más fuerte cerca de la lente
+  const L0 = PRO.clone().add(V(0.1, -0.005, -0.216)), cz = piz.position.z + 0.03, cy = piz.position.y + 0.05;
+  const esq = [V(-DIA.w / 2, cy - DIA.h / 2, cz), V(DIA.w / 2, cy - DIA.h / 2, cz), V(DIA.w / 2, cy + DIA.h / 2, cz), V(-DIA.w / 2, cy + DIA.h / 2, cz)];
+  const hp = [], huv = []; for (let k = 0; k < 4; k++) { const a = esq[k], b = esq[(k + 1) % 4]; hp.push(L0.x, L0.y, L0.z, a.x, a.y, a.z, b.x, b.y, b.z); huv.push(0.5, 0, 0, 1, 1, 1); }
+  const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(hp, 3)); hg.setAttribute('uv', new THREE.Float32BufferAttribute(huv, 2));
+  const hazTex = lienzo(16, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,.12)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+  const haz = new THREE.Mesh(hg, new THREE.MeshBasicMaterial({ color: C(0xbfefff), alphaMap: hazTex, transparent: true, opacity: 0.085, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false }));
+  S.add(haz);
+  // polvito flotando dentro del haz
+  const NP = 140, pp = new Float32Array(NP * 3), sem = [];
+  for (let k = 0; k < NP; k++) sem.push([Math.random(), Math.random(), Math.random(), Math.random() * 6.28]);
+  const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pp, 3));
+  const polvo = new THREE.Points(pg, new THREE.PointsMaterial({ color: C(0xe8fbff), size: 0.012, transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  S.add(polvo);
+  const polvoVa = (t) => { for (let k = 0; k < NP; k++) { const [u, v, w, f] = sem[k], d = (u + t * 0.015) % 1, x = (v - 0.5) * DIA.w * d * 0.95, y = (w - 0.5) * DIA.h * d * 0.95;
+      pp[k * 3] = L0.x + x + Math.sin(t * 0.4 + f) * 0.02; pp[k * 3 + 1] = L0.y + (cy - L0.y) * d + y + Math.sin(t * 0.5 + f * 2) * 0.015; pp[k * 3 + 2] = L0.z + (cz - L0.z) * d; }
+    pg.attributes.position.needsUpdate = true; };
+  // sombritas de contacto bajo mesas y sillas (más realista)
+  const somTex = lienzo(128, 128, (g) => { const rg = g.createRadialGradient(64, 64, 4, 64, 64, 64); rg.addColorStop(0, 'rgba(20,30,50,.55)'); rg.addColorStop(1, 'rgba(20,30,50,0)'); g.fillStyle = rg; g.fillRect(0, 0, 128, 128); });
+  const somM = new THREE.MeshBasicMaterial({ map: somTex, transparent: true, depthWrite: false });
+  MESAS.forEach(([x, z]) => { const sm = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), somM); sm.rotation.x = -Math.PI / 2; sm.position.set(x, 0.004, z); S.add(sm); });
+  // puerta moderna con marco de luz (pared derecha, adelante)
+  const pu = new THREE.Group(); pu.position.set(X - 0.02, 1.05, -Z + 1.3); pu.rotation.y = -Math.PI / 2; S.add(pu);
+  malla(new THREE.BoxGeometry(1.0, 2.1, 0.04), PM({ color: 0xe9eef5, roughness: 0.3, clearcoat: 0.6 }), [0, 0, 0], null, pu, false);
+  [[0, 1.06, 1.04, 0.02], [-0.51, 0, 0.02, 2.12], [0.51, 0, 0.02, 2.12]].forEach(([x, y, w, h]) => malla(new THREE.BoxGeometry(w, h, 0.02), CIAN, [x, y, 0.025], null, pu, false));
+  malla(new THREE.BoxGeometry(0.04, 0.3, 0.03), PLATA, [0.38, 0, 0.035], null, pu, false);
 
   // ---- cámara (los ojos de Molí) y sus 4 lugares ----
   const cam = new THREE.PerspectiveCamera(55, 1, 0.05, 60); S.add(cam);
@@ -185,7 +225,7 @@ function AulaMoli3(THREE, canvas) {
     { n: '🏫 Aula', obj: 'AULA DE CIENCIA', from: V(0.4, 1.6, Z - 0.6), look: V(0, 1.0, -Z + 0.5) },
     { n: '📗 Cuaderno', obj: 'CUADERNO DE SESIONES', from: CU.clone().add(V(0.0, 0.62, 0.78)), look: CU.clone().add(V(0, 0.1, -0.06)) },
     { n: '📌 Corcho', obj: 'CORCHO DE UNIDAD', from: V(X - 2.55, 1.58, 0.6), look: PANT.c.clone() },
-    { n: '🧑‍🏫 Pizarra', obj: 'PIZARRA DIGITAL', from: V(0, 1.6, -Z + 3.3), look: V(0, 1.55, -Z) },
+    { n: '🧑‍🏫 Pizarra', obj: 'PIZARRA Y PROYECTOR', from: V(0.5, 1.7, -Z + 4.1), look: V(0, 1.6, -Z) },
     { n: '🖼️ Muro', obj: 'MURO DEL AULA', from: V(0, 1.62, Z - 3.7), look: V(0, 1.78, Z) }
   ];
   const pos = ESC[0].from.clone(), look = ESC[0].look.clone();
@@ -199,6 +239,7 @@ function AulaMoli3(THREE, canvas) {
       const t = performance.now() / 1000 - t00;
       const fv = (cam.aspect < 1 ? 72 : 55) + fovMas; if (Math.abs(cam.fov - fv) > 0.01) { cam.fov = fv; cam.updateProjectionMatrix(); }
       cam.position.copy(pos); cam.position.x += Math.sin(t * 0.5) * 0.008; cam.position.y += Math.sin(t * 0.7) * 0.006; cam.lookAt(look); if (roll) cam.rotateZ(roll);
+      polvoVa(t);
       holo.position.y = 0.24 + Math.sin(t * 1.6) * 0.008; holo.rotation.y = Math.sin(t * 0.6) * 0.12; holo.material.opacity = 0.85 + Math.sin(t * 9) * 0.08;
       R.render(S, cam);
     }
