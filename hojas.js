@@ -15,14 +15,16 @@
   fetch(BQURL(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { const v = j && j.fields && j.fields.b64 && j.fields.b64.stringValue; if (!v) return;
     const x = JSON.parse(decodeURIComponent(escape(atob(v)))); BQ.u = x.u || {}; BQ.s = x.s || {}; BQ.j = x.j || {}; repintar(); }).catch(() => {});
   async function candado(ds) {
-    const key = ds.j != null ? ds.j : ds.n == null ? ds.k : ds.k + ':' + ds.n, M = ds.j != null ? BQ.j : ds.n == null ? BQ.u : BQ.s, antes = !!M[key];
-    if (antes) delete M[key]; else M[key] = true; repintar();
+    const key = ds.j != null ? ds.j : ds.n == null ? ds.k : ds.k + ':' + ds.n, M = ds.j != null ? BQ.j : ds.n == null ? BQ.u : BQ.s, tenia = key in M, prev = M[key], antes = ds.j != null ? juegoBq(key) : !!M[key];
+    if (ds.j != null) M[key] = !antes; else if (antes) delete M[key]; else M[key] = true; repintar();
     try { if (!window.Docente || !await Docente.token()) throw new Error('AUTH');
       await Docente.commit([{ update: { name: Docente.DOC('files', BQF), fields: Docente.toF({ b64: btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, u: BQ.u, s: BQ.s, j: BQ.j, at: Date.now() })))), updatedAt: new Date() }) } }]);
-    } catch (e) { if (antes) M[key] = true; else delete M[key]; repintar();
+    } catch (e) { if (ds.j != null) { if (tenia) M[key] = prev; else delete M[key]; } else if (antes) M[key] = true; else delete M[key]; repintar();
       alert(e.message === 'AUTH' ? '🔐 Conecta tu cuenta: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No se pudo guardar el candado. Revisa tu internet.'); }
   }
-  window.Candados = { juego: f => !!BQ.j[f], cambiarJuego: f => candado({ j: f }) };   // 🔒 juegos de la Biblioteca de Temas que la docente bloquea
+  const ABIERTOS = ['enfermedades.html', 'enfermedades2.html'];         // juegos abiertos para los niños si la docente no dice otra cosa (los demás, con candado)
+  const juegoBq = f => f in BQ.j ? !!BQ.j[f] : !ABIERTOS.includes(f);
+  window.Candados = { juego: juegoBq, cambiarJuego: f => candado({ j: f }) };   // 🔒 juegos de la Biblioteca de Temas que la docente bloquea
   const mezcla = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const nom1 = me => String(me && me.name || '').split(' ')[0].toLowerCase().replace(/^./, c => c.toUpperCase());
   const MODOS = { individual: '👤 Individual', group: '👥 En equipo', grupo: '👥 En equipo', pair: '👫 En pareja', pairs: '👫 En pareja', pareja: '👫 En pareja', whole: '🏫 Toda la clase', clase: '🏫 Toda la clase' };

@@ -184,10 +184,10 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hojas.css?v=202610201832">
+<link rel="stylesheet" href="hojas.css?v=202610210212">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610201832"></script><script src="sincro.js?v=202610201832"></script><script src="guion.js?v=202610201832"></script><script src="datos.js?v=202610201832"></script><script src="docente.js?v=202610201832"></script>
-<script src="hojas.js?v=202610201832"></script><script src="hojas-docente.js?v=202610201832"></script><script src="diplomas.js?v=202610201832"></script><script src="fotocheck.js?v=202610201832"></script><script src="herramientas.js?v=202610201832"></script><script src="remoto.js?v=202610201832"></script><script src="escaner.js?v=202610201832"></script><script src="tarjetas.js?v=202610201832"></script>
+<script src="moli3d.js?v=202610210212"></script><script src="sincro.js?v=202610210212"></script><script src="guion.js?v=202610210212"></script><script src="datos.js?v=202610210212"></script><script src="docente.js?v=202610210212"></script>
+<script src="hojas.js?v=202610210212"></script><script src="hojas-docente.js?v=202610210212"></script><script src="diplomas.js?v=202610210212"></script><script src="fotocheck.js?v=202610210212"></script><script src="herramientas.js?v=202610210212"></script><script src="remoto.js?v=202610210212"></script><script src="escaner.js?v=202610210212"></script><script src="tarjetas.js?v=202610210212"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -686,6 +686,7 @@ const JUEGOS = [
   ['☀️', 'Energías renovables y no renovables', 'Salva tu isla', 'energias.html', ['#4ade80', '#10b981', '#0f766e']],
   ['🐢', 'Evolución con Darwin', '¿Sobrevivirás?', 'evolucion.html', ['#facc15', '#84cc16', '#3f6212']],
   ['🦠', 'Enfermedades', 'Duelo de cartas', 'enfermedades.html', ['#fb7185', '#e11d48', '#7c3aed']],
+  ['👑', 'Enfermedades 2', 'Leuco contra el Virus Titán', 'enfermedades2.html', ['#e879f9', '#9333ea', '#1e1b4b']],
   ['⚙️', 'Máquinas simples y compuestas', 'Teatro de 9 obras', 'maquinas.html', ['#f87171', '#b91c1c', '#6d28d9']],
   ['🪐', 'Sistema solar', 'Viaja por los planetas', 'solar.html', ['#a78bfa', '#6d28d9', '#1e1b4b']],
   ['🌙', 'La Tierra y la Luna', 'Mareas y fases', 'luna.html', ['#67e8f9', '#0284c7', '#172554']],
@@ -815,7 +816,7 @@ function makeBiblioteca() {                                         // ancho 62 
   const plant = makePlantancio(); plant.position.set(-0.07, yB + t, 0.02); plant.userData.dyn = true; g.add(plant);
   const can = makeRegadera(); can.position.set(0.16, yB + t, 0.03); can.rotation.y = 0.5; can.userData.dyn = true; g.add(can);
   // los discos parados en las 3 repisas abiertas, con el lomo hacia afuera
-  const slots = [], comps = [[yC + t, 6], [1.02 + t, 5], [1.37 + t, 5]], cases = [];
+  const slots = [], comps = [[yC + t, 6], [1.02 + t, 6], [1.37 + t, 5]], cases = [];
   let k = 0;
   comps.forEach(([y0, n]) => { for (let q = 0; q < n && k < JUEGOS.length; q++, k++) {
     const c = makeCase(JUEGOS[k]), x = -W / 2 + t + 0.03 + q * (CASE_T + 0.006) + CASE_T / 2;
@@ -2734,7 +2735,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202610201832"></script><script src="corcho.js?v=202610201832"></script><script src="mando.js?v=202610201832"></script><script src="anuncio.js?v=202610201832"></script><script src="muro.js?v=202610201832"></script><script src="comunicado.js?v=202610201832"></script>
-<script src="archivos.js?v=202610201832"></script><script src="editor.js?v=202610201832"></script>
+<script src="revista.js?v=202610210212"></script><script src="corcho.js?v=202610210212"></script><script src="mando.js?v=202610210212"></script><script src="anuncio.js?v=202610210212"></script><script src="muro.js?v=202610210212"></script><script src="comunicado.js?v=202610210212"></script>
+<script src="archivos.js?v=202610210212"></script><script src="editor.js?v=202610210212"></script>
 </body>
 </html>
