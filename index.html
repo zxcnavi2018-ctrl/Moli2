@@ -174,9 +174,10 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #bibName { min-width: min(300px, 40vw); max-width: 40vw; text-align: center; font: 800 13px/1.25 "Trebuchet MS", system-ui, sans-serif; color: #1e3a8a; }
   #bibName small { display: block; color: #7c3aed; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
   #bibName b { display: block; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } #bibName span { color: #ea580c; }
-  #sheet.biblio { background: #8b5a2b; border: 4px solid #2b2547; border-radius: 16px; }
-  #sheet.biblio .paper { position: absolute; inset: 10px 10px 50px 10px; background: #fff; border: 2px solid #2b2547; border-radius: 8px; overflow: hidden; }
-  #sheet.biblio .bibx { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); border: 3px solid #2b2547; border-radius: 999px; padding: 5px 18px; background: #fde68a; color: #2b2547; font: 900 14px "Trebuchet MS", system-ui, sans-serif; box-shadow: 0 3px 0 #2b2547; }
+  #sheet.biblio { background: #8b5a2b; border: 3px solid #2b2547; border-radius: 12px; }
+  #sheet.biblio .paper { position: absolute; inset: 3px; background: #fff; border: 2px solid #2b2547; border-radius: 8px; overflow: hidden; }
+  body.jugando #tourBar { display: none !important; }
+  #sheet.biblio .bibx { position: absolute; z-index: 3; left: 10px; bottom: 10px; opacity: .88; border: 3px solid #2b2547; border-radius: 999px; padding: 4px 14px; background: #fde68a; color: #2b2547; font: 900 14px "Trebuchet MS", system-ui, sans-serif; box-shadow: 0 3px 0 #2b2547; }
   @media (max-height: 520px) { #bibBar { top: 6px; padding: 5px 8px; gap: 6px; } #bibBar > button { width: 38px; height: 38px; font-size: 15px; } #bibName b { font-size: 14px; } }
   #bibBar #bibAv { background: linear-gradient(180deg, #7dd3fc, #0a6aa1); color: #fff; } #bibBar #bibAv[hidden] { display: none; }
   #bibBar #bibLock { width: auto; padding: 0 16px; border-radius: 999px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); color: #0f172a; font: 900 15px "Trebuchet MS", system-ui, sans-serif; } #bibBar #bibLock.on { background: linear-gradient(180deg, #fca5a5, #dc2626); color: #fff; } #bibBar #bibLock[hidden] { display: none; }
@@ -184,10 +185,10 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hojas.css?v=202610210219">
+<link rel="stylesheet" href="hojas.css?v=202610210224">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610210219"></script><script src="sincro.js?v=202610210219"></script><script src="guion.js?v=202610210219"></script><script src="datos.js?v=202610210219"></script><script src="docente.js?v=202610210219"></script>
-<script src="hojas.js?v=202610210219"></script><script src="hojas-docente.js?v=202610210219"></script><script src="diplomas.js?v=202610210219"></script><script src="fotocheck.js?v=202610210219"></script><script src="herramientas.js?v=202610210219"></script><script src="remoto.js?v=202610210219"></script><script src="escaner.js?v=202610210219"></script><script src="tarjetas.js?v=202610210219"></script>
+<script src="moli3d.js?v=202610210224"></script><script src="sincro.js?v=202610210224"></script><script src="guion.js?v=202610210224"></script><script src="datos.js?v=202610210224"></script><script src="docente.js?v=202610210224"></script>
+<script src="hojas.js?v=202610210224"></script><script src="hojas-docente.js?v=202610210224"></script><script src="diplomas.js?v=202610210224"></script><script src="fotocheck.js?v=202610210224"></script><script src="herramientas.js?v=202610210224"></script><script src="remoto.js?v=202610210224"></script><script src="escaner.js?v=202610210224"></script><script src="tarjetas.js?v=202610210224"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -2285,13 +2286,14 @@ const SHEETS = {                                                    // lo que se
   cuaderno: { t: '📗 Mi cuaderno verde', ar: [1.3, 2.0], html: '<div class="pg l"><div class="slot" id="slot-cuaderno-izq"></div></div><div class="ring"></div><div class="pg r"><div class="slot" id="slot-cuaderno-der"></div></div>' },
   folder: { t: '📁 Mi portafolio · Exit tickets', ar: [1.3, 2.0], html: '<div class="paper"><div class="slot" id="slot-folder"></div></div>' },
   laptop: { t: '💻 Repositorio Educativo', ar: [1.3, 2.5], big: true, html: '<div class="paper"><div class="slot" id="slot-laptop"></div></div>' },
-  biblio: { t: '📚 Biblioteca de Temas', ar: [1.3, 2.5], big: true, html: '<div class="paper"><div class="slot"></div></div><button type="button" class="bibx">📀 Guardar disco</button>' },
+  biblio: { t: '📚 Biblioteca de Temas', ar: [1.3, 2.5], big: 'full', html: '<div class="paper"><div class="slot"></div></div><button type="button" class="bibx">📀 Guardar disco</button>' },
   labav: { t: '📊 Avance de la Biblioteca', ar: [1.3, 2.5], big: true, html: '<div class="paper"><div class="slot"></div></div><button type="button" class="bibx">✕ Cerrar</button>' },
   mision: { t: '📗 Mis misiones de refuerzo', ar: [1.3, 2.0], html: '<div class="paper"><div class="slot"></div></div>' },
   docente: { t: '📂 Mis notas', ar: [1.3, 2.0], html: '<div class="paper"><div class="slot" id="slot-docente"></div></div>' },
   pizarra: { t: '📽️ Pizarra', ar: [1.6, 2.4], html: '<div class="paper"><div class="slot" id="slot-pizarra"></div></div>' }
 };
 function bigRect(ar, big) {                                         // casi toda la pantalla (las flechas quedan a los costados), con la proporción que mejor quepa
+  if (big === 'full') return { x: 4, y: 4, w: innerWidth - 8, h: innerHeight - 8 };   // los juegos: casi pantalla completa
   const side = big ? 50 : 64, top = big ? 4 : 8, bottom = big ? 4 : 8, mw = innerWidth - side * 2, mh = innerHeight - top - bottom;
   const r = Math.min(ar[1], Math.max(ar[0], mw / mh)); let w = mw, h = w / r; if (h > mh) { h = mh; w = h * r; }
   return { x: (innerWidth - w) / 2, y: top + (mh - h) / 2, w, h };
@@ -2483,12 +2485,12 @@ async function bibShow(i) {
 }
 async function bibPlay() {                                           // el disco se agranda: se juega dentro del aula
   if (BIB.busy || BIB.open || BIB.i < 0) return;
-  if (bibBloq(BIB.i) && !MD.esDocente()) return toast('🔒 Tu profe bloqueó este juego por ahora. ¡Elige otro disco!', 4); BIB.open = true; bibBarOn(BIB.here);
+  if (bibBloq(BIB.i) && !MD.esDocente()) return toast('🔒 Tu profe bloqueó este juego por ahora. ¡Elige otro disco!', 4); BIB.open = true; bibBarOn(BIB.here); document.body.classList.add('jugando');
   const c = FOCUS.biblio.bib.userData.cases[BIB.i]; await expand('biblio', c);
 }
 async function bibCloseGame() {
   if (!BIB.open) return; try { MD.subirLab(MD.yo()); } catch (e) {} const c = BIB.i >= 0 ? FOCUS.biblio.bib.userData.cases[BIB.i] : FOCUS.biblio.bib;
-  await shrink(c); BIB.open = false; bibBarOn(BIB.here);
+  document.body.classList.remove('jugando'); await shrink(c); BIB.open = false; bibBarOn(BIB.here);
 }
 document.getElementById('bibPrev').addEventListener('click', e => { e.stopPropagation(); bibShow(bibPaso(-1)); });
 document.getElementById('bibNext').addEventListener('click', e => { e.stopPropagation(); bibShow(bibPaso(1)); });
@@ -2738,7 +2740,7 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202610210219"></script><script src="corcho.js?v=202610210219"></script><script src="mando.js?v=202610210219"></script><script src="anuncio.js?v=202610210219"></script><script src="muro.js?v=202610210219"></script><script src="comunicado.js?v=202610210219"></script>
-<script src="archivos.js?v=202610210219"></script><script src="editor.js?v=202610210219"></script>
+<script src="revista.js?v=202610210224"></script><script src="corcho.js?v=202610210224"></script><script src="mando.js?v=202610210224"></script><script src="anuncio.js?v=202610210224"></script><script src="muro.js?v=202610210224"></script><script src="comunicado.js?v=202610210224"></script>
+<script src="archivos.js?v=202610210224"></script><script src="editor.js?v=202610210224"></script>
 </body>
 </html>
