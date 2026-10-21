@@ -541,8 +541,8 @@
   // =================================================================
   //  5) MI PRESENTACIÓN (modo Canva, en el proyector)
   // =================================================================
-  const CV_K = { uni: ['📘', 'Unidad'], ses: ['🗓️', 'Sesión'], meta: ['🎯', 'Meta y criterios'], rol: ['👥', 'Roles'], acu: ['🤝', 'Acuerdos'], act: ['🧪', 'Actividad'], exit: ['🎟️', 'Exit ticket'], mq: ['🤖', 'Molí pregunta'], aq: ['🤖', 'Molí pregunta'], exa: ['✅', 'Respuestas'], sync: ['🚩', 'Molí nos sincroniza'], voc: ['📖', 'Palabra nueva'], sab: ['💡', '¿Sabías que?'], ref: ['🪞', 'Reflexión'] };
-  const CV_BG = { reto: ['#0b2e4f', '#0a6aa1'], meta: ['#2563eb', '#38bdf8'], rol: ['#7c3aed', '#c084fc'], acu: ['#0d9488', '#34d399'], act: ['#ea580c', '#facc15'], exit: ['#db2777', '#f472b6'], mq: ['#4338ca', '#0ea5e9'], aq: ['#0e7490', '#a855f7'], exa: ['#be185d', '#f472b6'], voc: ['#0f766e', '#22d3ee'], sab: ['#c2410c', '#facc15'], ref: ['#4338ca', '#22d3ee'] };
+  const CV_K = { uni: ['📘', 'Unidad'], ses: ['🗓️', 'Sesión'], meta: ['🎯', 'Meta y criterios'], rol: ['👥', 'Roles'], acu: ['🤝', 'Acuerdos'], act: ['🧪', 'Actividad'], exit: ['🎟️', 'Exit ticket'], mq: ['🤖', 'Molí pregunta'], aq: ['🤖', 'Molí pregunta'], exa: ['✅', 'Respuestas'], sync: ['🚩', 'Molí nos sincroniza'], fic: ['📄', 'En tu ficha'], voc: ['📖', 'Palabra nueva'], sab: ['💡', '¿Sabías que?'], ref: ['🪞', 'Reflexión'] };
+  const CV_BG = { fic: ['#92400e', '#f59e0b'], reto: ['#0b2e4f', '#0a6aa1'], meta: ['#2563eb', '#38bdf8'], rol: ['#7c3aed', '#c084fc'], acu: ['#0d9488', '#34d399'], act: ['#ea580c', '#facc15'], exit: ['#db2777', '#f472b6'], mq: ['#4338ca', '#0ea5e9'], aq: ['#0e7490', '#a855f7'], exa: ['#be185d', '#f472b6'], voc: ['#0f766e', '#22d3ee'], sab: ['#c2410c', '#facc15'], ref: ['#4338ca', '#22d3ee'] };
   const CV_PAL = [['#7c3aed', '#06b6d4'], ['#0ea5e9', '#22c55e'], ['#f97316', '#ec4899'], ['#2563eb', '#8b5cf6'], ['#14b8a6', '#6366f1'], ['#e11d48', '#f59e0b']];
   const CV_ROL = [['🎤', 'SPEAKER', 'Presenta y habla por el equipo'], ['🧰', 'HELPER', 'Trae y organiza los materiales'], ['⏱️', 'TIMER', 'Cuida el tiempo del equipo'], ['🎨', 'DESIGNER', 'Hace que el trabajo se vea bonito y ordenado']];
   const CV_ACU = [['✋', 'Levantar la mano para participar'], ['🤫', 'No conversamos en clase'], ['🪑', 'Nos quedamos en nuestro sitio']];
@@ -615,6 +615,24 @@
   }
   const GU = new Set(['rol', 'acu', 'sab', 'ref']);                  // diapositivas que Molí hace con su voz (guion.js)
   const sabDe = it => { const f = it.s && it.s.fx; return f && L(f.sb) ? f.sb : (cacheIA(hashQ(it)) || {}).s || ''; };   // el «¿Sabías que…?»: el de la ficha de la sesión o el que pensó Molí
+  // ---- 📄 «¡Busca esto en tu ficha!»: las preguntas y tablas de la ficha que tocan en esa actividad, con su misma numeración ----
+  function fichaParte(s, j) {
+    const fx = s && s.fx; if (!fx) return null; const P = []; let nq = 0;
+    if (fx.v === 2) (fx.s || []).forEach(x => { const num = /^(texto|lista|datos)$/.test(x.k) ? '' : fx.nn ? '' : ++nq; if (+x.a === j) P.push({ ...x, num }); });
+    else (fx.k || []).forEach((x, i) => { if (+x.a === j) P.push({ k: x.c && x.c.length ? 'tabla' : 'pregunta', t: x.q, hp: x.h, c: x.c, r: x.r, f: x.f, num: i + 1 }); });
+    return P.some(x => !/^(texto|lista)$/.test(x.k)) ? { t: fx.t, P } : null;
+  }
+  const corta = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : t; };
+  function ficItem(x) {
+    const tb = (c, r, it, d) => `<table class="fic-t"><tr>${c.map(h => `<th>${esc(corta(h, 40))}</th>`).join('')}</tr>${(d && d.length ? d.slice(0, 4) : Array.from({ length: Math.min(3, Math.max(1, r || 2, (it || []).length)) }, (_, i) => c.map((_, k) => k === 0 && it && it[i] ? it[i] : ''))).map(f => `<tr>${c.map((_, k) => `<td>${esc(corta(f[k], 30))}</td>`).join('')}</tr>`).join('')}</table>`;
+    const n = x.num ? `<b class="fic-n">${x.num}</b>` : '<b class="fic-n">✎</b>';
+    if (x.k === 'texto') return `<div class="fic-bl">${L(x.h) ? `<b>${esc(x.h)}</b>` : ''}<p>${esc(corta(x.t, 220))}</p></div>`;
+    if (x.k === 'lista') return `<div class="fic-bl">${L(x.h) ? `<b>${esc(x.h)}</b>` : ''}<ul>${(x.it || []).slice(0, 5).map(t => `<li>${esc(corta(t, 80))}</li>`).join('')}</ul></div>`;
+    if (x.k === 'datos') return `<div class="fic-bl">${L(x.h) ? `<b>${esc(x.h)}</b>` : ''}${tb(x.c || [], 0, [], x.d)}</div>`;
+    if (x.k === 'tabla') return `<div class="fic-q">${n}<div><p>${esc(corta(x.t || x.h, 160))}</p>${x.c && x.c.length ? tb(x.c, x.r, x.it, x.d) : ''}</div></div>`;
+    if (x.k === 'cuad') return `<div class="fic-q">${n}<div><p>${esc(corta(x.t, 160))}</p><div class="fic-cuad"></div></div></div>`;
+    return `<div class="fic-q">${n}<div><p>${esc(corta(x.t || x.h, 170))}</p>${x.op && x.op.length ? `<div class="fic-op">${x.op.slice(0, 4).map(o => `<span>☐ ${esc(corta(o, 40))}</span>`).join('')}</div>` : `<div class="fic-ln" style="height:${1.5 * Math.min(3, Math.max(1, x.ln || 1))}em">${L(x.f) ? `<span>${esc(corta(x.f, 60))}</span>` : ''}</div>`}</div></div>`;
+  }
   function flujoPresentacion(host) {
     const P = { L: [], i: 0, ia: {}, pide: new Set() }, RT = rutina(host);
     const actOk = x => x && (L(x.title) || L(x.desc));
@@ -629,7 +647,7 @@
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); if (fichaParte(s, j + 1)) Lst.push({ ...b, k: 'fic', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(SB) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
@@ -719,6 +737,8 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     function slide(it) {
       if (it.k === 'vid') return slideVideo(it);
       if (it.k === 'sync') return Sincro.html(syncDe(it));
+      if (it.k === 'fic') { const F = fichaParte(it.s, it.j), M = 5, P = F ? F.P.slice(0, M) : [], [c1, c2] = CV_BG.fic;
+        return `<div class="cv-sl cv-fic" style="--c1:${c1};--c2:${c2}">${crumb(it)}<div class="fic-h"><span class="cv-num">${it.j}</span><div><b>📄 ¡Busca esto en tu ficha!</b><small>Actividad ${it.j}${L(it.x.title) ? ' · ' + esc(it.x.title) : ''}</small></div><img src="${IMG('curiosa')}" alt=""></div><div class="fic-hoja"><div class="fic-tt">${esc(F && F.t || 'Ficha de la sesión')} · <b>Actividad ${it.j}</b></div>${P.map(ficItem).join('')}${F && F.P.length > M ? `<p class="fic-mas">👉 … y ${F.P.length - M} parte${F.P.length - M > 1 ? 's' : ''} más de esta actividad en tu ficha</p>` : ''}</div></div>`; }
       const u = it.u, s = it.s, [c1, c2] = it.k in CV_BG ? CV_BG[it.k] : color(u), st = `style="--c1:${c1};--c2:${c2}"`;
       const mol = (im, inner) => `<div class="cv-sl" ${st}>${crumb(it)}<div class="cv-mqb"><img class="cv-moli" src="${IMG(im)}" alt="Molí"><div class="cv-bub">${inner}</div></div></div>`;
       if (it.k === 'uni') return `<div class="cv-sl cv-c" ${st}><span class="cv-pill">UNIDAD ${esc(u.num)}</span><div class="cv-ico">${esc(u.icon || '📘')}</div><h2 class="cv-h1">${esc(u.title)}</h2><p class="cv-sub">${it.ss.length} ${it.ss.length === 1 ? 'sesión' : 'sesiones'}</p></div>`;
@@ -745,6 +765,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">✅ Respuestas del Exit ticket</h2>${qs.length ? `<ol class="cv-cards cv-q">${qs.map(x => `<li><b>${esc(x.q)}</b><ul>${(x.options || []).map((o, k) => L(o) ? `<li class="${k === x.answer ? 'ok' : ''}">${k === x.answer ? '✓ ' : ''}${esc(o)}</li>` : '').join('')}</ul></li>`).join('')}</ol>` : '<p class="cv-lead">Sin preguntas todavía.</p>'}</div>`;
     }
     function ajustar(d) {                                               // la diapositiva usa todo el cuadro: agranda la letra hasta llenarlo sin cortarse
+      if (d && d.classList.contains('cv-fic')) { const h = d.querySelector('.fic-hoja'); if (!h) return; let lo = .55, hi = 1.7; for (let k = 0; k < 9; k++) { const m = (lo + hi) / 2; h.style.fontSize = m + 'em'; if (h.scrollHeight <= h.clientHeight + 1) lo = m; else hi = m; } h.style.fontSize = (lo * .98) + 'em'; return; }   // la hoja de la ficha: la letra se ajusta para que entre todo
       if (!d || d.classList.contains('sy') || d.classList.contains('cv-foto') || d.classList.contains('cv-vid') || d.querySelector('.cv-rfig')) return;
       const H = d.clientHeight, Wd = d.clientWidth; if (!H || !Wd) return;
       const prev = d.style.justifyContent; d.style.justifyContent = 'flex-start'; d.style.overflow = 'visible';

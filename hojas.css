@@ -650,3 +650,20 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .pal-sep { width: clamp(20px, 4vw, 60px); } .pal-sep.g { width: clamp(28px, 5vw, 80px); border-left: 4px dashed rgba(255,255,255,.7); height: 7vh; }
 .pal-et { display: flex; gap: 10vw; font: 900 clamp(16px, 2.6vh, 28px) "Trebuchet MS", system-ui; color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.25); } .pal-et .n { color: #bbf7d0; }
 .an-pal.turno .pal-et .n { animation: palLate .5s ease-in-out infinite alternate; } @keyframes palLate { to { transform: scale(1.25); } }
+/* 📄 «¡Busca esto en tu ficha!» (Mi presentación) */
+.cv-fic { justify-content: flex-start; gap: .5em; padding-top: 2.4em; }
+.cv-fic .fic-h { display: flex; align-items: center; gap: .6em; } .cv-fic .fic-h > div { flex: 1; display: flex; flex-direction: column; }
+.cv-fic .fic-h b { font-size: 1.5em; font-weight: 900; text-shadow: 0 2px 0 rgba(0,0,0,.25); } .cv-fic .fic-h small { font-weight: 800; font-size: .9em; opacity: .92; }
+.cv-fic .fic-h img { width: 3.6em; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); animation: ficMo 2.4s ease-in-out infinite; } @keyframes ficMo { 50% { transform: translateY(-.25em) rotate(-4deg); } }
+.cv-fic .fic-hoja { position: relative; flex: 1; min-height: 0; overflow: hidden; padding: .7em 1em .7em 2.6em; border-radius: .5em; background: #fffdf7 repeating-linear-gradient(transparent 0 1.55em, #dbeafe 1.55em calc(1.55em + 1px)); color: #1e293b; box-shadow: 0 .5em 1.2em rgba(0,0,0,.35); transform: rotate(-.6deg); }
+.cv-fic .fic-hoja::before { content: ''; position: absolute; left: 1.7em; top: 0; bottom: 0; width: 2px; background: #fca5a5; }
+.cv-fic .fic-tt { margin: 0 0 .4em; padding-bottom: .25em; border-bottom: 2px solid #2b2547; font-weight: 900; font-size: .95em; color: #1d4ed8; }
+.cv-fic .fic-q { display: flex; gap: .5em; margin: .45em 0; padding: .3em .45em; border-radius: .4em; animation: ficLuz 2.6s ease-in-out infinite; } .cv-fic .fic-q:nth-child(odd) { animation-delay: -1.3s; }
+@keyframes ficLuz { 50% { background: rgba(250,204,21,.22); } }
+.cv-fic .fic-n { flex: none; display: grid; place-items: center; width: 1.7em; height: 1.7em; border-radius: 50%; background: #2563eb; color: #fff; font-weight: 900; box-shadow: 0 0 0 .18em #bfdbfe; }
+.cv-fic .fic-q > div { flex: 1; min-width: 0; } .cv-fic .fic-q p, .cv-fic .fic-bl p { margin: 0 0 .2em; font-weight: 800; line-height: 1.3; } .cv-fic .fic-bl { margin: .35em 0; } .cv-fic .fic-bl b { color: #b45309; } .cv-fic .fic-bl ul { margin: .1em 0; padding-left: 1.2em; font-weight: 700; }
+.cv-fic .fic-ln { background: repeating-linear-gradient(transparent 0 1.45em, #94a3b8 1.45em calc(1.45em + 1px)); } .cv-fic .fic-ln span { color: #64748b; font-style: italic; }
+.cv-fic .fic-op { display: flex; flex-wrap: wrap; gap: .15em 1.1em; font-weight: 800; color: #334155; }
+.cv-fic .fic-t { width: 100%; border-collapse: collapse; font-size: .85em; margin-top: .2em; background: #fff; } .cv-fic .fic-t th, .cv-fic .fic-t td { border: 1.5px solid #2b2547; padding: .18em .35em; height: 1.35em; } .cv-fic .fic-t th { background: #dbeafe; color: #1e3a8a; }
+.cv-fic .fic-cuad { height: 4.5em; border: 1.5px solid #2b2547; background: #fff linear-gradient(#cbd5e1 1px, transparent 1px) 0 0 / .75em .75em, linear-gradient(90deg, #cbd5e1 1px, transparent 1px) 0 0 / .75em .75em; }
+.cv-fic .fic-mas { margin: .4em 0 0; font-weight: 900; color: #b45309; }
