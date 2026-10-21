@@ -98,18 +98,20 @@ body.on #escenas{opacity:1;pointer-events:auto}
   background:radial-gradient(circle at 40% 35%,#1d3a8a,#0b1438);font-size:clamp(20px,3.6vmin,30px);cursor:pointer;box-shadow:0 0 16px rgba(111,243,255,.6);opacity:0;pointer-events:none;transition:opacity .4s,transform .15s}
 body.charla #mic{opacity:1;pointer-events:auto}
 #mic:hover{transform:scale(1.07)}
-body.oye #mic{border-color:#ff8b97;box-shadow:0 0 0 0 rgba(255,59,78,.7);animation:oye 1s infinite}
 @keyframes oye{0%{box-shadow:0 0 0 0 rgba(255,90,110,.75)}100%{box-shadow:0 0 0 22px rgba(255,90,110,0)}}
 #escribe{position:absolute;right:calc(5% + 6px);bottom:calc(5% + clamp(58px,9.5vmin,78px));z-index:5;display:none;gap:6px}
 body.texto #escribe{display:flex}
 #escribe input{font:700 clamp(14px,2.3vmin,18px) 'Baloo 2',sans-serif;width:min(260px,42vw);padding:.4em .9em;border-radius:99px;border:1px solid rgba(111,243,255,.7);background:rgba(8,20,48,.8);color:#fff;outline:none}
 #escribe button{font-size:18px;width:2.2em;border-radius:50%;border:0;background:linear-gradient(#c8fdff,#41dcef);color:#03222a;cursor:pointer}
-#tu{position:absolute;left:50%;bottom:calc(5% + clamp(130px,19vmin,170px));transform:translateX(-50%);max-width:78vw;padding:.3em 1em;border-radius:16px;background:rgba(255,255,255,.88);color:#0b1438;
+#tu{position:absolute;left:50%;top:calc(5% + clamp(84px,12.5vmin,116px));transform:translateX(-50%);max-width:78vw;padding:.3em 1em;border-radius:16px;background:rgba(255,255,255,.88);color:#0b1438;
   font-size:clamp(14px,2.4vmin,22px);font-weight:800;opacity:0;transition:opacity .3s;pointer-events:none;z-index:4;text-align:center}
 #tu.ver{opacity:1}
+#onda{position:absolute;left:50%;top:calc(5% + clamp(40px,6vmin,56px));transform:translateX(-50%);width:clamp(200px,32vmin,320px);height:clamp(36px,5.6vmin,56px);pointer-events:none;z-index:4}
+body.escucha #mic{border-color:#5fe3ff;box-shadow:0 0 22px rgba(111,243,255,.95),inset 0 0 12px rgba(111,243,255,.5)}
+body.escucha.oye #mic{border-color:#ff8b97;animation:oye 1s infinite}
 body.habla #borde{stroke:#bff8ff;filter:drop-shadow(0 0 9px #5fd0ff)!important}
 /* Subtítulos */
-#sub{position:absolute;left:50%;bottom:calc(5% + clamp(80px,12vmin,110px));transform:translateX(-50%) translateY(10px);max-width:80vw;padding:.35em 1.1em;border-radius:16px;background:rgba(8,20,48,.68);border:1px solid rgba(111,243,255,.6);box-shadow:0 0 16px rgba(111,243,255,.35);color:#fff;font-size:clamp(16px,3vmin,28px);font-weight:800;opacity:0;transition:.3s;pointer-events:none;z-index:4;text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#sub{position:absolute;left:50%;bottom:calc(5% + clamp(80px,12vmin,110px));transform:translateX(-50%) translateY(10px);max-width:min(80vw,900px);padding:.35em 1.1em;border-radius:16px;background:rgba(8,20,48,.68);border:1px solid rgba(111,243,255,.6);box-shadow:0 0 16px rgba(111,243,255,.35);color:#fff;font-size:clamp(15px,2.6vmin,24px);font-weight:800;opacity:0;transition:.3s;pointer-events:none;z-index:4;text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 #sub.ver{opacity:1;transform:translateX(-50%)}
 #pista{position:absolute;left:50%;bottom:calc(4% + clamp(40px,6.5vmin,56px));transform:translateX(-50%);font-size:clamp(13px,2.2vmin,20px);font-weight:800;color:#0b1438;background:rgba(255,255,255,.9);padding:.2em 1em;border-radius:99px;box-shadow:0 4px 14px rgba(20,40,80,.3);opacity:0;transition:opacity .4s;pointer-events:none;z-index:4;white-space:nowrap;animation:flota 1.4s ease-in-out infinite}
 #pista.ver{opacity:1}
@@ -179,6 +181,7 @@ body.habla #borde{stroke:#bff8ff;filter:drop-shadow(0 0 9px #5fd0ff)!important}
   <nav id="escenas" aria-label="Escenas del aula"></nav>
   <button id="mic" type="button" aria-label="Hablar con Molí" title="Hablar con Molí (tecla M)">🎙️</button>
   <form id="escribe" autocomplete="off"><input id="escribeT" type="text" placeholder="Escríbele a Molí…" aria-label="Escríbele a Molí"><button type="submit">➤</button></form>
+  <canvas id="onda" width="320" height="56" aria-hidden="true"></canvas>
   <div id="tu"></div>
   <div id="sub"></div>
   <div id="pista"></div>
@@ -199,9 +202,9 @@ body.habla #borde{stroke:#bff8ff;filter:drop-shadow(0 0 9px #5fd0ff)!important}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="aula3d.js?v=202610212230"></script>
-<script src="saber.js?v=202610212230"></script>
-<script src="brazo3d.js?v=202610212230"></script>
+<script src="aula3d.js?v=202610212250"></script>
+<script src="saber.js?v=202610212250"></script>
+<script src="brazo3d.js?v=202610212250"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
@@ -344,11 +347,11 @@ function campana(){
   nota(880,t,.6,.12); nota(1318,t+.12,.8,.11); nota(1760,t+.24,.9,.06);
 }
 function hablar(k,txt){
-  const a=voz[k]; $('#sub').textContent='🤖 '+txt; $('#sub').classList.add('ver');
+  const a=voz[k]; $('#sub').textContent='🤖 '+txt; $('#sub').classList.add('ver'); B.classList.add('habla'); conectarOnda(a);
   if(alarmaGan) alarmaGan.gain.setTargetAtTime(.35,AC.currentTime,.05);
   return new Promise(res=>{
     let hecho=false; const fin=()=>{if(hecho)return; hecho=true;
-      if(alarmaGan) alarmaGan.gain.setTargetAtTime(1,AC.currentTime,.2);
+      if(alarmaGan) alarmaGan.gain.setTargetAtTime(1,AC.currentTime,.2); B.classList.remove('habla');
       setTimeout(()=>$('#sub').classList.remove('ver'),700); res()};
     a.currentTime=0; a.onended=fin;
     a.play().catch(()=>setTimeout(fin,1800));
@@ -418,59 +421,109 @@ $('#vista').addEventListener('click',e=>{ if(fase==='brazo'){ if(tocaLuz(e)) abr
 $('#vista').addEventListener('pointermove',e=>{ $('#vista').style.cursor=(fase==='alarma'||(fase==='brazo'&&tocaLuz(e)))?'pointer':'default'; });
 $('#ok').addEventListener('click',confirmar);
 
-/* ---------- 🎙️ Conversar con Molí ---------- */
-const norm=t=>(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+/* ---------- 🎙️ Conversar con Molí (tipo Jarvis): escucha siempre, arma cada respuesta con bloques de su voz ---------- */
+const SB=window.SABER;
+const norm=t=>(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+const QS={general:SB.general};
+SB.charla.forEach(c=>{ if(c.q&&typeof c.q==='object') QS[c.q.id]=c.q; });
+Object.values(SB.temas).forEach(tm=>tm.datos.forEach(d=>{ if(d.q&&typeof d.q==='object') QS[d.q.id]=d.q; }));
+const preg=q=>typeof q==='string'?QS[q]:q;
+const azar=a=>a[Math.floor(Math.random()*a.length)];
+const ctx={tema:null,sig:null,ultimo:null,cursor:{},ultR:null,vuelta:0};
+const VERBO=/\b(llevame|lleva|llevar|vamos|ve|vete|ir|anda|muestrame|muestra|mostrar|abre|abrir|ensename|regresa|volvamos|vuelve|quiero ver)\b/;
+function puntos(claves,t,ws){ let p=0;
+  for(const k of claves){ if(k.includes(' ')){ if(t.includes(' '+k+' ')) p+=k.split(' ').length*1.5; }
+    else if(k.length>=4?ws.some(w=>w.startsWith(k)):ws.includes(k)) p+=1; }
+  return p; }
 function entender(txt){
-  const t=' '+norm(txt)+' '; if(!t.trim()) return SABER_NADA;
-  let mejor=null, pts=0;
-  for(const e of SABER){ let p=0; for(const k of e.claves) if(t.includes(' '+k+' ')) p+=k.split(' ').length; if(p>pts){ pts=p; mejor=e; } }
-  return mejor||SABER_FUERA;
+  const t=' '+norm(txt)+' ', ws=norm(txt).split(' ').filter(Boolean), frase=ws.join(' ');
+  if(!ws.length) return {tipo:'nada'};
+  if(/^(repite|repitelo|otra vez|no entendi|que dijiste)\b/.test(frase)) return {tipo:'repite'};
+  if(ws.length<=5){
+    if(/^(no se|no lo se|ni idea|no estoy seguro|cuentame|dime mas|explicame|que mas|sigue|mas)\b/.test(frase)) return {tipo:'si',mas:true};
+    if(/^(no|nop|nel|no gracias|no quiero|ya no)\b/.test(frase)) return {tipo:'no'};
+    if(/^(si|sii|claro|ya|ok|okey|dale|bueno|por supuesto|obvio|me gustaria|quiero|vale|de acuerdo)\b/.test(frase)) return {tipo:'si'};
+  }
+  const mueve=VERBO.test(t)||ws.length<=3; let best=null, bp=0;
+  for(const o of SB.ordenes){ let p=puntos(o.claves,t,ws); if(o.ir&&!mueve) p*=.4; if(p>bp){ bp=p; best={tipo:'orden',o}; } }
+  for(const c of SB.charla){ const p=puntos(c.claves,t,ws); if(p>bp){ bp=p; best={tipo:'charla',c}; } }
+  for(const [k,tm] of Object.entries(SB.temas)){ const p=puntos(tm.claves,t,ws); if(p>bp){ bp=p; best={tipo:'tema',k}; } }
+  return best||{tipo:'fuera'};
 }
-let hablando=null;
-function decir(e){                                                   // su voz (audio grabado) o, si no hay, la voz del navegador
-  return new Promise(res=>{
-    if(hablando) hablando(); let fin=false; const listo=()=>{ if(fin) return; fin=true; hablando=null; B.classList.remove('habla'); setTimeout(()=>{ if(!hablando) $('#sub').classList.remove('ver'); },900); res(); };
-    hablando=()=>{ try{ a.pause(); speechSynthesis.cancel(); }catch(er){} listo(); };
-    $('#sub').textContent='🤖 '+e.resp; $('#sub').classList.add('ver'); B.classList.add('habla');
-    const a=new Audio('audio/s/'+e.id+'.mp3'); a.onended=listo;
-    const navegador=()=>{ try{ const u=new SpeechSynthesisUtterance(e.resp); u.lang='es-ES'; u.rate=1.02; u.pitch=1.15; u.onend=listo; speechSynthesis.speak(u); }catch(er){ setTimeout(listo,2500); } };
-    a.onerror=navegador; a.play().catch(navegador);
-    setTimeout(listo,12000);
-  });
+function reaccion(){ let r; do r=azar(SB.reacciones); while(r===ctx.ultR&&SB.reacciones.length>1); ctx.ultR=r; return r; }
+function armar(k,reac){                                              // [reacción] + [dato nuevo del tema] + [pregunta para seguir]
+  const tm=SB.temas[k], i=ctx.cursor[k]||0, d=tm.datos[i%tm.datos.length], q=preg(d.q); ctx.cursor[k]=i+1;
+  ctx.tema=k; ctx.sig=q&&q.sig||null; return [reac,d,q].filter(Boolean);
+}
+// voz: cada bloque es audio/b/<id>.mp3 (su voz); si falta, la voz del navegador
+let hablaTok=0, sonando=null;
+const enOnda=new WeakSet(); let anal=null, ondaD=null;
+function conectarOnda(a){ if(!AC||enOnda.has(a)) return; try{ if(!anal){ anal=AC.createAnalyser(); anal.fftSize=64; ondaD=new Uint8Array(anal.frequencyBinCount); anal.connect(mezcla); }
+  AC.createMediaElementSource(a).connect(anal); enOnda.add(a); }catch(e){} }
+function tocar(p){ return new Promise(res=>{ let fin=false; const ok=()=>{ if(!fin){ fin=true; res(); } };
+  const a=new Audio('audio/b/'+p.id+'.mp3'); sonando=a; conectarOnda(a); a.onended=ok;
+  const nav=()=>{ try{ const u=new SpeechSynthesisUtterance(p.t); u.lang='es-ES'; u.rate=1.03; u.pitch=1.15; u.onend=ok; u.onerror=ok; speechSynthesis.speak(u); }catch(e){ ok(); } };
+  a.onerror=nav; a.play().catch(nav); setTimeout(ok,4000+p.t.length*90); }); }
+function decirPartes(partes){
+  const tok=++hablaTok; try{ speechSynthesis.cancel(); }catch(e){} if(sonando) sonando.pause();
+  $('#sub').textContent='🤖 '+partes.map(p=>p.t).join(' '); $('#sub').classList.add('ver'); B.classList.add('habla');
+  if(alarmaGan) alarmaGan.gain.setTargetAtTime(.3,AC.currentTime,.05);
+  return (async()=>{ for(const p of partes){ if(tok!==hablaTok) return; await tocar(p); if(tok!==hablaTok) return; await esperar(80); }
+    if(tok===hablaTok){ B.classList.remove('habla'); if(alarmaGan) alarmaGan.gain.setTargetAtTime(1,AC.currentTime,.2); setTimeout(()=>{ if(tok===hablaTok) $('#sub').classList.remove('ver'); },1800); } })();
 }
 const ESCN={aula:0,cuaderno:1,corcho:2,holograma:3,muro:4};
-async function responder(e){
-  if(e.ir){ const n=ESCN[e.ir]; if(n===escI&&!zoomOn){ await decir(SABER_ESCENA); return; } decir(e); await esperar(700); if(zoomOn&&n===escI) await acercar(false); else await volar(n); return; }
-  if(e.accion){
-    decir(e);
+async function responder(r){
+  let partes=null;
+  if(r.tipo==='nada'){ if(escuchaOn) return; partes=[SB.nada]; }
+  else if(r.tipo==='repite'){ if(ctx.ultimo) await decirPartes(ctx.ultimo); return; }
+  else if(r.tipo==='orden'){ const o=r.o;
+    if(o.ir){ const n=ESCN[o.ir]; if(n===escI&&!zoomOn){ await decirPartes([SB.yaAqui]); return; } decirPartes([o]); await esperar(700); if(zoomOn&&n===escI) await acercar(false); else await volar(n); return; }
+    decirPartes([o]);
     if(escI!==ESCN.holograma){ await esperar(600); await volar(ESCN.holograma); }
-    if(e.accion==='acercar') await acercar(true);
-    else if(e.accion==='alejar') await acercar(false);
-    else { const nn=A.dia(A.diaI+(e.accion==='siguiente'?1:-1)); $('#diaN').textContent=(nn+1)+' / '+A.DIAS; holoSon(); }
+    if(o.accion==='acercar') await acercar(true); else if(o.accion==='alejar') await acercar(false);
+    else { const nn=A.dia(A.diaI+(o.accion==='siguiente'?1:-1)); $('#diaN').textContent=(nn+1)+' / '+A.DIAS; holoSon(); }
     return; }
-  await decir(e);
+  else if(r.tipo==='si'){ const k=ctx.sig||(r.mas&&ctx.tema); partes=k?armar(k,azar(SB.reaccionesSi)):[SB.siSinTema,SB.general]; if(!k) ctx.sig=null; }
+  else if(r.tipo==='no'){ partes=[SB.no,SB.general]; ctx.sig=null; }
+  else if(r.tipo==='charla'){ const q=preg(r.c.q); partes=[r.c,q].filter(Boolean); ctx.sig=q&&q.sig||null; }
+  else if(r.tipo==='tema'){ partes=armar(r.k,Math.random()<.8?reaccion():null); }
+  else { const v=SB.volver[ctx.vuelta++%SB.volver.length]; partes=[SB.fuera,v]; ctx.sig=v.sig; }
+  ctx.ultimo=partes; await decirPartes(partes);
 }
 let tuT=0; const tu=t=>{ const el=$('#tu'); el.textContent='🧑 '+t; el.classList.add('ver'); clearTimeout(tuT); tuT=setTimeout(()=>el.classList.remove('ver'),4500); };
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, oyendo=false;
-function bip(f){ if(!AC) return; const t=AC.currentTime; nota(f||880,t,.12,.08); }
-function escuchar(){
-  if(!SR){ B.classList.toggle('texto'); $('#escribeT').focus(); return; }      // Firefox: no tiene micrófono para voz → se escribe
-  if(oyendo){ rec.stop(); return; }
-  if(hablando) hablando();
-  rec=new SR(); rec.lang='es-PE'; rec.interimResults=true; rec.maxAlternatives=1;
-  let dicho='', error='';
-  rec.onresult=ev=>{ let s=''; for(const r of ev.results) s+=r[0].transcript; dicho=s; tu(s); };
-  rec.onerror=ev=>{ error=ev.error; };
-  rec.onend=()=>{ oyendo=false; B.classList.remove('oye'); bip(660);
-    if(error==='not-allowed'||error==='service-not-allowed'){ B.classList.add('texto'); tu('Permite el micrófono o escríbele a Molí'); return; }
-    responder(entender(dicho)); };
-  oyendo=true; B.classList.add('oye'); bip(880);
-  try{ rec.start(); }catch(er){ oyendo=false; B.classList.remove('oye'); }
+function bip(f){ if(!AC) return; nota(f||880,AC.currentTime,.12,.08); }
+// micrófono siempre activo: una vez prendido escucha, responde y vuelve a escuchar (mientras Molí habla no escucha, para no oírse)
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, oyendo=false, escuchaOn=false;
+function microOn(on){
+  if(!SR){ B.classList.toggle('texto'); if(B.classList.contains('texto')) $('#escribeT').focus(); return; }   // Firefox: se le escribe
+  escuchaOn=on; B.classList.toggle('escucha',on); bip(on?880:520);
+  if(on){ tu('🎙️ Conversación activa: háblale a Molí'); ciclo(); } else { try{ rec&&rec.abort(); }catch(e){} oyendo=false; B.classList.remove('oye'); }
 }
-$('#mic').addEventListener('click',e=>{ e.stopPropagation(); escuchar(); });
+function ciclo(){
+  if(!escuchaOn||oyendo) return;
+  if(B.classList.contains('habla')||volando){ setTimeout(ciclo,300); return; }
+  rec=new SR(); rec.lang='es-PE'; rec.interimResults=true; rec.maxAlternatives=1;
+  let dicho='', err='';
+  rec.onresult=ev=>{ let s2=''; for(const r of ev.results) s2+=r[0].transcript; dicho=s2; tu(s2); };
+  rec.onerror=ev=>{ err=ev.error; };
+  rec.onend=async()=>{ oyendo=false; B.classList.remove('oye');
+    if(err==='not-allowed'||err==='service-not-allowed'){ microOn(false); B.classList.add('texto'); tu('Permite el micrófono o escríbele a Molí'); return; }
+    if(escuchaOn&&dicho.trim()) await responder(entender(dicho));
+    setTimeout(ciclo,err==='network'?1500:200); };
+  oyendo=true; B.classList.add('oye');
+  try{ rec.start(); }catch(e){ oyendo=false; B.classList.remove('oye'); setTimeout(ciclo,800); }
+}
+$('#mic').addEventListener('click',e=>{ e.stopPropagation(); microOn(!escuchaOn); });
 $('#escribe').addEventListener('click',e=>e.stopPropagation());
 $('#escribe').addEventListener('submit',e=>{ e.preventDefault(); const t=$('#escribeT').value.trim(); if(!t) return; $('#escribeT').value=''; tu(t); responder(entender(t)); });
-addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if((e.key==='m'||e.key==='M')&&B.classList.contains('charla')) escuchar(); });
+addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if((e.key==='m'||e.key==='M')&&B.classList.contains('charla')) microOn(!escuchaOn); });
+// onda de voz en el visor mientras Molí habla
+(function onda(){ const c=$('#onda'), g=c.getContext('2d'); const N=32;
+  const dib=()=>{ requestAnimationFrame(dib); if(!B.classList.contains('habla')){ if(c.dataset.v){ g.clearRect(0,0,c.width,c.height); c.dataset.v=''; } return; }
+    c.dataset.v='1'; const W=c.width, H=c.height; g.clearRect(0,0,W,H); let hay=false; if(anal){ anal.getByteFrequencyData(ondaD); hay=ondaD.some(v=>v>8); }
+    for(let i=0;i<N;i++){ const k=Math.abs(i-(N-1)/2)/((N-1)/2), v=hay?ondaD[Math.min(ondaD.length-1,Math.floor(k*ondaD.length*.7))]/255:(.25+.5*Math.random())*(1-k*.6);
+      const h=Math.max(3,v*H*.92), x=i*(W/N)+2; g.fillStyle=`rgba(${120+100*v|0},240,255,${.55+.45*v})`; g.shadowColor='#5fe3ff'; g.shadowBlur=8; g.fillRect(x,(H-h)/2,W/N-4,h); } };
+  dib(); })();
 window.__entender=entender; window.__responder=t=>responder(entender(t));
 // 🔍 zoom: Molí se acerca volando hasta que el holograma le llena la vista (y vuelve)
 async function acercar(on){
