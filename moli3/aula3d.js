@@ -145,7 +145,7 @@ function AulaMoli3(THREE, canvas) {
     tarjeta(1540, 220, 450, 700); g.textAlign = 'center'; g.fillStyle = '#9ff0ff'; g.font = ORB(36); g.fillText(CO.cientT, 1765, 300);
     g.textAlign = 'left'; CO.pasos.forEach((t, i) => { const y = 420 + i * 120; g.fillStyle = ['#38bdf8', '#f59e0b', '#22c55e', '#a78bfa'][i]; g.beginPath(); g.arc(1610, y - 16, 30, 0, 7); g.fill();
       g.fillStyle = '#05102e'; g.font = F(800, 40); g.textAlign = 'center'; g.fillText(i + 1, 1610, y - 2); g.textAlign = 'left'; g.fillStyle = '#ffffff'; g.font = F(700, 48); g.fillText(t, 1665, y); });
-    g.textAlign = 'center'; g.fillStyle = 'rgba(160,245,255,.7)'; g.font = ORB(30); g.fillText('PANTALLA DE UNIDAD · MOLÍ 3', w / 2, 830); });
+    g.textAlign = 'center'; g.fillStyle = 'rgba(160,245,255,.7)'; g.font = ORB(30); g.fillText('CORCHO DE UNIDAD · MOLÍ 3', w / 2, 830); });
   const PANT = { c: V(X - 0.06, 1.62, 0.6), w: 3.2, h: 1.6 };
   const pant = new THREE.Group(); pant.position.copy(PANT.c); pant.rotation.y = -Math.PI / 2; S.add(pant);
   malla(new THREE.BoxGeometry(PANT.w + 0.12, PANT.h + 0.12, 0.06), PM({ color: 0x1a2030, roughness: 0.3, metalness: 0.6 }), [0, 0, -0.01], null, pant);
@@ -184,18 +184,20 @@ function AulaMoli3(THREE, canvas) {
   const ESC = [
     { n: '🏫 Aula', obj: 'AULA DE CIENCIA', from: V(0.4, 1.6, Z - 0.6), look: V(0, 1.0, -Z + 0.5) },
     { n: '📗 Cuaderno', obj: 'CUADERNO DE SESIONES', from: CU.clone().add(V(0.0, 0.62, 0.78)), look: CU.clone().add(V(0, 0.1, -0.06)) },
-    { n: '📌 Pantalla', obj: 'PANTALLA DE UNIDAD', from: V(X - 2.55, 1.58, 0.6), look: PANT.c.clone() },
+    { n: '📌 Corcho', obj: 'CORCHO DE UNIDAD', from: V(X - 2.55, 1.58, 0.6), look: PANT.c.clone() },
+    { n: '🧑‍🏫 Pizarra', obj: 'PIZARRA DIGITAL', from: V(0, 1.6, -Z + 3.3), look: V(0, 1.55, -Z) },
     { n: '🖼️ Muro', obj: 'MURO DEL AULA', from: V(0, 1.62, Z - 3.7), look: V(0, 1.78, Z) }
   ];
   const pos = ESC[0].from.clone(), look = ESC[0].look.clone();
   const tam = () => { const w = canvas.clientWidth, h = canvas.clientHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.fov = cam.aspect < 1 ? 72 : 55; cam.updateProjectionMatrix(); };
   addEventListener('resize', tam); tam();
-  const t00 = performance.now() / 1000; let roll = 0;
+  const t00 = performance.now() / 1000; let roll = 0, fovMas = 0;
   return {
     renderer: R, camera: cam, pos, look, ESC,
-    set roll(v) { roll = v; },
+    set roll(v) { roll = v; }, set fov(v) { fovMas = v; },
     update() {
       const t = performance.now() / 1000 - t00;
+      const fv = (cam.aspect < 1 ? 72 : 55) + fovMas; if (Math.abs(cam.fov - fv) > 0.01) { cam.fov = fv; cam.updateProjectionMatrix(); }
       cam.position.copy(pos); cam.position.x += Math.sin(t * 0.5) * 0.008; cam.position.y += Math.sin(t * 0.7) * 0.006; cam.lookAt(look); if (roll) cam.rotateZ(roll);
       holo.position.y = 0.24 + Math.sin(t * 1.6) * 0.008; holo.rotation.y = Math.sin(t * 0.6) * 0.12; holo.material.opacity = 0.85 + Math.sin(t * 9) * 0.08;
       R.render(S, cam);

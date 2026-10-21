@@ -70,8 +70,14 @@ body.alarma #borde{stroke:#ff5a6b;animation:latido 1.3s ease-in-out infinite}
 body.abierto .parpado.arr{transform:translateY(-106%)}
 body.abierto .parpado.aba{transform:translateY(106%)}
 
+/* Líneas de velocidad al volar */
+#rayas{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:3;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(220,250,255,.0) 0deg 4deg,rgba(220,250,255,.22) 4.4deg,rgba(220,250,255,0) 5deg 11deg);
+  -webkit-mask-image:radial-gradient(ellipse at center,transparent 38%,#000 85%);mask-image:radial-gradient(ellipse at center,transparent 38%,#000 85%);animation:rayas .35s linear infinite}
+@keyframes rayas{to{transform:rotate(3deg) scale(1.03)}}
+body.vuela #hud .mira{opacity:.15}
 /* Escenas del aula (abajo) */
-#escenas{position:absolute;left:50%;bottom:calc(4% + 4px);transform:translateX(-50%);display:flex;gap:8px;z-index:4;opacity:0;pointer-events:none;transition:opacity .5s}
+#escenas{position:absolute;left:50%;bottom:calc(4% + 4px);transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;width:max-content;max-width:92vw;gap:8px;z-index:4;opacity:0;pointer-events:none;transition:opacity .5s}
 body.on #escenas{opacity:1;pointer-events:auto}
 #escenas button{font:800 clamp(12px,2vmin,17px) 'Baloo 2',sans-serif;color:#dffcff;background:rgba(8,20,48,.62);border:1px solid rgba(111,243,255,.55);border-radius:99px;padding:.25em 1em;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:.2s}
 #escenas button:hover{background:rgba(20,50,100,.75)}
@@ -144,6 +150,7 @@ body.on #escenas{opacity:1;pointer-events:auto}
     <path id="borde" fill="none" stroke="#6ff3ff" stroke-width="2.5" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 5px #5fd0ff)" d="M38 20 Q500 6 962 20 Q996 300 962 580 Q500 594 38 580 Q4 300 38 20Z"/>
   </svg>
 
+  <div id="rayas"></div>
   <nav id="escenas" aria-label="Escenas del aula"></nav>
   <div id="sub"></div>
   <div id="pista"></div>
@@ -164,8 +171,8 @@ body.on #escenas{opacity:1;pointer-events:auto}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="aula3d.js?v=202610211742"></script>
-<script src="brazo3d.js?v=202610211742"></script>
+<script src="aula3d.js?v=202610211747"></script>
+<script src="brazo3d.js?v=202610211747"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
@@ -176,8 +183,9 @@ function conectar(){
   try{ A=AulaMoli3(THREE,$('#aula')); BR=BrazoMoli(THREE,A.renderer,A.camera); window.__br=BR; }catch(e){ console.error(e); return; }
   ESC=A.ESC;
   const nav=$('#escenas'); nav.innerHTML='';
-  ESC.forEach((e,n)=>{ if(!n) return; const b=document.createElement('button'); b.type='button'; b.textContent=e.n; b.dataset.n=n;
+  ESC.forEach((e,n)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=e.n; b.dataset.n=n;
     b.addEventListener('click',ev=>{ ev.stopPropagation(); volar(n); }); nav.appendChild(b); });
+  pintarEsc();
   const bucle=()=>{ try{ BR&&BR.update(); A.update(); }catch(e){ console.error(e) } requestAnimationFrame(bucle); };
   bucle();
   const bt=$('#encender'); bt.disabled=false; bt.textContent='▶ Encender a Molí';
@@ -185,20 +193,41 @@ function conectar(){
 (document.fonts&&document.fonts.load?Promise.all([document.fonts.load('800 40px "Baloo 2"'),document.fonts.load('800 40px Orbitron')]).catch(()=>0):Promise.resolve()).then(conectar);
 const pintarEsc=()=>[...$('#escenas').children].forEach(b=>{ b.classList.toggle('on',+b.dataset.n===escI); b.disabled=volando; });
 function estadoBase(){ estado(fase==='alarma'?'⚠ ALERTA':fase==='mensaje'?'📨 MENSAJE':fase==='listo'?'✔ TODO EN ORDEN':'ESCANEANDO…'); }
+// vuelo épico: sube en curva, gira la mirada suave (sin trompos), se inclina en las curvas,
+// abre un poquito la vista en pleno vuelo, con líneas de velocidad y un "whoosh"; al llegar se asienta con un rebotito
+const suave=k=>k<.5?16*k**5:1-(-2*k+2)**5/2;                       // arranque y frenado muy suaves
+const mirada=k=>k<.5?4*k**3:1-(-2*k+2)**3/2;
 async function volar(n){
   const e=ESC[n]; if(volando||!A||!e||n===escI) return;
-  volando=true; escI=n; pintarEsc(); B.classList.remove('on'); estado('DESPLAZANDO…');
-  const p0=A.pos.clone(), l0=A.look.clone(), p1=e.from, l1=e.look, d=p0.distanceTo(p1), ms=Math.min(2600,1200+d*220);
-  zumbido(ms/1000);
-  const t0=performance.now();
-  await new Promise(res=>{ const paso=()=>{ const k=Math.min(1,(performance.now()-t0)/ms), q=k*k*(3-2*k);
-    A.pos.lerpVectors(p0,p1,q); A.pos.y+=Math.sin(Math.PI*q)*Math.min(.3,d*.05); A.look.lerpVectors(l0,l1,q); A.roll=Math.sin(Math.PI*q)*.03;
-    if(k<1) requestAnimationFrame(paso); else { A.roll=0; res(); } }; paso(); });
+  volando=true; escI=n; pintarEsc(); B.classList.remove('on'); B.classList.add('vuela'); estado('DESPLAZANDO…');
+  const T=THREE, p0=A.pos.clone(), l0=A.look.clone(), p1=e.from.clone(), l1=e.look.clone(), d=p0.distanceTo(p1);
+  const ms=Math.min(3200,1500+d*260), up=new T.Vector3(0,1,0), m4=new T.Matrix4();
+  const q0=new T.Quaternion().setFromRotationMatrix(m4.lookAt(p0,l0,up)), q1=new T.Quaternion().setFromRotationMatrix(m4.lookAt(p1,l1,up));
+  const d0=p0.distanceTo(l0), d1=p1.distanceTo(l1);
+  const y0=Math.atan2(l0.x-p0.x,l0.z-p0.z), y1=Math.atan2(l1.x-p1.x,l1.z-p1.z); let giro=y1-y0; giro=Math.atan2(Math.sin(giro),Math.cos(giro));
+  const c=p0.clone().lerp(p1,.5); c.y+=Math.min(.9,.25+d*.12);       // punto alto de la curva
+  const atras=p1.clone().sub(l1).setY(0).normalize().multiplyScalar(Math.min(.8,d*.1)); c.add(atras);   // entra de frente, como cámara de cine
+  zumbido(ms/1000); whoosh(ms/1000);
+  const q=new T.Quaternion(), fw=new T.Vector3(), t0=performance.now(); let ant=0;
+  await new Promise(res=>{ const paso=()=>{ const k=Math.min(1,(performance.now()-t0)/ms), s=suave(k), a=1-s;
+    A.pos.set(a*a*p0.x+2*a*s*c.x+s*s*p1.x, a*a*p0.y+2*a*s*c.y+s*s*p1.y, a*a*p0.z+2*a*s*c.z+s*s*p1.z);
+    const km=mirada(Math.min(1,k*1.08)); q.copy(q0).slerp(q1,km);
+    fw.set(0,0,-1).applyQuaternion(q).multiplyScalar(d0+(d1-d0)*km); A.look.copy(A.pos).add(fw);
+    const vel=Math.abs(s-ant)*60; ant=s;
+    A.roll=-Math.sin(Math.PI*k)*Math.max(-.09,Math.min(.09,giro*.05)) + Math.sin(Math.PI*k)*.012;
+    A.fov=Math.sin(Math.PI*k)*9;
+    $('#rayas').style.opacity=Math.min(.85,vel*1.6).toFixed(3);
+    if(k<1) requestAnimationFrame(paso); else res(); }; paso(); });
+  // se asienta: un rebotito de la cámara al frenar
+  const t1=performance.now();
+  await new Promise(res=>{ const paso=()=>{ const k=Math.min(1,(performance.now()-t1)/420); A.roll=Math.sin(k*Math.PI*2)*.006*(1-k); A.fov=-Math.sin(k*Math.PI)*1.2;
+    if(k<1) requestAnimationFrame(paso); else { A.roll=0; A.fov=0; res(); } }; paso(); });
+  $('#rayas').style.opacity=0; B.classList.remove('vuela');
   $('#objetivo b').textContent='OBJETO: '+e.obj;
   volando=false; pintarEsc(); B.classList.add('on'); estadoBase();
 }
 addEventListener('keydown',e=>{ if(!B.classList.contains('on')&&!volando) return;
-  const n=ESC.length-1, i=Math.max(escI,1); if(e.key==='ArrowRight') volar(i%n+1); if(e.key==='ArrowLeft') volar((i-2+n)%n+1); });
+  const n=ESC.length; if(e.key==='ArrowRight') volar((escI+1)%n); if(e.key==='ArrowLeft') volar((escI-1+n)%n); });
 
 /* ---------- Sonidos ---------- */
 let AC, mezcla, alarmaGan, alarmaT=null;
@@ -223,6 +252,15 @@ function servo(dur=.38,f0=170,f1=420,vol=.16){
   o.connect(bp); o2.connect(g2); g2.connect(bp); bp.connect(g); g.connect(mezcla);
   o.start(t); o2.start(t); o.stop(t+dur+.02); o2.stop(t+dur+.02);
   clic(t+dur);
+}
+// whoosh: aire que pasa (ruido filtrado que sube y baja)
+function whoosh(dur){
+  if(!AC) return; const t=AC.currentTime, n=Math.floor(AC.sampleRate*dur), buf=AC.createBuffer(1,n,AC.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+  const src=AC.createBufferSource(), bp=AC.createBiquadFilter(), g=AC.createGain(); src.buffer=buf;
+  bp.type='bandpass'; bp.Q.value=.8; bp.frequency.setValueAtTime(300,t); bp.frequency.exponentialRampToValueAtTime(1800,t+dur*.5); bp.frequency.exponentialRampToValueAtTime(350,t+dur);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.07,t+dur*.5); g.gain.linearRampToValueAtTime(0,t+dur);
+  src.connect(bp); bp.connect(g); g.connect(mezcla); src.start(t); src.stop(t+dur);
 }
 // motorcito suave mientras Molí se mueve por el aula
 function zumbido(dur){
