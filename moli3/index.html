@@ -94,10 +94,11 @@ body.on #escenas{opacity:1;pointer-events:auto}
 #escenas button:disabled{opacity:.55;cursor:default}
 #encender:disabled{animation:none;opacity:.7;cursor:wait}
 /* 🎙️ Hablar con Molí */
-#mic{position:absolute;right:calc(5% + 6px);bottom:calc(5% + 4px);z-index:5;width:clamp(48px,8vmin,66px);height:clamp(48px,8vmin,66px);border-radius:50%;border:2px solid rgba(160,245,255,.9);
-  background:radial-gradient(circle at 40% 35%,#1d3a8a,#0b1438);font-size:clamp(20px,3.6vmin,30px);cursor:pointer;box-shadow:0 0 16px rgba(111,243,255,.6);opacity:0;pointer-events:none;transition:opacity .4s,transform .15s}
+#mic{position:absolute;right:calc(5% + 12px);bottom:calc(5% + 10px);z-index:5;width:clamp(86px,14vmin,128px);height:clamp(86px,14vmin,128px);border:0;border-radius:50%;padding:0;
+  background:transparent;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .5s,transform .15s}
+#mic canvas{width:100%;height:100%;display:block}
 body.charla #mic{opacity:1;pointer-events:auto}
-#mic:hover{transform:scale(1.07)}
+#mic:hover{transform:scale(1.05)}
 @keyframes oye{0%{box-shadow:0 0 0 0 rgba(255,90,110,.75)}100%{box-shadow:0 0 0 22px rgba(255,90,110,0)}}
 #escribe{position:absolute;right:calc(5% + 6px);bottom:calc(5% + clamp(58px,9.5vmin,78px));z-index:5;display:none;gap:6px}
 body.texto #escribe{display:flex}
@@ -106,9 +107,7 @@ body.texto #escribe{display:flex}
 #tu{position:absolute;left:50%;top:calc(5% + clamp(84px,12.5vmin,116px));transform:translateX(-50%);max-width:78vw;padding:.3em 1em;border-radius:16px;background:rgba(255,255,255,.88);color:#0b1438;
   font-size:clamp(14px,2.4vmin,22px);font-weight:800;opacity:0;transition:opacity .3s;pointer-events:none;z-index:4;text-align:center}
 #tu.ver{opacity:1}
-#onda{position:absolute;left:50%;top:calc(5% + clamp(40px,6vmin,56px));transform:translateX(-50%);width:clamp(200px,32vmin,320px);height:clamp(36px,5.6vmin,56px);pointer-events:none;z-index:4}
-body.escucha #mic{border-color:#5fe3ff;box-shadow:0 0 22px rgba(111,243,255,.95),inset 0 0 12px rgba(111,243,255,.5)}
-body.escucha.oye #mic{border-color:#ff8b97;animation:oye 1s infinite}
+
 body.habla #borde{stroke:#bff8ff;filter:drop-shadow(0 0 9px #5fd0ff)!important}
 /* Subtítulos */
 #sub{position:absolute;left:50%;bottom:calc(5% + clamp(80px,12vmin,110px));transform:translateX(-50%) translateY(10px);max-width:min(80vw,900px);padding:.35em 1.1em;border-radius:16px;background:rgba(8,20,48,.68);border:1px solid rgba(111,243,255,.6);box-shadow:0 0 16px rgba(111,243,255,.35);color:#fff;font-size:clamp(15px,2.6vmin,24px);font-weight:800;opacity:0;transition:.3s;pointer-events:none;z-index:4;text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
@@ -179,9 +178,8 @@ body.habla #borde{stroke:#bff8ff;filter:drop-shadow(0 0 9px #5fd0ff)!important}
   <div id="rayas"></div>
   <div id="dias"><button type="button" data-d="-1">◀</button><span id="diaN">1 / 5</span><button type="button" data-d="1">▶</button><button type="button" id="zoom" class="zm">🔍 Acercar</button></div>
   <nav id="escenas" aria-label="Escenas del aula"></nav>
-  <button id="mic" type="button" aria-label="Hablar con Molí" title="Hablar con Molí (tecla M)">🎙️</button>
+  <button id="mic" type="button" aria-label="Hablar con Molí" title="Hablar con Molí (tecla M para apagar o prender)"><canvas id="jarvis" width="260" height="260"></canvas></button>
   <form id="escribe" autocomplete="off"><input id="escribeT" type="text" placeholder="Escríbele a Molí…" aria-label="Escríbele a Molí"><button type="submit">➤</button></form>
-  <canvas id="onda" width="320" height="56" aria-hidden="true"></canvas>
   <div id="tu"></div>
   <div id="sub"></div>
   <div id="pista"></div>
@@ -202,9 +200,9 @@ body.habla #borde{stroke:#bff8ff;filter:drop-shadow(0 0 9px #5fd0ff)!important}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="aula3d.js?v=202610212250"></script>
-<script src="saber.js?v=202610212250"></script>
-<script src="brazo3d.js?v=202610212250"></script>
+<script src="aula3d.js?v=202610221255"></script>
+<script src="saber.js?v=202610221255"></script>
+<script src="brazo3d.js?v=202610221255"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s), B=document.body;
@@ -370,7 +368,7 @@ async function parpadear(rapido){
 /* ---------- Secuencia ---------- */
 let fase='apagado';
 async function encender(){
-  audioIni(); AC.resume&&AC.resume();
+  audioIni(); AC.resume&&AC.resume(); abrirMic();
   $('#inicio').classList.add('fuera');
   await esperar(500);
   servo(.5,140,460,.16); B.classList.add('abierto'); await esperar(900);
@@ -378,7 +376,7 @@ async function encender(){
   B.classList.add('on'); estado('SISTEMA EN LÍNEA ✔');
   await esperar(300);
   await hablar('saludo','Saludos, usuario.');
-  fase='mirando'; estado('ESCANEANDO…'); B.classList.add('charla');
+  fase='mirando'; estado('ESCANEANDO…'); B.classList.add('charla'); if(!escuchaOn) microOn(true);   // siempre activo
   await esperar(3200);
   alertar();
 }
@@ -494,8 +492,33 @@ let tuT=0; const tu=t=>{ const el=$('#tu'); el.textContent='🧑 '+t; el.classLi
 function bip(f){ if(!AC) return; nota(f||880,AC.currentTime,.12,.08); }
 // micrófono siempre activo: una vez prendido escucha, responde y vuelve a escuchar (mientras Molí habla no escucha, para no oírse)
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, oyendo=false, escuchaOn=false;
+// Firefox no trae reconocimiento de voz: Molí usa su «oído local» (Vosk, español, funciona dentro de la página)
+let voskRec=null, voskCargando=false, ocupado=false, finHabla=0;
+new MutationObserver(()=>{ if(!B.classList.contains('habla')) finHabla=performance.now(); }).observe(B,{attributes:true,attributeFilter:['class']});
+const cargarScript=src=>new Promise((ok,no)=>{ const e=document.createElement('script'); e.src=src; e.onload=ok; e.onerror=no; document.head.appendChild(e); });
+async function oidoLocal(){
+  if(voskRec) return true; if(voskCargando) return false; voskCargando=true;
+  tu('⏳ Preparando el oído de Molí… (la primera vez tarda un poquito)');
+  try{
+    await abrirMic(); if(!micStream) throw new Error('sin micrófono');
+    if(!window.Vosk) await cargarScript('voz/vosk.js');
+    const modelo=await Vosk.createModel(new URL('voz/modelo-es.tar.gz',location.href).href);
+    voskRec=new modelo.KaldiRecognizer(AC.sampleRate);
+    const quieto=()=>B.classList.contains('habla')||performance.now()-finHabla<600||volando||ocupado;
+    let ultP='', pausaT=0;                                         // si dejas de hablar ~1 s, Molí ya responde (no espera más)
+    voskRec.on('partialresult',m=>{ const p=(m.result&&m.result.partial)||''; if(!p||!escuchaOn||quieto()) return;
+      if(p!==ultP){ ultP=p; tu(p); B.classList.add('oye'); clearTimeout(pausaT); pausaT=setTimeout(()=>{ try{ voskRec.retrieveFinalResult(); }catch(e){} },1000); } });
+    voskRec.on('result',async m=>{ clearTimeout(pausaT); ultP=''; const t=((m.result&&m.result.text)||'').trim(); B.classList.remove('oye'); if(!t||!escuchaOn||quieto()) return;
+      tu(t); ocupado=true; try{ await responder(entender(t)); } finally{ ocupado=false; } });
+    const src=AC.createMediaStreamSource(micStream), sp=AC.createScriptProcessor(4096,1,1), cero=AC.createGain(); cero.gain.value=0;
+    sp.onaudioprocess=ev=>{ if(!escuchaOn||quieto()) return; try{ voskRec.acceptWaveform(ev.inputBuffer); }catch(e){} };
+    src.connect(sp); sp.connect(cero); cero.connect(AC.destination); window.__sp=sp;
+    tu('🎙️ Conversación activa: háblale a Molí'); return true;
+  }catch(e){ console.error(e); tu('No pude usar el micrófono: escríbele a Molí'); B.classList.add('texto'); escuchaOn=false; B.classList.remove('escucha'); return false; }
+  finally{ voskCargando=false; }
+}
 function microOn(on){
-  if(!SR){ B.classList.toggle('texto'); if(B.classList.contains('texto')) $('#escribeT').focus(); return; }   // Firefox: se le escribe
+  if(!SR){ escuchaOn=on; B.classList.toggle('escucha',on); bip(on?880:520); if(on){ if(voskRec) tu('🎙️ Conversación activa: háblale a Molí'); else oidoLocal(); } else B.classList.remove('oye'); return; }
   escuchaOn=on; B.classList.toggle('escucha',on); bip(on?880:520);
   if(on){ tu('🎙️ Conversación activa: háblale a Molí'); ciclo(); } else { try{ rec&&rec.abort(); }catch(e){} oyendo=false; B.classList.remove('oye'); }
 }
@@ -517,13 +540,41 @@ $('#mic').addEventListener('click',e=>{ e.stopPropagation(); microOn(!escuchaOn)
 $('#escribe').addEventListener('click',e=>e.stopPropagation());
 $('#escribe').addEventListener('submit',e=>{ e.preventDefault(); const t=$('#escribeT').value.trim(); if(!t) return; $('#escribeT').value=''; tu(t); responder(entender(t)); });
 addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if((e.key==='m'||e.key==='M')&&B.classList.contains('charla')) microOn(!escuchaOn); });
-// onda de voz en el visor mientras Molí habla
-(function onda(){ const c=$('#onda'), g=c.getContext('2d'); const N=32;
-  const dib=()=>{ requestAnimationFrame(dib); if(!B.classList.contains('habla')){ if(c.dataset.v){ g.clearRect(0,0,c.width,c.height); c.dataset.v=''; } return; }
-    c.dataset.v='1'; const W=c.width, H=c.height; g.clearRect(0,0,W,H); let hay=false; if(anal){ anal.getByteFrequencyData(ondaD); hay=ondaD.some(v=>v>8); }
-    for(let i=0;i<N;i++){ const k=Math.abs(i-(N-1)/2)/((N-1)/2), v=hay?ondaD[Math.min(ondaD.length-1,Math.floor(k*ondaD.length*.7))]/255:(.25+.5*Math.random())*(1-k*.6);
-      const h=Math.max(3,v*H*.92), x=i*(W/N)+2; g.fillStyle=`rgba(${120+100*v|0},240,255,${.55+.45*v})`; g.shadowColor='#5fe3ff'; g.shadowBlur=8; g.fillRect(x,(H-h)/2,W/N-4,h); } };
-  dib(); })();
+// 🎙️ círculo tipo Jarvis: anillo de palitos que se mueven con la voz de Molí (blanco-celeste) o con la tuya (celeste);
+// en reposo respira suave; apagado se pone gris
+let micAnal=null, micD=null, micStream=null;
+async function abrirMic(){ try{ if(!navigator.mediaDevices||micAnal) return;
+  const st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,channelCount:1}}); micStream=st;
+  const src=AC.createMediaStreamSource(st); micAnal=AC.createAnalyser(); micAnal.fftSize=64; micD=new Uint8Array(micAnal.frequencyBinCount); src.connect(micAnal); }catch(e){} }
+(function jarvis(){ const c=$('#jarvis'), g=c.getContext('2d'), W=c.width, C=W/2, N=56, val=new Float32Array(N); let rot=0, tAnt=performance.now();
+  const dib=now=>{ requestAnimationFrame(dib); const dt=Math.min(.1,(now-tAnt)/1000); tAnt=now; const t=now/1000;
+    const habla=B.classList.contains('habla'), oye=escuchaOn&&!habla, apagado=!escuchaOn&&!habla;
+    let datos=null; if(habla&&anal){ anal.getByteFrequencyData(ondaD); if(ondaD.some(v=>v>6)) datos=ondaD; } else if(oye&&micAnal){ micAnal.getByteFrequencyData(micD); datos=micD; }
+    for(let i=0;i<N;i++){ const k=Math.abs(((i/N)*2)%2-1);                                   // simétrico: graves arriba y abajo
+      let v=datos?datos[Math.min(datos.length-1,Math.floor(k*datos.length*.75))]/255:(habla?.25+.45*Math.random():.06+.05*Math.sin(t*2.2+i*.45));
+      if(apagado) v=.04; val[i]+=(v-val[i])*Math.min(1,dt*14); }
+    rot+=dt*(habla?.9:oye?.45:.15);
+    g.clearRect(0,0,W,W);
+    const fondo=g.createRadialGradient(C,C,W*.2,C,C,W*.5); fondo.addColorStop(0,'rgba(6,16,40,.55)'); fondo.addColorStop(.85,'rgba(6,16,40,.35)'); fondo.addColorStop(1,'rgba(6,16,40,0)'); g.fillStyle=fondo; g.beginPath(); g.arc(C,C,W*.5,0,7); g.fill();
+    const col=apagado?'150,165,190':habla?'210,250,255':'95,227,255', R0=W*.27;
+    // núcleo
+    const rg=g.createRadialGradient(C,C,W*.04,C,C,R0); rg.addColorStop(0,apagado?'rgba(40,50,70,.9)':'rgba(30,80,170,.95)'); rg.addColorStop(1,'rgba(8,20,48,.92)');
+    g.fillStyle=rg; g.beginPath(); g.arc(C,C,R0*.92,0,7); g.fill();
+    g.strokeStyle=`rgba(${col},.9)`; g.lineWidth=3; g.shadowColor=`rgb(${col})`; g.shadowBlur=apagado?0:14; g.beginPath(); g.arc(C,C,R0*.92,0,7); g.stroke();
+    // palitos
+    g.lineCap='round'; g.lineWidth=W*.022;
+    for(let i=0;i<N;i++){ const a=i/N*Math.PI*2-Math.PI/2+rot*.15, L=W*.035+val[i]*W*.17, r1=R0*1.04, r2=r1+L;
+      g.strokeStyle=`rgba(${col},${.45+.55*Math.min(1,val[i]*1.6)})`; g.beginPath(); g.moveTo(C+Math.cos(a)*r1,C+Math.sin(a)*r1); g.lineTo(C+Math.cos(a)*r2,C+Math.sin(a)*r2); g.stroke(); }
+    // anillos que giran
+    g.shadowBlur=apagado?0:10; g.lineWidth=2.5;
+    [[W*.47,rot,1.5],[W*.47,rot+Math.PI,1.1],[W*.43,-rot*1.6,.7],[W*.43,-rot*1.6+Math.PI,.5]].forEach(([r,a0,l])=>{ g.strokeStyle=`rgba(${col},.75)`; g.beginPath(); g.arc(C,C,r,a0,a0+l); g.stroke(); });
+    // micrófono en el centro
+    g.shadowBlur=0; g.fillStyle=`rgba(${col},1)`; g.strokeStyle=`rgba(${col},1)`; g.lineWidth=W*.022;
+    const mw=W*.075, mh=W*.13, my=C-W*.05; g.beginPath(); g.moveTo(C-mw/2,my+mw/2); g.arc(C,my+mw/2,mw/2,Math.PI,0); g.lineTo(C+mw/2,my+mh-mw/2); g.arc(C,my+mh-mw/2,mw/2,0,Math.PI); g.closePath(); g.fill();
+    g.beginPath(); g.arc(C,my+mh*.55,mw*.95,.15*Math.PI,.85*Math.PI); g.stroke(); g.beginPath(); g.moveTo(C,my+mh*.55+mw*.95); g.lineTo(C,my+mh+W*.045); g.stroke();
+    if(apagado){ g.strokeStyle='rgba(255,120,135,.95)'; g.beginPath(); g.moveTo(C-W*.09,C+W*.09); g.lineTo(C+W*.09,C-W*.11); g.stroke(); }
+  };
+  requestAnimationFrame(dib); })();
 window.__entender=entender; window.__responder=t=>responder(entender(t));
 // 🔍 zoom: Molí se acerca volando hasta que el holograma le llena la vista (y vuelve)
 async function acercar(on){
