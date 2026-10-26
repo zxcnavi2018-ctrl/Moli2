@@ -647,7 +647,7 @@
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); if (fichaParte(s, j + 1)) Lst.push({ ...b, k: 'fic', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); if (fichaParte(s, j + 1)) Lst.push({ ...b, k: 'fic', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(SB) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
@@ -737,6 +737,9 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     function slide(it) {
       if (it.k === 'vid') return slideVideo(it);
       if (it.k === 'sync') return Sincro.html(syncDe(it));
+      if (it.k === 'ej' || it.k === 'nx') { const ok = it.k === 'ej', E = (ok ? it.x.ej : it.x.nx) || {}, [c1, c2] = ok ? ['#065f46', '#10b981'] : ['#7f1d1d', '#ef4444'];   // ✅ ejemplo / ❌ contraejemplo de la actividad
+        const tb = `<table class="fic-t"><tr>${(E.c || []).map(h => `<th>${esc(h)}</th>`).join('')}</tr>${(E.d || []).map(f => `<tr>${(E.c || []).map((_, k) => `<td>${esc(f[k] || '')}</td>`).join('')}</tr>`).join('')}</table>`;
+        return `<div class="cv-sl cv-fic" style="--c1:${c1};--c2:${c2}">${crumb(it)}<div class="fic-h"><span class="cv-num">${it.j}</span><div><b>${ok ? '✅ ¡Así queda! · Ejemplo' : '❌ ¡Así NO! · Contraejemplo'}</b><small>Actividad ${it.j}${L(it.x.title) ? ' · ' + esc(it.x.title) : ''}</small></div><img src="${IMG(ok ? 'feliz' : 'pensativa')}" alt=""></div><div class="fic-hoja"><div class="fic-tt">${esc(E.t || '')}</div>${tb}${L(E.nota) ? `<p class="fic-mas">💬 ${esc(E.nota)}</p>` : ''}${L(E.por) ? `<p class="fic-mas">🤔 <b>¿Por qué está mal?</b> ${esc(E.por)}</p>` : ''}</div></div>`; }
       if (it.k === 'fic') { const F = fichaParte(it.s, it.j), M = 5, P = F ? F.P.slice(0, M) : [], [c1, c2] = CV_BG.fic;
         return `<div class="cv-sl cv-fic" style="--c1:${c1};--c2:${c2}">${crumb(it)}<div class="fic-h"><span class="cv-num">${it.j}</span><div><b>📄 ¡Busca esto en tu ficha!</b><small>Actividad ${it.j}${L(it.x.title) ? ' · ' + esc(it.x.title) : ''}</small></div><img src="${IMG('curiosa')}" alt=""></div><div class="fic-hoja"><div class="fic-tt">${esc(F && F.t || 'Ficha de la sesión')} · <b>Actividad ${it.j}</b></div>${P.map(ficItem).join('')}${F && F.P.length > M ? `<p class="fic-mas">👉 … y ${F.P.length - M} parte${F.P.length - M > 1 ? 's' : ''} más de esta actividad en tu ficha</p>` : ''}</div></div>`; }
       const u = it.u, s = it.s, [c1, c2] = it.k in CV_BG ? CV_BG[it.k] : color(u), st = `style="--c1:${c1};--c2:${c2}"`;
