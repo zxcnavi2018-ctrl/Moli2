@@ -281,7 +281,7 @@ Devuelve "sections" en orden; cada una con "kind": "texto" (información: "headi
             const s = { ...s0, title: x.title, meta: x.meta, criteria: x.criteria, rubric: x.rubric, flipped: { ...OFF, ...x.flipped, file: (s0.flipped || {}).file || '' }, flipped2: { ...OFF, ...x.flipped2, file: (s0.flipped2 || {}).file || '' }, fx: x.fx };
             if ('hidden' in x) s.hidden = x.hidden;
             if (!x.fx) delete s.fx; if (!x.pdf) { delete s.pdf; delete s.ficha; }   // sesiones sin ficha: se trabaja en el cuaderno y en papelote
-            s.activities = x.activities.map((a, k) => ({ ...(A0[k] || {}), ficha: x.pdf ? 'Ficha de la sesión' : '', file: k === 0 && x.pdf ? `fu${P.num}s${x.n}` : '', mode: a.mode, title: a.title, desc: a.desc, ...(a.ej ? { ej: a.ej } : {}), ...(a.nx ? { nx: a.nx } : {}) }));   // se quedan sus videos; una sola ficha por sesión
+            s.activities = x.activities.map((a, k) => ({ ...(A0[k] || {}), ficha: x.pdf ? 'Ficha de la sesión' : '', file: k === 0 && x.pdf ? `fu${P.num}s${x.n}` : '', mode: a.mode, title: a.title, desc: a.desc, ...(a.cu ? { cu: a.cu } : {}), ...(a.ej ? { ej: a.ej } : {}), ...(a.nx ? { nx: a.nx } : {}) }));   // se quedan sus videos; una sola ficha por sesión
             if (x.pdf) s.pdf = x.pdf; if (x.tareaPdf) { s.tareaPdf = x.tareaPdf; s.flipped.file = `fu${P.num}s${x.n}t`; } if (x.tarea) s.tarea = x.tarea;
             if (!(d && hechos[d] && !rep.has(x.n) && s0.ticket && (s0.ticket.questions || []).length)) s.ticket = x.ticket;   // si ya lo respondieron, se quedan sus preguntas
             while (U.sessions.length < x.n - 1) U.sessions.push(vacia());
