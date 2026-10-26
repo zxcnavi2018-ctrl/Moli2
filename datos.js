@@ -100,6 +100,11 @@
     let files = {}; try { files = JSON.parse((c && c.data) || '{}').files || {}; } catch (e) {}
     if (!esp()) try { const r = await fetch('data/ticket-u7s1.json', { cache: 'no-cache' }); if (r.ok) { const T = await r.json();      // Exit ticket nuevo de la Sesión 1 (Unidad 7), puesto directo
       const u = units.find(x => String(x.num) === String(T.unidad)), s = u && u.sessions && u.sessions[T.sesion - 1]; if (s && Array.isArray(T.questions) && T.questions.length) s.ticket = { ...(s.ticket || {}), questions: T.questions }; } } catch (e) {}
+    if (!esp()) try { const r = await fetch('data/unidad7.json', { cache: 'no-cache' }); if (r.ok) { const P = await r.json();   // sesiones de la Unidad 7 sin ficha (cuaderno y papelote), puestas directo
+      const u = units.find(x => String(x.num) === String(P.num));
+      if (u && u.sessions) P.sesiones.filter(x => x.sinFicha).forEach(x => { const s = u.sessions[x.n - 1]; if (!s) return; const A0 = s.activities || [];
+        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria }); delete s.fx; delete s.pdf;
+        s.activities = x.activities.map((a, k) => { const v = { ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ficha: '', file: '' }; ['cu', 'ej', 'nx'].forEach(c => { if (a[c]) v[c] = a[c]; else delete v[c]; }); return v; }); }); } } catch (e) {}
     contenido = { units, files };
     LS.set('moli2:content' + esp(), contenido);
     return contenido;
