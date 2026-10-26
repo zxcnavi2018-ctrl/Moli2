@@ -103,7 +103,7 @@
     if (!esp()) try { const r = await fetch('data/unidad7.json', { cache: 'no-cache' }); if (r.ok) { const P = await r.json();   // sesiones de la Unidad 7 sin ficha (cuaderno y papelote), puestas directo
       const u = units.find(x => String(x.num) === String(P.num));
       if (u && u.sessions) P.sesiones.filter(x => x.sinFicha).forEach(x => { const s = u.sessions[x.n - 1]; if (!s) return; const A0 = s.activities || [];
-        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria }); delete s.fx; delete s.pdf;
+        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria }); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; delete s.fx; delete s.pdf;
         s.activities = x.activities.map((a, k) => { const v = { ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ficha: '', file: '' }; ['cu', 'ej', 'nx'].forEach(c => { if (a[c]) v[c] = a[c]; else delete v[c]; }); return v; }); }); } } catch (e) {}
     contenido = { units, files };
     LS.set('moli2:content' + esp(), contenido);
