@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comunicación 6.° B · Módulo 3 · Sesión 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --tinta: #1f1d3a; --amarillo: #ffe500; --verde: #b9f26b; --verdeo: #8cc63f; --rosa: #ef3a6c; --lila: #5b4fa3; --celeste: #7de9f5; --crema: #fff8c9; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-family: "Nunito", system-ui, sans-serif; color: var(--tinta); }
+  /* lienzo 16:9 que se escala a la pantalla del proyector */
+  #escena { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform-origin: center; background: #fdfdfb; overflow: hidden; }
+  .sl { position: absolute; inset: 0; padding: 70px 90px 90px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transform: translateX(40px); transition: opacity .45s, transform .45s, visibility .45s;
+    background: #fdfdfb linear-gradient(#e7e7ee 1px, transparent 1px) 0 0 / 34px 34px, linear-gradient(90deg, #e7e7ee 1px, transparent 1px) 0 0 / 34px 34px; }
+  .sl.on { opacity: 1; visibility: visible; transform: none; }
+  .sl.prev { transform: translateX(-40px); }
+  h1, h2, h3 { font-family: "Baloo 2", "Nunito", sans-serif; margin: 0; line-height: 1.05; }
+  .chip { display: inline-block; align-self: flex-start; padding: 8px 22px; border-radius: 16px; background: var(--amarillo); font: 800 30px "Baloo 2", sans-serif; box-shadow: 0 5px 0 rgba(0,0,0,.15); }
+  .titulo { font-size: 74px; text-align: center; margin: 6px 0 26px; }
+  .marca { position: absolute; left: 34px; top: 26px; padding: 6px 16px; border-radius: 12px; background: var(--amarillo); font: 800 22px "Baloo 2", sans-serif; line-height: 1.1; z-index: 3; }
+  .moli { position: absolute; width: 190px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.25)); animation: flota 3s ease-in-out infinite; }
+  @keyframes flota { 50% { transform: translateY(-12px) rotate(-2deg); } }
+  .burbuja { position: relative; background: #fff; border: 4px solid var(--tinta); border-radius: 28px; padding: 22px 28px; font-size: 34px; font-weight: 800; line-height: 1.3; box-shadow: 0 8px 0 rgba(0,0,0,.12); }
+  .nota { background: #ececec; border-radius: 6px; box-shadow: 10px 10px 0 #9a9a9a; padding: 34px 26px 22px; position: relative; text-align: center; }
+  .nota::before { content: ""; position: absolute; top: -18px; left: 50%; width: 110px; height: 36px; transform: translateX(-50%) rotate(-3deg); background: #8fc1a9; opacity: .9; }
+  .caja { border: 4px solid var(--tinta); border-radius: 18px; padding: 24px 30px; box-shadow: 8px 8px 0 var(--tinta); }
+  .etq { display: inline-block; padding: 6px 20px; border-radius: 14px; font: 800 34px "Baloo 2", sans-serif; margin-bottom: 14px; }
+  ul.grande, ol.grande { margin: 0; padding-left: 1.2em; font-size: 38px; font-weight: 800; line-height: 1.4; }
+  ul.grande li, ol.grande li { margin: 8px 0; }
+  .mano { font-size: 60px; display: inline-block; animation: saluda 1.2s ease-in-out infinite; transform-origin: 70% 90%; }
+  @keyframes saluda { 25% { transform: rotate(-16deg); } 75% { transform: rotate(14deg); } }
+  /* portada */
+  .portada { background: var(--amarillo) linear-gradient(#e8d300 2px, transparent 2px) 0 0 / 46px 46px, linear-gradient(90deg, #e8d300 2px, transparent 2px) 0 0 / 46px 46px; align-items: center; justify-content: center; }
+  .portada .marco { background: #fde4c8; border: 6px solid var(--tinta); box-shadow: 18px 18px 0 var(--tinta); border-radius: 8px; padding: 60px 110px; text-align: center; }
+  .portada h1 { font-size: 132px; }
+  .portada .sub { font: 800 40px "Baloo 2", sans-serif; margin-top: 18px; color: #5b3f00; }
+  .deco { position: absolute; font-size: 120px; filter: drop-shadow(6px 6px 0 rgba(0,0,0,.25)); }
+  /* normas */
+  .normas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; margin: 10px 30px 0; }
+  .normas .nota { min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: transform .2s; }
+  .normas .nota:nth-child(1) { transform: rotate(-3deg); } .normas .nota:nth-child(3) { transform: rotate(3deg); }
+  .normas .nota:hover { transform: scale(1.04); }
+  .normas b { font: 800 40px "Baloo 2", sans-serif; line-height: 1.05; text-transform: uppercase; }
+  .normas .ic { font-size: 110px; }
+  .votos { font: 900 30px "Nunito"; color: var(--lila); min-height: 40px; }
+  .pregunta { margin-top: auto; text-align: center; font: 800 42px "Baloo 2"; color: #1f6fb2; }
+  /* meta */
+  .meta-txt { font: 800 92px "Baloo 2", sans-serif; text-align: center; text-transform: uppercase; line-height: 1.1; margin: auto 40px; }
+  .meta-txt small { display: block; font-size: 70px; color: #e0262a; text-transform: none; text-shadow: 3px 3px 0 #ffb3b3; margin-bottom: 20px; }
+  /* lectura */
+  .lectura { font-size: 44px; line-height: 1.55; font-weight: 700; text-align: justify; max-width: 1340px; margin: 0 auto; }
+  .lectura p { margin: 0 0 28px; }
+  .lectura h2 { font-size: 64px; text-decoration: underline; margin-bottom: 20px; }
+  /* línea de tiempo con Molí */
+  .lt-zona { position: relative; flex: 1; }
+  .hecho { position: absolute; width: 330px; padding: 14px 18px; background: #fff6a5; border: 4px solid #111; border-radius: 18px; font-size: 25px; font-weight: 800; line-height: 1.25; box-shadow: 0 6px 0 rgba(0,0,0,.18);
+    transition: left .9s cubic-bezier(.6,-.2,.3,1.3), top .9s cubic-bezier(.6,-.2,.3,1.3), opacity .4s, transform .4s; opacity: 0; transform: scale(.6); }
+  .hecho.ver { opacity: 1; transform: none; }
+  .hecho b { color: #b45309; }
+  .hecho.pasado { background: #ffd7e2; border-color: var(--rosa); }
+  .linea { position: absolute; left: 125px; width: 1170px; top: 70px; height: 14px; background: #111; border-radius: 99px; opacity: 0; transition: opacity .6s; }
+  .linea.ver { opacity: 1; }
+  .linea i { position: absolute; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: #4b5563; border: 5px solid #fff; box-shadow: 0 0 0 4px #111; }
+  .linea span { position: absolute; top: -64px; font: 800 26px "Baloo 2"; color: var(--lila); transform: translateX(-50%); white-space: nowrap; }
+  .molibox { position: absolute; left: 0; bottom: 0; display: flex; align-items: flex-end; gap: 18px; width: 100%; }
+  .molibox .moli { position: static; width: 170px; }
+  .molibox .burbuja { flex: 1; font-size: 31px; margin-bottom: 18px; }
+  .molibox .burbuja::before { content: ""; position: absolute; left: -26px; bottom: 30px; border: 14px solid transparent; border-right-color: var(--tinta); border-width: 14px 26px 14px 0; }
+  .paso { display: inline-block; padding: 2px 14px; border-radius: 10px; background: var(--lila); color: #fff; font-size: 24px; margin-right: 10px; vertical-align: middle; }
+  .ctrl { position: absolute; right: 0; top: -78px; display: flex; gap: 10px; z-index: 4; }
+  .ctrl button, .boton { font: 900 24px "Nunito"; padding: 10px 20px; border-radius: 14px; border: 3px solid var(--tinta); background: #fff; cursor: pointer; box-shadow: 0 5px 0 var(--tinta); }
+  .ctrl button:active, .boton:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--tinta); }
+  .ctrl .sig { background: var(--verde); }
+  /* preguntas + temporizador */
+  .metac { font: italic 800 62px "Baloo 2", sans-serif; color: #e0262a; text-shadow: 3px 3px 0 #ffc2c2; line-height: 1.35; margin: auto 0 auto 140px; }
+  .reloj { position: absolute; left: 40px; top: 40px; background: #000; color: #fff; border-radius: 14px; padding: 10px 26px 14px; text-align: center; cursor: pointer; user-select: none; box-shadow: 0 8px 0 rgba(0,0,0,.25); }
+  .reloj b { font: 900 92px "Nunito"; letter-spacing: 2px; display: block; line-height: 1; }
+  .reloj small { font: 800 20px "Nunito"; opacity: .8; }
+  .reloj.fin { background: #dc2626; animation: late .6s ease-in-out infinite; }
+  @keyframes late { 50% { transform: scale(1.06); } }
+  /* colaborativa */
+  .col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; flex: 1; }
+  .proposito { background: var(--crema); }
+  .criterios { background: #e6fbd0; }
+  .frases { background: #ececec; border: 4px solid #111; border-radius: 14px; padding: 18px 26px; font-size: 32px; font-weight: 700; line-height: 1.5; }
+  .criterio-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 26px; }
+  .criterio-col div { background: #b8f5b0; border-radius: 14px; padding: 24px; text-align: center; font: 800 34px "Baloo 2"; box-shadow: 6px 6px 0 #2d6a2d; }
+  .rol { display: flex; gap: 22px; align-items: center; margin: 18px 0; font-size: 40px; font-weight: 800; }
+  .rol .i { font-size: 74px; }
+  /* tabla autoevaluación */
+  table.auto { width: 100%; border-collapse: separate; border-spacing: 14px; font-size: 34px; font-weight: 800; }
+  table.auto th { background: #f0d43c; padding: 16px; border: 3px solid #111; font-size: 30px; }
+  table.auto td { background: #fff6a5; padding: 22px 18px; border: 3px solid #111; height: 110px; }
+  table.auto td:nth-child(2) { width: 150px; } table.auto td:nth-child(3) { width: 600px; }
+  /* plenario */
+  .franja { margin: -70px -90px 40px; padding: 30px; text-align: center; color: #111; }
+  .franja h1 { font-size: 110px; -webkit-text-stroke: 3px #ffe500; paint-order: stroke fill; }
+  .plen { display: grid; gap: 40px; font: 800 44px "Nunito"; }
+  .plen div { background: var(--verde); border: 3px solid #111; box-shadow: 8px 8px 0 #111; padding: 30px 36px; text-align: center; line-height: 1.3; }
+  .alzar { position: absolute; right: 80px; bottom: 60px; text-align: center; font: 800 30px "Baloo 2"; }
+  /* barra de navegación */
+  #barra { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 10px; z-index: 10; opacity: .25; transition: opacity .3s; }
+  #barra:hover { opacity: 1; }
+  #barra button, #barra a { font: 900 18px "Nunito"; padding: 10px 18px; border-radius: 12px; border: 0; background: rgba(20,20,40,.85); color: #fff; cursor: pointer; text-decoration: none; }
+  #num { color: #fff; font: 900 18px "Nunito"; background: rgba(20,20,40,.85); padding: 10px 16px; border-radius: 12px; }
+</style>
+</head>
+<body>
+<div id="escena">
+
+  <!-- 1 · Portada -->
+  <section class="sl portada">
+    <div class="deco" style="left:60px;top:40px">📚</div><div class="deco" style="right:70px;top:50px">📖</div>
+    <div class="deco" style="left:70px;bottom:40px">💬</div><div class="deco" style="right:70px;bottom:40px">📝</div>
+    <div class="marco"><span class="chip">MÓDULO 03</span><h1>Módulo de<br>comunicación</h1><div class="sub">6.° B · Sesión 5</div></div>
+  </section>
+
+  <!-- 2 · Normas de convivencia -->
+  <section class="sl" data-normas>
+    <h1 class="titulo">NORMAS DE CONVIVENCIA</h1>
+    <div class="normas">
+      <div class="nota"><b>Escuchamos con atención</b><div class="ic">👂</div><div class="votos"></div></div>
+      <div class="nota"><b>Cumplimos con nuestras actividades</b><div class="ic">📚</div><div class="votos"></div></div>
+      <div class="nota"><b>Mantenemos un ambiente de respeto</b><div class="ic">🤝</div><div class="votos"></div></div>
+    </div>
+    <div class="pregunta"><span class="mano">✋</span> ¿Cuál de estas normas consideran que debemos priorizar como grupo?<br><small style="font-size:24px;color:#555">Levanten la mano · toca una norma para contar las manos</small></div>
+  </section>
+
+  <!-- 3 · Meta -->
+  <section class="sl">
+    <div class="marca">MÓDULO 3<br>SESIÓN 5</div>
+    <img class="moli" src="img/moli/decidida.webp" alt="Molí" style="right:90px;top:60px">
+    <div class="meta-txt"><small>🎯 Meta:</small>Reconocer la secuencia de hechos en cuentos fantásticos</div>
+  </section>
+
+  <!-- 4 · Lectura (1/2) -->
+  <section class="sl">
+    <div class="lectura"><h2>No debes silbar</h2>
+      <p>Lo encontraron a orillas del río, temblando y con la mirada perdida. “Yo silbé primero… él no perdona”, repetía José, como si esas palabras fueran un conjuro para mantener algo lejos. Nadie entendió de qué hablaba. Ni él. Decía que no recordaba, pero en su mente, las imágenes volvían en fragmentos.</p>
+      <p style="color:#888;font-size:30px;text-align:right">continúa ›</p></div>
+  </section>
+
+  <!-- 5 · Lectura (2/2) -->
+  <section class="sl">
+    <div class="lectura" style="font-size:38px"><p>Horas antes —o quizá días, el tiempo ya no era claro— estaba en su campamento, solo, registrando los sonidos nocturnos de la selva. De pronto, aquel silbido: “fiiin… fiiin… fiiin… fiiin…”, delgado, insistente. Creyó que era un ave desconocida y, por juego, lo imitó. El eco volvió, más fuerte, luego desde otro punto, más cerca. La linterna parpadeó. Entre los árboles, algo alto, sin rostro, flotaba sobre patas de cabra.</p>
+      <p>El sonido del silbido se fundió con un silencio tan espeso que parecía no tener fin. Cuando volvió a abrir los ojos, ya no estaba en el campamento.</p>
+      <p>El resto era un vacío donde solo quedaba la certeza de que el silbido no era de un ave. Y que en la selva, algunas llamadas no deben responderse.</p></div>
+  </section>
+
+  <!-- 6 · Molí explica la estrategia «Línea de tiempo» -->
+  <section class="sl" data-lt>
+    <h1 class="titulo" style="font-size:56px;margin-bottom:8px;text-align:left">Estrategia <span style="color:#7c3aed">“Línea de</span> <span style="color:#e0262a">tiempo”</span></h1>
+    <div class="lt-zona">
+      <div class="ctrl"><button class="atr" type="button">◀ Atrás</button><button class="voz" type="button">🔊 Molí habla</button><button class="sig" type="button">Siguiente paso ▶</button></div>
+      <div class="linea"></div>
+      <div class="molibox"><img class="moli" src="img/moli/idea.webp" alt="Molí"><div class="burbuja"></div></div>
+    </div>
+  </section>
+
+  <!-- 7 · Preguntas + temporizador -->
+  <section class="sl">
+    <div class="reloj" data-reloj="180"><b>03:00</b><small>toca para empezar · doble toque reinicia</small></div>
+    <div style="position:absolute;left:470px;top:50px;font-size:120px">🗣️</div>
+    <div class="metac">• ¿Cómo se aplica la estrategia?<br>• ¿Para qué utilizamos la estrategia?<br>• ¿Cuándo es necesario aplicar la estrategia?</div>
+  </section>
+
+  <!-- 8 · Actividad colaborativa: propósito y criterios -->
+  <section class="sl">
+    <h1 class="titulo" style="font-size:60px"><span class="chip" style="font-size:52px">ACTIVIDAD COLABORATIVA</span></h1>
+    <div class="col2">
+      <div class="caja proposito"><span class="etq" style="background:var(--amarillo)">Propósito</span><p style="font-size:46px;font-weight:800;line-height:1.35;margin:10px 0">Reconocer la secuencia de hechos en el texto “Ayaymama”</p></div>
+      <div class="caja criterios"><span class="etq" style="background:var(--verdeo)">Criterios de éxito</span>
+        <ol class="grande" style="font-size:36px"><li>Lee el cuento e identifico los hechos principales.</li><li>Detecta si hay un cambio de tiempo.</li><li>Ordena los hechos en una línea de tiempo según cómo ocurrieron, no según como se contaron.</li></ol></div>
+    </div>
+  </section>
+
+  <!-- 9 · Roles -->
+  <section class="sl">
+    <h1 class="titulo">Roles y rutina · <span style="color:#0891b2">Dúos</span></h1>
+    <div class="col2">
+      <div class="caja" style="background:#e6fbd0"><span class="etq" style="color:#dc2626;text-decoration:underline">Roles específicos</span>
+        <div class="rol"><span class="i">🧭</span><span><b>Líder:</b> Dirige el diálogo.</span></div>
+        <div class="rol"><span class="i">✍️</span><span><b>Sintetizador:</b> Escribe el consenso y las ideas clave.</span></div></div>
+      <div class="caja" style="background:#e6fbd0"><span class="etq" style="color:#dc2626;text-decoration:underline">Roles adicionales</span>
+        <div class="rol"><span class="i">📣</span><span>Un integrante asume el rol de <b>vocero</b>.</span></div></div>
+    </div>
+  </section>
+
+  <!-- 10 · Rutina de diálogo -->
+  <section class="sl">
+    <h1 class="titulo" style="color:#dc2626;text-decoration:underline">Rutina de diálogo</h1>
+    <div class="caja" style="background:#e6fbd0;font-size:40px;font-weight:800;line-height:1.45">
+      <p style="margin:0 0 18px">👤 <b>Individual:</b> Lee el texto y subraya los hechos principales.</p>
+      <p style="margin:0 0 6px">👥 <b>En dúo:</b></p>
+      <ol class="grande" style="font-size:38px"><li>Comparen los hechos que identificaron.</li><li>Detecten si hay cambios en el tiempo que alteren el orden de la narración.</li><li>Ordena los hechos en una línea de tiempo siguiendo su orden real, no el del texto.</li></ol>
+    </div>
+  </section>
+
+  <!-- 11 · Frases y conversación académica -->
+  <section class="sl">
+    <h1 class="titulo" style="font-size:62px">💬 Conversación académica</h1>
+    <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:40px">
+      <div class="frases"><b style="font-family:'Baloo 2';font-size:36px">Frases para guiar el diálogo</b><br>
+        “Creo que este hecho ocurrió antes/después de…”<br>“Aquí el narrador vuelve al pasado/avanza en el tiempo cuando dice…”<br>“Si seguimos el orden real, este hecho iría primero/luego/después…”<br>“La línea de tiempo empezaría con…”</div>
+      <div class="caja" style="background:#f0fdff;font-size:40px;font-weight:800;line-height:1.5">• Estoy de acuerdo, porque…<br>• No estoy de acuerdo, porque…</div>
+    </div>
+    <div style="margin-top:34px;font:800 32px 'Baloo 2';text-align:center">✅ CRITERIOS PARA EL TRABAJO COLABORATIVO</div>
+    <div class="criterio-col" style="margin-top:14px"><div>Usar adecuadamente el tiempo.</div><div>Cumplimos nuestros roles.</div><div>Usamos las conversaciones académicas</div></div>
+  </section>
+
+  <!-- 12 · Autoevaluación -->
+  <section class="sl">
+    <h1 class="titulo">NOS AUTOEVALUAMOS COMO EQUIPO</h1>
+    <table class="auto"><tr><th>CRITERIOS DE ÉXITO</th><th>SÍ/NO</th><th>¿CÓMO LO LOGRAMOS O QUÉ PODEMOS MEJORAR?</th></tr>
+      <tr><td>Identificamos los hechos principales.</td><td></td><td></td></tr>
+      <tr><td>Identificamos si hay cambios de tiempo.</td><td></td><td></td></tr>
+      <tr><td>Ordenamos los hechos en una línea de tiempo según cómo ocurrieron, no según cómo se contaron.</td><td></td><td></td></tr></table>
+  </section>
+
+  <!-- 13 · Plenario -->
+  <section class="sl">
+    <div class="franja" style="background:#3eaeb0"><h1>Plenario</h1></div>
+    <div class="plen"><div>¿Están de acuerdo con la secuencia de hechos expuesta? ¿Por qué?</div><div>¿Qué información del texto respalda sus afirmaciones?</div><div>¿Qué nueva idea pueden aportar a lo ya mencionado?</div></div>
+    <div class="alzar"><span class="mano">✋</span><br>¡Levanta la mano!</div>
+  </section>
+
+  <!-- 14 · Exit ticket (1/2) -->
+  <section class="sl">
+    <h1 class="titulo"><span class="chip" style="font-size:70px;padding:10px 40px">🎟️ Exit Ticket</span></h1>
+    <div class="caja" style="background:#fffde8;text-align:center;font:800 56px 'Baloo 2';line-height:1.3;margin:10px 60px">Leer, de manera <u>individual</u>, texto titulado <span style="color:#6d28d9">“El Amaru”</span></div>
+    <div class="caja" style="background:#c8f7ff;text-align:center;margin:50px 200px 0"><span class="etq" style="background:#5b21b6;color:#fff">PROPÓSITO</span><div style="font:800 52px 'Baloo 2'">Reconocer la secuencia de hechos</div></div>
+  </section>
+
+  <!-- 15 · Exit ticket (2/2) -->
+  <section class="sl">
+    <h1 class="titulo" style="font-size:64px">🎟️ Exit Ticket · <span style="color:#65a30d">Criterios de éxito</span></h1>
+    <div style="display:grid;gap:30px;font:800 44px 'Nunito';line-height:1.3">
+      <div class="rol caja" style="background:#c7f285;margin:0"><span class="i">📖</span><span>Lee el cuento e identifico los hechos principales.</span></div>
+      <div class="rol caja" style="background:#c7f285;margin:0"><span class="i">🕒</span><span>Detecta si hay un cambio de tiempo.</span></div>
+      <div class="rol caja" style="background:#c7f285;margin:0"><span class="i">📍</span><span>Ordena los hechos en una línea de tiempo según cómo ocurrieron, no según como se contaron.</span></div>
+    </div>
+  </section>
+
+  <!-- 16 · Reflexiones finales -->
+  <section class="sl">
+    <div class="franja" style="background:var(--lila)"><h1 style="font-size:100px">Reflexiones finales</h1><div style="font:800 40px 'Baloo 2';color:#fff">Completamos en el cuaderno ✏️</div></div>
+    <ul class="grande" style="font-size:42px;line-height:1.5;margin:0 60px">
+      <li><b>Hoy aprendí a…</b> <span style="font-weight:600">(explica qué estrategia o habilidad usaste y para qué sirvió)</span></li>
+      <li><b>Para lograrlo, lo que hice fue…</b> <span style="font-weight:600">(describe los pasos o decisiones que tomaste)</span></li>
+      <li><b>Lo más difícil fue…, pero lo superé cuando…</b> <span style="font-weight:600">(menciona el reto y cómo lo enfrentaste)</span></li></ul>
+    <img class="moli" src="img/moli/orgullosa.webp" alt="Molí" style="right:60px;bottom:30px;width:170px">
+  </section>
+</div>
+
+<div id="barra"><a id="volver" href="index.html">← Aula</a><button id="ant" type="button">◀</button><span id="num"></span><button id="sig" type="button">▶</button><button id="full" type="button">⛶ Pantalla completa</button></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s), E = $('#escena'), S = [...document.querySelectorAll('.sl')];
+  let i = 0;
+  const ajustar = () => { const k = Math.min(innerWidth / 1600, innerHeight / 900); E.style.transform = `translate(-50%,-50%) scale(${k})`; };
+  addEventListener('resize', ajustar); ajustar();
+  function ir(n) { i = Math.max(0, Math.min(S.length - 1, n)); S.forEach((s, j) => { s.classList.toggle('on', j === i); s.classList.toggle('prev', j < i); }); $('#num').textContent = `${i + 1} / ${S.length}`; try { speechSynthesis.cancel(); } catch (e) {} }
+  // en la diapositiva de la línea de tiempo, las flechas avanzan los pasos de Molí primero
+  const avanzar = d => { const lt = S[i].dataset.lt !== undefined; if (lt && LT.mover(d)) return; ir(i + d); };
+  $('#ant').onclick = () => avanzar(-1); $('#sig').onclick = () => avanzar(1);
+  addEventListener('keydown', e => { if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); avanzar(1); } if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); avanzar(-1); } if (e.key === 'f') pantalla(); });
+  const pantalla = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+  $('#full').onclick = pantalla;
+  try { if (document.referrer && new URL(document.referrer).origin === location.origin) $('#volver').onclick = e => { e.preventDefault(); history.back(); }; } catch (e) {}
+
+  // ✋ normas: tocar una norma suma una mano (clic derecho resta)
+  document.querySelectorAll('[data-normas] .nota').forEach(n => { let v = 0; const pon = () => n.querySelector('.votos').textContent = v ? '✋'.repeat(Math.min(v, 12)) + (v > 12 ? ` ${v}` : '') + `  (${v})` : '';
+    n.onclick = () => { v++; pon(); }; n.oncontextmenu = e => { e.preventDefault(); v = Math.max(0, v - 1); pon(); }; });
+
+  // ⏱️ temporizador de 3 minutos
+  document.querySelectorAll('[data-reloj]').forEach(r => { const T = +r.dataset.reloj; let t = T, iv = null; const b = r.querySelector('b');
+    const pinta = () => { b.textContent = `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`; r.classList.toggle('fin', t === 0); };
+    const beep = () => { try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, .35, .7].forEach(d => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; g.gain.setValueAtTime(.3, a.currentTime + d); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + d + .3); o.connect(g).connect(a.destination); o.start(a.currentTime + d); o.stop(a.currentTime + d + .32); }); } catch (e) {} };
+    r.onclick = () => { if (iv) { clearInterval(iv); iv = null; return; } if (t === 0) t = T; iv = setInterval(() => { t = Math.max(0, t - 1); pinta(); if (!t) { clearInterval(iv); iv = null; beep(); } }, 1000); };
+    r.ondblclick = () => { clearInterval(iv); iv = null; t = T; pinta(); }; pinta(); });
+
+  // 🦉 Molí explica la línea de tiempo, paso a paso (los hechos son los del profe)
+  const H = [['H1', 'José fue encontrado a orillas del río, temblando y repitiendo la frase.'], ['H2', 'José estaba en el campamento registrando sonidos.'], ['H3', 'Escuchó un silbido y lo imitó.'],
+    ['H4', 'El eco se volvió más fuerte, apareció una figura extraña y la linterna parpadeó.'], ['H5', 'José pierde la conciencia.'], ['H6', 'Despertó y ya no estaba en el campamento.']];
+  const ORDEN = [1, 2, 3, 4, 5, 0];                                   // orden real: H2 H3 H4 H5 H6 H1
+  const zona = document.querySelector('[data-lt] .lt-zona'), linea = zona.querySelector('.linea'), bur = zona.querySelector('.burbuja'), img = zona.querySelector('.moli');
+  const cards = H.map(([n, t]) => { const d = document.createElement('div'); d.className = 'hecho'; d.innerHTML = `<b>${n}:</b> ${t}`; zona.appendChild(d); return d; });
+  const X = k => 125 + k * (1170 / 5);                          // puntos de la línea
+  linea.innerHTML = ORDEN.map((_, k) => `<i style="left:${k * 20}%"></i>`).join('') + '<span style="left:0%">Primero</span><span style="left:100%">Al final</span>';
+  const enRejilla = (c, j) => { c.style.left = (j % 3) * 470 + 20 + 'px'; c.style.top = Math.floor(j / 3) * 165 + 10 + 'px'; };
+  const enLinea = (c, k) => { c.style.left = X(k) - 112 + 'px'; c.style.top = '125px'; c.style.width = '224px'; c.style.fontSize = '22px'; };
+  const PASOS = [
+    { m: 'hola', t: '¡Hola! Soy Molí. Hoy aprenderemos la estrategia <b>«Línea de tiempo»</b>: nos ayuda a ordenar los hechos de un cuento <b>según cómo ocurrieron</b>.', f: () => { cards.forEach(c => c.classList.remove('ver', 'pasado')); linea.classList.remove('ver'); } },
+    { m: 'pensativa', t: '<span class="paso">Paso 1</span>Leemos el cuento y <b>subrayamos los hechos principales</b>. En «No debes silbar» encontramos <b>6 hechos</b>, en el orden en que aparecen en el texto.', f: () => { linea.classList.remove('ver'); cards.forEach((c, j) => { c.style.width = '440px'; c.style.fontSize = '25px'; enRejilla(c, j); c.classList.remove('pasado'); setTimeout(() => c.classList.add('ver'), j * 250); }); } },
+    { m: 'curiosa', t: '<span class="paso">Paso 2</span><b>¿Hay un cambio de tiempo?</b> ¡Sí! El cuento empieza por el final (<b>H1</b>: lo encuentran en el río) y luego dice <b>«Horas antes…»</b>: el narrador <b>vuelve al pasado</b>.', f: () => { cards.forEach((c, j) => { c.classList.add('ver'); enRejilla(c, j); c.style.width = '440px'; c.style.fontSize = '25px'; c.classList.toggle('pasado', j === 0); }); linea.classList.remove('ver'); } },
+    { m: 'idea', t: '<span class="paso">Paso 3</span>Ordenamos los hechos <b>según cómo ocurrieron, no según cómo se contaron</b>. Por eso <b>H1</b> pasa al <b>final</b> de la línea de tiempo.', f: () => { linea.classList.add('ver'); ORDEN.forEach((j, k) => { cards[j].classList.add('ver'); enLinea(cards[j], k); }); } },
+    { m: 'genial', t: '¡Listo! La historia real es: <b>H2 → H3 → H4 → H5 → H6 → H1</b>. Ahora ustedes harán lo mismo con el cuento <b>«Ayaymama»</b>. 💪', f: () => {} },
+  ];
+  let p = 0;
+  function paso(n) { p = Math.max(0, Math.min(PASOS.length - 1, n)); const P = PASOS[p]; bur.innerHTML = P.t; img.src = `img/moli/${P.m}.webp`; P.f(); }
+  window.LT = { mover(d) { if (!S[i] || S[i].dataset.lt === undefined) return false; const n = p + d; if (n < 0 || n >= PASOS.length) return false; paso(n); return true; } };
+  zona.querySelector('.sig').onclick = () => paso(p + 1); zona.querySelector('.atr').onclick = () => paso(p - 1);
+  zona.querySelector('.voz').onclick = () => { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(bur.textContent.replace(/^Paso \d/, m => m + '. ')); u.lang = 'es-PE'; u.rate = .95; u.pitch = 1.25;
+    const v = speechSynthesis.getVoices().find(v => /^es/.test(v.lang)); if (v) u.voice = v; speechSynthesis.speak(u); } catch (e) {} };
+  paso(0);
+  ir(+(location.hash.slice(1)) - 1 || 0);
+})();
+</script>
+</body>
+</html>
