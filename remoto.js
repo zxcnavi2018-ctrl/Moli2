@@ -42,6 +42,7 @@
   function estado() { clearTimeout(stT); stT = setTimeout(() => { if (R.rol !== 'pc') return; const G = window.G; const st = { i: G ? G.TOUR.i : 0, p: puntos(), n: Date.now() % 100000 };
     poner('s-' + R.c, { st: JSON.stringify(st), at: new Date() }).catch(() => {}); }, 300); }
   function ejecutar(cmd, arg) {
+    if (window.ComPres && ComPres.abierta() && (cmd === 'nx' || cmd === 'pv')) return ComPres.enviar(cmd);   // presentación de Comunicación abierta: el control la pasa
     const G = window.G; if (!G) return;
     const sh = G.sheet, abierto = sh && sh.style.display === 'block', clic = sel => { const b = sh.querySelector(sel); if (b && !b.disabled) { b.click(); return true; } return false; };
     if (cmd === 'off') { quitarTimer(); puntosReset(); return detener(); }

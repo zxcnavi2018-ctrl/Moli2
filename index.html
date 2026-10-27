@@ -197,7 +197,7 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
 <link rel="stylesheet" href="hojas.css?v=202610221255">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="moli3d.js?v=202610221255"></script><script src="sincro.js?v=202610221255"></script><script src="guion.js?v=202610221255"></script><script src="datos.js?v=202610261600"></script><script src="docente.js?v=202610221255"></script>
-<script src="hojas.js?v=202610271200"></script><script src="hojas-docente.js?v=202610221255"></script><script src="diplomas.js?v=202610221255"></script><script src="fotocheck.js?v=202610221255"></script><script src="herramientas.js?v=202610261400"></script><script src="remoto.js?v=202610221255"></script><script src="escaner.js?v=202610221255"></script><script src="tarjetas.js?v=202610221255"></script>
+<script src="hojas.js?v=202610271200"></script><script src="hojas-docente.js?v=202610221255"></script><script src="diplomas.js?v=202610221255"></script><script src="fotocheck.js?v=202610221255"></script><script src="herramientas.js?v=202610261400"></script><script src="remoto.js?v=202610271500"></script><script src="escaner.js?v=202610221255"></script><script src="tarjetas.js?v=202610221255"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -2761,6 +2761,17 @@ Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait }); 
 </script>
 <script src="revista.js?v=202610221255"></script><script src="corcho.js?v=202610221255"></script><script src="mando.js?v=202610221255"></script><script src="anuncio.js?v=202610221255"></script><script src="muro.js?v=202610221255"></script><script src="comunicado.js?v=202610221255"></script>
 <script src="archivos.js?v=202610221255"></script><script src="editor.js?v=202610221255"></script>
+<div id="comWin"><button id="comCerrar" type="button">← Volver al aula</button><iframe id="comFrame" allow="fullscreen; autoplay"></iframe></div>
+<style>#comWin{position:fixed;inset:0;z-index:60;background:#111;display:none}#comWin.on{display:block}#comWin iframe{width:100%;height:100%;border:0}#comCerrar{position:absolute;left:12px;top:12px;z-index:2;font:900 15px system-ui;padding:8px 14px;border-radius:10px;border:0;background:rgba(20,20,40,.75);color:#fff;cursor:pointer;opacity:.35}#comCerrar:hover{opacity:1}</style>
+<script>(() => {   // 📽️ la presentación se abre DENTRO del aula: así el control remoto (celular) y el clicker la pasan
+  const a = document.getElementById('comLink'), W = document.getElementById('comWin'), F = document.getElementById('comFrame');
+  const cerrar = () => { W.classList.remove('on'); F.src = 'about:blank'; };
+  a.addEventListener('click', e => { e.preventDefault(); F.src = 'comunicacion-6b.html?en=aula&t=' + Date.now(); W.classList.add('on'); F.onload = () => { try { F.contentWindow.focus(); } catch (x) {} }; });
+  document.getElementById('comCerrar').onclick = cerrar;
+  addEventListener('message', e => { const c = e.data && e.data.pres; if (c === 'cerrar') cerrar();
+    if (c === 'fs') { const de = document.documentElement; if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); else de.requestFullscreen && de.requestFullscreen().catch(() => {}); } });
+  window.ComPres = { abierta: () => W.classList.contains('on'), enviar: c => { try { F.contentWindow.postMessage({ pres: c }, '*'); } catch (x) {} } };
+})();</script>
 <script>(function v() { const a = document.getElementById('comLink'); if (!a) return; if (window.MD && MD.esDocente) { a.hidden = !MD.esDocente(); } setTimeout(v, 3000); })();   // 📽️ presentación de Comunicación 6.° B (sólo la docente)</script>
 </body>
 </html>
