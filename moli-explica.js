@@ -47,7 +47,7 @@
       { m: 'pensativa', t: 'En el cuaderno copien la tabla y midan la espuma a los cero, diez y veinte minutos: regla vertical, desde la línea inicial, con los ojos a la altura de la regla.', a: [{ k: 'tabla', c: ['Tiempo', 'Altura de la espuma (cm)', 'Lo que observamos'], d: [['0 min', '', ''], ['10 min', '', ''], ['20 min', '', '']] }] },
       { m: 'curiosa', t: 'A los veinte minutos, tres integrantes miden la misma espuma, cada uno sin mirar el dato del otro. Anoten las tres lecturas debajo de la tabla.', a: [{ k: 'chips', x: ['📏 Lectura 1', '📏 Lectura 2', '📏 Lectura 3'] }] },
       { m: 'idea', t: '¿Para qué tres lecturas? En la próxima clase compartiremos datos con los equipos de nuestra misma causa y sacaremos el promedio.', a: [{ k: 'nota', x: '🤝 Sesión 9: compartimos datos y sacamos promedios' }] },
-      { m: 'genial', t: '¡Cuiden mucho su cuaderno! Esos datos los usaremos en las próximas clases.', a: [{ k: 'ok', x: '📓 Nuestros datos = nuestro tesoro científico' }] }],
+      { m: 'genial', t: 'Si pasa algo raro, como un derrame, anótenlo debajo como incidencia. ¡Y cuiden su cuaderno: esos datos los usaremos en las próximas clases!', a: [{ k: 'ok', x: '⚠️ ¿Algo raro? Anótalo como incidencia · 📓 Cuida tus datos' }] }],
     '9-1': [
       { m: 'hola', t: 'Hoy trabajamos un criterio muy importante: organizar y procesar datos. Y esta vez, ¡con una ficha!', a: [{ k: 'tag', x: '⭐ Criterio: Organiza y procesa datos · Ficha' }] },
       { m: 'curiosa', t: 'Cada equipo probó un solo valor de su causa. Por eso, ¡compartimos datos! Júntense con los equipos que investigaron su misma causa.', a: [{ k: 'chips', x: ['🌡️ Temperatura', '🍬 Azúcar', '🟤 Levadura'] }, { k: 'tit', x: '🤝 Compartimos datos con nuestra misma causa' }] },
