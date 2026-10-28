@@ -6,12 +6,12 @@
   const TIT = { 6: 'Determinamos las variables', 7: 'Diseñamos y validamos la indagación', 8: 'Experimentamos con la levadura', 9: 'Procesamos los datos obtenidos', 10: 'Interpretamos patrones y diferencias', 11: 'Argumentamos nuestra conclusión', 12: 'Evaluamos nuestra capacidad para indagar' };
   const E = {
     '6-1': [
-      { m: 'hola', t: '¡Hola! Soy Molí. En esta actividad, cada uno hará en su cuaderno una tabla de variables. ¡Te explico cómo!', a: [{ k: 'tag', x: '📓 En tu cuaderno · Individual' }] },
+      { m: 'hola', t: '¡Hola! Soy Molí. En esta actividad, cada uno hará en su cuaderno el cuadro de variables. ¡Te explico cómo!', a: [{ k: 'tag', x: '📓 En tu cuaderno · Individual' }] },
       { m: 'idea', t: 'Primero, copia la pregunta y la hipótesis que sacó tu equipo cuando observamos la levadura.', a: [{ k: 'fila', n: 1, i: '❓', x: 'Copia la pregunta de tu equipo' }, { k: 'fila', n: 2, i: '💡', x: 'Copia la hipótesis de tu equipo' }] },
-      { m: 'pensativa', t: 'Luego dibuja una tabla de tres columnas. En la primera, CAMBIAREMOS: la única cosa que vas a cambiar, y con qué instrumento.', a: [{ k: 'col', i: '🔄', h: 'CAMBIAREMOS', x: 'Solo UNA cosa y con qué instrumento' }] },
-      { m: 'curiosa', t: 'En la segunda, MEDIREMOS: lo que vas a medir, con qué instrumento y en qué unidad.', a: [{ k: 'col', i: '📏', h: 'MEDIREMOS', x: 'Qué mido, con qué instrumento y en qué unidad' }] },
-      { m: 'decidida', t: 'En la tercera, MANTENDREMOS IGUAL: escribe al menos cuatro cosas que no van a cambiar.', a: [{ k: 'col', i: '⚖️', h: 'MANTENDREMOS IGUAL', x: 'Al menos 4 cosas que no cambian' }] },
-      { m: 'genial', t: '¡Recuerda la regla de oro! Una sola cosa cambia, una se mide y todo lo demás se queda igual. Mira el ejemplo y el contraejemplo que vienen.', a: [{ k: 'ok', x: '1 cosa cambia · 1 se mide · lo demás queda igual' }] }],
+      { m: 'pensativa', t: 'Debajo, dibuja una tabla de doble entrada con dos columnas. En la primera, la variable independiente: lo que vamos a cambiar. ¡Solo una cosa!', a: [{ k: 'col', i: '🔄', h: 'VARIABLE INDEPENDIENTE', x: 'Lo que cambiamos · solo UNA cosa' }] },
+      { m: 'curiosa', t: 'En la segunda, la variable dependiente: lo que vamos a medir, con qué instrumento y en qué unidad.', a: [{ k: 'col', i: '📏', h: 'VARIABLE DEPENDIENTE', x: 'Lo que medimos · con qué instrumento y en qué unidad' }] },
+      { m: 'decidida', t: '¿Por qué se llama dependiente? ¡Porque depende de lo que cambiamos! Si cambia la variable independiente, cambia lo que medimos.', a: [{ k: 'tit', x: '🔄 VI cambia → 📏 la VD también cambia' }] },
+      { m: 'genial', t: '¡Recuerda la regla de oro! Una sola cosa cambia, y una se mide con un instrumento. Mira el ejemplo y el contraejemplo que vienen.', a: [{ k: 'ok', x: '1 cosa cambia (VI) · 1 se mide con instrumento (VD)' }] }],
     '6-2': [
       { m: 'hola', t: 'Ahora trabajaremos en equipo, en un papelote. ¡Escuchen la historia de Don Pepe, el panadero!', a: [{ k: 'tag', x: '📜 Papelote · En equipo' }] },
       { m: 'curiosa', t: 'Don Pepe quería saber si con agua tibia la levadura infla más la masa del pan. Entonces hizo dos masas.', a: [{ k: 'tit', x: '🍞 ¿Con agua tibia se infla más la masa?' }] },
