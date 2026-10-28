@@ -656,7 +656,7 @@
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); ficTrozos(fichaParte(s, j + 1)).forEach((_, q) => Lst.push({ ...b, k: 'fic', x, j: j + 1, p: q ? 'f' + (q + 1) : '' })); if (x.cu) Lst.push({ ...b, k: 'cu', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (window.MoliExp && MoliExp.tiene(u, s, n, j + 1)) Lst.push({ ...b, k: 'mx', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); ficTrozos(fichaParte(s, j + 1)).forEach((_, q) => Lst.push({ ...b, k: 'fic', x, j: j + 1, p: q ? 'f' + (q + 1) : '' })); if (x.cu) Lst.push({ ...b, k: 'cu', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(SB) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
@@ -746,6 +746,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     function slide(it) {
       if (it.k === 'vid') return slideVideo(it);
       if (it.k === 'sync') return Sincro.html(syncDe(it));
+      if (it.k === 'mx') return MoliExp.html(it.n, it.j, it.x);                // Molí explica la actividad (moli-explica.js)
       if (it.k === 'ej' || it.k === 'nx' || it.k === 'cu') { const ok = it.k !== 'nx', cu = it.k === 'cu', E = (cu ? it.x.cu : ok ? it.x.ej : it.x.nx) || {}, [c1, c2] = cu ? ['#1e3a8a', '#3b82f6'] : ok ? ['#065f46', '#10b981'] : ['#7f1d1d', '#ef4444'];   // ✅ ejemplo / ❌ contraejemplo de la actividad
         const tb = `<table class="fic-t"><tr>${(E.c || []).map(h => `<th>${esc(h)}</th>`).join('')}</tr>${(E.d || []).map(f => `<tr>${(E.c || []).map((_, k) => `<td>${esc(f[k] || '')}</td>`).join('')}</tr>`).join('')}</table>`;
         return `<div class="cv-sl cv-fic" style="--c1:${c1};--c2:${c2}">${crumb(it)}<div class="fic-h"><span class="cv-num">${it.j}</span><div><b>${cu ? '📝 ¡Completa este cuadro!' : ok ? '✅ ¡Así queda! · Ejemplo' : '❌ ¡Así NO! · Contraejemplo'}</b><small>Actividad ${it.j}${L(it.x.title) ? ' · ' + esc(it.x.title) : ''}</small></div><img src="${IMG(ok ? 'feliz' : 'pensativa')}" alt=""></div><div class="fic-hoja"><div class="fic-tt">${esc(E.t || '')}</div>${tb}${L(E.nota) ? `<p class="fic-mas">${cu ? '✏️' : '💬'} ${esc(E.nota)}</p>` : ''}${L(E.por) ? `<p class="fic-mas">🤔 <b>¿Por qué está mal?</b> ${esc(E.por)}</p>` : ''}</div></div>`; }
@@ -778,7 +779,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     }
     function ajustar(d) {                                               // la diapositiva usa todo el cuadro: agranda la letra hasta llenarlo sin cortarse
       if (d && d.classList.contains('cv-fic')) { const h = d.querySelector('.fic-hoja'); if (!h) return; let lo = .55, hi = 2.4; for (let k = 0; k < 10; k++) { const m = (lo + hi) / 2; h.style.fontSize = m + 'em'; if (h.scrollHeight <= h.clientHeight + 1) lo = m; else hi = m; } h.style.fontSize = (lo * .98) + 'em'; return; }   // la hoja de la ficha: la letra se ajusta para que entre todo
-      if (!d || d.classList.contains('sy') || d.classList.contains('cv-foto') || d.classList.contains('cv-vid') || d.querySelector('.cv-rfig')) return;
+      if (!d || d.classList.contains('sy') || d.classList.contains('mx') || d.classList.contains('cv-foto') || d.classList.contains('cv-vid') || d.querySelector('.cv-rfig')) return;
       const H = d.clientHeight, Wd = d.clientWidth; if (!H || !Wd) return;
       const prev = d.style.justifyContent; d.style.justifyContent = 'flex-start'; d.style.overflow = 'visible';
       const cabe = () => { const kids = [...d.children].filter(c => getComputedStyle(c).position !== 'absolute'); if (!kids.length) return true;
@@ -797,7 +798,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       const sk = it.k === 'sync' ? claveSl(it) : '';
       if (sk && P.syk === sk && Sincro.activo()) Sincro.actualizar(syncDe(it));   // ya está en pantalla (llegó lo que pensó Molí): no se reinicia la animación
       else if (GU.has(it.k) && window.Guion && P.guk === claveSl(it) + it.k && Guion.activo()) Guion.dato(sabDe(it));   // ya está en pantalla: no se reinicia
-      else { if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.syk = sk; sl.innerHTML = slide(it); const gu = GU.has(it.k) && window.Guion; P.guk = gu ? claveSl(it) + it.k : ''; if (!gu) ajustar(sl.firstChild); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); if (gu) Guion.montar(sl.firstChild, it.k, { t: sabDe(it) }); }
+      else { if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); if (window.MoliExp) MoliExp.parar(); P.syk = sk; sl.innerHTML = slide(it); const gu = GU.has(it.k) && window.Guion; P.guk = gu ? claveSl(it) + it.k : ''; if (!gu && it.k !== 'mx') ajustar(sl.firstChild); if (it.k === 'mx') MoliExp.montar(sl.firstChild, P.atras); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); if (gu) Guion.montar(sl.firstChild, it.k, { t: sabDe(it) }); }
       if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });
       if (it.u && it.n != null) RT.sesion(it.u.key + ':' + it.n);                // Molí piensa las preguntas de la sesión desde antes
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
@@ -834,6 +835,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       try { await guardarVideos(CVV.L.filter(x => x.id !== it.id)); P.i = Math.max(0, P.i - 1); armar(); pinta(true); }
       catch (x) { alert(x.message === 'AUTH' ? '🔐 Conecta tu cuenta: toca tu fotocheck → «Conectar mi cuenta».' : '📶 No se pudo quitar. Revisa tu internet.'); }
     }
+    function mover(d) { const it = P.L[P.i]; if (it && it.k === 'mx' && window.MoliExp && MoliExp.activo() && MoliExp.mover(d)) return; P.i += d; P.atras = d < 0; pinta(true); P.atras = false; }
     function montar() {
       armar();
       host.innerHTML = `<div class="cv"><div class="cv-stage"></div>${MD.esDocente() ? '<button type="button" class="cv-add" aria-label="Añadir una diapositiva de video aquí">+</button>' : ''}<div class="cv-bar"><button data-cv="-1" aria-label="Anterior">‹</button><select aria-label="Ir a">${MD.unidades().map(u => `<option value="u:${esc(u.key)}">📘 Unidad ${esc(u.num)} · ${esc(u.title)}</option>${MD.sesionesDe(u).map(({ s, n }) => `<option value="s:${esc(u.key)}:${n}">   🗓️ Sesión ${n} · ${esc(temaDe(s, n)).slice(0, 50)}</option>`).join('')}`).join('')}</select><span class="cv-n"></span><button data-cv="1" aria-label="Siguiente">›</button></div></div>`;
@@ -841,9 +843,9 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       el.addEventListener('click', e => {
         if (e.target.closest('.cv-add')) { e.stopPropagation(); return formVideo(null); }
         const vb = e.target.closest('[data-vid]'); if (vb) { e.stopPropagation(); const it = P.L[P.i]; if (it && it.k === 'vid') { if (vb.dataset.vid === 'del') quitarVideo(it); else formVideo(CVV.L.find(x => x.id === it.id) || it); } return; }
-        const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); P.i += +b.dataset.cv; pinta(true); });
+        const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); mover(+b.dataset.cv); });
       el.querySelector('select').addEventListener('change', e => { const v = e.target.value.split(':'); const k = P.L.findIndex(z => v[0] === 'u' ? z.k === 'uni' && z.u.key === v[1] : z.k === 'ses' && z.u.key === v[1] && z.n === +v[2]); if (k >= 0) { P.i = k; pinta(true); } });
-      let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar,.cv-add,.cv-ved,.cv-form') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) { P.i += dx < 0 ? 1 : -1; pinta(true); } });
+      let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar,.cv-add,.cv-ved,.cv-form') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) mover(dx < 0 ? 1 : -1); });
       pinta(true);
     }
     function gate() {
@@ -853,7 +855,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
       Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
-    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.guk = ''; P.syk = ''; RT.quitar(); };
+    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.MoliExp) MoliExp.parar(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.guk = ''; P.syk = ''; RT.quitar(); };
     return P;
   }
 
