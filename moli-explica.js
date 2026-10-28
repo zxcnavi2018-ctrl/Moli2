@@ -16,8 +16,9 @@
       { m: 'hola', t: 'Ahora trabajaremos en equipo, en un papelote. ¡Escuchen la historia de Don Pepe, el panadero!', a: [{ k: 'tag', x: '📜 Papelote · En equipo' }] },
       { m: 'curiosa', t: 'Don Pepe quería saber si con agua tibia la levadura infla más la masa del pan. Entonces hizo dos masas.', a: [{ k: 'tit', x: '🍞 ¿Con agua tibia se infla más la masa?' }] },
       { m: 'pensativa', t: 'La masa uno: agua fría, poquita levadura, y la dejó en la refrigeradora. La masa dos: agua tibia, mucha levadura, y la dejó al lado del horno. ¡La masa dos se infló más!', a: [{ k: 'col', i: '🧊', h: 'Masa 1', x: 'Agua fría · poca levadura · en la refrigeradora' }, { k: 'col', i: '🔥', h: 'Masa 2', x: 'Agua tibia · mucha levadura · al lado del horno' }] },
-      { m: 'enojado', t: '¿Ven el error? Don Pepe cambió varias cosas a la vez. En el papelote dibujen las dos masas y encierren en rojo lo que cambió además del agua.', a: [{ k: 'no', x: 'Cambió el agua, la levadura y el lugar… ¡todo a la vez!' }] },
-      { m: 'idea', t: 'Después escriban cómo debió hacerlo Don Pepe, para saber si de verdad fue por el agua tibia.', a: [{ k: 'fila', n: '✍️', i: '', x: '¿Cómo debió hacerlo Don Pepe?' }] },
+      { m: 'enojado', t: '¿Ven el error? Don Pepe cambió varias cosas a la vez, no solo el agua. ¡Así no sabe por qué se infló!', a: [{ k: 'no', x: 'Cambió el agua, la levadura y el lugar… ¡todo a la vez!' }] },
+      { m: 'idea', t: 'En el papelote copien esta tabla de doble entrada. Arriba dice: la mezcla que hizo Don Pepe, y cómo debió hacerlo. En la primera fila va la masa uno, y en la segunda, la masa dos.', a: [{ k: 'tabla', c: ['La mezcla que hizo Don Pepe', 'Cómo debió hacerlo'], d: [['Masa 1:', ''], ['Masa 2:', '']], ult: { s: 5, f: ['✏️ Aquí dibujan la masa 1 de Don Pepe', '✏️ Aquí dibujan la masa 2 de Don Pepe'] } }] },
+      { m: 'curiosa', t: 'En la fila de abajo, dibujen: a la izquierda la masa uno, y a la derecha la masa dos. Y encierren en rojo todo lo que Don Pepe cambió además del agua.', a: [] },
       { m: 'decidida', t: 'Al final completen la frase: en nuestros vasos con levadura, solo cambiaremos… y lo demás será igual. Cada uno la copia en su cuaderno.', a: [{ k: 'nota', x: 'Solo cambiaremos ________ y lo demás será igual: ________' }] }],
     '7-1': [
       { m: 'hola', t: 'Hoy cada equipo prepara, en un papelote, la lista de materiales para SU vaso con levadura.', a: [{ k: 'tag', x: '📜 Papelote · En equipo' }] },
@@ -113,6 +114,7 @@
     if (p.k === 'col') return `<div class="mx-p mx-col" ${d}><span>${p.i}</span><b>${esc(p.h)}</b>${p.x ? `<small>${esc(p.x)}</small>` : '<i></i><i></i>'}</div>`;
     if (p.k === 'fila') return `<div class="mx-p mx-fila" ${d}><span class="mx-n">${esc(p.n)}</span>${p.i ? `<span>${p.i}</span>` : ''}<b>${esc(p.x)}</b></div>`;
     if (p.k === 'chips') return `<div class="mx-p mx-chips" ${d}>${p.x.map(c => `<span>${esc(c)}</span>`).join('')}</div>`;
+    if (p.k === 'tabla') return `<div class="mx-p mx-tabla" ${d}><table><tr>${p.c.map(h => `<th>${esc(h)}</th>`).join('')}</tr>${p.d.map(f => `<tr>${f.map(x => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}${p.ult ? `<tr class="mx-tr mx-dib" data-s="${p.ult.s}">${p.ult.f.map(x => `<td>${esc(x)}</td>`).join('')}</tr>` : ''}</table></div>`;
     if (p.k === 'dato') return `<div class="mx-p mx-dato" ${d}>${esc(p.x)}</div>`;
     if (p.k === 'graf') return `<div class="mx-p mx-graf" ${d}><div class="mx-gb">${p.x.map((c, q) => `<div><i style="height:${30 + q * 55 / p.x.length}%;background:${['#60a5fa', '#34d399', '#fbbf24', '#f87171'][q % 4]}">?</i><small>${esc(c)}</small></div>`).join('')}</div></div>`;
     return `<div class="mx-p mx-${p.k}" ${d}>${p.k === 'ok' ? '✅ ' : p.k === 'no' ? '❌ ' : ''}${esc(p.x)}</div>`;
@@ -134,7 +136,7 @@
   function hablar() { if (!S) return; try { audio.pause(); audio.src = `audio/mx/u7-${S.k}-${S.p}.mp3`; audio.currentTime = 0; audio.play().catch(() => {}); } catch (e) {} }
   function paso(n, voz) {
     if (!S) return; const P = E[S.k]; S.p = n; const st = P[n], el = S.el;
-    el.querySelectorAll('.mx-p').forEach(p => { const k = +p.dataset.s; p.classList.toggle('ver', k <= n); p.classList.toggle('nue', k === n); });
+    el.querySelectorAll('.mx-p, .mx-tr').forEach(p => { const k = +p.dataset.s; p.classList.toggle('ver', k <= n); p.classList.toggle('nue', k === n); });
     const b = el.querySelector('.mx-bub'); b.textContent = st.t; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
     el.querySelector('.mx-img').src = `img/moli/${st.m}.webp`;
     el.querySelectorAll('.mx-dots i').forEach((d, k) => { d.classList.toggle('on', k === n); d.classList.toggle('ya', k < n); });

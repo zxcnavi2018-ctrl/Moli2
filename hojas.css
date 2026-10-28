@@ -703,3 +703,7 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 @keyframes mxIn { from { opacity: 0; transform: translateY(.5em) scale(.96); } to { opacity: 1; transform: none; } }
 @keyframes mxPop { from { transform: scale(.92); opacity: .4; } to { transform: none; opacity: 1; } }
 @keyframes mxHabla { from { transform: translateY(0) rotate(-1.5deg); } to { transform: translateY(-.25em) rotate(1.5deg); } }
+.mx-tabla { justify-content: center; } .mx-tabla table { width: 100%; border-collapse: collapse; background: #fff; font-size: .95em; }
+.mx-tabla th { background: #dbeafe; color: #1e3a8a; font-weight: 900; padding: .35em .5em; border: .08em solid #334155; }
+.mx-tabla td { border: .08em solid #334155; padding: .5em; height: 1.6em; font-weight: 800; color: #475569; }
+.mx-tr { display: none; } .mx-tr.ver { display: table-row; } .mx-tr.nue td { background: #fef3c7; } .mx-dib td { height: 3.2em; text-align: center; color: #b45309; }
