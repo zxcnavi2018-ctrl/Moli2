@@ -2,7 +2,7 @@
 // 🎃 Halloween: los adornos del aula y el disfraz de Molí salen solos en octubre (fecha del aparato) y se van el 1 de noviembre.
 //    Para probar en otro mes: ?halloween=1 (siempre) o ?halloween=0 (nunca).
 window.esHalloween = function () { const q = new URLSearchParams(location.search).get('halloween'); return q === '1' || q === '0' ? q === '1' : new Date().getMonth() === 9; };
-// en octubre, los dibujos de Molí (img/moli/<cara>.webp) pasan a ser los de Molí con su disfraz de costal (img/moli-hw/<cara>.webp)
+// en octubre, los dibujos de Molí (img/moli/<cara>.webp) pasan a ser los de Molí con su disfraz (costal y cabeza de calabaza) (img/moli-hw/<cara>.webp)
 window.moliDibujo = n => (window.esHalloween() ? 'img/moli-hw/' : 'img/moli/') + n + '.webp';
 if (window.esHalloween()) {
   const disfrazar = el => { const s = el.tagName === 'IMG' && el.getAttribute('src'); if (s && /(^|\/)img\/moli\/\w+\.webp/.test(s)) el.setAttribute('src', s.replace('img/moli/', 'img/moli-hw/')); };
@@ -207,8 +207,8 @@ function crearMoli(THREE, opt = {}) {
     part(new THREE.SphereGeometry(0.04, 14, 12), NAVY, hand, [-0.068 * sx, -0.03, 0.06], [0, 0, -0.6 * sx], [1, 1.35, 1]);
     return { sh, hand, sx, a: 0.42, v: 0, f: 0 };
   });
-  // ---- 🎃 disfraz de Halloween (sólo en octubre): Molí se mete en un costal de yute con costuras gruesas,
-  //      gorro de costal amarrado con soga arriba, mangas de costal con puño de soga y un parche naranja ----
+  // ---- 🎃 disfraz de Halloween (sólo en octubre): Molí se mete en un costal de yute con costuras gruesas (como un espantapájaros),
+  //      mangas de costal con puño de soga, un parche naranja y una cabeza de calabaza tallada ----
   if (opt.disfraz !== false && window.esHalloween && window.esHalloween()) {
     const yute = canvasTex(256, 256, (g, w, h) => {                   // tejido de yute: hilos gruesos que pasan por arriba y por abajo
       g.fillStyle = '#5c4222'; g.fillRect(0, 0, w, h);
@@ -273,53 +273,53 @@ function crearMoli(THREE, opt = {}) {
       for (let y = -0.27; y <= 0.0; y += 0.054) cruz(A.sh, V(A.sx * (rb((y + 0.39) / 0.44) + 0.004) + 0.008 * A.sx, y, 0), V(0, 1, 0), V(A.sx, 0, 0), 0.04);
       part(new THREE.TorusGeometry(rb((-0.325 + 0.39) / 0.44) + 0.006, 0.017, 8, 36), SOGA, A.sh, [0.008 * A.sx, -0.325, 0], [Math.PI / 2, 0, 0]);
     });
-    // ---- capucha de costal: toda la cabeza (la cara y los audífonos también) forrada de yute, fruncida arriba y amarrada con
-    //      soga; huecos cosidos para los ojitos (se siguen viendo sus expresiones), boca cosida y una costura en la frente ----
-    const OJ = [-1, 1].map(sx => ({ x: 0.225 * sx, y: VI.y + 0.035, rx: 0.14, ry: 0.195 }));
-    const BW = 0.26, bocaA = x => -0.222 - 0.035 * (1 - (x / BW) ** 2), bocaB = x => -0.222 - 0.13 * Math.pow(Math.max(0, 1 - (x / BW) ** 2), 0.7);   // labio de arriba y de abajo
-    const hueco = (x, y, z) => z > 0.2 && (OJ.some(o => ((x - o.x) / o.rx) ** 2 + ((y - o.y) / o.ry) ** 2 < 1) || (Math.abs(x) < BW && y < bocaA(x) && y > bocaB(x)));
-    const defH = (x, y, z) => {                                         // del casco a la capucha: más grande, un bulto en cada audífono y fruncida arriba
-      const k = sstep(0.33, 0.5, y), th = Math.atan2(x, z), f = 1.065 * (1 - 0.84 * k) * (1 + 0.1 * k * Math.sin(th * 11) + 0.01 * Math.sin(th * 7 + y * 9));
-      const d = Math.hypot(y - VI.y - 0.02, z + 0.04), b = 0.13 * (1 - sstep(0.17, 0.29, d)) * sstep(0.25, 0.5, Math.abs(x));
-      return V(x * f + Math.sign(x) * b, y * 1.065 + 0.2 * k, z * f); };
-    const capucha = helmet(180, 132), frente = []; let sr = 0, sy = 0, sn = 0;
-    { const q = capucha.attributes.position;
-      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), p = defH(x, y, z);
-        if (y > 0.445 && y < 0.456) { sr += Math.hypot(p.x, p.z); sy += p.y; sn++; } q.setXYZ(i, p.x, p.y, p.z); }
-      soldar(capucha); const n = capucha.attributes.normal;
+    // ---- 🎃 cabeza de calabaza: gajos con surcos, tallada con ojos de triángulo (por ahí se ven sus ojitos y expresiones),
+    //      sonrisa con dientes que brilla por dentro, bordes de pulpa y su tallo verde con hojita y zarcillo ----
+    ears.forEach(e => { e.e.visible = false; e.halo.visible = false; });   // los audífonos quedan adentro de la calabaza
+    const CR = [0.77, 0.64, 0.73], gajo = th => Math.pow(Math.abs(Math.sin(th * 4)), 0.35);   // 8 gajos; un surco justo al medio de la cara
+    const enCal = (x, y, z) => { const th = Math.atan2(x, z), rxz = Math.hypot(x, z), f = 0.95 + 0.05 * gajo(th);
+      return V(x * CR[0] * f, CR[1] * y * (1 - 0.12 * Math.pow(1 - Math.min(1, rxz), 3)), z * CR[2] * f); };
+    const OJC = [-1, 1].map(sx => ({ x: 0.225 * sx, b: VI.y - 0.2, a: VI.y + 0.33, w: 0.25 }));   // triángulos de los ojos (base abajo, punta arriba)
+    const enTri = (x, y, o, m = 0) => y > o.b - m && y < o.a + m && Math.abs(x - o.x) < (o.w + m) * (o.a + m - y) / (o.a - o.b + 2 * m);
+    const BWc = 0.38, bocaU = x => -0.3 + 0.08 * (x / BWc) ** 2, bocaL = x => -0.47 + 0.15 * (x / BWc) ** 2;   // sonrisa (los bordes suben)
+    const diente = (x, y) => (Math.abs(x) < 0.055 && y > bocaU(x) - 0.065) || [-1, 1].some(sg => Math.abs(x - 0.19 * sg) < 0.05 && y < bocaL(x) + 0.065);
+    const enBoca = (x, y) => Math.abs(x) < BWc && y < bocaU(x) && y > bocaL(x) && !diente(x, y);
+    const hueco = (x, y, z) => z > 0.25 && (OJC.some(o => enTri(x, y, o)) || enBoca(x, y));
+    const calG = new THREE.SphereGeometry(1, 160, 110); calG.rotateY(-Math.PI / 2);
+    const col = [], frente = [];
+    { const q = calG.attributes.position, A = new THREE.Color(0xa8360a).convertSRGBToLinear(), B = new THREE.Color(0xf26b0f).convertSRGBToLinear(), c = new THREE.Color();
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), p = enCal(x, y, z); q.setXYZ(i, p.x, p.y, p.z);
+        c.copy(A).lerp(B, 0.35 + 0.65 * gajo(Math.atan2(x, z)) * (1 - 0.35 * Math.abs(y) ** 3)); col.push(c.r, c.g, c.b); }
+      calG.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); soldar(calG); const n = calG.attributes.normal;
       for (let i = 0; i < q.count; i++) if (q.getZ(i) > 0.3) frente.push([q.getX(i), q.getY(i), q.getZ(i), n.getX(i), n.getY(i), n.getZ(i)]);
-      const src = capucha.index.array, out = [], c3 = (a, b, c, f) => (f(a) + f(b) + f(c)) / 3;
-      for (let i = 0; i < src.length; i += 3) { const a = src[i], b = src[i + 1], c = src[i + 2];
-        if (!hueco(c3(a, b, c, j => q.getX(j)), c3(a, b, c, j => q.getY(j)), c3(a, b, c, j => q.getZ(j)))) out.push(a, b, c); }
-      capucha.setIndex(out); }
-    part(capucha, SACO, head);
-    ears.forEach(e => { e.halo.visible = false; });                      // los audífonos quedan adentro de la capucha
-    const sobre = (x, y, off = 0.006) => { let f = frente[0], bd = 1e9;  // punto de la cara de la capucha (delante de x, y)
+      const src = calG.index.array, out = [], c3 = (a, b, cc, f) => (f(a) + f(b) + f(cc)) / 3;
+      for (let i = 0; i < src.length; i += 3) { const a = src[i], b = src[i + 1], cc = src[i + 2];
+        if (!hueco(c3(a, b, cc, k => q.getX(k)), c3(a, b, cc, k => q.getY(k)), c3(a, b, cc, k => q.getZ(k)))) out.push(a, b, cc); }
+      calG.setIndex(out); }
+    const CALAB = PM({ color: 0xffffff, vertexColors: true, roughness: 0.55, clearcoat: 0.25, clearcoatRoughness: 0.5, envMapIntensity: 0.3, side: THREE.DoubleSide });
+    const PULPA = new THREE.MeshBasicMaterial({ color: 0xffc94d }), LUZ = new THREE.MeshBasicMaterial({ color: 0xffa21f, side: THREE.DoubleSide });
+    const TALLO = PM({ color: 0x6b7f2a, roughness: 0.8, envMapIntensity: 0.15 }), HOJA = PM({ color: 0x3f8f2f, roughness: 0.7, envMapIntensity: 0.2, side: THREE.DoubleSide });
+    head.add(new THREE.Mesh(calG, CALAB));                              // sola (no se junta con otras piezas: lleva sus colores por vértice)
+    const sobre = (x, y, off = 0.006) => { let f = frente[0], bd = 1e9;  // punto de la cara de la calabaza (delante de x, y)
       for (const v of frente) { const d = (v[0] - x) ** 2 + (v[1] - y) ** 2; if (d < bd) { bd = d; f = v; } }
       const n = V(f[3], f[4], f[5]); return { p: V(x, y, f[2]).addScaledVector(n, off), n }; };
-    const ribete = pts => part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([x, y]) => sobre(x, y, 0.004).p), true), 96, 0.017, 6, true), HILO, head);
-    OJ.forEach(o => { const P = Array.from({ length: 48 }, (_, i) => { const a = i / 48 * Math.PI * 2; return [o.x + Math.cos(a) * o.rx, o.y + Math.sin(a) * o.ry]; }); ribete(P);
-      for (let i = 0; i < 12; i++) { const a = (i + 0.5) / 12 * Math.PI * 2, e = sobre(o.x + Math.cos(a) * o.rx, o.y + Math.sin(a) * o.ry, 0.012);   // puntadas alrededor del ojo
-        puntada(head, e.p, V(Math.cos(a) / o.rx, Math.sin(a) / o.ry, 0), e.n, 0.065); } });
-    ribete([...Array.from({ length: 25 }, (_, i) => { const x = BW * (2 * i / 24 - 1); return [x, bocaA(x)]; }), ...Array.from({ length: 23 }, (_, i) => { const x = BW * (1 - 2 * (i + 1) / 24); return [x, bocaB(x)]; })]);
-    [-0.18, -0.12, -0.06, 0, 0.06, 0.12, 0.18].forEach(x => { const a = sobre(x, bocaA(x) + 0.022, 0.012), b = sobre(x, bocaB(x) - 0.022, 0.012), m = sobre(x, (bocaA(x) + bocaB(x)) / 2, 0.012);   // boca cosida
-      puntada(head, m.p, b.p.clone().sub(a.p), m.n, a.p.distanceTo(b.p)); });
-    const casco = (th, s) => { const c = Math.sqrt(Math.max(0, 1 - s * s)), yy = sp(s, 0.7), k = 1 - 0.13 * Math.max(0, yy) ** 2 - 0.04 * Math.max(0, -yy) ** 2;
-      return V(sp(Math.sin(th) * c, 0.6) * k * HS[0], yy * HS[1], sp(Math.cos(th) * c, 0.62) * k * HS[2]); };
-    const enCap = (th, s, off = 0.006) => { const p0 = casco(th, s), p = defH(p0.x, p0.y, p0.z), n = V(p.x, p.y * 0.35, p.z).normalize(); return { p: p.addScaledVector(n, off), n }; };
-    { const th = -0.55; for (let s = 0.36; s < 0.84; s += 0.07) { const a = enCap(th, s, 0.008), b = enCap(th, s + 0.02, 0.008); cruz(head, a.p, b.p.clone().sub(a.p), a.n, 0.05); } }   // costura en la frente
-    { const th = 1.35, s0 = 0.48, pg = new THREE.PlaneGeometry(0.15, 0.13, 6, 6), q = pg.attributes.position;   // parchecito naranja al costado
-      for (let i = 0; i < q.count; i++) { const e = enCap(th + q.getX(i) / 0.52, s0 + q.getY(i) * 1.7, 0.009); q.setXYZ(i, e.p.x, e.p.y, e.p.z); }
-      pg.computeVertexNormals(); part(pg, PARCHE, head);
-      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([i, j]) => { const e = enCap(th + i * 0.06 / 0.52, s0 + j * 0.05 * 1.7, 0.013); cruz(head, e.p, V(0, 1, 0), e.n, 0.03); }); }
-    const ry = sy / Math.max(1, sn), rrg = sr / Math.max(1, sn) + 0.02;  // soga del gorro y la punta de tela que sale arriba
-    part(new THREE.TorusGeometry(rrg, 0.024, 10, 40), SOGA, head, [0, ry, 0], [Math.PI / 2, 0, 0]);
-    const punta = new THREE.Group(); punta.position.set(0, ry + 0.005, 0); punta.rotation.set(0.15, 0, -0.42); head.add(punta);
-    { const pp = new THREE.SplineCurve([[0.06, -0.02], [0.08, 0.04], [0.115, 0.1], [0.14, 0.15], [0.128, 0.162]].map(([r, y]) => new THREE.Vector2(r, y))).getPoints(14);
-      const g = new THREE.LatheGeometry(pp, 40), q = g.attributes.position;
-      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), th = Math.atan2(x, z), f = 1 + 0.16 * sstep(0.02, 0.15, y) * Math.sin(th * 7); q.setXYZ(i, x * f, y + 0.012 * Math.sin(th * 9) * sstep(0.1, 0.16, y), z * f); }
-      part(soldar(g), SACO, punta);
-      for (let k = 0; k < 16; k++) { const th = k / 16 * Math.PI * 2, r = 0.135; part(new THREE.CylinderGeometry(0.004, 0.003, 0.05, 4), SOGA, punta, [Math.sin(th) * r, 0.17, Math.cos(th) * r], [Math.cos(th) * 0.7, 0, -Math.sin(th) * 0.7]); } }
+    const borde = pts => part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([x, y]) => sobre(x, y, -0.004).p), true, 'centripetal'), 120, 0.016, 6, true), PULPA, head);
+    OJC.forEach(o => borde([[o.x - o.w, o.b], [o.x + o.w, o.b], [o.x, o.a]].flatMap(([x, y], k, L) => { const [x2, y2] = L[(k + 1) % 3]; return Array.from({ length: 12 }, (_, t) => [x + (x2 - x) * t / 12, y + (y2 - y) * t / 12]); })));
+    { const P = [], N = 40; for (let k = 0; k <= N; k++) { const x = -BWc + 2 * BWc * k / N; P.push([x, Math.abs(x) < 0.055 ? bocaU(x) - 0.065 : bocaU(x)]); }   // la sonrisa con sus 3 dientes
+      for (let k = N; k >= 0; k--) { const x = -BWc + 2 * BWc * k / N; P.push([x, [-1, 1].some(sg => Math.abs(x - 0.19 * sg) < 0.05) ? bocaL(x) + 0.065 : bocaL(x)]); }
+      borde(P);
+      const g = new THREE.SphereGeometry(1, 90, 60); g.rotateY(-Math.PI / 2); const q = g.attributes.position;   // la luz de adentro, detrás de la sonrisa
+      for (let i = 0; i < q.count; i++) { const p = enCal(q.getX(i), q.getY(i), q.getZ(i)).multiplyScalar(0.93); q.setXYZ(i, p.x, p.y, p.z); }
+      const src = g.index.array, out = [];
+      for (let i = 0; i < src.length; i += 3) { const ok = [0, 1, 2].every(t => { const k = src[i + t], x = q.getX(k), y = q.getY(k), z = q.getZ(k); return z > 0.3 && Math.abs(x) < BWc + 0.06 && y < -0.27 && y > -0.56; }); if (ok) out.push(src[i], src[i + 1], src[i + 2]); }
+      g.setIndex(out); part(g, LUZ, head); }
+    const top = CR[1] * 0.88;                                          // el tallo: sale del hoyito de arriba, curvado, con su hojita y un zarcillo
+    part(new THREE.CylinderGeometry(0.075, 0.095, 0.05, 20), TALLO, head, [0, top + 0.01, 0]);
+    part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([V(0, top, 0), V(0.005, top + 0.09, 0), V(0.035, top + 0.17, 0.01), V(0.095, top + 0.2, 0.02)]), 24, 0.05, 12, false), TALLO, head);
+    part(new THREE.SphereGeometry(0.05, 14, 10), TALLO, head, [0.095, top + 0.2, 0.02], null, [1, 0.8, 1]);
+    { const hoja = new THREE.Shape(); hoja.moveTo(0, 0); hoja.bezierCurveTo(0.08, 0.05, 0.16, 0.02, 0.22, 0.09); hoja.bezierCurveTo(0.15, 0.13, 0.05, 0.11, 0, 0);
+      part(new THREE.ShapeGeometry(hoja, 12), HOJA, head, [-0.03, top + 0.04, 0.03], [-1.1, 0.5, 2.6]); }
+    part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(Array.from({ length: 30 }, (_, k) => { const a = k * 0.55, r = 0.06 - k * 0.0012; return V(-0.06 - k * 0.008 + Math.cos(a) * r * 0.4, top + 0.03 + Math.sin(a) * r, 0.06 + Math.cos(a) * r); })), 80, 0.008, 6, false), HOJA, head);
   }
   flush();
 
