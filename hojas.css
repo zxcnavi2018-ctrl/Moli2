@@ -707,3 +707,6 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .mx-tabla th { background: #dbeafe; color: #1e3a8a; font-weight: 900; padding: .35em .5em; border: .08em solid #334155; }
 .mx-tabla td { border: .08em solid #334155; padding: .5em; height: 1.6em; font-weight: 800; color: #475569; }
 .mx-tr { display: none; } .mx-tr.ver { display: table-row; } .mx-tr.nue td { background: #fef3c7; } .mx-dib td { height: 3.2em; text-align: center; color: #b45309; }
+/* actividad que trabaja un criterio de la rúbrica: franja dorada que brilla */
+.cv-rub { margin: .35em 0; padding: .35em .8em; border-radius: .6em; background: linear-gradient(90deg, #facc15, #fde68a); color: #713f12; font-weight: 800; font-size: .9em; box-shadow: 0 0 0 .12em #fff, 0 .3em .8em rgba(0,0,0,.25); animation: cvRub 1.8s ease-in-out infinite alternate; }
+.cv-rub b { font-weight: 900; } @keyframes cvRub { from { box-shadow: 0 0 0 .12em #fff, 0 0 .2em rgba(250,204,21,.4); } to { box-shadow: 0 0 0 .12em #fff, 0 0 1.1em rgba(250,204,21,.95); } }

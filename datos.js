@@ -104,7 +104,11 @@
       const u = units.find(x => String(x.num) === String(P.num));
       if (u && u.sessions) P.sesiones.filter(x => x.sinFicha).forEach(x => { const s = u.sessions[x.n - 1]; if (!s) return; const A0 = s.activities || [];
         Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria }); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; delete s.fx; delete s.pdf;
-        s.activities = x.activities.map((a, k) => { const v = { ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ficha: '', file: '' }; ['cu', 'ej', 'nx'].forEach(c => { if (a[c]) v[c] = a[c]; else delete v[c]; }); return v; }); }); } } catch (e) {}
+        s.activities = x.activities.map((a, k) => { const v = { ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ficha: '', file: '' }; ['cu', 'ej', 'nx'].forEach(c => { if (a[c]) v[c] = a[c]; else delete v[c]; }); return v; });
+      });
+      if (u && u.sessions) P.sesiones.filter(x => x.pon).forEach(x => { const s = u.sessions[x.n - 1]; if (!s) return; const A0 = s.activities || [];   // sesiones con ficha cambiada aquí (cada equipo con su propia causa y un solo vaso)
+        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria, fx: x.fx }); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; if (x.pdf) s.pdf = x.pdf + '?v=' + encodeURIComponent(P.v || '');
+        s.activities = x.activities.map((a, k) => ({ ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ...(a.rub ? { rub: a.rub } : {}) })); }); } } catch (e) {}
     contenido = { units, files };
     LS.set('moli2:content' + esp(), contenido);
     return contenido;
