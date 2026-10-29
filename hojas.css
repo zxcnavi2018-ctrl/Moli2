@@ -758,3 +758,73 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 @keyframes rolFlota { from { transform: translateY(-.4em) scale(1.12); } to { transform: translateY(-.7em) scale(1.14); } }
 @keyframes rolHolo { from { transform: translateX(-40%); } to { transform: translateX(40%); } }
 @keyframes rolGira { 0%, 100% { transform: rotateY(0) scale(1); } 50% { transform: rotateY(180deg) scale(1.2); } }
+/* ---- 🤫✈️ Silencio: Molí viaja en su avión (la turbina hace «shhhh») ---- */
+#anim.cielo { background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 55%, #e0f2fe 100%); }
+.an-shh2 { width: 100vw; height: 100vh; overflow: hidden; justify-content: flex-end; padding-bottom: 7vh; }
+.an-nube { position: absolute; left: 100%; width: calc(14vw * var(--s)); height: calc(5vw * var(--s)); border-radius: 99em; background: #fff; opacity: .9;
+  box-shadow: calc(4vw * var(--s)) calc(-1.6vw * var(--s)) 0 calc(.5vw * var(--s)) #fff, calc(-3vw * var(--s)) calc(-1vw * var(--s)) 0 0 #fff; animation: anNube var(--d) linear var(--r) infinite; }
+@keyframes anNube { to { transform: translateX(-130vw); } }
+.an-vuelo { position: absolute; top: 18vh; left: 0; width: min(62vw, 760px); animation: anCruza 7.4s cubic-bezier(.25,.6,.6,.95) both; }
+.an-avion { width: 100%; display: block; filter: drop-shadow(0 1.4vh 1.4vh rgba(15,23,42,.3)); animation: anBob 1.4s ease-in-out infinite alternate; }
+.an-estela { position: absolute; right: 88%; top: 45%; width: 70vw; height: 1.2vh; border-radius: 99em; background: linear-gradient(90deg, transparent, rgba(255,255,255,.95)); }
+@keyframes anCruza { 0% { transform: translateX(-75vw) rotate(4deg); } 22% { transform: translateX(14vw) rotate(-1deg); } 78% { transform: translateX(22vw) rotate(1deg); } 100% { transform: translateX(120vw) rotate(-5deg); } }
+@keyframes anBob { from { transform: translateY(-1vh) rotate(-1deg); } to { transform: translateY(1vh) rotate(1deg); } }
+.an-shh2 .an-big, .an-shh2 .an-bub { position: relative; z-index: 3; }
+.an-big.shh { color: #fff; text-shadow: 0 .5vh 0 #1e3a8a, 0 0 3vh rgba(30,58,138,.5); font-size: clamp(50px, 11vw, 140px); }
+/* ---- 😠🚁 Atención: Molí enojado en su helicóptero ---- */
+.an-heli { width: 100vw; height: 100vh; }
+.an-hv { position: relative; width: min(58vw, 680px); animation: anPop .7s cubic-bezier(.3,1.6,.5,1) both, anHover 1.6s .7s ease-in-out infinite alternate; }
+.an-heli-s { width: 100%; display: block; filter: drop-shadow(0 2vh 1.6vh rgba(0,0,0,.4)); animation: anTiembla .12s linear infinite; }
+.an-rot1 { transform-origin: 201px 20px; animation: anRot1 .14s linear infinite; } .an-rot2 { transform-origin: 30px 112px; animation: anRot2 .1s linear infinite; }
+@keyframes anRot1 { 50% { transform: scaleX(.12); } } @keyframes anRot2 { 50% { transform: scaleY(.12); } }
+@keyframes anHover { from { transform: translateY(-2vh) rotate(-2deg); } to { transform: translateY(2vh) rotate(2deg); } }
+.an-hv .an-vena { top: 10%; left: 74%; } .an-hv .an-humo { top: 0; } .an-hv .an-humo.l { left: 52%; } .an-hv .an-humo.r { left: 84%; }
+.an-soga { position: absolute; left: 50%; top: 80%; width: .5vh; height: 9vh; background: #334155; }
+.an-colg { position: absolute; left: 50%; top: calc(80% + 9vh); transform: translateX(-50%); white-space: nowrap; animation: anPop .7s .9s both, anColg 1s 1.6s ease-in-out infinite alternate; }
+@keyframes anColg { from { transform: translateX(-50%) rotate(-4deg); } to { transform: translateX(-50%) rotate(4deg); } }
+/* ---- 🤝🚀 Acuerdos en la nave espacial (tipo Orión): todo flota ---- */
+#anim.espacio { background: radial-gradient(90% 90% at 50% 40%, #1e293b, #020617); }
+.an-orion { width: 100vw; height: 100vh; overflow: hidden; justify-content: flex-start; padding-top: 3vh; gap: 1vh; color: #fff; }
+.an-est { position: absolute; width: .35vh; height: .35vh; border-radius: 50%; background: #fff; animation: anTwk var(--t) ease-in-out infinite alternate; } @keyframes anTwk { from { opacity: .2; } to { opacity: 1; } }
+.an-pared { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 50%, transparent 52%, rgba(148,163,184,.25) 53%, rgba(71,85,105,.85) 70%, #1e293b 100%); pointer-events: none; }
+.an-vent { position: absolute; top: 9vh; width: 22vh; height: 22vh; border-radius: 50%; border: 1.6vh solid #94a3b8; box-shadow: inset 0 0 0 .6vh #475569, 0 0 3vh rgba(125,211,252,.35); overflow: hidden; background: #020617; }
+.an-vent.v1 { left: 5vw; } .an-vent.v2 { right: 5vw; }
+.an-tierra { position: absolute; left: 10%; top: 30%; width: 120%; height: 120%; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #93c5fd, #2563eb 45%, #1e3a8a 70%); box-shadow: inset -2vh -1vh 3vh rgba(0,0,0,.5); }
+.an-tierra::after { content: ""; position: absolute; inset: 20% 30% 35% 15%; border-radius: 40% 60% 50% 45%; background: #22c55e; opacity: .85; }
+.an-luna { position: absolute; left: 30%; top: 25%; width: 45%; height: 45%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f1f5f9, #94a3b8); }
+.an-rot { position: absolute; left: 50%; bottom: 3vh; transform: translateX(-50%); font: 900 2.2vh "Trebuchet MS", system-ui; letter-spacing: .4em; color: #7dd3fc; font-style: normal; opacity: .8; }
+.an-led { position: absolute; left: 50%; bottom: 7vh; transform: translateX(-50%); display: flex; gap: 1vh; } .an-led i { width: 1.2vh; height: 1.2vh; border-radius: 50%; background: #22c55e; animation: anTwk .6s ease-in-out infinite alternate; }
+.an-led i:nth-child(3n) { background: #f59e0b; animation-delay: .3s; } .an-led i:nth-child(4n) { background: #38bdf8; animation-delay: .15s; }
+.an-flo { position: absolute; font-style: normal; font-size: clamp(28px, 5vh, 56px); animation: anFlo var(--d) ease-in-out infinite alternate; } 
+@keyframes anFlo { from { transform: translate(0, 0) rotate(var(--r)); } to { transform: translate(var(--x), var(--y)) rotate(calc(var(--r) + 200deg)); } }
+.an-orion h2 { position: relative; z-index: 2; margin: 0; font: 900 clamp(28px, 5vw, 60px) "Trebuchet MS", system-ui; color: #fde68a; text-shadow: 0 .4vh 0 rgba(0,0,0,.5); }
+.an-grav { position: relative; z-index: 2; flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; gap: 2vw; animation: anGrav 5s ease-in-out infinite alternate; }
+@keyframes anGrav { from { transform: translateY(-2.5vh) rotate(-2.5deg); } to { transform: translateY(2.5vh) rotate(2.5deg); } }
+.an-grav .an-m { width: min(40vh, 330px); height: min(40vh, 330px); animation: anPop .7s cubic-bezier(.3,1.6,.5,1) both; }
+.an-palo { width: 3vw; height: 1.2vh; border-radius: 99em; background: #94a3b8; margin: 0 -2.4vw 0 -1vw; }
+.an-letr { width: min(58vw, 820px); min-height: 34vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1vh; padding: 3vh 3vw; border-radius: 3vh;
+  background: #fff; color: #0f172a; border: 1vh solid #38bdf8; box-shadow: 0 0 0 .5vh #0c4a6e, 0 0 6vh rgba(56,189,248,.55); text-align: center; }
+.an-letr i { font-style: normal; font-size: clamp(60px, 13vh, 140px); line-height: 1; } .an-letr b { font: 900 clamp(34px, 6.4vw, 86px)/1.08 "Trebuchet MS", system-ui; }
+.an-letr.gira { animation: anGira .55s ease-in-out; } @keyframes anGira { 50% { transform: rotateY(90deg) scale(.9); } }
+.an-orion .an-dots { position: relative; z-index: 2; margin-bottom: 4vh; } .an-orion .an-dots i { width: 1.6vh; height: 1.6vh; } .an-orion .an-dots i.on { width: 4.4vh; background: #fde68a; }
+@media (max-aspect-ratio: 1/1) { .an-grav { flex-direction: column; gap: 1vh; min-height: 0; } .an-grav .an-m { width: 24vh; height: 24vh; } .an-palo { display: none; } .an-letr { width: 90vw; min-height: 30vh; } .an-letr b { font-size: clamp(28px, 8.5vw, 60px); } .an-vent { width: 12vh; height: 12vh; top: 12vh; } }
+
+/* ---- 📓 Molí te explica (U7): la pizarra ahora es un cuaderno que se escribe solo, con su lápiz ---- */
+.mx-pz { position: relative; padding: 1.9em .9em .7em 2.9em; border-radius: .5em .8em .8em .5em;
+  background: linear-gradient(90deg, transparent 2.25em, #f87171 2.25em, #f87171 calc(2.25em + 2px), transparent calc(2.25em + 2px)),
+    repeating-linear-gradient(180deg, transparent 0 1.6em, #bfdbfe 1.6em calc(1.6em + 1px)), #fffef8;
+  box-shadow: inset 0 0 0 .12em rgba(15,23,42,.12), .35em .35em 0 #e2e8f0, .5em .5em .9em rgba(0,0,0,.3); }
+.mx-pz::before { content: ""; position: absolute; left: .6em; right: .6em; top: -.45em; height: 1.4em; pointer-events: none;
+  background: radial-gradient(circle at 50% 62%, transparent .2em, #475569 .22em, #94a3b8 .34em, transparent .37em) repeat-x; background-size: 1.5em 1.4em; }
+.mx-cuad { position: absolute; top: .45em; right: .8em; font: 700 .8em "Patrick Hand", "Comic Sans MS", cursive; color: #64748b; }
+.mx-pz .mx-tit, .mx-pz .mx-fila b, .mx-pz .mx-ok, .mx-pz .mx-no, .mx-pz .mx-nota, .mx-pz .mx-col b, .mx-pz .mx-col small, .mx-pz .mx-tabla td, .mx-pz .mx-chips span {
+  font-family: "Patrick Hand", "Comic Sans MS", cursive; font-size: 1.08em; letter-spacing: .01em; }
+.mx-pz .mx-tit { color: #1e3a8a; text-decoration: underline wavy #f59e0b .08em; text-underline-offset: .2em; }
+.mx-pz .mx-fila, .mx-pz .mx-col, .mx-pz .mx-tabla table { background: rgba(255,255,255,.65); }
+.mx-pz .mx-fila b, .mx-pz .mx-col b { color: #1e3a8a; }
+.mx-pz .mx-p.nue { animation: mxEscribe 1.2s ease-in-out both; box-shadow: 0 0 0 .12em #fbbf24, 0 0 .8em rgba(251,191,36,.45); }
+.mx-pz .mx-tr.nue td { animation: mxEscribe 1.2s ease-in-out both; }
+@keyframes mxEscribe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.mx-lapiz { position: absolute; z-index: 3; font-style: normal; font-size: 1.8em; line-height: 1; pointer-events: none; opacity: 0; transform: translate(-.15em, -.9em) rotate(-8deg); filter: drop-shadow(0 .15em .1em rgba(0,0,0,.35)); transition: opacity .3s; }
+.mx-lapiz.escribe { animation: mxLapiz .16s ease-in-out infinite alternate; } @keyframes mxLapiz { from { transform: translate(-.15em, -.95em) rotate(-14deg); } to { transform: translate(-.15em, -.75em) rotate(-2deg); } }
+.an-shh2 { box-sizing: border-box; }

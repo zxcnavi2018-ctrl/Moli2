@@ -157,18 +157,71 @@
   function ruido(t0, d, f = 3000, v = .3) { const a = A(), n = a.sampleRate * d, b = a.createBuffer(1, n, a.sampleRate), x = b.getChannelData(0); for (let i = 0; i < n; i++) x[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / n);
     const s = a.createBufferSource(), fl = a.createBiquadFilter(), g = a.createGain(); s.buffer = b; fl.type = 'bandpass'; fl.frequency.value = f; g.gain.value = v; s.connect(fl).connect(g).connect(a.destination); s.start(a.currentTime + t0); }
   const golpe = t0 => { tono(90, t0, .25, 'sine', .7); ruido(t0, .08, 180, .5); };
+  function sonido(d, arma) { const a = A(), n = Math.floor(a.sampleRate * d), b = a.createBuffer(1, n, a.sampleRate), x = b.getChannelData(0); let ult = 0;
+    for (let i = 0; i < n; i++) { ult = .97 * ult + .03 * (Math.random() * 2 - 1); x[i] = ult * 9; }                       // ruido suave (rosado)
+    const s = a.createBufferSource(); s.buffer = b; arma(a, s, a.currentTime); s.start(); }
+  function jet(d) { sonido(d, (a, s, t) => {                             // ✈️ la turbina del avión: «shhhhhh» que crece y se va
+    const bp = a.createBiquadFilter(), g = a.createGain(), lp = a.createBiquadFilter(), g2 = a.createGain();
+    bp.type = 'bandpass'; bp.Q.value = .7; bp.frequency.setValueAtTime(700, t); bp.frequency.linearRampToValueAtTime(2600, t + d * .55); bp.frequency.linearRampToValueAtTime(900, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.55, t + d * .4); g.gain.linearRampToValueAtTime(.4, t + d * .7); g.gain.linearRampToValueAtTime(0, t + d);
+    lp.type = 'lowpass'; lp.frequency.value = 160; g2.gain.setValueAtTime(0, t); g2.gain.linearRampToValueAtTime(.5, t + d * .4); g2.gain.linearRampToValueAtTime(0, t + d);
+    s.connect(bp).connect(g).connect(a.destination); s.connect(lp).connect(g2).connect(a.destination); }); }
+  function helice(d) { sonido(d, (a, s, t) => {                          // 🚁 el «chop-chop-chop» de las hélices
+    const lp = a.createBiquadFilter(), am = a.createGain(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
+    lp.type = 'lowpass'; lp.frequency.value = 520; lfo.type = 'square'; lfo.frequency.value = 13; lg.gain.value = .5; am.gain.value = .5; lfo.connect(lg).connect(am.gain);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.9, t + .5); g.gain.setValueAtTime(.9, t + d - .8); g.gain.linearRampToValueAtTime(0, t + d);
+    s.connect(lp).connect(am).connect(g).connect(a.destination); lfo.start(t); lfo.stop(t + d); }); }
+  function espacio(d) { const a = A(), t = a.currentTime;                // 🚀 zumbido suave de la nave
+    [55, 82.5].forEach(f => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.09, t + 1); g.gain.setValueAtTime(.09, t + d - 1); g.gain.linearRampToValueAtTime(0, t + d); o.connect(g).connect(a.destination); o.start(t); o.stop(t + d); }); }
+  // ✈️ avión de pasajeros (mira a la derecha), Molí de piloto en la ventana de la cabina
+  const AVION = img => `<svg class="an-avion" viewBox="0 0 400 170" aria-hidden="true">
+    <path d="M70 70 L40 12 Q38 6 46 6 L64 6 Q70 6 74 12 L118 66 Z" fill="#2563eb" stroke="#1e3a8a" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M40 86 Q40 58 90 56 L320 56 Q372 58 386 88 Q372 116 320 118 L90 118 Q40 116 40 86 Z" fill="#f8fafc" stroke="#334155" stroke-width="3.5"/>
+    <path d="M60 104 Q200 116 368 100" stroke="#2563eb" stroke-width="8" fill="none" stroke-linecap="round"/>
+    ${[0, 1, 2, 3, 4].map(q => `<rect x="${112 + q * 26}" y="72" width="13" height="17" rx="6" fill="#7dd3fc" stroke="#1e3a8a" stroke-width="2"/>`).join('')}
+    <path d="M180 92 L120 150 Q116 156 124 156 L150 156 Q156 156 160 150 L240 96 Z" fill="#3b82f6" stroke="#1e3a8a" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="160" y="122" width="54" height="16" rx="8" fill="#94a3b8" stroke="#334155" stroke-width="2.5"/>
+    <path d="M352 66 Q372 72 382 86 L352 86 Z" fill="#bae6fd" stroke="#1e3a8a" stroke-width="2.5"/>
+    <clipPath id="anCab"><circle cx="306" cy="76" r="44"/></clipPath><circle cx="306" cy="76" r="47" fill="#bae6fd" stroke="#1e3a8a" stroke-width="5"/>
+    <image href="${img}" x="256" y="28" width="100" height="100" clip-path="url(#anCab)"/><path d="M276 52 Q290 40 306 38" stroke="#fff" stroke-width="4" fill="none" opacity=".7" stroke-linecap="round"/></svg>`;
+  // 🚁 helicóptero rojo con Molí enojado en la burbuja
+  const HELI = img => `<svg class="an-heli-s" viewBox="0 0 400 260" aria-hidden="true">
+    <rect x="196" y="18" width="10" height="34" fill="#334155"/><g class="an-rot1"><ellipse cx="201" cy="20" rx="190" ry="9" fill="rgba(30,41,59,.75)"/></g>
+    <path d="M40 120 L190 108 L190 132 L40 130 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="3"/><path d="M40 130 L24 96 L52 96 L62 126 Z" fill="#b91c1c" stroke="#7f1d1d" stroke-width="3"/>
+    <g class="an-rot2"><ellipse cx="30" cy="112" rx="7" ry="30" fill="rgba(30,41,59,.7)"/></g>
+    <path d="M150 120 Q150 52 236 50 Q320 52 336 118 Q330 176 250 180 L180 180 Q150 176 150 120 Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="4"/>
+    <clipPath id="anBur"><path d="M232 64 Q306 66 318 122 L232 124 Z"/></clipPath><path d="M232 64 Q306 66 318 122 L232 124 Z" fill="#bae6fd" stroke="#1e3a8a" stroke-width="3"/>
+    <image href="${img}" x="222" y="50" width="104" height="104" clip-path="url(#anBur)"/>
+    <path d="M170 150 Q240 160 320 146" stroke="#fde047" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <line x1="190" y1="180" x2="180" y2="214" stroke="#334155" stroke-width="5"/><line x1="290" y1="180" x2="300" y2="214" stroke="#334155" stroke-width="5"/>
+    <path d="M140 214 L340 214 Q352 214 356 204" stroke="#334155" stroke-width="7" fill="none" stroke-linecap="round"/></svg>`;
   function animar(k) {
     try { A().resume && A().resume(); } catch (e) {}
     if (k === 'palmas') return palmas();
-    if (k === 'shh') { molí3d('guiño'); [0, 1.4, 2.8].forEach(t => ruido(t, 1.1, 3500, .35));
-      return mostrar(`<div class="an-st an-shh"><div class="an-ondas"><i></i><i></i><i></i></div><img class="an-m flota" src="${IMG('decidida')}" alt=""><div class="an-big">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7000, 'azul'); }
+    if (k === 'shh') { molí3d('guiño'); jet(7);                       // 🤫✈️ Molí viaja en su avión: la turbina hace «shhhhh»
+      const nubes = Array.from({ length: 9 }, (_, q) => `<i class="an-nube" style="top:${8 + (q * 37) % 78}%;--d:${5 + (q % 4) * 1.6}s;--r:${-(q * 1.3)}s;--s:${.7 + (q % 3) * .35}"></i>`).join('');
+      return mostrar(`<div class="an-st an-shh2">${nubes}<div class="an-vuelo"><div class="an-estela"></div>${AVION(IMG('decidida'))}</div>
+        <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielo'); }
     if (k === 'drum') { molí3d('feliz', 'saltar'); for (let i = 0; i < 16; i++) golpe(i * .14); golpe(2.6); tono(55, 2.6, 1.2, 'triangle', .5);
       return mostrar(`<div class="an-st an-drum"><img class="an-m bota" src="${IMG('salta')}" alt=""><div class="an-tam">🥁</div><div class="an-pum"><b>¡PUM!</b><b>¡PUM!</b><b>¡PUM!</b></div></div>`, 4600, 'naranja'); }
-    if (k === 'angry') { molí3d('enojado'); tono(110, 0, .9, 'sawtooth', .18); tono(98, .5, .9, 'sawtooth', .18);
-      return mostrar(`<div class="an-st an-angry"><img class="an-m tiembla" src="${IMG('enojado')}" alt=""><div class="an-vena">💢</div><div class="an-humo l">💨</div><div class="an-humo r">💨</div><div class="an-bub rojo">¡Prestamos atención!</div></div>`, 6500, 'rojo'); }
-    if (k === 'acu' || k === 'rol') {
-      const L = k === 'acu' ? [['✋', 'Levantamos la mano para participar'], ['🤐', 'No conversamos cuando otro habla'], ['🪑', 'Nos quedamos en nuestro sitio'], ['🤝', 'Respetamos a todos']]
-        : [['🎤', 'VOCERO', 'Presenta lo que hizo el equipo'], ['📦', 'AYUDANTE', 'Trae y guarda los materiales'], ['⏳', 'CONTROLADOR DEL TIEMPO', 'Avisa cuánto tiempo queda'], ['✏️', 'DISEÑADOR', 'Escribe y dibuja el trabajo']];
+    if (k === 'angry') { molí3d('enojado'); helice(6.5); tono(110, .2, .9, 'sawtooth', .14); tono(98, .8, .9, 'sawtooth', .14);   // 😠🚁 Molí enojado en su helicóptero
+      return mostrar(`<div class="an-st an-heli"><div class="an-hv">${HELI(IMG('enojado'))}<div class="an-vena">💢</div><div class="an-humo l">💨</div><div class="an-humo r">💨</div>
+        <div class="an-soga"></div><div class="an-bub rojo an-colg">¡Prestamos atención!</div></div></div>`, 7000, 'rojo'); }
+    if (k === 'acu') {                                                  // 🤝🚀 acuerdos en la nave espacial (tipo Orión): todo flota, Molí levanta su letrero
+      const L = [['✋', 'Levantamos la mano para participar'], ['🤐', 'No conversamos cuando otro habla'], ['🪑', 'Nos quedamos en nuestro sitio'], ['🤝', 'Respetamos a todos']];
+      molí3d('feliz', 'señalar'); espacio(L.length * 4800 / 1000 + 1.5); let i = 0;
+      const flot = ['✏️', '📚', '🍎', '🧪', '🔭', '🧃', '📏', '🪐', '🎒', '🖍️'].map((e, q) => `<i class="an-flo" style="left:${(q * 23) % 92}%;top:${(q * 41) % 80}%;--d:${7 + q % 5}s;--r:${q * 37}deg;--x:${(q % 2 ? 1 : -1) * (3 + q % 4)}vw;--y:${(q % 3 - 1) * 4}vh">${e}</i>`).join('');
+      const est = Array.from({ length: 40 }, (_, q) => `<b class="an-est" style="left:${(q * 53) % 100}%;top:${(q * 29) % 100}%;--t:${1 + q % 4 * .5}s"></b>`).join('');
+      const paso = () => { if (!capa.classList.contains('on')) return; const x = L[i]; tono(988, 0, .12, 'sine', .18); tono(1318, .1, .18, 'sine', .15);
+        const c = capa.querySelector('.an-letr'); c.classList.remove('gira'); void c.offsetWidth; c.classList.add('gira');
+        setTimeout(() => { c.innerHTML = `<i>${x[0]}</i><b>${x[1]}</b>`; }, 260);
+        capa.querySelectorAll('.an-dots i').forEach((d, j) => d.classList.toggle('on', j === i)); i++; if (i < L.length) setTimeout(paso, 4800); };
+      mostrar(`<div class="an-st an-orion">${est}<div class="an-pared"><span class="an-vent v1"><i class="an-tierra"></i></span><span class="an-vent v2"><i class="an-luna"></i></span><em class="an-rot">ORIÓN · MOLÍ 🚀</em>
+        <div class="an-led">${'<i></i>'.repeat(8)}</div></div>${flot}<h2>🤝 Acuerdos de convivencia</h2>
+        <div class="an-grav"><img class="an-m" src="${IMG('feliz')}" alt=""><div class="an-palo"></div><div class="an-letr"></div></div><div class="an-dots">${L.map(() => '<i></i>').join('')}</div></div>`, L.length * 4800 + 1800, 'espacio');
+      return setTimeout(paso, 700); }
+    if (k === 'rol') {
+      const L = [['🎤', 'VOCERO', 'Presenta lo que hizo el equipo'], ['📦', 'AYUDANTE', 'Trae y guarda los materiales'], ['⏳', 'CONTROLADOR DEL TIEMPO', 'Avisa cuánto tiempo queda'], ['✏️', 'DISEÑADOR', 'Escribe y dibuja el trabajo']];
       molí3d('feliz', 'señalar'); let i = 0;
       const paso = () => { if (!capa.classList.contains('on')) return; const x = L[i]; tono(660, 0, .15); tono(880, .12, .2);
         capa.querySelector('.an-sc').innerHTML = `<div class="an-card"><i>${x[0]}</i><b>${x[1]}</b>${x[2] ? `<small>${x[2]}</small>` : ''}</div>`;

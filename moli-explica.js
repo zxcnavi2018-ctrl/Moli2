@@ -126,7 +126,7 @@
     cierra();
     return `<div class="cv-sl mx" data-mxk="${n}-${j}" style="--c1:#0f766e;--c2:#0ea5e9">
       <div class="mx-h"><span class="cv-num">${j}</span><div><b>🎬 ¡Molí te explica!</b><small>Actividad ${j}${x && x.title ? ' · ' + esc(x.title) : ''}</small></div></div>
-      <div class="mx-b"><div class="mx-mo"><div class="mx-bub"></div><img class="mx-img" src="img/moli/hola.webp" alt="Molí"></div><div class="mx-pz">${pz}</div></div>
+      <div class="mx-b"><div class="mx-mo"><div class="mx-bub"></div><img class="mx-img" src="img/moli/hola.webp" alt="Molí"></div><div class="mx-pz"><span class="mx-cuad">📓 Así queda en el cuaderno</span>${pz}<i class="mx-lapiz" aria-hidden="true">✏️</i></div></div>
       <div class="mx-ctl"><button type="button" data-mxb="-1">◀ Atrás</button><span class="mx-dots">${P.map(() => '<i></i>').join('')}</span><button type="button" data-mxb="0">🔊 Repetir</button><button type="button" data-mxb="1" class="mx-sig">Siguiente ▶</button></div></div>`;
   }
   let S = null;
@@ -141,8 +141,18 @@
     el.querySelector('.mx-img').src = `img/moli/${st.m}.webp`;
     el.querySelectorAll('.mx-dots i').forEach((d, k) => { d.classList.toggle('on', k === n); d.classList.toggle('ya', k < n); });
     const z = el.querySelector('.mx-pz'); if (z.clientHeight) { let lo = .6, hi = 1.45; for (let q = 0; q < 8; q++) { const m = (lo + hi) / 2; z.style.fontSize = m + 'em'; if (z.scrollHeight <= z.clientHeight + 1) lo = m; else hi = m; } z.style.fontSize = lo + 'em'; }   // la pizarra llena su cuadro sin cortarse
+    escribe(z, el.querySelector('.mx-p.nue, .mx-tr.nue'));
     el.querySelector('.mx-sig').textContent = n === P.length - 1 ? 'Continuar ▶' : 'Siguiente ▶';
     if (voz) hablar(); else audio.pause();
+  }
+  // ✏️ el lápiz recorre lo nuevo mientras se «escribe» en el cuaderno
+  function escribe(z, p) {
+    const l = z && z.querySelector('.mx-lapiz'); if (!l) return; clearTimeout(l._t); l.classList.remove('escribe');
+    if (!p) { l.style.opacity = 0; return; }
+    const R = z.getBoundingClientRect(), Q = p.getBoundingClientRect(), y = Q.top - R.top + z.scrollTop + Q.height * .55;
+    l.style.transition = 'none'; l.style.left = (Q.left - R.left) + 'px'; l.style.top = y + 'px'; l.style.opacity = 1; void l.offsetWidth;
+    l.style.transition = 'left 1.2s ease-in-out, top .3s'; l.style.left = (Q.right - R.left - 6) + 'px'; l.classList.add('escribe');
+    l._t = setTimeout(() => { l.classList.remove('escribe'); l.style.opacity = .0; }, 1700);
   }
   function mover(d) { if (!S) return false; const n = S.p + d; if (n < 0 || n >= E[S.k].length) return false; paso(n, true); return true; }
   function montar(el, alFinal) {
