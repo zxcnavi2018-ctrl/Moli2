@@ -38,20 +38,50 @@
     const sc = new T.Scene(), cam = new T.PerspectiveCamera(30, 1, 0.1, 50);
     sc.add(new T.HemisphereLight(0xfffdf8, 0x7f8ba3, 0.75)); const k1 = new T.DirectionalLight(0xfff8ee, 0.85), k2 = new T.DirectionalLight(0x9fd6ff, 0.5); k1.position.set(2.5, 4, 5); k2.position.set(-3, 2, -2); sc.add(k1, k2);
     const m = crearMoli(T, { renderer: r }); sc.add(m.root); m.mirar(new T.Vector3(0, 1.05, 8));
-    const flags = {};
+    const HW = !!(window.esHalloween && esHalloween()), flags = {};      // 🎃 en Halloween: banderas naranja y morada con calabazas
+    const lienzo = (w, h, dib) => { const c = document.createElement('canvas'); c.width = w; c.height = h; dib(c.getContext('2d'), w, h); return c; };
+    const calabaza = (g, cx, cy, r) => { g.fillStyle = '#4d7c0f'; g.fillRect(cx - r * .12, cy - r * 1.15, r * .24, r * .4);
+      [-.55, 0, .55].forEach(o => { g.fillStyle = o ? '#ea580c' : '#f97316'; g.beginPath(); g.ellipse(cx + o * r, cy, r * .62, r * .85, 0, 0, 7); g.fill(); });
+      g.fillStyle = '#1c1917'; [-1, 1].forEach(e => { g.beginPath(); g.moveTo(cx + e * r * .45, cy - r * .35); g.lineTo(cx + e * r * .2, cy + r * .05); g.lineTo(cx + e * r * .7, cy + r * .05); g.fill(); });
+      g.beginPath(); g.moveTo(cx - r * .65, cy + r * .25); for (let k = 0; k <= 6; k++) g.lineTo(cx - r * .65 + k * r * .217, cy + r * (k % 2 ? .38 : .25)); g.lineTo(cx + r * .5, cy + r * .6); g.lineTo(cx - r * .5, cy + r * .6); g.fill(); };
+    const estrella = (g, cx, cy, r, col) => { g.fillStyle = col; g.beginPath(); for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, q = k % 2 ? r * .45 : r; g.lineTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q); } g.fill(); };
+    const telaTex = sx => new T.CanvasTexture(lienzo(256, 168, (g, w, h) => {
+      g.fillStyle = HW ? (sx < 0 ? '#6d28d9' : '#f97316') : (sx < 0 ? COL.i : COL.d); g.fillRect(0, 0, w, h);
+      g.fillStyle = 'rgba(255,255,255,.28)'; g.fillRect(0, 0, w, 12); g.fillRect(0, h - 12, w, 12);
+      if (!HW) return estrella(g, w / 2, h / 2, 52, '#fff');
+      if (sx < 0) calabaza(g, w / 2, h / 2 + 8, 50); else { g.fillStyle = '#1c1917'; [-1, 1].forEach(e => { g.beginPath(); g.moveTo(w / 2 + e * 52, 40); g.lineTo(w / 2 + e * 22, 86); g.lineTo(w / 2 + e * 82, 86); g.fill(); });
+        g.beginPath(); g.moveTo(60, 104); for (let k = 0; k <= 8; k++) g.lineTo(60 + k * 17, k % 2 ? 122 : 104); g.lineTo(190, 140); g.lineTo(66, 140); g.fill(); } }));
     [-1, 1].forEach(sx => {                                             // palito + tela que flamea; sale de la manito hacia afuera cuando el brazo sube
-      const g = new T.Group(), c = new T.Color(sx < 0 ? COL.i : COL.d);
-      const palo = new T.Mesh(new T.CylinderGeometry(0.014, 0.014, 0.78, 10), new T.MeshStandardMaterial({ color: 0xf1e7d0, roughness: 0.6 })); palo.position.y = -0.27; g.add(palo);
-      const bola = new T.Mesh(new T.SphereGeometry(0.03, 12, 10), new T.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 })); bola.position.y = -0.67; g.add(bola);
-      const geo = new T.PlaneGeometry(0.46, 0.3, 14, 4); geo.translate(-0.23 * sx, 0, 0);
-      const tela = new T.Mesh(geo, new T.MeshStandardMaterial({ color: c, roughness: 0.55, side: T.DoubleSide })); tela.position.set(-0.012 * sx, -0.5, 0); g.add(tela);
-      m.manos[sx].add(g); flags[sx] = { g, geo, base: geo.attributes.position.array.slice() };
+      const g = new T.Group();
+      const palo = new T.Mesh(new T.CylinderGeometry(0.014, 0.014, 0.78, 10), new T.MeshStandardMaterial({ color: HW ? 0x3f2a14 : 0xf1e7d0, roughness: 0.6 })); palo.position.y = -0.27; g.add(palo);
+      if (HW) { const cal = new T.Mesh(new T.SphereGeometry(0.055, 16, 12), new T.MeshStandardMaterial({ color: 0xf97316, roughness: 0.45 })); cal.scale.set(1, 0.8, 1); cal.position.y = -0.68; g.add(cal);
+        const tallo = new T.Mesh(new T.CylinderGeometry(0.008, 0.012, 0.035, 8), new T.MeshStandardMaterial({ color: 0x4d7c0f })); tallo.position.y = -0.73; g.add(tallo); }
+      else { const bola = new T.Mesh(new T.SphereGeometry(0.03, 12, 10), new T.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 })); bola.position.y = -0.67; g.add(bola); }
+      const geo = new T.PlaneGeometry(0.46, 0.3, 18, 6); geo.translate(-0.23 * sx, 0, 0);
+      const tela = new T.Mesh(geo, new T.MeshStandardMaterial({ map: telaTex(sx), roughness: 0.55, side: T.DoubleSide })); tela.position.set(-0.012 * sx, -0.5, 0); g.add(tela);
+      m.manos[sx].add(g); flags[sx] = { g, geo, tela, base: geo.attributes.position.array.slice(), amp: 0.35, up: false, sw: 0 };
     });
+    // chispitas al levantar la bandera: estrellas (o murciélagos y caramelos en Halloween)
+    const spr = dib => new T.SpriteMaterial({ map: new T.CanvasTexture(lienzo(64, 64, dib)), transparent: true, depthWrite: false });
+    const MATS = HW ? [spr(g => { g.fillStyle = '#1f1235'; g.beginPath(); g.moveTo(32, 26); g.quadraticCurveTo(20, 8, 2, 18); g.quadraticCurveTo(10, 26, 8, 36); g.quadraticCurveTo(18, 30, 22, 40); g.quadraticCurveTo(28, 34, 32, 44); g.quadraticCurveTo(36, 34, 42, 40); g.quadraticCurveTo(46, 30, 56, 36); g.quadraticCurveTo(54, 26, 62, 18); g.quadraticCurveTo(44, 8, 32, 26); g.fill(); g.beginPath(); g.arc(32, 30, 7, 0, 7); g.fill(); }),
+        spr(g => { g.fillStyle = '#f97316'; g.beginPath(); g.ellipse(32, 32, 14, 10, 0, 0, 7); g.fill(); g.fillStyle = '#facc15'; [[10, 32, 18, 24, 18, 40], [54, 32, 46, 24, 46, 40]].forEach(([a, b, c, d, e, h]) => { g.beginPath(); g.moveTo(a, b); g.lineTo(c, d); g.lineTo(e, h); g.fill(); }); })]
+      : [spr(g => estrella(g, 32, 32, 28, '#facc15')), spr(g => estrella(g, 32, 32, 22, '#fff'))];
+    const parts = [], pw = new T.Vector3();
+    const chispas = F => { F.tela.getWorldPosition(pw); for (let k = 0; k < 8; k++) { const s = new T.Sprite(MATS[k % 2].clone()); s.position.copy(pw); s.scale.setScalar(HW ? 0.24 : 0.14); sc.add(s);
+      parts.push({ s, v: new T.Vector3((Math.random() - 0.5) * 1.4, 0.7 + Math.random() * 0.9, Math.random() * 0.5), t: 0 }); } };
+    const brazo0 = m.brazo.bind(m);
+    m.brazo = (l, on) => { brazo0(l, on); const F = flags[l > 0 ? 1 : -1]; if (!F) return; if (on && !F.up) { F.sw = 1; setTimeout(() => chispas(F), 180); } F.up = !!on; };
     let raf = 0, t0 = performance.now() / 1000, last = t0, w = 0, h = 0;
     const tick = () => { raf = requestAnimationFrame(tick); const now = performance.now() / 1000, dt = now - last; last = now;
       const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return; if (W !== w || H !== h) { w = W; h = H; r.setSize(W, H, false); cam.aspect = W / H; const f = Math.max(1, 0.62 / cam.aspect); cam.position.set(0, 1.12, 5.4 * f); cam.lookAt(0, 1.12, 0); cam.updateProjectionMatrix(); }
       m.update(now - t0, dt);
-      [-1, 1].forEach(sx => { const F = flags[sx], p = F.geo.attributes.position; for (let i = 0; i < p.count; i++) { const x = F.base[i * 3], k = Math.abs(x) / 0.46; p.setZ(i, Math.sin(now * 7 + k * 5) * 0.045 * k); } p.needsUpdate = true; });
+      [-1, 1].forEach(sx => { const F = flags[sx], p = F.geo.attributes.position, fr = F.up ? 12 : 7;     // la tela flamea más fuerte cuando la bandera está arriba
+        F.amp += ((F.up ? 1 : 0.35) - F.amp) * Math.min(1, dt * 4); F.sw *= Math.pow(0.03, dt);
+        for (let i = 0; i < p.count; i++) { const x = F.base[i * 3], y = F.base[i * 3 + 1], k = Math.abs(x) / 0.46;
+          p.setZ(i, (Math.sin(now * fr - k * 6 + y * 4) * 0.075 + Math.sin(now * 19 - k * 11) * 0.012) * k * F.amp); p.setY(i, y + Math.sin(now * fr * 0.8 - k * 5) * 0.018 * k * F.amp); }
+        p.needsUpdate = true; F.geo.computeVertexNormals(); F.g.rotation.x = Math.sin(now * 24) * 0.4 * F.sw; });
+      for (let k = parts.length - 1; k >= 0; k--) { const q = parts[k]; q.t += dt; q.v.y -= 1.6 * dt; q.s.position.addScaledVector(q.v, dt); q.s.material.rotation += dt * 3; q.s.material.opacity = Math.max(0, 1 - q.t / 1.2);
+        if (q.t > 1.2) { sc.remove(q.s); q.s.material.dispose(); parts.splice(k, 1); } }
       r.render(sc, cam); };
     tick();
     return { m, parar() { cancelAnimationFrame(raf); try { r.dispose(); r.forceContextLoss(); } catch (e) {} } };

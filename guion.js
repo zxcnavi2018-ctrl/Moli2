@@ -43,12 +43,24 @@
   const AUD = {}, audio = k => AUD[k] || (AUD[k] = Object.assign(new Audio(RUTA(k)), { preload: 'auto' }));
   let S = null;
 
+  // 🕷️ en Halloween la tarjeta del «¿Sabías que…?» baja colgada de una araña, rebota con un «plop» y la araña se vuelve a subir
+  const HW = () => !!(window.esHalloween && esHalloween());
+  const ARANA = `<div class="gu-arana" aria-hidden="true"><i></i><svg viewBox="0 0 120 100"><g stroke="#111" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M45 50 Q25 30 8 38"/><path d="M45 56 Q22 50 4 62"/><path d="M47 62 Q28 70 12 88"/><path d="M50 66 Q38 82 30 98"/>
+    <path d="M75 50 Q95 30 112 38"/><path d="M75 56 Q98 50 116 62"/><path d="M73 62 Q92 70 108 88"/><path d="M70 66 Q82 82 90 98"/></g>
+    <ellipse cx="60" cy="60" rx="22" ry="20" fill="#1c1917"/><circle cx="60" cy="36" r="14" fill="#1c1917"/>
+    <circle cx="54" cy="34" r="5" fill="#fff"/><circle cx="66" cy="34" r="5" fill="#fff"/><circle cx="55" cy="35" r="2.4" fill="#111"/><circle cx="67" cy="35" r="2.4" fill="#111"/>
+    <path d="M53 44 Q60 49 67 44" stroke="#f97316" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M50 62 L70 62" stroke="#f97316" stroke-width="3"/></svg></div>`;
+  let ctxA = null;
+  function plop() { try { ctxA = ctxA || new (window.AudioContext || window.webkitAudioContext)(); const c = ctxA, t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(700, t); o.frequency.exponentialRampToValueAtTime(130, t + 0.16); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.25); } catch (e) {} }
   function html(tipo, D) {
-    if (tipo === 'sab') return `<div class="cv-sl sy gu gu-sab" style="--c1:#1e1b4b;--c2:#7c3aed"><div class="sy-luz"></div>
+    if (tipo === 'sab') return `<div class="cv-sl sy gu gu-sab${HW() ? ' hw' : ''}" style="--c1:#1e1b4b;--c2:#7c3aed"><div class="sy-luz"></div>
       <div class="sy-mo"><canvas></canvas><img class="sy-img" src="img/moli/estrellas.webp" alt="Molí" hidden></div>
       <div class="gu-caja"><i class="gu-tapa"></i><i class="gu-cuerpo">?</i><i class="gu-brillo"></i></div><div class="gu-pum"></div>
       <div class="sy-bub" hidden></div>
-      <div class="gu-dato" hidden><b>💡 ¿Sabías que…?</b><p>${esc(limpiaSab(D && D.t) || '✨ Molí está buscando un dato curioso…')}</p></div>
+      <div class="gu-dato" hidden>${HW() ? ARANA : ''}<b>💡 ¿Sabías que…?</b><p>${esc(limpiaSab(D && D.t) || '✨ Molí está buscando un dato curioso…')}</p></div>
       <div class="sy-bt"><button type="button" class="sy-rep" data-gurep title="Repetir desde el inicio">🔁</button><button type="button" class="sy-a" data-gua hidden>Ⓐ Abrir la caja secreta</button></div></div>`;
     if (tipo === 'ref') return `<div class="cv-sl sy gu gu-ref" style="--c1:#7c2d12;--c2:#f59e0b"><div class="sy-luz"></div>
       <div class="sy-mo"><canvas></canvas><img class="sy-img" src="img/moli/feliz.webp" alt="Molí" hidden></div>
@@ -120,7 +132,7 @@
   PASOS.sab = [
     async ok => { const M = S.M; M.expr('feliz'); mano(true, true); S.el.classList.add('caja'); decir('ding', false); await espera(500); ok(); await decir('sab_hola'); ok(); M.expr('estrellas'); S.btxt = 'Ⓐ Abrir la caja secreta'; },
     async ok => { const el = S.el, M = S.M; burbuja(''); el.classList.add('tiembla'); await espera(900); ok(); el.classList.remove('tiembla'); el.classList.add('pum'); decir('ding', false); M.expr('sorpresa'); M.accion && M.accion('saltar');
-      await espera(500); ok(); mano(false, true); el.classList.add('abierta'); const d = el.querySelector('.gu-dato'); d.hidden = false; d.classList.add('in'); M.expr('feliz');
+      await espera(500); ok(); mano(false, true); el.classList.add('abierta'); const d = el.querySelector('.gu-dato'); d.hidden = false; d.classList.add('in'); if (el.classList.contains('hw')) S.T.push(setTimeout(plop, 780)); M.expr('feliz');
       await decir('sab_intro'); ok(); const t = limpiaSab(S.D && S.D.t); if (t) { burbuja(''); M.expr('estrellas'); await decir('sab:' + t, false); ok(); } M.expr('feliz'); return 'fin'; }];
   PASOS.ref = [
     async ok => { const M = S.M; M.expr('feliz'); M.accion && M.accion('girar'); mano(true, true); await decir('ding', false); ok(); await decir('ref_hola'); ok(); mano(false, true); M.accion && M.accion('saltar'); await espera(400); ok(); panel(); await espera(600); ok();
