@@ -418,6 +418,6 @@ function crearMoli(THREE, opt = {}) {
     floorGlow.material.opacity = (0.22 + pulse * 0.16) * (0.4 + near * 0.6);
     ripples.forEach((r, k) => { const ph = (t * 0.42 + k / 3) % 1; r.scale.setScalar(0.62 + ph * 0.75); r.material.opacity = Math.sin(ph * Math.PI) * (1 - ph) * 0.7 * (0.4 + near * 0.6); });
   }
-  return { root, update, expr, accion, hablar, mirar, brazo, palma, CLAP, manos: { '-1': arms[0].hand, 1: arms[1].hand }, env };
+  return { root, head, update, expr, accion, hablar, mirar, brazo, palma, CLAP, manos: { '-1': arms[0].hand, 1: arms[1].hand }, env };
 }
 window.crearMoli = crearMoli;

@@ -881,3 +881,12 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .sy-mar .sy-op::before { content: ''; position: absolute; z-index: -1; left: -5%; right: -5%; bottom: -1.5em; height: 2.2em; clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%);
   background: repeating-linear-gradient(0deg, #92400e 0 .45em, #b45309 .45em .55em), #92400e; }
 .rev .sy-op.no { z-index: 4; } .rev .sy-op.no .sy-roca { z-index: 6; }
+/* 🏴‍☠️ versión pirata: barcos, pregunta y respuestas más grandes */
+.cv-sl.sy > .sy-pre { top: 3%; bottom: 12%; gap: .3em; }
+.sy-pre .sy-q { font-size: 2em; padding: .4em .8em; }
+.sy-ops.sy-mar { gap: 2em; padding: 6.2em .4em 2.5em; }
+.sy-mar .sy-op { min-height: 5.5em; padding: .5em .9em .8em; gap: .3em; }
+.sy-mar .sy-op b { font-size: 1.7em; line-height: 1.12; }
+.sy-mar .sy-lado { font-size: 1em; }
+.sy-vela { width: 11.5em; height: 6.8em; margin-left: -5.75em; margin-bottom: -.5em; }
+.sy-mundo { top: -.2em; }
