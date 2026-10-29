@@ -28,7 +28,9 @@
       <div class="sy-bt"><button type="button" class="sy-rep" data-syrep title="Repetir la sincronización">🔁</button><button type="button" class="sy-a" data-sync hidden></button></div></div>`;
   }
   const preHtml = (Q, nv) => !Q || !Q.q ? '<p class="sy-q">✨ Molí está pensando la pregunta…</p>'
-    : `${nv ? `<p class="sy-nv">${nv === 1 ? '🔥 ¡Más difícil!' : '🔥🔥 ¡La más difícil!'}</p>` : ''}<p class="sy-q">${esc(Q.q)}</p><div class="sy-ops"><div class="sy-op i"><span class="sy-lado">✋ IZQUIERDA</span><b>${esc(Q.i)}</b></div><div class="sy-op d"><span class="sy-lado">DERECHA ✋</span><b>${esc(Q.d)}</b></div></div>`;
+    : `${nv ? `<p class="sy-nv">${nv === 1 ? '🔥 ¡Más difícil!' : '🔥🔥 ¡La más difícil!'}</p>` : ''}<p class="sy-q">${esc(Q.q)}</p><div class="sy-ops sy-mar"><i class="sy-mundo"><i class="sy-arco"></i><i class="sy-sol"></i></i><div class="sy-op i">${VELA('#2563eb')}<span class="sy-lado">✋ IZQUIERDA</span><b>${esc(Q.i)}</b><i class="sy-roca"></i></div><div class="sy-op d">${VELA('#f97316')}<span class="sy-lado">DERECHA ✋</span><b>${esc(Q.d)}</b><i class="sy-roca"></i></div><i class="sy-olas"></i></div>`;
+  // ⛵ cada respuesta es un barco: vela de su color y la respuesta escrita en el casco
+  function VELA(c) { return `<svg class="sy-vela" viewBox="0 0 120 70" aria-hidden="true"><line x1="60" y1="4" x2="60" y2="70" stroke="#78350f" stroke-width="4"/><path d="M62 8 L62 64 L108 64 Z" fill="${c}" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><path d="M58 14 L58 64 L20 64 Z" fill="#fff" stroke="${c}" stroke-width="3" stroke-linejoin="round"/><path d="M60 4 L78 9 L60 14 Z" fill="#facc15"/></svg>`; }
 
   // ---- Molí 3D con sus dos banderas (si no hay 3D, su foto con banderitas de CSS) ----
   function tres(cv) {
@@ -136,10 +138,21 @@
       if (S.f === 4) { S.k = (S.k || 0) + 1; const p = el.querySelector('.sy-pre'); p.innerHTML = preHtml(cur(), S.k); p.classList.remove('in'); void p.offsetWidth; p.classList.add('in');   // A: otra pregunta, más difícil
         bandera(1, false); bandera(-1, false); fase(2); decir('ding', false); await espera(350); ok(); M.expr('pensativo'); await decir('lee'); ok(); burbuja(''); M.expr('normal'); return; }
       if (S.f === 3) { const Q = cur(), lado = Q && Q.ok === 'd' ? 1 : -1; fase(4);
-        el.querySelectorAll('.sy-op').forEach(o => o.classList.add(o.classList.contains(Q && Q.ok === 'd' ? 'd' : 'i') ? 'ok' : 'no'));
-        bandera(lado, true); M.expr('estrellas'); M.accion('saltar'); decir('ding', false); await espera(300); ok(); await decir('correcta'); ok(); await espera(1200); ok(); bandera(lado, false); M.expr('feliz'); }
+        const ops = el.querySelector('.sy-ops'); el.querySelectorAll('.sy-op').forEach(o => o.classList.add(o.classList.contains(Q && Q.ok === 'd' ? 'd' : 'i') ? 'ok' : 'no'));
+        ops.classList.add('rev', lado > 0 ? 'gana-d' : 'gana-i'); sonido('choque', 0.55); sonido('magia', 0.2); chispas(ops.querySelector('.sy-op.ok'));
+        M.expr('estrellas'); M.accion('saltar'); await espera(500); ok(); await decir('correcta'); ok(); await espera(1200); ok(); M.expr('feliz'); }
     } catch (e) {}
   }
+  // 🔊 efectos del barco: «¡crash!» del que choca y campanitas mágicas del que llega al mundo brillante
+  let AC = null;
+  function sonido(tipo, retraso = 0) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); const c = AC, t = c.currentTime + retraso;
+    if (tipo === 'choque') { const n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * 0.6, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2.5);
+      const f = c.createBiquadFilter(), g = c.createGain(); f.type = 'lowpass'; f.frequency.value = 900; g.gain.value = 0.5; n.buffer = b; n.connect(f); f.connect(g); g.connect(c.destination); n.start(t);
+      const o = c.createOscillator(), og = c.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.4); og.gain.setValueAtTime(0.4, t); og.gain.exponentialRampToValueAtTime(0.0001, t + 0.45); o.connect(og); og.connect(c.destination); o.start(t); o.stop(t + 0.5); }
+    else [1047, 1319, 1568, 2093, 2637].forEach((fr, k) => { const o = c.createOscillator(), g = c.createGain(), tt = t + k * 0.1; o.type = 'sine'; o.frequency.value = fr; g.gain.setValueAtTime(0.0001, tt); g.gain.exponentialRampToValueAtTime(0.07, tt + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.8); o.connect(g); g.connect(c.destination); o.start(tt); o.stop(tt + 0.85); });
+  } catch (e) {} }
+  function chispas(op) { if (!op) return; for (let k = 0; k < 16; k++) { const i = document.createElement('i'); i.className = 'sy-chis'; i.textContent = ['✨', '⭐', '🌟', '💫'][k % 4];
+    i.style.left = (10 + Math.random() * 80) + '%'; i.style.top = (Math.random() * 60) + '%'; i.style.animationDelay = (0.3 + Math.random() * 1.2) + 's'; op.appendChild(i); } }
   function cortar() { if (!S) return; S.T.forEach(clearTimeout); S.T = []; if (S.a) { try { S.a.pause(); } catch (e) {} } }
 
   function montar(el, Q) {
