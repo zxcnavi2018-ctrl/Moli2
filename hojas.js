@@ -799,8 +799,11 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       if (sk && P.syk === sk && Sincro.activo()) Sincro.actualizar(syncDe(it));   // ya está en pantalla (llegó lo que pensó Molí): no se reinicia la animación
       else if (GU.has(it.k) && window.Guion && P.guk === claveSl(it) + it.k && Guion.activo()) Guion.dato(sabDe(it));   // ya está en pantalla: no se reinicia
       else { if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); if (window.MoliExp) MoliExp.parar(); P.syk = sk; sl.innerHTML = slide(it); const gu = GU.has(it.k) && window.Guion; P.guk = gu ? claveSl(it) + it.k : ''; if (!gu && it.k !== 'mx') ajustar(sl.firstChild); if (it.k === 'mx') MoliExp.montar(sl.firstChild, P.atras); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); if (gu) Guion.montar(sl.firstChild, it.k, { t: sabDe(it) }); }
-      if (anim && window.Aviones) { const u = it.u, AV = { ses: 1, meta: 1, acu: 1, rol: 1, sync: 1, exit: 1 }, sí = u && it.n != null && ((String(u.num) === '7' && it.n >= 7) || String(u.num) === '8');   // ✈️ avioncitos de adorno (U7 desde la sesión 7 y U8)
-        if (sí && AV[it.k]) { const k = it.k, n = it.n; clearTimeout(P.avT); P.avT = setTimeout(() => Aviones.play(k, el, { n }), /^(acu|rol|sync)$/.test(k) ? 1500 : 400); } else { clearTimeout(P.avT); Aviones.parar(); } }
+      if (anim) { clearTimeout(P.avT); if (window.Aviones) Aviones.parar(); if (window.Intro) Intro.parar();
+        const u = it.u, AV = { ses: 1, meta: 1, acu: 1, rol: 1, sync: 1, exit: 1 }, sí = u && it.n != null && ((String(u.num) === '7' && it.n >= 7) || String(u.num) === '8'), k = it.k, n = it.n;   // ✈️ avioncitos de adorno (U7 desde la sesión 7 y U8)
+        const avion = () => { if (sí && AV[k] && window.Aviones) Aviones.play(k, el, { n }); };
+        if (k === 'ses' && window.Intro) Intro.play(el, { n, titulo: tema(it) }, avion);   // ✨ Molí lee el nombre de la sesión; después despega el avión
+        else P.avT = setTimeout(avion, /^(acu|rol|sync)$/.test(k) ? 1500 : 400); }
       if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });
       if (it.u && it.n != null) RT.sesion(it.u.key + ':' + it.n);                // Molí piensa las preguntas de la sesión desde antes
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
@@ -857,7 +860,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
       Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
-    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.MoliExp) MoliExp.parar(); clearTimeout(P.avT); if (window.Aviones) Aviones.parar(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.guk = ''; P.syk = ''; RT.quitar(); };
+    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.MoliExp) MoliExp.parar(); clearTimeout(P.avT); if (window.Aviones) Aviones.parar(); if (window.Intro) Intro.parar(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.guk = ''; P.syk = ''; RT.quitar(); };
     return P;
   }
 

@@ -72,7 +72,7 @@
       <div class="sy-mo"><canvas></canvas><img class="sy-img" src="img/moli/hola.webp" alt="Molí" hidden><div class="sy-fl i"></div><div class="sy-fl d"></div></div>
       <div class="sy-bub" hidden></div>
       <div class="gu-pan" hidden><h2 class="gu-t">${acu ? '🤝 Acuerdos de convivencia' : '👥 Roles de trabajo'}</h2>
-        <ul class="gu-cards gu-n${L.length}">${L.map((x, k) => `<li class="gu-c" data-k="${k}"><span>${x[0]}</span><b>${esc(x[1])}</b>${acu ? '' : `<small>${esc(x[2])}</small>`}</li>`).join('')}</ul>
+        ${acu ? '<i class="gu-cuerda"></i>' : ''}<ul class="gu-cards gu-n${L.length}">${L.map((x, k) => `<li class="gu-c" data-k="${k}">${acu ? '<i class="gu-pinza"></i>' : '<i class="gu-num">' + (k + 1) + '</i>'}<span>${x[0]}</span><b>${esc(x[1])}</b>${acu ? '' : `<small>${esc(x[2])}</small>`}</li>`).join('')}</ul>
         <div class="gu-q" hidden></div></div>
       <div class="sy-bt"><button type="button" class="sy-rep" data-gurep title="Repetir desde el inicio">🔁</button><button type="button" class="sy-a" data-gua hidden>Ⓐ Siguiente</button></div></div>`;
   }
