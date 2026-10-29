@@ -21,12 +21,12 @@
       { m: 'curiosa', t: 'En la fila de abajo, dibujen: a la izquierda la masa uno, y a la derecha la masa dos. Y encierren en rojo todo lo que Don Pepe cambió además del agua.', a: [] },
       { m: 'decidida', t: 'Al final completen la frase: en nuestros vasos con levadura, solo cambiaremos… y lo demás será igual. Cada uno la copia en su cuaderno.', a: [{ k: 'nota', x: 'Solo cambiaremos ________ y lo demás será igual: ________' }] }],
     '7-1': [
-      { m: 'hola', t: 'Hoy cada equipo prepara, en un papelote, la lista de materiales para SU vaso con levadura.', a: [{ k: 'tag', x: '📜 Papelote · En equipo' }] },
+      { m: 'hola', t: 'Hoy cada equipo prepara, en el cuaderno, la lista de materiales para SU vaso con levadura.', a: [{ k: 'tag', x: '📓 Cuaderno · En equipo' }] },
       { m: 'curiosa', t: 'Recuerden: cada equipo investiga su propia causa. Puede ser la temperatura del agua, la cantidad de azúcar o la cantidad de levadura. Primero escriban su causa y el valor que les tocó.', a: [{ k: 'chips', x: ['🌡️ Temperatura', '🍬 Azúcar', '🟤 Levadura'] }, { k: 'nota', x: 'Nuestra causa: ________ · El valor que nos tocó: ________' }] },
-      { m: 'pensativa', t: 'En el papelote hagan un cuadro de tres columnas: el material, para qué sirve, y cuánto usarán.', a: [{ k: 'col', i: '🧰', h: 'Material', x: '' }, { k: 'col', i: '❓', h: '¿Para qué sirve?', x: '' }, { k: 'col', i: '🥄', h: '¿Cuánto usaremos?', x: '' }] },
+      { m: 'pensativa', t: 'En el cuaderno, cada uno hace un cuadro de tres columnas: el material, para qué sirve, y cuánto usarán.', a: [{ k: 'col', i: '🧰', h: 'Material', x: '' }, { k: 'col', i: '❓', h: '¿Para qué sirve?', x: '' }, { k: 'col', i: '🥄', h: '¿Cuánto usaremos?', x: '' }] },
       { m: 'idea', t: 'Los materiales son: vaso, agua, azúcar, levadura, termómetro, regla y reloj.', a: [{ k: 'chips', x: ['🥛 Vaso', '💧 Agua', '🍬 Azúcar', '🟤 Levadura', '🌡️ Termómetro', '📏 Regla', '⏱️ Reloj'] }] },
       { m: 'decidida', t: '¡Muy importante! Solo cambia nuestra causa. Todo lo demás va en la misma cantidad que en los equipos que investigan nuestra misma causa. Así, después, podremos compartir y comparar datos.', a: [{ k: 'ok', x: 'Solo cambia NUESTRA causa · lo demás, igual que los equipos de la misma causa' }] },
-      { m: 'genial', t: 'Cuando terminen, cada uno copia el cuadro en su cuaderno. ¡A trabajar!', a: [{ k: 'nota', x: '📓 Cada uno lo copia en su cuaderno' }] }],
+      { m: 'genial', t: 'Conversen en equipo, pero cada uno escribe el cuadro en su propio cuaderno. ¡A trabajar!', a: [{ k: 'nota', x: '📓 Cada uno en su cuaderno' }] }],
     '7-2': [
       { m: 'hola', t: 'Ahora, cada uno en su cuaderno, escribirá los pasos del experimento que haremos la próxima clase.', a: [{ k: 'tag', x: '📓 En tu cuaderno · Individual' }] },
       { m: 'pensativa', t: 'Haz un cuadro de tres columnas: el número del paso, qué hacemos, y un dibujo.', a: [{ k: 'col', i: '🔢', h: 'Paso', x: '' }, { k: 'col', i: '✍️', h: '¿Qué hacemos?', x: '' }, { k: 'col', i: '✏️', h: 'Dibujo', x: '' }] },
@@ -70,7 +70,7 @@
       { m: 'decidida', t: 'Al final revísalo con la lista: título, ejes, escala pareja, barras iguales a la tabla, colores y leyenda.', a: [{ k: 'ok', x: 'Título · ejes · escala · barras = tabla · colores · leyenda' }] },
       { m: 'genial', t: '¡Ya tienes tus datos en una tabla y en un gráfico! Ahora vamos a analizarlos.', a: [] }],
     '10-2': [
-      { m: 'hola', t: 'Ahora somos detectives de datos: en equipo, en un papelote, comparamos los tres valores de nuestra causa.', a: [{ k: 'tag', x: '⭐ Criterio: Organiza y procesa datos · Papelote' }] },
+      { m: 'hola', t: 'Ahora somos detectives de datos: en equipo comparamos los tres valores de nuestra causa, y cada uno lo escribe en su cuaderno.', a: [{ k: 'tag', x: '⭐ Criterio: Organiza y procesa datos · Cuaderno' }] },
       { m: 'pensativa', t: 'Para cada valor, escriban la altura inicial, la de los veinte minutos y el cambio: la de los veinte minutos menos la inicial.', a: [{ k: 'dato', x: 'Cambio = altura a los 20 min − altura inicial' }] },
       { m: 'curiosa', t: 'Encuentren la mayor y la menor altura, y calculen la diferencia.', a: [{ k: 'nota', x: 'La mayor fue ___ cm con ____; la menor, ___ cm con ____. Diferencia: ___ cm' }] },
       { m: 'idea', t: 'Ahora el patrón, con el andamio: cuando… aumenta, la altura de la espuma… Y den dos datos que lo demuestran.', a: [{ k: 'tit', x: '🔁 Cuando ____ aumenta, la espuma ____' }] },
