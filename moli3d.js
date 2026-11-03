@@ -3,9 +3,14 @@
 //    Para probar en otro mes: ?halloween=1 (siempre) o ?halloween=0 (nunca).
 window.esHalloween = function () { const q = new URLSearchParams(location.search).get('halloween'); return q === '1' || q === '0' ? q === '1' : new Date().getMonth() === 9; };
 // en octubre, los dibujos de Molí (img/moli/<cara>.webp) pasan a ser los de Molí con su disfraz (costal y cabeza de calabaza) (img/moli-hw/<cara>.webp)
-window.moliDibujo = n => (window.esHalloween() ? 'img/moli-hw/' : 'img/moli/') + n + '.webp';
-if (window.esHalloween()) {
-  const disfrazar = el => { const s = el.tagName === 'IMG' && el.getAttribute('src'); if (s && /(^|\/)img\/moli\/\w+\.webp/.test(s)) el.setAttribute('src', s.replace('img/moli/', 'img/moli-hw/')); };
+// 🎄 Navidad: del 1 de noviembre al 6 de enero (Bajada de Reyes) el aula se adorna, cae un poquito de nieve al piso y Molí usa gorro navideño.
+//    Para probar: ?navidad=1 (siempre) o ?navidad=0 (nunca).
+window.esNavidad = function () { const q = new URLSearchParams(location.search).get('navidad'); if (q === '1' || q === '0') return q === '1';
+  const d = new Date(), m = d.getMonth(); return m === 10 || m === 11 || (m === 0 && d.getDate() <= 6); };
+const MOLI_DIS = window.esHalloween() ? 'img/moli-hw/' : window.esNavidad() ? 'img/moli-nv/' : '';   // carpeta de los dibujos disfrazados (o ninguna)
+window.moliDibujo = n => (MOLI_DIS || 'img/moli/') + n + '.webp';
+if (MOLI_DIS) {
+  const disfrazar = el => { const s = el.tagName === 'IMG' && el.getAttribute('src'); if (s && /(^|\/)img\/moli\/\w+\.webp/.test(s)) el.setAttribute('src', s.replace('img/moli/', MOLI_DIS)); };
   const todo = r => { if (r.nodeType !== 1) return; disfrazar(r); r.querySelectorAll('img').forEach(disfrazar); };
   new MutationObserver(ms => ms.forEach(m => m.type === 'attributes' ? disfrazar(m.target) : m.addedNodes.forEach(todo)))
     .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
@@ -320,6 +325,19 @@ function crearMoli(THREE, opt = {}) {
     { const hoja = new THREE.Shape(); hoja.moveTo(0, 0); hoja.bezierCurveTo(0.08, 0.05, 0.16, 0.02, 0.22, 0.09); hoja.bezierCurveTo(0.15, 0.13, 0.05, 0.11, 0, 0);
       part(new THREE.ShapeGeometry(hoja, 12), HOJA, head, [-0.03, top + 0.04, 0.03], [-1.1, 0.5, 2.6]); }
     part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(Array.from({ length: 30 }, (_, k) => { const a = k * 0.55, r = 0.06 - k * 0.0012; return V(-0.06 - k * 0.008 + Math.cos(a) * r * 0.4, top + 0.03 + Math.sin(a) * r, 0.06 + Math.cos(a) * r); })), 80, 0.008, 6, false), HOJA, head);
+  }
+  // ---- 🎄 gorro navideño (del 1 de noviembre al 6 de enero): cono rojo de felpa que se dobla, borde de peluche blanco y pompón ----
+  else if (opt.disfraz !== false && window.esNavidad && window.esNavidad()) {
+    const ROJO = PM({ color: 0xd62828, roughness: 0.85, envMapIntensity: 0.15 });
+    const FELPA = PM({ color: 0xffffff, roughness: 1, envMapIntensity: 0.1 });
+    const yB = 0.28, rx = 0.56, rz = 0.5, H0 = 0.62;                   // la banda abraza el casco un poco arriba de los audífonos
+    const gorro = lathe(k => [Math.pow(1 - k, 0.85) * 1, yB + H0 * k], 24, 48);
+    { const q = gorro.attributes.position;                             // ovalado como el casco y la punta se dobla hacia atrás y a un lado
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), k = (y - yB) / H0, b = Math.pow(k, 2.2);
+        q.setXYZ(i, x * rx + 0.3 * b, y - 0.18 * Math.pow(k, 3), z * rz - 0.22 * b); } gorro.computeVertexNormals(); }
+    part(gorro, ROJO, head, [0, 0, 0], [0, 0, 0.08]);
+    part(new THREE.TorusGeometry(1, 0.13, 14, 64), FELPA, head, [0, yB + 0.01, 0], [Math.PI / 2, 0, 0.08], [rx + 0.035, rz + 0.035, 0.75]);
+    { const tx = 0.3, ty = yB + H0 - 0.18, a = 0.08; part(new THREE.SphereGeometry(0.1, 20, 16), FELPA, head, [tx * Math.cos(a) - ty * Math.sin(a), tx * Math.sin(a) + ty * Math.cos(a), -0.22]); }   // pompón en la punta
   }
   flush();
 

@@ -194,10 +194,10 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hojas.css?v=202610292200">
+<link rel="stylesheet" href="hojas.css?v=202611031329">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202610292200"></script><script src="sincro.js?v=202610292200"></script><script src="guion.js?v=202610291951"></script><script src="datos.js?v=202610291951"></script><script src="docente.js?v=202610291951"></script>
-<script src="intro.js?v=202610291951"></script><script src="aviones.js?v=202610291951"></script><script src="moli-explica.js?v=202610291951"></script><script src="hojas.js?v=202610291951"></script><script src="hojas-docente.js?v=202610291951"></script><script src="diplomas.js?v=202610291951"></script><script src="fotocheck.js?v=202610291951"></script><script src="herramientas.js?v=202610291951"></script><script src="remoto.js?v=202610291951"></script><script src="escaner.js?v=202610291951"></script><script src="tarjetas.js?v=202610291951"></script>
+<script src="moli3d.js?v=202611031329"></script><script src="sincro.js?v=202611031329"></script><script src="guion.js?v=202611031329"></script><script src="datos.js?v=202611031329"></script><script src="docente.js?v=202611031329"></script>
+<script src="intro.js?v=202611031329"></script><script src="aviones.js?v=202611031329"></script><script src="moli-explica.js?v=202611031329"></script><script src="hojas.js?v=202611031329"></script><script src="hojas-docente.js?v=202611031329"></script><script src="diplomas.js?v=202611031329"></script><script src="fotocheck.js?v=202611031329"></script><script src="herramientas.js?v=202611031329"></script><script src="remoto.js?v=202611031329"></script><script src="escaner.js?v=202611031329"></script><script src="tarjetas.js?v=202611031329"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -1175,6 +1175,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       addSwitch('Ventilador ' + rname, x, z, fy, on => { fan.on = on; });
     });
     if (window.esHalloween && esHalloween()) halloween6B({ P, Wc, Dp, fy, rotU, svec, F6 });   // 🎃 sólo en octubre
+    else if (window.esNavidad && esNavidad()) navidad6B({ P, Wc, Dp, fy, rotU, svec, F6 });   // 🎄 del 1 de noviembre al 6 de enero
   } else if (kind === 'class') {
     teach(); lockers(); clusters(false);                              // pizarra grande + ecran + proyector; lockers al fondo
   } else if (kind === 'ml') {                                         // media lab: salón gigante (2 módulos unidos), mesas en roseta con laptops
@@ -1434,6 +1435,136 @@ function halloween6B({ P, Wc, Dp, fy, rotU, svec, F6 }) {
     FAN.forEach(o => { o.f.head.getWorldPosition(o.p); o.f.head.getWorldDirection(o.d); o.on = o.f.on; });
     ANIM.forEach(f => f(t, dt));
   });
+}
+
+// ===================================================================
+//  🎄 NAVIDAD EN EL AULA (del 1 de noviembre al 6 de enero: esNavidad() de moli3d.js). Arbolito con luces que titilan,
+//  esferas, guirnalda dorada y su estrella; regalos al pie; guirnaldas con foquitos en las paredes de los costados;
+//  banderines «FELIZ NAVIDAD» en la pared de la pizarra; una corona en la pared del fondo; copos de nieve colgando
+//  del techo y un poquito de nieve en el piso (en las esquinas y junto a las paredes).
+//  Todo se arma en coordenadas del salón (igual que Halloween): u (de la pizarra al corcho), altura y sd (de una pared lateral a la otra).
+// ===================================================================
+function navidad6B({ P, Wc, Dp, fy, rotU, svec, F6 }) {
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  const sala = new THREE.Group(), [ox, oz] = P(0, 0); sala.position.set(ox, fy, oz); sala.rotation.y = rotU; scene.add(sala); sala.updateMatrixWorld(true);
+  const zs = Math.sign(Math.sin(rotU) * svec[0] + Math.cos(rotU) * svec[1]) || 1;
+  const L = (u, y, s) => V3(u, y, zs * s);
+  const U0 = -(Wc / 2 - T), U1 = Wc / 2 - T, S1 = Dp - 2 * T;
+  const lienzo = (w, h, f) => { const c = document.createElement('canvas'); c.width = w; c.height = h; f(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t; };
+  const mira = p => Math.atan2(0.4 - p.x, zs * S1 / 2 - p.z);
+  const ANIM = [];
+  const FOCO = [0xff3b3b, 0xffd23f, 0x34d399, 0x3b82f6, 0xff7ad9, 0xffffff].map(c => new THREE.MeshBasicMaterial({ color: c }));   // foquitos: titilan por color
+  const FOCO0 = FOCO.map(m => m.color.clone());
+
+  // ---- 🎄 el arbolito (en la esquina junto a la pizarra), con maceta roja ----
+  const ARB = [U0 + 0.36, S1 - 0.36];                                  // la esquina junto a la pizarra (detrás de la mesa del profesor)
+  { const p = L(ARB[0], 0, ARB[1]), g = new THREE.Group(); g.position.copy(p); g.rotation.y = mira(p); g.scale.setScalar(0.82); sala.add(g);
+    const VERDE = [toon(0x166534), toon(0x15803d), toon(0x16a34a)], ORO = toon(0xfacc15), MACETA = toon(0xb91c1c);
+    const maceta = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.16, 0.24, 24), MACETA); maceta.position.y = 0.12; g.add(maceta);
+    const aro = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.022, 8, 28), ORO); aro.rotation.x = Math.PI / 2; aro.position.y = 0.235; g.add(aro);
+    const tronco = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.065, 0.2, 10), toon(0x78350f)); tronco.position.y = 0.32; g.add(tronco);
+    const PIS = [[0.52, 0.38, 0.6], [0.42, 0.68, 0.55], [0.31, 0.95, 0.48], [0.2, 1.19, 0.4]];   // [radio, base, alto] de cada piso
+    PIS.forEach(([r, y, h], k) => { const cg = new THREE.ConeGeometry(r, h, 28, 1, true), q = cg.attributes.position;
+      for (let i = 0; i < q.count; i++) if (q.getY(i) < 0) { const x = q.getX(i), z = q.getZ(i), a = Math.atan2(x, z), f = 1 + 0.07 * Math.sin(a * 9); q.setXYZ(i, x * f, q.getY(i) - 0.03 * Math.abs(Math.sin(a * 9)), z * f); }   // borde con puntas
+      cg.computeVertexNormals(); const m = new THREE.Mesh(cg, VERDE[k % 3]); m.material.side = THREE.DoubleSide; m.position.y = y + h / 2; g.add(m); });
+    const enCono = (y, a, off = 0.015) => { const pz = PIS.find(([r, b, h]) => y >= b && y <= b + h) || PIS[0], [r, b, h] = pz, rr = r * (1 - (y - b) / h) + off; return V3(Math.sin(a) * rr, y, Math.cos(a) * rr); };
+    // guirnalda dorada en espiral
+    const esp = []; for (let i = 0; i <= 140; i++) { const k = i / 140, y = 0.42 + k * 1.1, a = k * Math.PI * 7; esp.push(enCono(y, a, 0.03)); }
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(esp), 300, 0.012, 6), ORO));
+    // esferas de colores
+    const BOLA = [toon(0xdc2626), toon(0x2563eb), toon(0xfacc15), toon(0xf8fafc), toon(0xdb2777)], bola = new THREE.SphereGeometry(0.045, 14, 10);
+    for (let i = 0; i < 26; i++) { const y = 0.45 + (i * 0.6180339 % 1) * 1.0, a = i * 2.4; const b = new THREE.Mesh(bola, BOLA[i % BOLA.length]); b.position.copy(enCono(y, a, 0.02)); g.add(b); }
+    // foquitos
+    const foco = new THREE.SphereGeometry(0.019, 8, 6);
+    for (let i = 0; i < 46; i++) { const y = 0.43 + (i * 0.381966 % 1) * 1.08, a = i * 1.37; const f = new THREE.Mesh(foco, FOCO[i % FOCO.length]); f.position.copy(enCono(y, a, 0.01)); g.add(f); }
+    // estrella en la punta
+    const st = new THREE.Shape(); for (let i = 0; i < 10; i++) { const a = Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.045 : 0.11; i ? st.lineTo(Math.cos(a) * r, Math.sin(a) * r) : st.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+    const sg = new THREE.ExtrudeGeometry(st, { depth: 0.03, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.008, bevelSegments: 2 }); sg.center();
+    const estrella = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ color: 0xffe066 })); estrella.position.y = 1.66; estrella.userData.dyn = true; g.add(estrella);
+    const brillo = new THREE.Sprite(new THREE.SpriteMaterial({ map: lienzo(128, 128, (c) => { const gr = c.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(255,240,150,.95)'); gr.addColorStop(1, 'rgba(255,220,80,0)'); c.fillStyle = gr; c.fillRect(0, 0, 128, 128); }), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    brillo.scale.setScalar(0.45); brillo.position.y = 1.66; brillo.userData.dyn = true; g.add(brillo);
+    ANIM.push(t => { estrella.rotation.y = t * 0.8; brillo.material.opacity = 0.65 + 0.35 * Math.sin(t * 3); });
+    // regalos al pie del árbol
+    const regalo = (x, z, w, h, c, cint, rot) => { const r = new THREE.Group(); r.position.set(x, 0, z); r.rotation.y = rot; g.add(r);
+      const caja = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), toon(c)); caja.position.y = h / 2; r.add(caja);
+      const C = toon(cint); [[w + 0.004, h + 0.004, 0.035], [0.035, h + 0.004, w + 0.004]].forEach(([a, b, d]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(a, b, d), C); m.position.y = h / 2; r.add(m); });
+      [-1, 1].forEach(sx => { const l = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.012, 6, 14), C); l.position.set(sx * 0.03, h + 0.025, 0); l.rotation.set(0, Math.PI / 2, sx * 0.6); r.add(l); }); };
+    regalo(0.36, 0.22, 0.2, 0.16, 0x2563eb, 0xfacc15, 0.4); regalo(-0.3, 0.3, 0.17, 0.2, 0xdc2626, 0xf8fafc, -0.3); regalo(0.12, 0.4, 0.14, 0.12, 0x16a34a, 0xdc2626, 0.9); regalo(-0.42, -0.05, 0.15, 0.13, 0xf8fafc, 0xdc2626, 0.2);
+  }
+
+  // ---- guirnaldas verdes con foquitos en las paredes de los costados (cuelgan un poquito) ----
+  function guirnalda(A, B, caida) {
+    const cuerda = k => A.clone().lerp(B, k).add(V3(0, -caida * 4 * k * (1 - k), 0)), N = 30;
+    const pts = Array.from({ length: N + 1 }, (_, i) => cuerda(i / N));
+    sala.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.035, 7), toon(0x166534)));
+    sala.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => p.clone().add(V3(0, 0.012, 0)))), 120, 0.022, 5), toon(0x15803d)));
+    const d = A.distanceTo(B), n = Math.round(d / 0.22), foco = new THREE.SphereGeometry(0.026, 8, 6);
+    for (let i = 1; i < n; i++) { const f = new THREE.Mesh(foco, FOCO[i % 5]); f.position.copy(cuerda(i / n)).add(V3(0, -0.05, 0)); f.scale.y = 1.35; sala.add(f); }
+    [0, 1].forEach(k => { const lazo = new THREE.Group(); lazo.position.copy(k ? B : A).add(V3(0, -0.02, 0)); sala.add(lazo);   // moñitos rojos en las puntas
+      const R = toon(0xdc2626); [-1, 1].forEach(sx => { const l = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.02, 6, 14), R); l.position.x = sx * 0.055; l.rotation.z = sx * 0.5; l.rotation.y = Math.PI / 2 * 0; lazo.add(l); });
+      const c = new THREE.Mesh(new THREE.SphereGeometry(0.028, 10, 8), R); lazo.add(c); });
+  }
+  { const uA = U0 + 1.0, uB = U1 - 1.95;
+    guirnalda(L(uA, RH - 0.06, S1 - 0.06), L(uB, RH - 0.06, S1 - 0.06), 0.16); guirnalda(L(uA, RH - 0.06, 0.06), L(uB, RH - 0.06, 0.06), 0.16); }
+
+  // ---- banderines «FELIZ NAVIDAD» en la pared de la pizarra ----
+  { const LET = ['arb', 'F', 'E', 'L', 'I', 'Z', 'est', 'N', 'A', 'V', 'I', 'D', 'A', 'D', 'arb'], fondo = ['#dc2626', '#16a34a', '#f8fafc'], letra = ['#fff', '#fff', '#dc2626'];
+    let A = L(U0 + 0.045, RH - 0.035, 0.95), B = L(U0 + 0.045, RH - 0.035, S1 - 0.95); const n = V3(1, 0, 0), fw = 0.32, fh = 0.36, caida = 0.1;
+    const NF = LET.length, CW = 120, CH = 150, der = n.clone().negate().cross(V3(0, 1, 0)); if (A.dot(der) > B.dot(der)) [A, B] = [B, A];
+    const tex = lienzo(CW * NF, CH, g => LET.forEach((ch, i) => {
+      const x0 = i * CW, c = fondo[i % fondo.length]; g.beginPath(); g.moveTo(x0 + 3, 3); g.lineTo(x0 + CW - 3, 3); g.lineTo(x0 + CW / 2, CH - 3); g.closePath(); g.fillStyle = c; g.fill(); g.strokeStyle = '#2b2547'; g.lineWidth = 5; g.stroke();
+      const tx = x0 + CW / 2, ty = 52;
+      if (ch === 'arb') { g.fillStyle = '#15803d'; g.beginPath(); g.moveTo(tx, ty - 34); g.lineTo(tx + 28, ty + 22); g.lineTo(tx - 28, ty + 22); g.fill(); g.fillStyle = '#facc15'; g.beginPath(); g.arc(tx, ty - 34, 7, 0, 6.3); g.fill(); g.fillStyle = '#78350f'; g.fillRect(tx - 5, ty + 22, 10, 10); }
+      else if (ch === 'est') { g.fillStyle = '#facc15'; g.beginPath(); for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 13 : 30; g.lineTo(tx + Math.cos(a) * r, ty + Math.sin(a) * r); } g.closePath(); g.fill(); g.strokeStyle = '#92400e'; g.lineWidth = 3; g.stroke(); }
+      else { g.fillStyle = letra[i % letra.length]; g.font = '900 66px "Arial Black", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, tx, 56); } }));
+    const dir = V3(0, 0, 0).subVectors(B, A), dk = fw / 2 / dir.length(), cuerda = k => A.clone().lerp(B, k).add(V3(0, -caida * 4 * k * (1 - k), 0)); dir.normalize();
+    sala.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(Array.from({ length: 13 }, (_, i) => cuerda(i / 12))), 60, 0.005, 5), toon(0x2b2547)));
+    const pos = new Float32Array(NF * 9), uv = [], cs = [];
+    for (let i = 0; i < NF; i++) { const k = (i + 0.5) / NF, px = 3 / (CW * NF); cs.push({ a: cuerda(k - dk), b: cuerda(k + dk), m: cuerda(k) }); uv.push(i / NF + px, 1 - 3 / CH, (i + 1) / NF - px, 1 - 3 / CH, (i + 0.5) / NF, 3 / CH); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide })); m.userData.dyn = true; m.frustumCulled = false; sala.add(m);
+    ANIM.push(t => { cs.forEach((c, i) => { const an = 0.08 + 0.1 * (0.5 + 0.5 * Math.sin(t * 2.1 + i * 0.7)), fl = Math.sin(t * 3 + i) * 0.01;
+      pos.set([c.a.x, c.a.y, c.a.z, c.b.x, c.b.y, c.b.z, c.m.x + n.x * Math.sin(an) * fh + dir.x * fl, c.m.y - 0.01 - Math.cos(an) * fh, c.m.z + n.z * Math.sin(an) * fh + dir.z * fl], i * 9); });
+      g.attributes.position.needsUpdate = true; }); }
+
+  // ---- corona navideña en la pared del fondo ----
+  { const p = L(-2.0, 1.75, S1 - 0.03), c = new THREE.Group(); c.position.copy(p); c.rotation.y = zs > 0 ? Math.PI : 0; sala.add(c);
+    const H = [toon(0x166534), toon(0x15803d)];
+    for (let i = 0; i < 22; i++) { const a = i / 22 * Math.PI * 2, h = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), H[i % 2]); h.position.set(Math.cos(a) * 0.24, Math.sin(a) * 0.24, 0.02); h.scale.set(1, 0.7, 0.55); h.rotation.z = a; c.add(h); }
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + 0.3, b = new THREE.Mesh(new THREE.SphereGeometry(0.028, 10, 8), toon(i % 2 ? 0xdc2626 : 0xfacc15)); b.position.set(Math.cos(a) * 0.25, Math.sin(a) * 0.25, 0.07); c.add(b); }
+    const R = toon(0xdc2626); [-1, 1].forEach(sx => { const l = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.025, 6, 16), R); l.position.set(sx * 0.07, -0.24, 0.08); l.rotation.z = sx * 0.5; c.add(l);
+      const cinta = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.2, 0.01), R); cinta.position.set(sx * 0.05, -0.36, 0.07); cinta.rotation.z = sx * 0.25; c.add(cinta); });
+    const nudo = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), R); nudo.position.set(0, -0.24, 0.1); c.add(nudo); }
+
+  // ---- ❄️ copos de nieve colgando del techo (giran despacito) ----
+  { const copo = lienzo(256, 256, (g) => { g.translate(128, 128); g.strokeStyle = '#e0f2fe'; g.lineCap = 'round'; g.shadowColor = '#60a5fa'; g.shadowBlur = 10;
+      for (let k = 0; k < 6; k++) { g.save(); g.rotate(k * Math.PI / 3); g.lineWidth = 14; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -108); g.stroke();
+        g.lineWidth = 10; [[-52, 30], [-82, 22]].forEach(([y, l]) => { g.beginPath(); g.moveTo(0, y); g.lineTo(-l, y - l); g.moveTo(0, y); g.lineTo(l, y - l); g.stroke(); }); g.restore(); } });
+    const HILO = new THREE.MeshBasicMaterial({ color: 0xe5e7eb });
+    [[-1.4, 0.9, 0.45], [0.6, 1.4, 0.55], [2.2, 0.85, 0.5], [-0.4, S1 - 1.3, 0.6], [1.6, S1 - 1.0, 0.45], [3.0, S1 / 2, 0.55], [-2.3, S1 / 2 + 0.3, 0.5]].forEach(([u, s, cae], i) => {
+      const piv = new THREE.Group(); piv.position.copy(L(u, RH, s)); piv.userData.dyn = true; sala.add(piv);
+      const h = new THREE.Mesh(new THREE.BoxGeometry(0.003, cae, 0.003), HILO); h.position.y = -cae / 2; piv.add(h);
+      const sp = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), new THREE.MeshBasicMaterial({ map: copo, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+      sp.position.y = -cae - 0.15; piv.add(sp);
+      ANIM.push(t => { sp.rotation.y = t * 0.6 + i; piv.rotation.z = Math.sin(t * 0.9 + i) * 0.04; }); }); }
+
+  // ---- ❄️ un poquito de nieve en el piso: montoncitos en las esquinas y junto a las paredes ----
+  { const nieve = lienzo(256, 256, (g) => {
+      const B = Array.from({ length: 22 }, (_, k) => [128 + Math.cos(k * 2.4) * 54 * Math.random(), 128 + Math.sin(k * 2.4) * 54 * Math.random(), 28 + Math.random() * 40]);
+      B.forEach(([x, y, r]) => { const gr = g.createRadialGradient(x, y, r * 0.55, x, y, r * 1.08); gr.addColorStop(0, 'rgba(125,170,220,.55)'); gr.addColorStop(1, 'rgba(125,170,220,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y + 3, r * 1.08, 0, 6.3); g.fill(); });   // sombrita celeste del borde
+      B.forEach(([x, y, r]) => { const gr = g.createRadialGradient(x - r * 0.2, y - r * 0.2, r * 0.2, x, y, r); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.8, '#f1f7ff'); gr.addColorStop(1, 'rgba(241,247,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.3); g.fill(); });
+      for (let k = 0; k < 120; k++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(186,230,253,.55)' : 'rgba(255,255,255,1)'; g.fillRect(64 + Math.random() * 128, 64 + Math.random() * 128, 2, 2); } });
+    const MN = new THREE.MeshBasicMaterial({ map: nieve, transparent: true, depthWrite: false, color: 0xf8fafc, polygonOffset: true, polygonOffsetFactor: -2 });
+    const parche = (u, s, w, d, r = 0) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), MN); m.rotation.set(-Math.PI / 2, 0, r); m.position.copy(L(u, 0.006, s)); m.renderOrder = 1; sala.add(m); };
+    parche(ARB[0], ARB[1], 1.6, 1.6); parche(U1 - 0.35, 0.35, 1.0, 1.0, 0.5); parche(U1 - 0.35, S1 - 0.35, 1.1, 1.1, 1.1); parche(U0 + 0.3, 0.3, 0.8, 0.8, 0.3);
+    parche(-0.8, S1 - 0.25, 1.4, 0.55, 0.05); parche(1.6, 0.22, 1.2, 0.45, -0.05); parche(U0 + 0.25, S1 / 2, 0.5, 1.3, 0.1);
+    const BL = toon(0xf8fafc), mon = new THREE.SphereGeometry(1, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2);   // montoncitos (media esfera aplastada)
+    [[ARB[0] + 0.5, ARB[1] - 0.1, 0.18], [ARB[0] + 0.1, ARB[1] - 0.55, 0.15], [U1 - 0.25, 0.25, 0.2], [U1 - 0.2, S1 - 0.3, 0.18], [U0 + 0.22, 0.22, 0.15]].forEach(([u, s, r]) => {
+      const m = new THREE.Mesh(mon, BL); m.position.copy(L(u, 0, s)); m.scale.set(r, r * 0.32, r * 0.85); sala.add(m); }); }
+
+  // ---- foquitos que titilan (cada color a su ritmo) ----
+  ANIM.push(t => FOCO.forEach((m, i) => { const k = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * (2.2 + i * 0.37) + i * 1.7)); m.color.copy(FOCO0[i]).multiplyScalar(k); }));
+  animHooks.push((t, dt) => ANIM.forEach(f => f(t, dt)));
 }
 
 // ---- aula hueca con puerta y ventanas grandes ----
@@ -2759,8 +2890,8 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202610291951"></script><script src="corcho.js?v=202610291951"></script><script src="mando.js?v=202610291951"></script><script src="anuncio.js?v=202610291951"></script><script src="muro.js?v=202610291951"></script><script src="comunicado.js?v=202610291951"></script>
-<script src="archivos.js?v=202610291951"></script><script src="editor.js?v=202610291951"></script>
+<script src="revista.js?v=202611031329"></script><script src="corcho.js?v=202611031329"></script><script src="mando.js?v=202611031329"></script><script src="anuncio.js?v=202611031329"></script><script src="muro.js?v=202611031329"></script><script src="comunicado.js?v=202611031329"></script>
+<script src="archivos.js?v=202611031329"></script><script src="editor.js?v=202611031329"></script>
 <div id="comWin"><button id="comCerrar" type="button">← Volver al aula</button><iframe id="comFrame" allow="fullscreen; autoplay"></iframe></div>
 <style>#comWin{position:fixed;inset:0;z-index:60;background:#111;display:none}#comWin.on{display:block}#comWin iframe{width:100%;height:100%;border:0}#comCerrar{position:absolute;left:12px;top:12px;z-index:2;font:900 15px system-ui;padding:8px 14px;border-radius:10px;border:0;background:rgba(20,20,40,.75);color:#fff;cursor:pointer;opacity:.35}#comCerrar:hover{opacity:1}</style>
 <script>(() => {   // 📽️ la presentación se abre DENTRO del aula: así el control remoto (celular) y el clicker la pasan
