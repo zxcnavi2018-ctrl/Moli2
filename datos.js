@@ -108,7 +108,8 @@
       });
       if (u && u.sessions) P.sesiones.filter(x => x.pon).forEach(x => { const s = u.sessions[x.n - 1]; if (!s) return; const A0 = s.activities || [];   // sesiones con ficha cambiada aquí (cada equipo con su propia causa y un solo vaso)
         Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria, fx: x.fx }); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; if (x.pdf) s.pdf = x.pdf + '?v=' + encodeURIComponent(P.v || '');
-        s.activities = x.activities.map((a, k) => ({ ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ...(a.rub ? { rub: a.rub } : {}) })); }); } } catch (e) {}
+        s.activities = x.activities.map((a, k) => ({ ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ...(a.rub ? { rub: a.rub } : {}) })); });
+      if (u && u.sessions) P.sesiones.filter(x => x.oculta).forEach(x => { const s = u.sessions[x.n - 1]; if (s) s.hidden = true; }); } } catch (e) {}   // sesiones que ya no se harán (la unidad termina antes)
     contenido = { units, files };
     LS.set('moli2:content' + esp(), contenido);
     return contenido;
