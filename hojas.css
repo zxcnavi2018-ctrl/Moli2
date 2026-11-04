@@ -890,3 +890,5 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .sy-mar .sy-lado { font-size: 1em; }
 .sy-vela { width: 11.5em; height: 6.8em; margin-left: -5.75em; margin-bottom: -.5em; }
 .sy-mundo { top: -.2em; }
+
+.cv-fic .fic-g { text-align: center; } .cv-fic .fic-g b { display: block; color: #1e3a8a; font-size: .8em; margin-bottom: .1em; } .cv-fic .fic-g svg { width: 100%; max-height: 52vh; font-family: inherit; }
