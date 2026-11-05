@@ -69,7 +69,7 @@
   }
   const escenas = () => { const B = [...document.querySelectorAll('#dots button')]; return B.length ? B.map(b => { const t = b.textContent.trim(), i = t.split(' ')[0]; return [i, t.slice(i.length).trim()]; }) : ESC; };   // las escenas reales del aula (incluye las nuevas)
   const ESC = [['🏫', 'Mi aula'], ['📗', 'Sesiones'], ['🎟️', 'Exit tickets'], ['💻', 'Laboratorio'], ['📌', 'Corcho'], ['📂', 'Notas'], ['💪', 'Misiones'], ['📽️', 'Pizarra']];
-  const ANIM = [['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
+  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
   const GC = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
   let cuerpo = null;
   function abrirControl() {
@@ -246,6 +246,48 @@
     <path d="M170 150 Q240 160 320 146" stroke="#fde047" stroke-width="7" fill="none" stroke-linecap="round"/>
     <line x1="190" y1="180" x2="180" y2="214" stroke="#334155" stroke-width="5"/><line x1="290" y1="180" x2="300" y2="214" stroke="#334155" stroke-width="5"/>
     <path d="M140 214 L340 214 Q352 214 356 204" stroke="#334155" stroke-width="7" fill="none" stroke-linecap="round"/></svg>`;
+  // 🎭 TEATRO: se abre el telón y Molí habla. «+»: saludo · «A»: la despedida con su orquesta de Molís, piano y música suave; al final se cierra el telón y aplauden
+  const TEL_TXT = ['¿Cómo están, estos niños tan buenos del sexto C?', 'Hoy les dedico unas palabras…', 'En el poco tiempo que hemos compartido, he aprendido mucho de ustedes… y seguramente, ustedes, mucho de mí.', 'Los felicito: está a punto de culminar una parte importante de su largo camino.', 'Les deseo lo mejor.', 'Atentamente… Molí 💙'];
+  const TEL_DUR = [3.1, 2.04, 6.17, 4.92, 1.51, 1.51];
+  function teatro(desp) {
+    const a = A(), M = a.createGain(); M.gain.value = 1; M.connect(a.destination); const t0 = a.currentTime;
+    const nota = (f, t, d, v, tipo = 'triangle') => { const o = a.createOscillator(), g = a.createGain(); o.type = tipo; o.frequency.value = f; g.gain.setValueAtTime(0, t0 + t); g.gain.linearRampToValueAtTime(v, t0 + t + .02); g.gain.exponentialRampToValueAtTime(.0008, t0 + t + d); o.connect(g).connect(M); o.start(t0 + t); o.stop(t0 + t + d + .05); };
+    const pad = (fs, t, d, v) => { const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; const g = a.createGain(); g.gain.setValueAtTime(0, t0 + t); g.gain.linearRampToValueAtTime(v, t0 + t + .9); g.gain.setValueAtTime(v, t0 + t + d - .6); g.gain.linearRampToValueAtTime(0, t0 + t + d + .2); lp.connect(g).connect(M);
+      fs.forEach(f => [-4, 4].forEach(dt => { const o = a.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(lp); o.start(t0 + t); o.stop(t0 + t + d + .3); })); };
+    const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+    const aplausos = (t, d) => { for (let i = 0; i < d * 55; i++) { const s = t + Math.random() * d, v = .05 + Math.random() * .1 * Math.min(1, (t + d - s) / 1.2 + .2); ruido(s, .035, 1800 + Math.random() * 2200, v); } };
+    // la música: Am – F – C – G (suave y un poquito triste): piano en arpegios y cuerdas de la orquesta
+    const PROG = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]], MEL = [76, 72, 71, 72, 69, 72, 74, 71];
+    const musica = (ini, fin) => { let t = ini, c = 0; while (t < fin) { const ch = PROG[c % 4], T = 2.6;
+        [0, 1, 2, 1, 0, 1, 2, 1].forEach((j, q) => nota(hz(ch[j] + 12), t + q * T / 8, 1.4, .07));
+        nota(hz(ch[0] - 12), t, 2.6, .09, 'sine'); pad(ch.map(hz), t, T, .018);
+        if (c % 2 === 0) nota(hz(MEL[(c / 2) % 8 | 0]), t + .1, 2.2, .045, 'sine'); t += T; c++; } };
+    const VOZ = desp ? TEL_DUR : [2.23], ABRE = 2.2, GAP = .75;
+    const habla = VOZ.reduce((s, d) => s + d + GAP, 0), fin = ABRE + habla + (desp ? 1.8 : .6), cierre = fin + 2.2, total = cierre + (desp ? 3.6 : .4);
+    if (desp) { musica(.3, fin + 1.2); aplausos(fin + 1.6, 4); } else { [523, 659, 784, 1047].forEach((f, j) => nota(f, ABRE - .3 + j * .12, .6, .16)); aplausos(fin + 1.6, 1.6); }
+    ruido(.1, 1.8, 400, .05); ruido(fin + .2, 1.8, 400, .05);                   // el «fssshh» del telón al abrir y al cerrar
+    const fig = n => window.moliDibujo ? moliDibujo(n) : IMG(n);
+    const ORQ = [['🎻', 'feliz'], ['🎺', 'genial'], ['🪈', 'curiosa'], ['🥁', 'salta'], ['🎻', 'idea'], ['🎷', 'estrellas']];
+    const orq = desp ? `<div class="tl-orq">${ORQ.map(([e, im], q) => `<div class="tl-mus" style="--r:${q * .37}s"><img src="${fig(im)}" alt=""><i>${e}</i></div>`).join('')}</div>
+      <div class="tl-piano"><img src="${fig('pensativa')}" alt=""><svg viewBox="0 0 220 120" aria-hidden="true"><path d="M10 40 L150 40 Q210 40 212 80 L212 92 L10 92 Z" fill="#111827" stroke="#374151" stroke-width="3"/><path d="M30 40 L110 6 L120 10 L60 40Z" fill="#1f2937"/>
+        <rect x="14" y="60" width="140" height="16" fill="#f8fafc"/>${Array.from({ length: 13 }, (_, q) => `<rect x="${20 + q * 10.5}" y="60" width="5" height="9" fill="#111827"/>`).join('')}<rect x="20" y="92" width="8" height="26" fill="#111827"/><rect x="190" y="92" width="8" height="26" fill="#111827"/></svg><i class="tl-notas">🎵</i></div>` : '';
+    const notas = desp ? Array.from({ length: 10 }, (_, q) => `<i class="tl-nota" style="left:${8 + q * 9}%;--d:${3 + q % 3}s;--r:${-q * .6}s">${q % 2 ? '🎵' : '🎶'}</i>`).join('') : '';
+    mostrar(`<div class="an-st an-tel${desp ? ' desp' : ''}"><div class="tl-luz"></div>${notas}<div class="tl-esc">${orq}
+      <div class="tl-main"><img src="${fig(desp ? 'feliz' : 'hola')}" alt=""><svg class="tl-mic" viewBox="0 0 60 200" aria-hidden="true"><rect x="27" y="40" width="6" height="150" fill="#9ca3af"/><ellipse cx="30" cy="194" rx="26" ry="6" fill="#4b5563"/>
+        <rect x="18" y="8" width="24" height="38" rx="12" fill="#374151"/><rect x="18" y="8" width="24" height="20" rx="10" fill="#9ca3af"/>${Array.from({ length: 4 }, (_, q) => `<line x1="20" x2="40" y1="${12 + q * 4}" y2="${12 + q * 4}" stroke="#4b5563" stroke-width="1.5"/>`).join('')}</svg></div></div>
+      <div class="tl-sub"></div><div class="tl-cort izq"></div><div class="tl-cort der"></div><div class="tl-val"></div></div>`, total * 1000, 'teatro');
+    const S = capa.querySelector('.an-tel'), sub = S.querySelector('.tl-sub'), vivo = () => S.isConnected && capa.classList.contains('on');
+    const parar = () => { try { M.gain.cancelScheduledValues(a.currentTime); M.gain.setTargetAtTime(0, a.currentTime, .15); } catch (e) {} try { au.pause(); } catch (e) {} };
+    const vig = setInterval(() => { if (!vivo()) { clearInterval(vig); parar(); } }, 300);
+    const au = new Audio(); au.volume = 1;
+    setTimeout(() => S.classList.add('abre'), 100);
+    const txt = desp ? TEL_TXT : ['¡Buenos días, niños del sexto C! ☀️'], arch = desp ? TEL_TXT.map((_, i) => 'desp-' + i) : ['saludo'];
+    let ts = ABRE * 1000; txt.forEach((x, i) => { setTimeout(() => { if (!vivo()) return; sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = x; sub.classList.add('ve'); S.classList.add('habla');
+        try { au.src = `audio/telon/${arch[i]}.mp3`; au.play().catch(() => {}); } catch (e) {} }, ts);
+      ts += (VOZ[i] + GAP) * 1000; setTimeout(() => S.classList.remove('habla'), ts - GAP * 1000); });
+    setTimeout(() => { if (vivo()) { S.classList.remove('abre'); S.classList.add('cierra'); } }, fin * 1000);
+    setTimeout(() => { if (vivo() && desp) sub.textContent = '👏👏👏'; }, (fin + 1.6) * 1000);
+  }
   function animar(k) {
     try { A().resume && A().resume(); } catch (e) {}
     if (k === 'palmas') return palmas();
@@ -260,6 +302,7 @@
       const nubes = Array.from({ length: 9 }, (_, q) => `<i class="an-nube" style="top:${8 + (q * 37) % 78}%;--d:${5 + (q % 4) * 1.6}s;--r:${-(q * 1.3)}s;--s:${.7 + (q % 3) * .35}"></i>`).join('');
       return mostrar(`<div class="an-st an-shh2">${nubes}<div class="an-vuelo"><div class="an-estela"></div>${AVION(IMG('decidida'))}</div>
         <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielo'); }
+    if (k === 'telon' || k === 'desp') return teatro(k === 'desp');
     if (k === 'drum' && NAV) { molí3d('feliz', 'saltar');                     // 🥁🦌 Molí toca el tambor en su trineo con renos que flotan: ¡PUM! ¡PUM! ¡PUM! y cascabeles
       for (let i = 0; i < 22; i++) { const t0 = i * .3; tono(i % 3 ? 80 : 70, t0, .3, 'sine', i % 3 ? .55 : .85); ruido(t0, .07, 160, i % 3 ? .35 : .55); }
       for (let i = 0; i < 40; i++) { const t0 = i * .17 + (i % 2) * .05; [2637, 3136, 3520].forEach((f, q) => tono(f + (i % 3) * 40, t0 + q * .012, .18, 'triangle', .035)); }
