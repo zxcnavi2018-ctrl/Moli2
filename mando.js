@@ -17,9 +17,9 @@
   const NOM = Object.fromEntries(BOT);
   // los joysticks: cada dirección hace algo (el izquierdo mueve las escenas)
   const STK = [['l<', 'Joystick izq. ←'], ['l>', 'Joystick izq. →'], ['l^', 'Joystick izq. ↑'], ['lv', 'Joystick izq. ↓'], ['r<', 'Joystick der. ←'], ['r>', 'Joystick der. →'], ['r^', 'Joystick der. ↑'], ['rv', 'Joystick der. ↓']];
-  const DEF = { v: 7, on: true, b: { 1: 'an:desp', 0: 'salir', 3: 'bib', 2: 'crono', 4: 'tabA', 5: 'tabS', 6: 'grupos', 7: 'revista', 8: 'an:palmas', 9: 'an:telon', 11: 'vidGrande', 12: 'pagA', 13: 'pagS', 14: 'pagA', 15: 'pagS', 16: 'aula', 17: 'video' },
+  const DEF = { v: 8, on: true, b: { 1: 'aceptar', 0: 'salir', 3: 'an:desp', 2: 'crono', 4: 'tabA', 5: 'tabS', 6: 'grupos', 7: 'revista', 8: 'an:palmas', 9: 'an:telon', 11: 'vidGrande', 12: 'pagA', 13: 'pagS', 14: 'pagA', 15: 'pagS', 16: 'aula', 17: 'video' },
     s: { 'l<': 'escA', 'l>': 'escS', 'l^': 'escA', 'lv': 'escS', 'r^': 'an:shh', 'rv': 'an:drum', 'r<': 'an:angry', 'r>': 'an:acu' } };
-  let CFG = (c => c && c.b && c.v >= 5 && c.b[17] === 'video' ? { v: 6, on: c.on !== false, b: { ...c.b, ...(c.v < 6 && c.b[8] === 'zoomM' ? { 8: 'an:palmas' } : {}), ...(c.v < 7 ? { 9: 'an:telon', 1: 'an:desp' } : {}) }, s: { ...DEF.s, ...(c.s || {}) } } : JSON.parse(JSON.stringify(DEF)))(LS.get(KEY, null));   // v6: el «−» hace las palmas
+  let CFG = (c => c && c.b && c.v >= 5 && c.b[17] === 'video' ? { v: 8, on: c.on !== false, b: { ...c.b, ...(c.v < 6 && c.b[8] === 'zoomM' ? { 8: 'an:palmas' } : {}), ...(c.v < 7 ? { 9: 'an:telon' } : {}), ...(c.v < 8 ? { 3: 'an:desp', ...(c.b[1] === 'an:desp' || c.v < 7 ? { 1: 'aceptar' } : {}) } : {}) }, s: { ...DEF.s, ...(c.s || {}) } } : JSON.parse(JSON.stringify(DEF)))(LS.get(KEY, null));   // v6: el «−» hace las palmas
   const guardar = () => LS.set(KEY, CFG);
   let P = null, SEL = null, btn = null, CR = null, GR = null, grBtn = -1;                     // panel, botón elegido, botón 🎮 y el selector del cronómetro
   const panelAbierto = () => !!(P && P.classList.contains('on'));
