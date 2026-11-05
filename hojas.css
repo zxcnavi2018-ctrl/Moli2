@@ -892,3 +892,43 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .sy-mundo { top: -.2em; }
 
 .cv-fic .fic-g { text-align: center; } .cv-fic .fic-g b { display: block; color: #1e3a8a; font-size: .8em; margin-bottom: .1em; } .cv-fic .fic-g svg { width: 100%; max-height: 52vh; font-family: inherit; }
+
+/* 🥁🦌 tambor: Molí en su trineo con renos que flotan */
+#anim.noche { background: linear-gradient(180deg, #0b1437 0%, #1e2a6b 60%, #3b4a9c 100%); }
+.an-navi { width: 100vw; height: 100vh; overflow: hidden; box-sizing: border-box; justify-content: space-between; padding: 6vh 0 7vh; }
+.an-navi .an-pum, .an-navi .an-bub { position: relative; z-index: 3; }
+.an-navi .an-pum b { color: #fde047; text-shadow: 0 4px 0 #b91c1c, 0 0 24px rgba(253,224,71,.6); animation-duration: .9s; }
+.an-lunag { position: absolute; right: 8vw; top: 7vh; width: 15vh; height: 15vh; border-radius: 50%; background: radial-gradient(circle at 38% 38%, #fffbe6, #fde68a 70%); box-shadow: 0 0 60px 18px rgba(253,230,138,.35); }
+.an-copo { position: absolute; top: -6vh; color: #fff; font-size: calc(3vh * var(--s)); opacity: .85; font-style: normal; animation: anCopo var(--d) linear var(--r) infinite; }
+@keyframes anCopo { to { transform: translate(-6vw, 112vh) rotate(260deg); } }
+.an-vtr { position: absolute; top: 30vh; left: 0; width: min(84vw, 1000px); z-index: 2; animation: anTrineo 7.6s cubic-bezier(.25,.6,.6,.95) both; }
+.an-trineo { width: 100%; display: block; overflow: visible; filter: drop-shadow(0 1.5vh 1.2vh rgba(0,0,0,.35)); animation: anBob 1.3s ease-in-out infinite alternate; }
+.an-chisp { position: absolute; right: 70%; top: 62%; width: 60vw; height: 1.4vh; border-radius: 99em; background: linear-gradient(90deg, transparent, rgba(253,224,71,.25), rgba(255,255,255,.9)); filter: blur(1px); }
+.an-reno { transform-box: fill-box; animation: anReno 1.1s ease-in-out var(--r) infinite alternate; }
+@keyframes anReno { from { transform: translateY(-7px) rotate(-3deg); } to { transform: translateY(7px) rotate(3deg); } }
+.an-pata { animation: anPata .5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: top; }
+@keyframes anPata { from { transform: skewX(14deg); } to { transform: skewX(-14deg); } }
+.an-nariz { animation: anNariz .6s ease-in-out infinite alternate; } @keyframes anNariz { to { fill: #fca5a5; filter: drop-shadow(0 0 6px #ef4444); } }
+.an-tamb { transform-box: fill-box; transform-origin: center; animation: anBota .3s ease-in-out infinite; }
+@keyframes anTrineo { 0% { transform: translateX(-90vw) translateY(6vh) rotate(-4deg); } 24% { transform: translateX(6vw) translateY(0) rotate(-1deg); } 76% { transform: translateX(12vw) translateY(-2vh) rotate(1deg); } 100% { transform: translateX(115vw) translateY(-14vh) rotate(-6deg); } }
+@media (orientation: portrait) { .an-vtr { width: 96vw; top: 34vh; } }
+
+/* 🎄⭐ atención en Navidad: Molí prende la estrella del árbol */
+.an-arb { width: 100vw; height: 100vh; overflow: hidden; box-sizing: border-box; justify-content: flex-end; padding-bottom: 5vh; }
+.an-arb .an-bub { position: relative; z-index: 3; opacity: 0; transform: scale(.6); transition: .5s cubic-bezier(.3,1.6,.5,1); }
+.an-arb.luz .an-bub { opacity: 1; transform: none; }
+.an-esc { position: absolute; left: 50%; top: 4vh; height: 74vh; aspect-ratio: 400 / 470; transform: translateX(-50%); z-index: 2; }
+.an-tree { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 2vh 2vh rgba(0,0,0,.35)); }
+.an-tope { opacity: .18; filter: grayscale(1); transition: opacity .3s, filter .3s; transform-box: fill-box; transform-origin: center; }
+.an-halo { opacity: 0; }
+.an-arb.luz .an-tope { opacity: 1; filter: none; animation: anTope 1.6s ease-in-out .2s infinite alternate; } .an-arb.luz .an-halo { opacity: 1; }
+@keyframes anTope { from { transform: scale(1) rotate(-4deg); } to { transform: scale(1.12) rotate(4deg); } }
+.an-foco { fill: #475569; } .an-arb.luz .an-foco { animation: anFoco .7s ease-in-out var(--d) infinite alternate; }
+@keyframes anFoco { from { fill: var(--c); filter: drop-shadow(0 0 5px var(--c)); } to { fill: #fff; } }
+.an-mvu { position: absolute; width: 30%; left: -60%; top: 85%; animation: anMvu 2.5s cubic-bezier(.35,.1,.3,1) both, anMvu2 2.4s 2.5s ease-in-out infinite alternate; }
+.an-mvu .an-m { width: 100%; height: auto; display: block; }
+.an-ests { position: absolute; right: -14%; top: 4%; font-size: 5vh; font-style: normal; transition: opacity .2s; } .an-arb.luz .an-ests { opacity: 0; }
+@keyframes anMvu { 0% { left: -60%; top: 85%; transform: rotate(-12deg); } 60% { left: 10%; top: 20%; } 100% { left: 26%; top: -6%; transform: rotate(6deg); } }
+@keyframes anMvu2 { from { left: 26%; top: -6%; } to { left: -22%; top: 6%; } }
+@media (orientation: portrait) { .an-esc { height: auto; width: 86vw; top: 12vh; } }
+.an-mvu { width: 36%; }

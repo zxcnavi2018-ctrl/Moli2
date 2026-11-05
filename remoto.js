@@ -185,6 +185,40 @@
     <clipPath id="anCab"><circle cx="306" cy="76" r="44"/></clipPath><circle cx="306" cy="76" r="47" fill="#bae6fd" stroke="#1e3a8a" stroke-width="5"/>
     <image href="${img}" x="256" y="28" width="100" height="100" clip-path="url(#anCab)"/><path d="M276 52 Q290 40 306 38" stroke="#fff" stroke-width="4" fill="none" opacity=".7" stroke-linecap="round"/></svg>`;
   // 🚁 helicóptero rojo con Molí enojado en la burbuja
+  const TRINEO = img => `<svg class="an-trineo" viewBox="0 0 800 250" aria-hidden="true">
+    <path d="M250 150 Q330 120 380 160 Q520 120 520 160 Q660 120 660 160" stroke="#fbbf24" stroke-width="3" fill="none"/>
+<g transform="translate(330 92)"><g class="an-reno" style="--r:-.5s">
+      <path d="M22 62 l-6 34 M34 66 l-2 32 M72 66 l4 32 M84 62 l10 30" class="an-pata" stroke="#5b3416" stroke-width="7" stroke-linecap="round"/>
+      <ellipse cx="54" cy="56" rx="42" ry="21" fill="#8b5a2b"/><ellipse cx="50" cy="64" rx="26" ry="9" fill="#c8a27a"/><path d="M14 50 q-12 -6 -8 -16 q8 4 10 12z" fill="#fff"/>
+      <path d="M78 50 Q92 34 98 18 L112 22 Q104 46 92 62 Z" fill="#8b5a2b"/>
+      <path d="M76 52 Q92 44 98 26" stroke="#dc2626" stroke-width="7" fill="none"/><circle cx="90" cy="44" r="5" fill="#facc15" stroke="#a16207" stroke-width="1.5"/>
+      <path d="M100 14 q-6 -16 -16 -20 M96 4 q-8 -2 -12 -10 M108 12 q2 -16 12 -22 M114 0 q8 -2 10 -10" stroke="#6b3f1d" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="106" cy="20" rx="15" ry="11" fill="#8b5a2b"/><ellipse cx="94" cy="10" rx="6" ry="3.5" fill="#6b3f1d" transform="rotate(-30 94 10)"/>
+      <circle cx="108" cy="16" r="3.2" fill="#111827"/><circle cx="109" cy="15" r="1" fill="#fff"/>
+      <circle cx="121" cy="22" r="4" fill="#3b2412"/></g></g><g transform="translate(470 92)"><g class="an-reno" style="--r:-.25s">
+      <path d="M22 62 l-6 34 M34 66 l-2 32 M72 66 l4 32 M84 62 l10 30" class="an-pata" stroke="#5b3416" stroke-width="7" stroke-linecap="round"/>
+      <ellipse cx="54" cy="56" rx="42" ry="21" fill="#8b5a2b"/><ellipse cx="50" cy="64" rx="26" ry="9" fill="#c8a27a"/><path d="M14 50 q-12 -6 -8 -16 q8 4 10 12z" fill="#fff"/>
+      <path d="M78 50 Q92 34 98 18 L112 22 Q104 46 92 62 Z" fill="#8b5a2b"/>
+      <path d="M76 52 Q92 44 98 26" stroke="#dc2626" stroke-width="7" fill="none"/><circle cx="90" cy="44" r="5" fill="#facc15" stroke="#a16207" stroke-width="1.5"/>
+      <path d="M100 14 q-6 -16 -16 -20 M96 4 q-8 -2 -12 -10 M108 12 q2 -16 12 -22 M114 0 q8 -2 10 -10" stroke="#6b3f1d" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="106" cy="20" rx="15" ry="11" fill="#8b5a2b"/><ellipse cx="94" cy="10" rx="6" ry="3.5" fill="#6b3f1d" transform="rotate(-30 94 10)"/>
+      <circle cx="108" cy="16" r="3.2" fill="#111827"/><circle cx="109" cy="15" r="1" fill="#fff"/>
+      <circle cx="121" cy="22" r="4" fill="#3b2412"/></g></g><g transform="translate(610 92)"><g class="an-reno" style="--r:0s">
+      <path d="M22 62 l-6 34 M34 66 l-2 32 M72 66 l4 32 M84 62 l10 30" class="an-pata" stroke="#5b3416" stroke-width="7" stroke-linecap="round"/>
+      <ellipse cx="54" cy="56" rx="42" ry="21" fill="#8b5a2b"/><ellipse cx="50" cy="64" rx="26" ry="9" fill="#c8a27a"/><path d="M14 50 q-12 -6 -8 -16 q8 4 10 12z" fill="#fff"/>
+      <path d="M78 50 Q92 34 98 18 L112 22 Q104 46 92 62 Z" fill="#8b5a2b"/>
+      <path d="M76 52 Q92 44 98 26" stroke="#dc2626" stroke-width="7" fill="none"/><circle cx="90" cy="44" r="5" fill="#facc15" stroke="#a16207" stroke-width="1.5"/>
+      <path d="M100 14 q-6 -16 -16 -20 M96 4 q-8 -2 -12 -10 M108 12 q2 -16 12 -22 M114 0 q8 -2 10 -10" stroke="#6b3f1d" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="106" cy="20" rx="15" ry="11" fill="#8b5a2b"/><ellipse cx="94" cy="10" rx="6" ry="3.5" fill="#6b3f1d" transform="rotate(-30 94 10)"/>
+      <circle cx="108" cy="16" r="3.2" fill="#111827"/><circle cx="109" cy="15" r="1" fill="#fff"/>
+      <circle cx="121" cy="22" r="6" fill="#ef4444" class="an-nariz"/></g></g>
+    <path d="M30 118 L36 70 Q40 60 52 60 L60 60" fill="none" stroke="#7f1d1d" stroke-width="10" stroke-linecap="round"/>
+    <image href="${img}" x="44" y="-6" width="150" height="150"/>
+    <text x="178" y="120" font-size="44" class="an-tamb">🥁</text>
+    <path d="M24 120 Q22 196 92 196 L226 196 Q262 196 268 160 Q276 128 300 124 Q312 122 312 110 Q296 106 284 116 Q262 132 240 120 L24 120 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M44 140 Q120 160 236 140" stroke="#fde047" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="140" cy="168" r="10" fill="#fde047"/><circle cx="104" cy="164" r="6" fill="#fde047"/><circle cx="176" cy="164" r="6" fill="#fde047"/>
+    <path d="M60 196 l-6 26 M210 196 l6 26" stroke="#a16207" stroke-width="7"/>
+    <path d="M6 214 Q14 232 44 232 L262 232 Q300 232 312 206 Q318 194 330 196" stroke="#facc15" stroke-width="9" fill="none" stroke-linecap="round"/></svg>`;
   const HELI = img => `<svg class="an-heli-s" viewBox="0 0 400 260" aria-hidden="true">
     <rect x="196" y="18" width="10" height="34" fill="#334155"/><g class="an-rot1"><ellipse cx="201" cy="20" rx="190" ry="9" fill="rgba(30,41,59,.75)"/></g>
     <path d="M40 120 L190 108 L190 132 L40 130 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="3"/><path d="M40 130 L24 96 L52 96 L62 126 Z" fill="#b91c1c" stroke="#7f1d1d" stroke-width="3"/>
@@ -202,8 +236,36 @@
       const nubes = Array.from({ length: 9 }, (_, q) => `<i class="an-nube" style="top:${8 + (q * 37) % 78}%;--d:${5 + (q % 4) * 1.6}s;--r:${-(q * 1.3)}s;--s:${.7 + (q % 3) * .35}"></i>`).join('');
       return mostrar(`<div class="an-st an-shh2">${nubes}<div class="an-vuelo"><div class="an-estela"></div>${AVION(IMG('decidida'))}</div>
         <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielo'); }
+    const NAV = window.esNavidad && esNavidad();                       // 🎄 del 1 de noviembre al 6 de enero: tambor = trineo, atención = árbol
+    if (k === 'drum' && NAV) { molí3d('feliz', 'saltar');                     // 🥁🦌 Molí toca el tambor en su trineo con renos que flotan: ¡PUM! ¡PUM! ¡PUM! y cascabeles
+      for (let i = 0; i < 22; i++) { const t0 = i * .3; tono(i % 3 ? 80 : 70, t0, .3, 'sine', i % 3 ? .55 : .85); ruido(t0, .07, 160, i % 3 ? .35 : .55); }
+      for (let i = 0; i < 40; i++) { const t0 = i * .17 + (i % 2) * .05; [2637, 3136, 3520].forEach((f, q) => tono(f + (i % 3) * 40, t0 + q * .012, .18, 'triangle', .035)); }
+      golpe(6.7); tono(55, 6.7, 1, 'triangle', .5);
+      const nieve = Array.from({ length: 34 }, (_, q) => `<i class="an-copo" style="left:${(q * 31) % 100}%;--d:${4 + q % 5}s;--r:${-(q * .7)}s;--s:${.5 + (q % 4) * .25}">❄</i>`).join('');
+      const est = Array.from({ length: 36 }, (_, q) => `<b class="an-est" style="left:${(q * 53) % 100}%;top:${(q * 29) % 70}%;--t:${1 + q % 4 * .5}s"></b>`).join('');
+      return mostrar(`<div class="an-st an-navi">${est}<i class="an-lunag"></i>${nieve}<div class="an-pum"><b>¡PUM!</b><b>¡PUM!</b><b>¡PUM!</b></div>
+        <div class="an-vtr"><div class="an-chisp"></div>${TRINEO(window.moliDibujo ? moliDibujo('salta') : IMG('salta'))}</div><div class="an-bub">🎄 ¡Jo, jo, jo! ¡Atentos!</div></div>`, 7800, 'noche'); }
     if (k === 'drum') { molí3d('feliz', 'saltar'); for (let i = 0; i < 16; i++) golpe(i * .14); golpe(2.6); tono(55, 2.6, 1.2, 'triangle', .5);
       return mostrar(`<div class="an-st an-drum"><img class="an-m bota" src="${IMG('salta')}" alt=""><div class="an-tam">🥁</div><div class="an-pum"><b>¡PUM!</b><b>¡PUM!</b><b>¡PUM!</b></div></div>`, 4600, 'naranja'); }
+    if (k === 'angry' && NAV) { molí3d('feliz', 'señalar');            // 🎄⭐ Molí vuela al árbol, prende la estrella y suena «Jingle Bells»
+      const JB = [[659,1],[659,1],[659,2],[659,1],[659,1],[659,2],[659,1],[784,1],[523,1.5],[587,.5],[659,4],[698,1],[698,1],[698,1.5],[698,.5],[698,1],[659,1],[659,1],[659,.5],[659,.5],[659,1],[587,1],[587,1],[659,1],[587,2],[784,2]];
+      let tt = 2.5; JB.forEach(([f, d]) => { tono(f, tt, d * .2 + .1, 'triangle', .28); tono(f * 2, tt, .12, 'sine', .06); tt += d * .2; });
+      tono(1568, 2.3, .5, 'sine', .25); tono(2093, 2.4, .7, 'sine', .2); ruido(2.3, 1.2, 6000, .08);
+      for (let i = 0; i < 26; i++) [2637, 3136].forEach((f, q) => tono(f, 2.5 + i * .2 + q * .01, .12, 'triangle', .025));
+      const B = [[200,150,'#ef4444'],[160,220,'#3b82f6'],[245,215,'#fbbf24'],[130,300,'#a855f7'],[205,285,'#ef4444'],[275,300,'#22d3ee'],[100,380,'#fbbf24'],[175,370,'#3b82f6'],[250,385,'#ef4444'],[310,375,'#a855f7']];
+      const luces = Array.from({ length: 22 }, (_, q) => { const y = 130 + q * 12.5, w = (y - 70) * .62, x = 200 + Math.sin(q * 1.9) * w * .85; return `<circle class="an-foco" cx="${x.toFixed(0)}" cy="${y}" r="6" style="--d:${(q % 5) * .15}s;--c:${['#fde047', '#f87171', '#60a5fa', '#4ade80', '#f0abfc'][q % 5]}"/>`; }).join('');
+      const est = Array.from({ length: 30 }, (_, q) => `<b class="an-est" style="left:${(q * 53) % 100}%;top:${(q * 29) % 70}%;--t:${1 + q % 4 * .5}s"></b>`).join('');
+      const nieve = Array.from({ length: 26 }, (_, q) => `<i class="an-copo" style="left:${(q * 31) % 100}%;--d:${4 + q % 5}s;--r:${-(q * .7)}s;--s:${.5 + (q % 4) * .25}">❄</i>`).join('');
+      mostrar(`<div class="an-st an-arb">${est}${nieve}<div class="an-esc"><svg class="an-tree" viewBox="0 0 400 470" aria-hidden="true">
+        <rect x="178" y="420" width="44" height="40" rx="6" fill="#7c4a1e"/><rect x="150" y="440" width="100" height="26" rx="6" fill="#b91c1c"/>
+        <path d="M200 70 L330 260 L280 260 L360 420 L40 420 L120 260 L70 260 Z" fill="#15803d" stroke="#14532d" stroke-width="6" stroke-linejoin="round"/>
+        <path d="M120 260 Q200 290 280 260 M90 340 Q200 372 310 340" stroke="#fbbf24" stroke-width="5" fill="none" stroke-dasharray="2 12" stroke-linecap="round"/>
+        ${B.map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="12" fill="${c}" stroke="#fff" stroke-width="2"/>`).join('')}${luces}
+        <g class="an-tope"><circle class="an-halo" cx="200" cy="52" r="56" fill="url(#anHalo)"/><path d="M200 12 L211 42 L243 42 L217 61 L227 92 L200 73 L173 92 L183 61 L157 42 L189 42 Z" fill="#fde047" stroke="#ca8a04" stroke-width="3" stroke-linejoin="round"/></g>
+        <defs><radialGradient id="anHalo"><stop offset="0" stop-color="#fff7c2" stop-opacity=".95"/><stop offset="1" stop-color="#fde047" stop-opacity="0"/></radialGradient></defs></svg>
+        <div class="an-mvu"><img class="an-m" src="${IMG('estrellas')}" alt=""><i class="an-ests">⭐</i></div></div>
+        <div class="an-bub">🎄 ¡Prestamos atención!</div></div>`, 8200, 'noche');
+      return setTimeout(() => { const s = capa.querySelector('.an-arb'); s && s.classList.add('luz'); }, 2400); }
     if (k === 'angry') { molí3d('enojado'); helice(6.5); tono(110, .2, .9, 'sawtooth', .14); tono(98, .8, .9, 'sawtooth', .14);   // 😠🚁 Molí enojado en su helicóptero
       return mostrar(`<div class="an-st an-heli"><div class="an-hv">${HELI(IMG('enojado'))}<div class="an-vena">💢</div><div class="an-humo l">💨</div><div class="an-humo r">💨</div>
         <div class="an-soga"></div><div class="an-bub rojo an-colg">¡Prestamos atención!</div></div></div>`, 7000, 'rojo'); }
