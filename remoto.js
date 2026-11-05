@@ -247,7 +247,7 @@
     <line x1="190" y1="180" x2="180" y2="214" stroke="#334155" stroke-width="5"/><line x1="290" y1="180" x2="300" y2="214" stroke="#334155" stroke-width="5"/>
     <path d="M140 214 L340 214 Q352 214 356 204" stroke="#334155" stroke-width="7" fill="none" stroke-linecap="round"/></svg>`;
   // 🎭 TEATRO: se abre el telón y Molí habla. «+»: saludo · «A»: la despedida con su orquesta de Molís, piano y música suave; al final se cierra el telón y aplauden
-  const TEL_TXT = ['¿Cómo están, estos niños tan buenos del sexto C?', 'Hoy les dedico unas palabras…', 'En el poco tiempo que hemos compartido, he aprendido mucho de ustedes… y seguramente, ustedes, mucho de mí.', 'Los felicito: está a punto de culminar una parte importante de su largo camino.', 'Les deseo lo mejor.', 'Atentamente… Molí 💙'];
+  const TEL_TXT = ['¿Cómo están, estos niños tan buenos del sexto A?', 'Hoy les dedico unas palabras…', 'En el poco tiempo que hemos compartido, he aprendido mucho de ustedes… y seguramente, ustedes, mucho de mí.', 'Los felicito: está a punto de culminar una parte importante de su largo camino.', 'Les deseo lo mejor.', 'Atentamente… Molí 💙'];
   const TEL_DUR = [3.1, 2.04, 6.17, 4.92, 1.51, 1.51];
   function teatro(desp) {
     const a = A(), M = a.createGain(); M.gain.value = 1; M.connect(a.destination); const t0 = a.currentTime;
@@ -262,7 +262,7 @@
         [0, 1, 2, 1, 0, 1, 2, 1].forEach((j, q) => nota(hz(ch[j] + 12), t + q * T / 8, 1.4, .07));
         nota(hz(ch[0] - 12), t, 2.6, .09, 'sine'); pad(ch.map(hz), t, T, .018);
         if (c % 2 === 0) nota(hz(MEL[(c / 2) % 8 | 0]), t + .1, 2.2, .045, 'sine'); t += T; c++; } };
-    const VOZ = desp ? TEL_DUR : [2.23], ABRE = 2.2, GAP = .75;
+    const VOZ = desp ? TEL_DUR : [2.14], ABRE = 2.2, GAP = .75;
     const habla = VOZ.reduce((s, d) => s + d + GAP, 0), fin = ABRE + habla + (desp ? 1.8 : .6), cierre = fin + 2.2, total = cierre + (desp ? 3.6 : .4);
     if (desp) { musica(.3, fin + 1.2); aplausos(fin + 1.6, 4); } else { [523, 659, 784, 1047].forEach((f, j) => nota(f, ABRE - .3 + j * .12, .6, .16)); aplausos(fin + 1.6, 1.6); }
     ruido(.1, 1.8, 400, .05); ruido(fin + .2, 1.8, 400, .05);                   // el «fssshh» del telón al abrir y al cerrar
@@ -281,7 +281,7 @@
     const vig = setInterval(() => { if (!vivo()) { clearInterval(vig); parar(); } }, 300);
     const au = new Audio(); au.volume = 1;
     setTimeout(() => S.classList.add('abre'), 100);
-    const txt = desp ? TEL_TXT : ['¡Buenos días, niños del sexto C! ☀️'], arch = desp ? TEL_TXT.map((_, i) => 'desp-' + i) : ['saludo'];
+    const txt = desp ? TEL_TXT : ['¡Buenos días, niños del sexto A! ☀️'], arch = desp ? TEL_TXT.map((_, i) => 'desp-' + i) : ['saludo'];
     let ts = ABRE * 1000; txt.forEach((x, i) => { setTimeout(() => { if (!vivo()) return; sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = x; sub.classList.add('ve'); S.classList.add('habla');
         try { au.src = `audio/telon/${arch[i]}.mp3`; au.play().catch(() => {}); } catch (e) {} }, ts);
       ts += (VOZ[i] + GAP) * 1000; setTimeout(() => S.classList.remove('habla'), ts - GAP * 1000); });
