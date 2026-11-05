@@ -184,6 +184,23 @@
     <path d="M352 66 Q372 72 382 86 L352 86 Z" fill="#bae6fd" stroke="#1e3a8a" stroke-width="2.5"/>
     <clipPath id="anCab"><circle cx="306" cy="76" r="44"/></clipPath><circle cx="306" cy="76" r="47" fill="#bae6fd" stroke="#1e3a8a" stroke-width="5"/>
     <image href="${img}" x="256" y="28" width="100" height="100" clip-path="url(#anCab)"/><path d="M276 52 Q290 40 306 38" stroke="#fff" stroke-width="4" fill="none" opacity=".7" stroke-linecap="round"/></svg>`;
+  const AVIONNAV = img => `<svg class="an-avion" viewBox="0 0 400 170" aria-hidden="true">
+    <path d="M70 70 L40 12 Q38 6 46 6 L64 6 Q70 6 74 12 L118 66 Z" fill="#16a34a" stroke="#14532d" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="66" cy="34" r="13" fill="none" stroke="#15803d" stroke-width="7"/><circle cx="66" cy="34" r="13" fill="none" stroke="#86efac" stroke-width="2" stroke-dasharray="2 5"/><path d="M60 46 l6 -5 l6 5" fill="#dc2626"/><circle cx="66" cy="44" r="3.5" fill="#dc2626"/>
+    <clipPath id="anFus"><path d="M40 86 Q40 58 90 56 L320 56 Q372 58 386 88 Q372 116 320 118 L90 118 Q40 116 40 86 Z"/></clipPath>
+    <path d="M40 86 Q40 58 90 56 L320 56 Q372 58 386 88 Q372 116 320 118 L90 118 Q40 116 40 86 Z" fill="#fff"/>
+    <g clip-path="url(#anFus)">${Array.from({ length: 16 }, (_, q) => `<path d="M${20 + q * 26} 130 L${50 + q * 26} 40 L${62 + q * 26} 40 L${32 + q * 26} 130 Z" fill="${q % 2 ? '#dc2626' : '#16a34a'}" opacity=".9"/>`).join('')}</g>
+    <path d="M40 86 Q40 58 90 56 L320 56 Q372 58 386 88 Q372 116 320 118 L90 118 Q40 116 40 86 Z" fill="none" stroke="#7f1d1d" stroke-width="3.5"/>
+    <path d="M60 104 Q200 116 368 100" stroke="#facc15" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M70 60 Q190 48 330 58" stroke="#14532d" stroke-width="2" fill="none"/>
+    ${Array.from({ length: 11 }, (_, q) => `<circle class="an-foco" cx="${78 + q * 24}" cy="${57 - Math.sin(q / 10 * Math.PI) * 6}" r="5" style="--d:${(q % 4) * .18}s;--c:${['#fde047', '#f87171', '#60a5fa', '#c084fc'][q % 4]}"/>`).join('')}
+    ${[0, 1, 2, 3, 4].map(q => `<rect x="${112 + q * 26}" y="72" width="13" height="17" rx="6" fill="#fef9c3" stroke="#7f1d1d" stroke-width="2"/>`).join('')}
+    <path d="M180 92 L120 150 Q116 156 124 156 L150 156 Q156 156 160 150 L240 96 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M150 122 L200 104" stroke="#fde047" stroke-width="4" stroke-linecap="round"/>
+    <rect x="160" y="122" width="54" height="16" rx="8" fill="#facc15" stroke="#a16207" stroke-width="2.5"/>
+    <path d="M352 66 Q372 72 382 86 L352 86 Z" fill="#bae6fd" stroke="#7f1d1d" stroke-width="2.5"/>
+    <clipPath id="anCab2"><circle cx="306" cy="76" r="44"/></clipPath><circle cx="306" cy="76" r="47" fill="#e0f2fe" stroke="#facc15" stroke-width="6"/>
+    <image href="${img}" x="256" y="28" width="100" height="100" clip-path="url(#anCab2)"/><path d="M276 52 Q290 40 306 38" stroke="#fff" stroke-width="4" fill="none" opacity=".7" stroke-linecap="round"/></svg>`;
   // 🚁 helicóptero rojo con Molí enojado en la burbuja
   const TRINEO = img => `<svg class="an-trineo" viewBox="0 0 800 250" aria-hidden="true">
     <path d="M250 150 Q330 120 380 160 Q520 120 520 160 Q660 120 660 160" stroke="#fbbf24" stroke-width="3" fill="none"/>
@@ -232,11 +249,17 @@
   function animar(k) {
     try { A().resume && A().resume(); } catch (e) {}
     if (k === 'palmas') return palmas();
+    const NAV = window.esNavidad && esNavidad();                       // 🎄 del 1 de noviembre al 6 de enero: avión navideño, tambor = trineo, atención = árbol
+    if (k === 'shh' && NAV) { molí3d('guiño'); jet(7); for (let i = 0; i < 30; i++) [2637, 3136].forEach((f, q) => tono(f, .3 + i * .22 + q * .01, .12, 'triangle', .02));   // 🤫✈️🎄 avión navideño
+      const nubes = Array.from({ length: 7 }, (_, q) => `<i class="an-nube" style="top:${8 + (q * 37) % 78}%;--d:${5 + (q % 4) * 1.6}s;--r:${-(q * 1.3)}s;--s:${.7 + (q % 3) * .35}"></i>`).join('');
+      const nieve = Array.from({ length: 30 }, (_, q) => `<i class="an-copo" style="left:${(q * 31) % 100}%;--d:${4 + q % 5}s;--r:${-(q * .7)}s;--s:${.5 + (q % 4) * .25}">${['❄', '✦', '❄', '★'][q % 4]}</i>`).join('');
+      const regalos = ['🎁', '🍬', '⭐', '🎀', '🔔', '🎁'].map((e, q) => `<i class="an-reg" style="--x:${12 + q * 15}vw;--d:${1.2 + q * .55}s">${e}</i>`).join('');
+      return mostrar(`<div class="an-st an-shh2 an-shnav">${nubes}${nieve}<div class="an-vuelo"><div class="an-banda"><span>🎄 ¡Feliz Navidad! 🎄</span></div>${AVIONNAV(window.moliDibujo ? moliDibujo('decidida') : IMG('decidida'))}${regalos}</div>
+        <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielonav'); }
     if (k === 'shh') { molí3d('guiño'); jet(7);                       // 🤫✈️ Molí viaja en su avión: la turbina hace «shhhhh»
       const nubes = Array.from({ length: 9 }, (_, q) => `<i class="an-nube" style="top:${8 + (q * 37) % 78}%;--d:${5 + (q % 4) * 1.6}s;--r:${-(q * 1.3)}s;--s:${.7 + (q % 3) * .35}"></i>`).join('');
       return mostrar(`<div class="an-st an-shh2">${nubes}<div class="an-vuelo"><div class="an-estela"></div>${AVION(IMG('decidida'))}</div>
         <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielo'); }
-    const NAV = window.esNavidad && esNavidad();                       // 🎄 del 1 de noviembre al 6 de enero: tambor = trineo, atención = árbol
     if (k === 'drum' && NAV) { molí3d('feliz', 'saltar');                     // 🥁🦌 Molí toca el tambor en su trineo con renos que flotan: ¡PUM! ¡PUM! ¡PUM! y cascabeles
       for (let i = 0; i < 22; i++) { const t0 = i * .3; tono(i % 3 ? 80 : 70, t0, .3, 'sine', i % 3 ? .55 : .85); ruido(t0, .07, 160, i % 3 ? .35 : .55); }
       for (let i = 0; i < 40; i++) { const t0 = i * .17 + (i % 2) * .05; [2637, 3136, 3520].forEach((f, q) => tono(f + (i % 3) * 40, t0 + q * .012, .18, 'triangle', .035)); }
@@ -269,6 +292,19 @@
     if (k === 'angry') { molí3d('enojado'); helice(6.5); tono(110, .2, .9, 'sawtooth', .14); tono(98, .8, .9, 'sawtooth', .14);   // 😠🚁 Molí enojado en su helicóptero
       return mostrar(`<div class="an-st an-heli"><div class="an-hv">${HELI(IMG('enojado'))}<div class="an-vena">💢</div><div class="an-humo l">💨</div><div class="an-humo r">💨</div>
         <div class="an-soga"></div><div class="an-bub rojo an-colg">¡Prestamos atención!</div></div></div>`, 7000, 'rojo'); }
+    if (k === 'acu' && NAV) {                                           // 🤝🎁 acuerdos en Navidad: cada regalo se abre y muestra una norma
+      const L = [['✋', 'Levantamos la mano para participar'], ['🤐', 'No conversamos cuando otro habla'], ['🪑', 'Nos quedamos en nuestro sitio'], ['🤝', 'Respetamos a todos']];
+      const C = [['#dc2626', '#fde047'], ['#16a34a', '#f87171'], ['#2563eb', '#fde047'], ['#a855f7', '#4ade80']], PASO = 4200;
+      molí3d('feliz', 'señalar'); let i = 0;
+      const nieve = Array.from({ length: 26 }, (_, q) => `<i class="an-copo" style="left:${(q * 31) % 100}%;--d:${4 + q % 5}s;--r:${-(q * .7)}s;--s:${.5 + (q % 4) * .25}">❄</i>`).join('');
+      const regalos = L.map((x, q) => `<div class="an-gift" style="--c:${C[q][0]};--l:${C[q][1]}"><div class="an-gnum">${q + 1}</div><div class="an-gcar"><i>${x[0]}</i><b>${x[1]}</b></div><div class="an-gcaja"></div><div class="an-gtapa"><span class="an-glazo"></span></div></div>`).join('');
+      const paso = () => { if (!capa.classList.contains('on')) return; const g = capa.querySelectorAll('.an-gift')[i], x = L[i]; if (!g) return;
+        g.classList.add('sacude'); ruido(0, .5, 900, .12); [0, .12, .24, .36].forEach(t0 => tono(180, t0, .08, 'square', .06));
+        setTimeout(() => { g.classList.remove('sacude'); g.classList.add('abre'); ruido(0, .12, 2500, .3); [784, 988, 1175, 1568].forEach((f, j) => tono(f, j * .08, .4, 'triangle', .22));
+          const n = capa.querySelector('.an-gnorma'); n.style.setProperty('--c', C[i][0]); n.classList.remove('ve'); void n.offsetWidth; n.innerHTML = `<i>${x[0]}</i><b>${x[1]}</b>`; n.classList.add('ve'); i++; if (i < L.length) setTimeout(paso, PASO - 900); }, 900); };
+      mostrar(`<div class="an-st an-gifts">${nieve}<h2>🎁 Acuerdos de convivencia</h2><div class="an-gnorma"><i>🎄</i><b>¡Abramos los regalos!</b></div>
+        <div class="an-gfila"><img class="an-m flota" src="${IMG('feliz')}" alt="">${regalos}</div></div>`, L.length * PASO + 2400, 'noche');
+      return setTimeout(paso, 1000); }
     if (k === 'acu') {                                                  // 🤝🚀 acuerdos en la nave espacial (tipo Orión): todo flota, Molí levanta su letrero
       const L = [['✋', 'Levantamos la mano para participar'], ['🤐', 'No conversamos cuando otro habla'], ['🪑', 'Nos quedamos en nuestro sitio'], ['🤝', 'Respetamos a todos']];
       molí3d('feliz', 'señalar'); espacio(L.length * 4800 / 1000 + 1.5); let i = 0;

@@ -338,6 +338,23 @@ function crearMoli(THREE, opt = {}) {
     part(gorro, ROJO, head, [0, 0, 0], [0, 0, 0.08]);
     part(new THREE.TorusGeometry(1, 0.13, 14, 64), FELPA, head, [0, yB + 0.01, 0], [Math.PI / 2, 0, 0.08], [rx + 0.035, rz + 0.035, 0.75]);
     { const tx = 0.3, ty = yB + H0 - 0.18, a = 0.08; part(new THREE.SphereGeometry(0.1, 20, 16), FELPA, head, [tx * Math.cos(a) - ty * Math.sin(a), tx * Math.sin(a) + ty * Math.cos(a), -0.22]); }   // pompón en la punta
+    // 🎅 traje de Santa: abrigo rojo con borde de peluche, cinturón negro con hebilla dorada, mangas con puños blancos y barba con bigote
+    const NEGRO = PM({ color: 0x1f1f24, roughness: 0.45, clearcoat: 0.4, envMapIntensity: 0.3 }), ORO = PM({ color: 0xf5c518, metalness: 0.7, roughness: 0.3, envMapIntensity: 0.8 });
+    part(lathe(k => { const y = 0.4 + 0.37 * k; return [torsoR(y) + 0.016, y]; }, 32, 48), ROJO, body);
+    part(new THREE.TorusGeometry(torsoR(0.41) + 0.02, 0.036, 12, 64), FELPA, body, [0, 0.41, 0], [Math.PI / 2, 0, 0]);
+    part(new THREE.TorusGeometry(0.15, 0.04, 12, 48), FELPA, body, [0, 0.77, 0], [Math.PI / 2, 0, 0]);
+    part(new THREE.CylinderGeometry(torsoR(0.47) + 0.026, torsoR(0.47) + 0.026, 0.065, 48, 1, true), NEGRO, body, [0, 0.47, 0]);
+    { const zb = torsoR(0.47) + 0.03; part(new THREE.BoxGeometry(0.13, 0.095, 0.02), ORO, body, [0, 0.47, zb]); part(new THREE.BoxGeometry(0.075, 0.045, 0.024), NEGRO, body, [0, 0.47, zb + 0.002]); }
+    arms.forEach(({ sh, sx }) => { part(armGeo, ROJO, sh, [0.008 * sx, 0.004, 0], null, [1.12, 1, 1.12]);
+      part(new THREE.TorusGeometry(0.105, 0.035, 10, 32), FELPA, sh, [0.01 * sx, -0.33, 0.004], [Math.PI / 2, 0, 0]); });
+    { const S = 0.17, geo = new THREE.PlaneGeometry(S, S, 12, 12), q = geo.attributes.position, yc = 0.585;   // el cuadrito del sodio, encima del abrigo
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = yc + q.getY(i), R = torsoR(y) + 0.016; q.setXYZ(i, x, y, Math.sqrt(Math.max(0, R * R - x * x)) + 0.006); }
+      geo.computeVertexNormals(); const na = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: naTex, transparent: true })); na.renderOrder = 2; body.add(na); }
+    for (let i = 0; i <= 14; i++) { const a = -1.15 + 2.3 * i / 14, c = Math.cos(a), r = 0.085 + 0.03 * c;      // barba: mechones esponjosos bajo el visor
+      part(new THREE.SphereGeometry(r, 16, 12), FELPA, head, [0.43 * Math.sin(a), -0.36 - 0.2 * c * c, 0.32 * c + 0.06], null, [1, 1.15, 0.8]);
+      if (Math.abs(a) < 0.8) part(new THREE.SphereGeometry(r * 0.9, 14, 10), FELPA, head, [0.32 * Math.sin(a), -0.46 - 0.16 * c * c, 0.26 * c + 0.04], null, [1, 1.2, 0.8]); }
+    part(new THREE.SphereGeometry(0.08, 16, 12), FELPA, head, [0, -0.66, 0.24], null, [1.1, 1.3, 0.8]);
+    [-1, 1].forEach(sx => part(new THREE.SphereGeometry(0.07, 16, 12), FELPA, head, [0.085 * sx, -0.355, 0.44], [0, 0, -0.35 * sx], [1.5, 0.75, 0.75]));   // bigote
   }
   flush();
 

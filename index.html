@@ -194,10 +194,10 @@ if (GR7) document.title = 'Molí 2 · Aula de séptimo grado';
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hojas.css?v=202611051324">
+<link rel="stylesheet" href="hojas.css?v=202611051456">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="moli3d.js?v=202611051324"></script><script src="sincro.js?v=202611051324"></script><script src="guion.js?v=202611051324"></script><script src="datos.js?v=202611051324"></script><script src="docente.js?v=202611051324"></script>
-<script src="intro.js?v=202611051324"></script><script src="aviones.js?v=202611051324"></script><script src="moli-explica.js?v=202611051324"></script><script src="hojas.js?v=202611051324"></script><script src="hojas-docente.js?v=202611051324"></script><script src="diplomas.js?v=202611051324"></script><script src="fotocheck.js?v=202611051324"></script><script src="herramientas.js?v=202611051324"></script><script src="remoto.js?v=202611051324"></script><script src="escaner.js?v=202611051324"></script><script src="tarjetas.js?v=202611051324"></script>
+<script src="moli3d.js?v=202611051456"></script><script src="sincro.js?v=202611051456"></script><script src="guion.js?v=202611051456"></script><script src="datos.js?v=202611051456"></script><script src="docente.js?v=202611051456"></script>
+<script src="intro.js?v=202611051456"></script><script src="aviones.js?v=202611051456"></script><script src="moli-explica.js?v=202611051456"></script><script src="hojas.js?v=202611051456"></script><script src="hojas-docente.js?v=202611051456"></script><script src="diplomas.js?v=202611051456"></script><script src="fotocheck.js?v=202611051456"></script><script src="herramientas.js?v=202611051456"></script><script src="remoto.js?v=202611051456"></script><script src="escaner.js?v=202611051456"></script><script src="tarjetas.js?v=202611051456"></script>
 <style id="splashCss">
   /* ---- pantalla de carga (como la de Molí 1): MOLÍ en letras grandes y Molí 3D trayendo el número 2 ---- */
   #splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
@@ -1560,7 +1560,33 @@ function navidad6B({ P, Wc, Dp, fy, rotU, svec, F6 }) {
     parche(-0.8, S1 - 0.25, 1.4, 0.55, 0.05); parche(1.6, 0.22, 1.2, 0.45, -0.05); parche(U0 + 0.25, S1 / 2, 0.5, 1.3, 0.1);
     const BL = toon(0xf8fafc), mon = new THREE.SphereGeometry(1, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2);   // montoncitos (media esfera aplastada)
     [[ARB[0] + 0.5, ARB[1] - 0.1, 0.18], [ARB[0] + 0.1, ARB[1] - 0.55, 0.15], [U1 - 0.25, 0.25, 0.2], [U1 - 0.2, S1 - 0.3, 0.18], [U0 + 0.22, 0.22, 0.15]].forEach(([u, s, r]) => {
-      const m = new THREE.Mesh(mon, BL); m.position.copy(L(u, 0, s)); m.scale.set(r, r * 0.32, r * 0.85); sala.add(m); }); }
+      const m = new THREE.Mesh(mon, BL); m.position.copy(L(u, 0, s)); m.scale.set(r, r * 0.32, r * 0.85); sala.add(m); });
+    // más nieve: una franja junto a todas las paredes, manchitas por el salón y más montoncitos
+    for (let u = U0 + 0.9; u < U1 - 0.6; u += 1.15) { parche(u, 0.3, 1.5, 0.75, (u * 7) % 0.4 - 0.2); parche(u + 0.5, S1 - 0.32, 1.5, 0.8, (u * 5) % 0.4 - 0.2); }
+    for (let s = 0.9; s < S1 - 0.6; s += 1.1) { parche(U0 + 0.3, s, 0.8, 1.5, (s * 3) % 0.4 - 0.2); parche(U1 - 0.3, s + 0.4, 0.8, 1.5, (s * 9) % 0.4 - 0.2); }
+    [[-1.9, 1.6, 0.9], [0.4, 2.3, 0.7], [2.4, 1.4, 0.85], [-0.6, S1 - 1.4, 0.75], [1.3, S1 - 1.6, 0.6], [3.2, S1 / 2 + 0.6, 0.8], [-3.0, S1 / 2 - 0.4, 0.7]].forEach(([u, s, w], i) => { if (u > U0 + 0.4 && u < U1 - 0.4) parche(u, s, w, w * 0.8, i); });
+    [[U0 + 0.35, S1 / 2 + 0.5, 0.17], [U1 - 0.3, S1 / 2 - 0.3, 0.16], [-1.2, 0.3, 0.14], [2.6, S1 - 0.28, 0.16], [0.9, 0.28, 0.12]].forEach(([u, s, r]) => {
+      const m = new THREE.Mesh(mon, BL); m.position.copy(L(u, 0, s)); m.scale.set(r, r * 0.32, r * 0.85); sala.add(m); });
+    // ⛄ muñeco de nieve junto a la pizarra
+    { const p = L(U0 + 0.5, 0, 0.75), g = new THREE.Group(); g.position.copy(p); g.rotation.y = mira(p); sala.add(g);
+      const NV = toon(0xffffff), NEG = toon(0x1f2937), ROJO = toon(0xdc2626), NAR = toon(0xf97316), PALO = toon(0x7c4a1e), VER = toon(0x16a34a);
+      const bola = (r, y) => { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 22, 16), NV); m.position.y = y; g.add(m); return m; };
+      bola(0.3, 0.27); bola(0.22, 0.7); bola(0.16, 1.04);
+      const base = new THREE.Mesh(mon, BL); base.scale.set(0.45, 0.1, 0.45); g.add(base);
+      [[-0.055, 1.08], [0.055, 1.08]].forEach(([x, y]) => { const o = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), NEG); o.position.set(x, y, 0.145); g.add(o); });
+      const nariz = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.17, 12), NAR); nariz.rotation.x = Math.PI / 2; nariz.position.set(0, 1.03, 0.23); g.add(nariz);
+      for (let k = 0; k < 5; k++) { const a = (k - 2) * 0.22, b = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), NEG); b.position.set(Math.sin(a) * 0.11, 0.97 - Math.cos(a) * 0.02 - Math.abs(k - 2) * 0.008, 0.13 + Math.cos(a) * 0.02); g.add(b); }
+      [0.62, 0.74, 0.3].forEach(y => { const b = new THREE.Mesh(new THREE.SphereGeometry(0.026, 10, 8), NEG); b.position.set(0, y, y > 0.5 ? 0.215 : 0.295); g.add(b); });
+      const bufanda = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.04, 8, 24), ROJO); bufanda.rotation.x = Math.PI / 2; bufanda.position.y = 0.9; g.add(bufanda);
+      const punta = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.24, 0.025), ROJO); punta.position.set(0.09, 0.78, 0.15); punta.rotation.z = 0.15; g.add(punta);
+      [[-1, 0.5], [1, -0.5]].forEach(([sx, rz]) => { const b = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.42, 6), PALO); b.position.set(sx * 0.36, 0.78, 0); b.rotation.z = sx * 1.0 + rz * 0.2; g.add(b);
+        const d = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.01, 0.1, 5), PALO); d.position.set(sx * 0.5, 0.92, 0); d.rotation.z = sx * 0.2; g.add(d); });
+      const ala = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.02, 20), NEG); ala.position.y = 1.17; g.add(ala);
+      const copa = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.17, 20), NEG); copa.position.y = 1.26; g.add(copa);
+      const cinta = new THREE.Mesh(new THREE.CylinderGeometry(0.112, 0.112, 0.035, 20), ROJO); cinta.position.y = 1.2; g.add(cinta);
+      const hoja = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 6), VER); hoja.position.set(0.08, 1.21, 0.07); g.add(hoja);
+      g.scale.setScalar(1.05); g.name = 'muneco'; }
+  }
 
   // ---- foquitos que titilan (cada color a su ritmo) ----
   ANIM.push(t => FOCO.forEach((m, i) => { const k = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * (2.2 + i * 0.37) + i * 1.7)); m.color.copy(FOCO0[i]).multiplyScalar(k); }));
@@ -2890,8 +2916,8 @@ window.SPLASH.then(function arrancar() {                                        
 window.G = { renderer, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 Object.assign(window.G, { moliIr, spotCerca, decir, callar, sheet, portrait });   // (lo usan el control remoto y sus animaciones)
 </script>
-<script src="revista.js?v=202611051324"></script><script src="corcho.js?v=202611051324"></script><script src="mando.js?v=202611051324"></script><script src="anuncio.js?v=202611051324"></script><script src="muro.js?v=202611051324"></script><script src="comunicado.js?v=202611051324"></script>
-<script src="archivos.js?v=202611051324"></script><script src="editor.js?v=202611051324"></script>
+<script src="revista.js?v=202611051456"></script><script src="corcho.js?v=202611051456"></script><script src="mando.js?v=202611051456"></script><script src="anuncio.js?v=202611051456"></script><script src="muro.js?v=202611051456"></script><script src="comunicado.js?v=202611051456"></script>
+<script src="archivos.js?v=202611051456"></script><script src="editor.js?v=202611051456"></script>
 <div id="comWin"><button id="comCerrar" type="button">← Volver al aula</button><iframe id="comFrame" allow="fullscreen; autoplay"></iframe></div>
 <style>#comWin{position:fixed;inset:0;z-index:60;background:#111;display:none}#comWin.on{display:block}#comWin iframe{width:100%;height:100%;border:0}#comCerrar{position:absolute;left:12px;top:12px;z-index:2;font:900 15px system-ui;padding:8px 14px;border-radius:10px;border:0;background:rgba(20,20,40,.75);color:#fff;cursor:pointer;opacity:.35}#comCerrar:hover{opacity:1}</style>
 <script>(() => {   // 📽️ la presentación se abre DENTRO del aula: así el control remoto (celular) y el clicker la pasan
