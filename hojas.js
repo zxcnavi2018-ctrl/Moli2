@@ -857,6 +857,9 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
         if (e.target.closest('.cv-add')) { e.stopPropagation(); return formVideo(null); }
         const vb = e.target.closest('[data-vid]'); if (vb) { e.stopPropagation(); const it = P.L[P.i]; if (it && it.k === 'vid') { if (vb.dataset.vid === 'del') quitarVideo(it); else formVideo(CVV.L.find(x => x.id === it.id) || it); } return; }
         const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); mover(+b.dataset.cv); });
+      { const ult = () => { for (let k = P.L.length - 1; k >= 0; k--) if (P.L[k].k === 'ses') return k; return -1; }, z = P.L[ult()];   // ⏩ atajo a la última sesión (la que toca proyectar)
+        if (z) { const b = document.createElement('button'); b.type = 'button'; b.className = 'cv-atajo'; b.innerHTML = `⏩ Ir a la Sesión ${z.n}`; b.title = `Unidad ${z.u.num} · Sesión ${z.n}`;
+          b.addEventListener('click', e => { e.stopPropagation(); const k = ult(); if (k >= 0) { P.i = k; pinta(true); } }); el.querySelector('.cv-bar select').after(b); } }
       el.querySelector('select').addEventListener('change', e => { const v = e.target.value.split(':'); const k = P.L.findIndex(z => v[0] === 'u' ? z.k === 'uni' && z.u.key === v[1] : z.k === 'ses' && z.u.key === v[1] && z.n === +v[2]); if (k >= 0) { P.i = k; pinta(true); } });
       let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar,.cv-add,.cv-ved,.cv-form') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) mover(dx < 0 ? 1 : -1); });
       pinta(true);

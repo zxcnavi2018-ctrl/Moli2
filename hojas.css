@@ -993,3 +993,10 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 @media (orientation: portrait) { .tl-orq { width: 60vw; bottom: 46vh; } .tl-piano { width: 40vw; bottom: 46vh; } .tl-main img { height: 30vh; } }
 .tl-mic { left: auto; right: -9vh; } .tl-orq { bottom: 25vh; } .tl-orq .tl-mus img { height: 13vh; }
 .an-tel.cierra .tl-sub { z-index: 8; background: none; font-size: clamp(40px, 12vh, 120px); }
+.an-falta { position: absolute; left: 0; right: 0; top: 41vh; z-index: 4; text-align: center; font: 900 clamp(26px, 7vh, 70px) system-ui; color: #fff; text-shadow: 0 .5vh 0 #b91c1c, 0 0 3vh rgba(253,224,71,.8); opacity: 0; transform: scale(.4); transition: opacity .6s .5s, transform .8s cubic-bezier(.3,1.6,.5,1) .5s; pointer-events: none; }
+.an-falta b { color: #fde047; font-size: 1.35em; }
+.an-arb.luz .an-falta { opacity: 1; transform: none; animation: anFalta 1.6s ease-in-out 1.4s infinite alternate; } @keyframes anFalta { to { transform: scale(1.06); } }
+.an-falta { left: 50%; right: auto; width: max-content; max-width: 92vw; transform: translateX(-50%) scale(.4); background: rgba(15,23,60,.62); border: .4vh solid #fde047; border-radius: 99em; padding: 1vh 3.2vw; box-shadow: 0 0 4vh rgba(253,224,71,.35); }
+.an-arb.luz .an-falta { transform: translateX(-50%); animation: none; }
+.cv-atajo { flex: none; border: 0; border-radius: 99em; padding: .35em .9em; font: 800 .95em system-ui; color: #fff; background: linear-gradient(135deg, #f97316, #db2777); box-shadow: 0 .2em .6em rgba(0,0,0,.25); cursor: pointer; white-space: nowrap; }
+.cv-atajo:hover { filter: brightness(1.1); transform: translateY(-1px); }

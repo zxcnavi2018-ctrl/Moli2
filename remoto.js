@@ -313,6 +313,9 @@
         <div class="an-vtr"><div class="an-chisp"></div>${TRINEO(window.moliDibujo ? moliDibujo('salta') : IMG('salta'))}</div><div class="an-bub">🎄 ¡Jo, jo, jo! ¡Atentos!</div></div>`, 7800, 'noche'); }
     if (k === 'drum') { molí3d('feliz', 'saltar'); for (let i = 0; i < 16; i++) golpe(i * .14); golpe(2.6); tono(55, 2.6, 1.2, 'triangle', .5);
       return mostrar(`<div class="an-st an-drum"><img class="an-m bota" src="${IMG('salta')}" alt=""><div class="an-tam">🥁</div><div class="an-pum"><b>¡PUM!</b><b>¡PUM!</b><b>¡PUM!</b></div></div>`, 4600, 'naranja'); }
+    const falta = () => { const h = new Date(), d0 = new Date(h.getFullYear(), h.getMonth(), h.getDate()); let nav = new Date(h.getFullYear(), 11, 25);   // ⭐ cuenta regresiva a Navidad
+      if (h.getMonth() === 0) return '🎄 ¡Feliz Navidad y feliz Año Nuevo! 🎉'; const n = Math.round((nav - d0) / 864e5);
+      return n === 0 ? '🎄 ¡Hoy es Navidad! 🎁' : n < 0 ? '🎄 ¡Feliz Navidad! 🎁' : n === 1 ? '⭐ ¡Falta <b>1</b> día para Navidad! ⭐' : `⭐ ¡Faltan <b>${n}</b> días para Navidad! ⭐`; };
     if (k === 'angry' && NAV) { molí3d('feliz', 'señalar');            // 🎄⭐ Molí vuela al árbol, prende la estrella y suena «Jingle Bells»
       const JB = [[659,1],[659,1],[659,2],[659,1],[659,1],[659,2],[659,1],[784,1],[523,1.5],[587,.5],[659,4],[698,1],[698,1],[698,1.5],[698,.5],[698,1],[659,1],[659,1],[659,.5],[659,.5],[659,1],[587,1],[587,1],[659,1],[587,2],[784,2]];
       let tt = 2.5; JB.forEach(([f, d]) => { tono(f, tt, d * .2 + .1, 'triangle', .28); tono(f * 2, tt, .12, 'sine', .06); tt += d * .2; });
@@ -330,7 +333,7 @@
         <g class="an-tope"><circle class="an-halo" cx="200" cy="52" r="56" fill="url(#anHalo)"/><path d="M200 12 L211 42 L243 42 L217 61 L227 92 L200 73 L173 92 L183 61 L157 42 L189 42 Z" fill="#fde047" stroke="#ca8a04" stroke-width="3" stroke-linejoin="round"/></g>
         <defs><radialGradient id="anHalo"><stop offset="0" stop-color="#fff7c2" stop-opacity=".95"/><stop offset="1" stop-color="#fde047" stop-opacity="0"/></radialGradient></defs></svg>
         <div class="an-mvu"><img class="an-m" src="${IMG('estrellas')}" alt=""><i class="an-ests">⭐</i></div></div>
-        <div class="an-bub">🎄 ¡Prestamos atención!</div></div>`, 8200, 'noche');
+        <div class="an-falta">${falta()}</div><div class="an-bub">🎄 ¡Prestamos atención!</div></div>`, 8200, 'noche');
       return setTimeout(() => { const s = capa.querySelector('.an-arb'); s && s.classList.add('luz'); }, 2400); }
     if (k === 'angry') { molí3d('enojado'); helice(6.5); tono(110, .2, .9, 'sawtooth', .14); tono(98, .8, .9, 'sawtooth', .14);   // 😠🚁 Molí enojado en su helicóptero
       return mostrar(`<div class="an-st an-heli"><div class="an-hv">${HELI(IMG('enojado'))}<div class="an-vena">💢</div><div class="an-humo l">💨</div><div class="an-humo r">💨</div>
