@@ -104,8 +104,10 @@
       { m: 'decidida', t: 'Escribe tu conclusión sustentada: responde la pregunta, usa dos datos y la tarjeta científica.', a: [{ k: 'chips', x: ['❓ Respuesta', '📊 2 datos', '🔬 Tarjeta científica'] }] },
       { m: 'genial', t: 'Revisa tu trabajo antes de entregar. ¡Estoy muy orgullosa de ti!', a: [] }],
   };
+  if (window.MX8) Object.entries(MX8.E).forEach(([k, v]) => { E['8:' + k] = v; });   // las de la Unidad 8 (moli-explica-u8.js)
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const tiene = (u, s, n, j) => !!(u && s && String(u.num) === '7' && TIT[n] && s.title === TIT[n] && E[n + '-' + j]);
+  const clave = (un, n, j) => (String(un) === '8' ? '8:' : '') + n + '-' + j;
+  const tiene = (u, s, n, j) => !!(u && s && (String(u.num) === '7' ? TIT[n] && s.title === TIT[n] : String(u.num) === '8' && window.MX8 && MX8.TIT[n] && s.title === MX8.TIT[n]) && E[clave(u.num, n, j)]);
   function pieza(p, k) {
     const d = `data-s="${k}"`;
     if (p.k === 'tag') return `<div class="mx-p mx-tag" ${d}>${esc(p.x)}</div>`;
@@ -118,21 +120,21 @@
     if (p.k === 'graf') return `<div class="mx-p mx-graf" ${d}><div class="mx-gb">${p.x.map((c, q) => `<div><i style="height:${30 + q * 55 / p.x.length}%;background:${['#60a5fa', '#34d399', '#fbbf24', '#f87171'][q % 4]}">?</i><small>${esc(c)}</small></div>`).join('')}</div></div>`;
     return `<div class="mx-p mx-${p.k}" ${d}>${p.k === 'ok' ? '✅ ' : p.k === 'no' ? '❌ ' : ''}${esc(p.x)}</div>`;
   }
-  function html(n, j, x) {
-    const P = E[n + '-' + j] || []; let pz = '', cols = '';                     // las columnas seguidas forman un cuadro
+  function html(n, j, x, un) {
+    const P = E[clave(un, n, j)] || []; let pz = '', cols = '';                     // las columnas seguidas forman un cuadro
     const cierra = () => { if (cols) pz += `<div class="mx-cols">${cols}</div>`; cols = ''; };
     P.forEach((s, k) => s.a.forEach(p => { if (p.k === 'col') cols += pieza(p, k); else { cierra(); pz += pieza(p, k); } }));
     cierra();
-    return `<div class="cv-sl mx" data-mxk="${n}-${j}" style="--c1:#0f766e;--c2:#0ea5e9">
+    return `<div class="cv-sl mx" data-mxk="${clave(un, n, j)}" style="--c1:#0f766e;--c2:#0ea5e9">
       <div class="mx-h"><span class="cv-num">${j}</span><div><b>🎬 ¡Molí te explica!</b><small>Actividad ${j}${x && x.title ? ' · ' + esc(x.title) : ''}</small></div></div>
-      <div class="mx-b"><div class="mx-mo"><div class="mx-bub"></div><img class="mx-img" src="img/moli/hola.webp" alt="Molí"></div><div class="mx-pz"><span class="mx-cuad">📓 Así queda en el cuaderno</span>${pz}<i class="mx-lapiz" aria-hidden="true">✏️</i></div></div>
+      <div class="mx-b"><div class="mx-mo"><div class="mx-bub"></div><img class="mx-img" src="img/moli/hola.webp" alt="Molí"></div><div class="mx-pz"><span class="mx-cuad">${P.some(s => s.a.some(p => p.k === 'tag' && /Ficha/.test(p.x))) ? '📄 Así queda en la ficha' : '📓 Así queda en el cuaderno'}</span>${pz}<i class="mx-lapiz" aria-hidden="true">✏️</i></div></div>
       <div class="mx-ctl"><button type="button" data-mxb="-1">◀ Atrás</button><span class="mx-dots">${P.map(() => '<i></i>').join('')}</span><button type="button" data-mxb="0">🔊 Repetir</button><button type="button" data-mxb="1" class="mx-sig">Siguiente ▶</button></div></div>`;
   }
   let S = null;
   const audio = new Audio();
   audio.addEventListener('playing', () => S && S.el.classList.add('habla'));
   ['pause', 'ended', 'error'].forEach(t => audio.addEventListener(t, () => S && S.el.classList.remove('habla')));
-  function hablar() { if (!S) return; try { audio.pause(); audio.src = `audio/mx/u7-${S.k}-${S.p}.mp3`; audio.currentTime = 0; audio.play().catch(() => {}); } catch (e) {} }
+  function hablar() { if (!S) return; try { audio.pause(); audio.src = /^8:/.test(S.k) ? `audio/mx/u8-${S.k.slice(2)}-${S.p}.mp3` : `audio/mx/u7-${S.k}-${S.p}.mp3`; audio.currentTime = 0; audio.play().catch(() => {}); } catch (e) {} }
   function paso(n, voz) {
     if (!S) return; const P = E[S.k]; S.p = n; const st = P[n], el = S.el;
     el.querySelectorAll('.mx-p, .mx-tr').forEach(p => { const k = +p.dataset.s; p.classList.toggle('ver', k <= n); p.classList.toggle('nue', k === n); });

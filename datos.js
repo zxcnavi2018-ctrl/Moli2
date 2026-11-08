@@ -100,14 +100,14 @@
     let files = {}; try { files = JSON.parse((c && c.data) || '{}').files || {}; } catch (e) {}
     if (!esp()) try { const r = await fetch('data/ticket-u7s1.json', { cache: 'no-cache' }); if (r.ok) { const T = await r.json();      // Exit ticket nuevo de la Sesión 1 (Unidad 7), puesto directo
       const u = units.find(x => String(x.num) === String(T.unidad)), s = u && u.sessions && u.sessions[T.sesion - 1]; if (s && Array.isArray(T.questions) && T.questions.length) s.ticket = { ...(s.ticket || {}), questions: T.questions }; } } catch (e) {}
-    if (!esp()) try { const r = await fetch('data/unidad7.json', { cache: 'no-cache' }); if (r.ok) { const P = await r.json();   // sesiones de la Unidad 7 sin ficha (cuaderno y papelote), puestas directo
+    if (!esp()) for (const F of ['data/unidad7.json', 'data/unidad8.json']) try { const r = await fetch(F, { cache: 'no-cache' }); if (r.ok) { const P = await r.json();   // sesiones de las Unidades 7 y 8 (con ficha o en el cuaderno), puestas directo
       const u = units.find(x => String(x.num) === String(P.num));
       if (u && u.sessions) P.sesiones.filter(x => x.sinFicha).forEach(x => { const s = u.sessions[x.n - 1]; if (!s) return; const A0 = s.activities || [];
-        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria }); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; delete s.fx; delete s.pdf; if (x.flipped && x.flipped.enabled) s.flipped = { ...x.flipped };
+        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria }, x.rubric ? { rubric: x.rubric } : {}, 'hidden' in x ? { hidden: x.hidden } : {}, x.sb ? { sb: x.sb } : {}); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; delete s.fx; delete s.pdf; if (x.flipped && x.flipped.enabled) s.flipped = { ...x.flipped };
         s.activities = x.activities.map((a, k) => { const v = { ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ficha: '', file: '' }; ['cu', 'ej', 'nx', 'rub'].forEach(c => { if (a[c]) v[c] = a[c]; else delete v[c]; }); return v; });
       });
       if (u && u.sessions) P.sesiones.filter(x => x.pon).forEach(x => { const s = u.sessions[x.n - 1]; if (!s) return; const A0 = s.activities || [];   // sesiones con ficha cambiada aquí (cada equipo con su propia causa y un solo vaso)
-        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria, fx: x.fx }); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; if (x.pdf) s.pdf = x.pdf + '?v=' + encodeURIComponent(P.v || '');
+        Object.assign(s, { title: x.title, meta: x.meta, criteria: x.criteria, fx: x.fx }, x.rubric ? { rubric: x.rubric } : {}, 'hidden' in x ? { hidden: x.hidden } : {}); if (x.ticket && x.ticket.questions) s.ticket = { ...(s.ticket || {}), ...x.ticket }; if (x.pdf) s.pdf = x.pdf + '?v=' + encodeURIComponent(P.v || '');
         s.activities = x.activities.map((a, k) => ({ ...(A0[k] || {}), mode: a.mode, title: a.title, desc: a.desc, ...(a.rub ? { rub: a.rub } : {}) })); });
       if (u && u.sessions) P.sesiones.filter(x => x.oculta).forEach(x => { const s = u.sessions[x.n - 1]; if (s) s.hidden = true; }); } } catch (e) {}   // sesiones que ya no se harán (la unidad termina antes)
     contenido = { units, files };

@@ -614,7 +614,7 @@
     R.sesion = sesion; return R;
   }
   const GU = new Set(['rol', 'acu', 'sab', 'ref']);                  // diapositivas que Molí hace con su voz (guion.js)
-  const sabDe = it => { const f = it.s && it.s.fx; return f && L(f.sb) ? f.sb : (cacheIA(hashQ(it)) || {}).s || ''; };   // el «¿Sabías que…?»: el de la ficha de la sesión o el que pensó Molí
+  const sabDe = it => { const f = it.s && it.s.fx; return f && L(f.sb) ? f.sb : it.s && L(it.s.sb) ? it.s.sb : (cacheIA(hashQ(it)) || {}).s || ''; };   // el «¿Sabías que…?»: el de la ficha de la sesión o el que pensó Molí
   // ---- 📄 «¡Busca esto en tu ficha!»: las preguntas y tablas de la ficha que tocan en esa actividad, con su misma numeración ----
   function fichaParte(s, j) {
     const fx = s && s.fx; if (!fx) return null; const P = []; let nq = 0;
@@ -746,7 +746,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     function slide(it) {
       if (it.k === 'vid') return slideVideo(it);
       if (it.k === 'sync') return Sincro.html(syncDe(it));
-      if (it.k === 'mx') return MoliExp.html(it.n, it.j, it.x);                // Molí explica la actividad (moli-explica.js)
+      if (it.k === 'mx') return MoliExp.html(it.n, it.j, it.x, String(it.u.num));                // Molí explica la actividad (moli-explica.js)
       if (it.k === 'ej' || it.k === 'nx' || it.k === 'cu') { const ok = it.k !== 'nx', cu = it.k === 'cu', E = (cu ? it.x.cu : ok ? it.x.ej : it.x.nx) || {}, [c1, c2] = cu ? ['#1e3a8a', '#3b82f6'] : ok ? ['#065f46', '#10b981'] : ['#7f1d1d', '#ef4444'];   // ✅ ejemplo / ❌ contraejemplo de la actividad
         const gr = G => { const v = G.v || [], mx = Math.max(0.5, ...v.map(z => +z[1] || 0)), top = Math.ceil(mx / 0.5) * 0.5 + 0.5, H = 200, W = 560, x0 = 70, y0 = 230, bw = Math.min(110, (W - x0 - 30) / v.length - 40), CL = ['#60a5fa', '#34d399', '#fbbf24', '#f472b6'];   // 📊 gráfico de barras de ejemplo
           const yy = c => y0 - c / top * H, f1 = c => String(c.toFixed(1)).replace('.', ',');
@@ -857,8 +857,8 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
         if (e.target.closest('.cv-add')) { e.stopPropagation(); return formVideo(null); }
         const vb = e.target.closest('[data-vid]'); if (vb) { e.stopPropagation(); const it = P.L[P.i]; if (it && it.k === 'vid') { if (vb.dataset.vid === 'del') quitarVideo(it); else formVideo(CVV.L.find(x => x.id === it.id) || it); } return; }
         const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); mover(+b.dataset.cv); });
-      { const ult = () => { for (let k = P.L.length - 1; k >= 0; k--) if (P.L[k].k === 'ses') return k; return -1; }, z = P.L[ult()];   // ⏩ atajo a la última sesión (la que toca proyectar)
-        if (z) { const b = document.createElement('button'); b.type = 'button'; b.className = 'cv-atajo'; b.innerHTML = `⏩ Ir a la Sesión ${z.n}`; b.title = `Unidad ${z.u.num} · Sesión ${z.n}`;
+      { const ult = () => { for (let k = P.L.length - 1; k >= 0; k--) if (P.L[k].k === 'uni' && P.L[k].ss && P.L[k].ss.length) return k; return -1; }, z = P.L[ult()];   // ⏩ atajo a la unidad que estamos trabajando (la última con sesiones)
+        if (z) { const b = document.createElement('button'); b.type = 'button'; b.className = 'cv-atajo'; b.innerHTML = `⏩ Ir a la Unidad ${z.u.num}`; b.title = `Unidad ${z.u.num} · ${z.u.title || ''}`;
           b.addEventListener('click', e => { e.stopPropagation(); const k = ult(); if (k >= 0) { P.i = k; pinta(true); } }); el.querySelector('.cv-bar select').after(b); } }
       el.querySelector('select').addEventListener('change', e => { const v = e.target.value.split(':'); const k = P.L.findIndex(z => v[0] === 'u' ? z.k === 'uni' && z.u.key === v[1] : z.k === 'ses' && z.u.key === v[1] && z.n === +v[2]); if (k >= 0) { P.i = k; pinta(true); } });
       let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar,.cv-add,.cv-ved,.cv-form') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) mover(dx < 0 ? 1 : -1); });
