@@ -1029,3 +1029,4 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .cv-aut .au-t td.on::after { content: '✔'; color: #15803d; font-weight: 900; font-size: 1.6em; }
 @keyframes auOk { 0% { transform: scale(0) rotate(-40deg); } 100% { transform: scale(1); } }
 .au-m { margin: 0; color: #fff; font-weight: 900; font-size: .9em; display: flex; gap: .4em; align-items: flex-end; } .au-m i { flex: 1; border-bottom: .12em dashed rgba(255,255,255,.75); height: 1em; }
+.au-n { display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: #7c3aed; color: #fff; font-size: .8em; font-weight: 900; margin-right: .45em; vertical-align: .1em; }
