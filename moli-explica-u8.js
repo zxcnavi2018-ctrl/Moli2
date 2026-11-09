@@ -3,6 +3,17 @@
 window.MX8 = {
   TIT: { 1: 'Conocemos el sistema reproductor humano', 2: 'Conocemos el sistema reproductor masculino', 3: 'Conocemos el sistema reproductor femenino y el ciclo ovárico', 4: 'La fecundación y el primer trimestre del embarazo', 5: 'El desarrollo del bebé en el segundo y tercer trimestre', 6: 'La tecnología en el embarazo: la ecografía', 7: 'Planificamos nuestros pósters científicos', 8: 'Elaboramos y exponemos nuestros pósters', 9: 'Celebramos lo aprendido: galería y reflexión' },
   E: {
+    'pro-1': [
+      { m: 'hola', t: '¡Hola, equipo! Hoy les presento algo nuevo: ¡el Equipo Pro! Cada equipo tendrá tres tarjetas de colores para comunicarse conmigo y con el profe.', a: [{ k: 'tag', x: '🏅 Equipo Pro · 3 tarjetas por equipo' }, { k: 'tit', x: '🃏 ¡Somos un Equipo Pro!' }] },
+      { m: 'genial', t: 'La tarjeta verde significa: ¡queremos participar! Alguien del grupo quiere dar una idea o una respuesta.', a: [{ k: 'tarj', c: 'verde', i: '🙋', h: 'Verde', x: '¡Queremos participar!' }] },
+      { m: 'curiosa', t: 'La tarjeta amarilla significa: tenemos una duda. El grupo, o alguien del grupo, quiere hacer una pregunta.', a: [{ k: 'tarj', c: 'amarillo', i: '❓', h: 'Amarilla', x: 'Tenemos una duda' }] },
+      { m: 'decidida', t: 'La tarjeta roja es de peligro: ocurre algo en el grupo. Por ejemplo, alguien se siente mal, se derramó algo, o no logran ponerse de acuerdo. El profe irá de inmediato.', a: [{ k: 'tarj', c: 'rojo', i: '🚨', h: 'Roja', x: '¡Peligro! Ocurre algo en el grupo' }] },
+      { m: 'pensativa', t: '¿Cómo se usan? Los integrantes le piden la tarjeta al líder del grupo. El líder la levanta en alto, y el profe la ve y los atiende.', a: [{ k: 'fila', n: 1, i: '🙋', x: 'Le pido la tarjeta al líder' }, { k: 'fila', n: 2, i: '🧭', x: 'El líder la levanta en alto' }, { k: 'fila', n: 3, i: '👀', x: 'El profe la ve y nos atiende' }] },
+      { m: 'genial', t: '¡Así trabajamos en orden, y nadie se queda sin ser escuchado! ¿Listos para ser un Equipo Pro?', a: [{ k: 'ok', x: '🏅 ¡Listos para ser un Equipo Pro!' }] }],
+    'pro-2': [
+      { m: 'hola', t: '¡Equipo Pro! Antes de empezar, recordemos nuestras tres tarjetas.', a: [{ k: 'tit', x: '🃏 Las tarjetas del Equipo Pro' }] },
+      { m: 'idea', t: 'Verde: queremos participar. Amarilla: tenemos una duda. Roja: ¡peligro!, ocurre algo en el grupo.', a: [{ k: 'tarj', c: 'verde', i: '🙋', h: 'Verde', x: '¡Queremos participar!' }, { k: 'tarj', c: 'amarillo', i: '❓', h: 'Amarilla', x: 'Tenemos una duda' }, { k: 'tarj', c: 'rojo', i: '🚨', h: 'Roja', x: '¡Peligro en el grupo!' }] },
+      { m: 'decidida', t: 'Recuerden: se la piden al líder, y el líder la levanta en alto. ¡A trabajar como un Equipo Pro!', a: [{ k: 'ok', x: '🧭 Se la pido al líder · él la levanta' }] }],
     '1-1': [
       { m: 'hola', t: '¡Bienvenidos a nuestra última unidad! Hoy empezamos a conocer el sistema reproductor humano. Trabajamos en equipo y en el cuaderno.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }] },
       { m: 'curiosa', t: 'Nuestro reto: el colegio será sede de una feria científica. Al final de la unidad, cada equipo presentará dos pósters científicos.', a: [{ k: 'tit', x: '🏆 Reto: ¡dos pósters para la feria científica!' }, { k: 'col', i: '🧬', h: 'Póster 1', x: 'Sistemas reproductores y ciclo ovárico' }, { k: 'col', i: '🩺', h: 'Póster 2', x: 'Tecnología en el embarazo y el parto' }] },

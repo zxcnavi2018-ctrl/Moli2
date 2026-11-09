@@ -116,18 +116,19 @@
     if (p.k === 'fila') return `<div class="mx-p mx-fila" ${d}><span class="mx-n">${esc(p.n)}</span>${p.i ? `<span>${p.i}</span>` : ''}<b>${esc(p.x)}</b></div>`;
     if (p.k === 'chips') return `<div class="mx-p mx-chips" ${d}>${p.x.map(c => `<span>${esc(c)}</span>`).join('')}</div>`;
     if (p.k === 'tabla') return `<div class="mx-p mx-tabla" ${d}><table><tr>${p.c.map(h => `<th>${esc(h)}</th>`).join('')}</tr>${p.d.map(f => `<tr>${f.map(x => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}${p.ult ? `<tr class="mx-tr mx-dib" data-s="${p.ult.s}">${p.ult.f.map(x => `<td>${esc(x)}</td>`).join('')}</tr>` : ''}</table></div>`;
+    if (p.k === 'tarj') return `<div class="mx-p mx-tarj mx-t-${p.c}" ${d}><span>${p.i}</span><b>${esc(p.h)}</b>${p.x ? `<small>${esc(p.x)}</small>` : ''}</div>`;   // tarjetas del Equipo Pro
     if (p.k === 'dato') return `<div class="mx-p mx-dato" ${d}>${esc(p.x)}</div>`;
     if (p.k === 'graf') return `<div class="mx-p mx-graf" ${d}><div class="mx-gb">${p.x.map((c, q) => `<div><i style="height:${30 + q * 55 / p.x.length}%;background:${['#60a5fa', '#34d399', '#fbbf24', '#f87171'][q % 4]}">?</i><small>${esc(c)}</small></div>`).join('')}</div></div>`;
     return `<div class="mx-p mx-${p.k}" ${d}>${p.k === 'ok' ? '✅ ' : p.k === 'no' ? '❌ ' : ''}${esc(p.x)}</div>`;
   }
   function html(n, j, x, un) {
     const P = E[clave(un, n, j)] || []; let pz = '', cols = '';                     // las columnas seguidas forman un cuadro
-    const cierra = () => { if (cols) pz += `<div class="mx-cols">${cols}</div>`; cols = ''; };
-    P.forEach((s, k) => s.a.forEach(p => { if (p.k === 'col') cols += pieza(p, k); else { cierra(); pz += pieza(p, k); } }));
+    let gk = ''; const cierra = () => { if (cols) pz += `<div class="mx-cols${gk === 'tarj' ? ' mx-tarjs' : ''}">${cols}</div>`; cols = ''; gk = ''; };
+    P.forEach((s, k) => s.a.forEach(p => { if (p.k === 'col' || p.k === 'tarj') { if (gk && gk !== p.k) cierra(); gk = p.k; cols += pieza(p, k); } else { cierra(); pz += pieza(p, k); } }));
     cierra();
     return `<div class="cv-sl mx" data-mxk="${clave(un, n, j)}" style="--c1:#0f766e;--c2:#0ea5e9">
-      <div class="mx-h"><span class="cv-num">${j}</span><div><b>🎬 ¡Molí te explica!</b><small>Actividad ${j}${x && x.title ? ' · ' + esc(x.title) : ''}</small></div></div>
-      <div class="mx-b"><div class="mx-mo"><div class="mx-bub"></div><img class="mx-img" src="img/moli/hola.webp" alt="Molí"></div><div class="mx-pz"><span class="mx-cuad">${P.some(s => s.a.some(p => p.k === 'tag' && /Ficha/.test(p.x))) ? '📄 Así queda en la ficha' : '📓 Así queda en el cuaderno'}</span>${pz}<i class="mx-lapiz" aria-hidden="true">✏️</i></div></div>
+      <div class="mx-h">${n === 'pro' ? '<span class="cv-num">🏅</span><div><b>🏅 Equipo Pro</b><small>Molí te enseña las 3 tarjetas del equipo</small></div>' : `<span class="cv-num">${j}</span><div><b>🎬 ¡Molí te explica!</b><small>Actividad ${j}${x && x.title ? ' · ' + esc(x.title) : ''}</small></div>`}</div>
+      <div class="mx-b"><div class="mx-mo"><div class="mx-bub"></div><img class="mx-img" src="img/moli/hola.webp" alt="Molí"></div><div class="mx-pz"><span class="mx-cuad">${n === 'pro' ? '🃏 Las tarjetas de mi equipo' : P.some(s => s.a.some(p => p.k === 'tag' && /Ficha/.test(p.x))) ? '📄 Así queda en la ficha' : '📓 Así queda en el cuaderno'}</span>${pz}<i class="mx-lapiz" aria-hidden="true">✏️</i></div></div>
       <div class="mx-ctl"><button type="button" data-mxb="-1">◀ Atrás</button><span class="mx-dots">${P.map(() => '<i></i>').join('')}</span><button type="button" data-mxb="0">🔊 Repetir</button><button type="button" data-mxb="1" class="mx-sig">Siguiente ▶</button></div></div>`;
   }
   let S = null;

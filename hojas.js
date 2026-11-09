@@ -545,6 +545,7 @@
   const CV_BG = { fic: ['#92400e', '#f59e0b'], reto: ['#0b2e4f', '#0a6aa1'], meta: ['#2563eb', '#38bdf8'], rol: ['#7c3aed', '#c084fc'], acu: ['#0d9488', '#34d399'], act: ['#ea580c', '#facc15'], exit: ['#db2777', '#f472b6'], mq: ['#4338ca', '#0ea5e9'], aq: ['#0e7490', '#a855f7'], exa: ['#be185d', '#f472b6'], voc: ['#0f766e', '#22d3ee'], sab: ['#c2410c', '#facc15'], ref: ['#4338ca', '#22d3ee'] };
   const CV_PAL = [['#7c3aed', '#06b6d4'], ['#0ea5e9', '#22c55e'], ['#f97316', '#ec4899'], ['#2563eb', '#8b5cf6'], ['#14b8a6', '#6366f1'], ['#e11d48', '#f59e0b']];
   const CV_ROL = [['🎤', 'SPEAKER', 'Presenta y habla por el equipo'], ['🧰', 'HELPER', 'Trae y organiza los materiales'], ['⏱️', 'TIMER', 'Cuida el tiempo del equipo'], ['🎨', 'DESIGNER', 'Hace que el trabajo se vea bonito y ordenado']];
+  const AUT = new Audio();                                          // voz de Molí en la autoevaluación
   const CV_ACU = [['✋', 'Levantar la mano para participar'], ['🤫', 'No conversamos en clase'], ['🪑', 'Nos quedamos en nuestro sitio']];
   // ---- lo que devuelve la IA de Molí se revisa antes de mostrarlo: nada de «borradores», inglés o textos pegados ----
   const RARO = /\b(let'?s|json|string|valid|wait|standard|make it|output|field|error|->)\b|[{}<>\[\]|\\]|\b[pdesw]\s*:/i;
@@ -618,7 +619,7 @@
   // ---- 📄 «¡Busca esto en tu ficha!»: las preguntas y tablas de la ficha que tocan en esa actividad, con su misma numeración ----
   function fichaParte(s, j) {
     const fx = s && s.fx; if (!fx) return null; const P = []; let nq = 0;
-    if (fx.v === 2) (fx.s || []).forEach(x => { const num = /^(texto|lista|datos)$/.test(x.k) ? '' : fx.nn ? '' : ++nq; if (+x.a === j) P.push({ ...x, num }); });
+    if (fx.v === 2) (fx.s || []).forEach(x => { const num = /^(texto|lista|datos)$/.test(x.k) ? '' : fx.nn ? '' : ++nq; if (+x.a === j && !x.au) P.push({ ...x, num }); });
     else (fx.k || []).forEach((x, i) => { if (+x.a === j) P.push({ k: x.c && x.c.length ? 'tabla' : 'pregunta', t: x.q, hp: x.h, c: x.c, r: x.r, f: x.f, num: i + 1 }); });
     return P.some(x => !/^(texto|lista)$/.test(x.k)) ? { t: fx.t, P } : null;
   }
@@ -655,8 +656,9 @@
           Lst.push({ ...b, k: 'ses' }, { ...b, k: 'meta' }, { ...b, k: 'mq' });
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
+          if (String(u.num) === '8' && window.MoliExp && MoliExp.E['8:pro-' + (n === 1 ? 1 : 2)]) Lst.push({ ...b, k: 'mx', pro: 1, x: { title: 'Equipo Pro' }, j: n === 1 ? 1 : 2 });   // 🏅 Molí enseña las tarjetas del Equipo Pro (completo en la sesión 1, repaso en las demás)
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (window.MoliExp && MoliExp.tiene(u, s, n, j + 1)) Lst.push({ ...b, k: 'mx', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); ficTrozos(fichaParte(s, j + 1)).forEach((_, q) => Lst.push({ ...b, k: 'fic', x, j: j + 1, p: q ? 'f' + (q + 1) : '' })); if (x.cu) Lst.push({ ...b, k: 'cu', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (window.MoliExp && MoliExp.tiene(u, s, n, j + 1)) Lst.push({ ...b, k: 'mx', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); ficTrozos(fichaParte(s, j + 1)).forEach((_, q) => Lst.push({ ...b, k: 'fic', x, j: j + 1, p: q ? 'f' + (q + 1) : '' })); if (x.cu) Lst.push({ ...b, k: 'cu', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); if (String(u.num) === '8' && /group|grupo|pair|pareja/.test(x.mode || '')) Lst.push({ ...b, k: 'aut', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(SB) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
@@ -746,7 +748,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     function slide(it) {
       if (it.k === 'vid') return slideVideo(it);
       if (it.k === 'sync') return Sincro.html(syncDe(it));
-      if (it.k === 'mx') return MoliExp.html(it.n, it.j, it.x, String(it.u.num));                // Molí explica la actividad (moli-explica.js)
+      if (it.k === 'mx') return MoliExp.html(it.pro ? 'pro' : it.n, it.j, it.x, String(it.u.num));                // Molí explica la actividad (moli-explica.js)
       if (it.k === 'ej' || it.k === 'nx' || it.k === 'cu') { const ok = it.k !== 'nx', cu = it.k === 'cu', E = (cu ? it.x.cu : ok ? it.x.ej : it.x.nx) || {}, [c1, c2] = cu ? ['#1e3a8a', '#3b82f6'] : ok ? ['#065f46', '#10b981'] : ['#7f1d1d', '#ef4444'];   // ✅ ejemplo / ❌ contraejemplo de la actividad
         const gr = G => { const v = G.v || [], mx = Math.max(0.5, ...v.map(z => +z[1] || 0)), top = Math.ceil(mx / 0.5) * 0.5 + 0.5, H = 200, W = 560, x0 = 70, y0 = 230, bw = Math.min(110, (W - x0 - 30) / v.length - 40), CL = ['#60a5fa', '#34d399', '#fbbf24', '#f472b6'];   // 📊 gráfico de barras de ejemplo
           const yy = c => y0 - c / top * H, f1 = c => String(c.toFixed(1)).replace('.', ',');
@@ -767,6 +769,8 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       if (it.k === 'meta') { const cr = (s.criteria || []).filter(L); return `<div class="cv-sl cv-meta" ${st}>${crumb(it)}<h2 class="cv-h2">🎯 Meta de la sesión</h2><p class="cv-lead cv-metac">${L(s.meta) ? esc(s.meta) : 'Sin meta todavía'}</p>${cr.length ? `<h3>✅ Criterios de éxito</h3><ul class="cv-cards">${cr.map((c, q) => `<li><i class="cv-cn">${q + 1}</i>${esc(c)}</li>`).join('')}</ul>` : ''}${L(s.rubric) ? `<p class="cv-sub">📏 Criterio de la rúbrica: ${esc(s.rubric)}</p>` : ''}</div>`; }
       if (GU.has(it.k) && window.Guion) return Guion.html(it.k, { t: sabDe(it) });   // Molí los hace con su voz (guion.js)
       if (it.k === 'rol') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">👥 Roles de trabajo</h2><ul class="cv-cards cv-c4">${CV_ROL.map(([i, n, d]) => `<li class="cv-role"><span>${i}</span><b>${n}</b><small>${d}</small></li>`).join('')}</ul></div>`;
+      if (it.k === 'aut') { const par = /pair|pareja/.test(it.x.mode || ''), C = [par ? '👫 Los dos participamos y nos ayudamos.' : '👥 Todos participamos y cumplimos nuestro rol.', '👂 Escuchamos y respetamos las ideas de todos.', ...(Array.isArray(it.x.auto) && it.x.auto.length ? it.x.auto.map(t => '📝 ' + t) : ['📝 Completamos el trabajo con lenguaje científico.']), '⏱️ Terminamos a tiempo.'];   // 🪞 autoevaluación después de cada actividad en equipo o en pareja (Unidad 8)
+        return `<div class="cv-sl cv-aut" ${st}>${crumb(it)}<div class="au-h"><img src="${IMG('estrellas')}" alt="Molí"><div><b>🪞 ¡Nos autoevaluamos!</b><small>Actividad ${it.j}${L(it.x.title) ? ' · ' + esc(it.x.title) : ''} · ${par ? 'en pareja' : 'en equipo'}</small></div></div><p class="au-i">Miren su trabajo, conversen ${par ? 'en pareja' : 'en equipo'} y marquen con honestidad. ✍️ ${par ? 'Cada uno dibuja' : 'El secretario dibuja'} las estrellas en el cuaderno.</p><table class="au-t"><tr><th>¿Cómo trabajamos?</th><th>⭐⭐⭐<small>¡Lo logramos!</small></th><th>⭐⭐<small>Casi</small></th><th>⭐<small>Aún no</small></th></tr>${C.map((c, r) => `<tr><td>${esc(c)}</td>${[0, 1, 2].map(q => `<td data-aut="${r}" data-q="${q}"></td>`).join('')}</tr>`).join('')}</table><p class="au-m">🌱 La próxima vez mejoraremos en: <i></i></p></div>`; }
       if (it.k === 'acu') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">🤝 Acuerdos de convivencia</h2><ul class="cv-cards cv-c3">${CV_ACU.map(([i, t]) => `<li class="cv-role"><span>${i}</span><b>${t}</b></li>`).join('')}</ul></div>`;
       if (it.k === 'mq' || it.k === 'aq') { const Q = preguntasDe(it), tt = it.k === 'aq' ? `Sobre la actividad ${it.j}${L(it.x.title) ? ': ' + esc(it.x.title) : ''}` : it.prev ? `Recordamos la sesión ${it.prev.n}` : '¡Empezamos la unidad!';
         return mol(it.k === 'aq' ? 'curiosa' : it.prev ? 'pensativa' : 'hola', `<p class="cv-mqt">${tt}</p><ol>${Q.q.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${Q.wait ? '<p class="cv-think">✨ Molí está leyendo la sesión…</p>' : ''}`); }
@@ -807,6 +811,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       if (sk && P.syk === sk && Sincro.activo()) Sincro.actualizar(syncDe(it));   // ya está en pantalla (llegó lo que pensó Molí): no se reinicia la animación
       else if (GU.has(it.k) && window.Guion && P.guk === claveSl(it) + it.k && Guion.activo()) Guion.dato(sabDe(it));   // ya está en pantalla: no se reinicia
       else { if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); if (window.MoliExp) MoliExp.parar(); P.syk = sk; sl.innerHTML = slide(it); const gu = GU.has(it.k) && window.Guion; P.guk = gu ? claveSl(it) + it.k : ''; if (!gu && it.k !== 'mx') ajustar(sl.firstChild); if (it.k === 'mx') MoliExp.montar(sl.firstChild, P.atras); if (anim) sl.firstChild.classList.add('cv-in'); if (sk) Sincro.montar(sl.firstChild, syncDe(it)); if (gu) Guion.montar(sl.firstChild, it.k, { t: sabDe(it) }); }
+      try { if (it.k === 'aut' && anim) { AUT.src = 'audio/mx/u8-aut-' + (/pair|pareja/.test(it.x.mode || '') ? 'par' : 'eq') + '.mp3'; AUT.currentTime = 0; AUT.play().catch(() => {}); } else if (it.k !== 'aut') AUT.pause(); } catch (e) {}
       if (anim) { clearTimeout(P.avT); if (window.Aviones) Aviones.parar(); if (window.Intro) Intro.parar();
         const u = it.u, AV = { ses: 1, meta: 1, acu: 1, rol: 1, sync: 1, exit: 1 }, sí = u && it.n != null && ((String(u.num) === '7' && it.n >= 7) || String(u.num) === '8'), k = it.k, n = it.n;   // ✈️ avioncitos de adorno (U7 desde la sesión 7 y U8)
         const avion = () => { if (sí && AV[k] && window.Aviones) Aviones.play(k, el, { n }); };
@@ -856,6 +861,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       el.addEventListener('click', e => {
         if (e.target.closest('.cv-add')) { e.stopPropagation(); return formVideo(null); }
         const vb = e.target.closest('[data-vid]'); if (vb) { e.stopPropagation(); const it = P.L[P.i]; if (it && it.k === 'vid') { if (vb.dataset.vid === 'del') quitarVideo(it); else formVideo(CVV.L.find(x => x.id === it.id) || it); } return; }
+        const au = e.target.closest('[data-aut]'); if (au) { e.stopPropagation(); const on = au.classList.contains('on'); au.closest('tr').querySelectorAll('[data-aut]').forEach(c => c.classList.remove('on')); if (!on) au.classList.add('on'); return; }
         const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); mover(+b.dataset.cv); });
       { const ult = () => { for (let k = P.L.length - 1; k >= 0; k--) if (P.L[k].k === 'uni' && P.L[k].ss && P.L[k].ss.length) return k; return -1; }, z = P.L[ult()];   // ⏩ atajo a la unidad que estamos trabajando (la última con sesiones)
         if (z) { const b = document.createElement('button'); b.type = 'button'; b.className = 'cv-atajo'; b.innerHTML = `⏩ Ir a la Unidad ${z.u.num}`; b.title = `Unidad ${z.u.num} · ${z.u.title || ''}`;
@@ -871,7 +877,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
     }
     P.iniciar = () => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b style="font-size:1.4em">🎨 Preparando Mi presentación…</b></div></div>';
       Promise.all([MD.cargar(), CVV.ok ? null : cargarVideos()]).then(() => { let ok = MD.esDocente(); try { ok = ok || sessionStorage.getItem('moli2:cv') === '1'; } catch (e) {} ok ? montar() : gate(); }).catch(() => { host.innerHTML = '<div class="cv"><div class="cv-gate"><b>📶 No pude cargar las sesiones. Revisa tu internet.</b></div></div>'; }); };
-    P.cerrar = () => { P.ro && P.ro.disconnect(); if (window.MoliExp) MoliExp.parar(); clearTimeout(P.avT); if (window.Aviones) Aviones.parar(); if (window.Intro) Intro.parar(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.guk = ''; P.syk = ''; RT.quitar(); };
+    P.cerrar = () => { try { AUT.pause(); } catch (e) {} P.ro && P.ro.disconnect(); if (window.MoliExp) MoliExp.parar(); clearTimeout(P.avT); if (window.Aviones) Aviones.parar(); if (window.Intro) Intro.parar(); if (window.Sincro) Sincro.parar(); if (window.Guion) Guion.parar(); P.guk = ''; P.syk = ''; RT.quitar(); };
     return P;
   }
 
