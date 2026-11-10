@@ -658,7 +658,7 @@
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
           if (String(u.num) === '8' && window.MoliExp && MoliExp.E['8:pro-' + (n === 1 ? 1 : 2)]) Lst.push({ ...b, k: 'mx', pro: 1, x: { title: 'Equipo Pro' }, j: n === 1 ? 1 : 2 });   // 🏅 Molí enseña las tarjetas del Equipo Pro (completo en la sesión 1, repaso en las demás)
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
-          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); if (window.MoliExp && MoliExp.tiene(u, s, n, j + 1)) Lst.push({ ...b, k: 'mx', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); ficTrozos(fichaParte(s, j + 1)).forEach((_, q) => Lst.push({ ...b, k: 'fic', x, j: j + 1, p: q ? 'f' + (q + 1) : '' })); if (x.cu) Lst.push({ ...b, k: 'cu', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); if (String(u.num) === '8' && /group|grupo|pair|pareja/.test(x.mode || '')) Lst.push({ ...b, k: 'aut', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
+          acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); (x.not || []).forEach((_, q) => Lst.push({ ...b, k: 'not', x, j: j + 1, p: 'n' + q })); if (window.MoliExp && MoliExp.tiene(u, s, n, j + 1)) Lst.push({ ...b, k: 'mx', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); ficTrozos(fichaParte(s, j + 1)).forEach((_, q) => Lst.push({ ...b, k: 'fic', x, j: j + 1, p: q ? 'f' + (q + 1) : '' })); if (x.cu) Lst.push({ ...b, k: 'cu', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); if (String(u.num) === '8' && /group|grupo|pair|pareja/.test(x.mode || '')) Lst.push({ ...b, k: 'aut', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(SB) && !sj) Lst.push({ ...b, k: 'sab' });
           Lst.push({ ...b, k: 'ref' }, { ...b, k: 'exit' }, { ...b, k: 'exa' });
         });
@@ -749,6 +749,16 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       if (it.k === 'vid') return slideVideo(it);
       if (it.k === 'sync') return Sincro.html(syncDe(it));
       if (it.k === 'mx') return MoliExp.html(it.pro ? 'pro' : it.n, it.j, it.x, String(it.u.num));                // Molí explica la actividad (moli-explica.js)
+      if (it.k === 'not') { const N = it.x.not[+it.p.slice(1)] || {}, B = s => esc(s || '').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'), [c1, c2] = it.n % 2 ? ['#9d174d', '#db2777'] : ['#1e3a8a', '#2563eb'];   // 📰 la noticia (lectura de la actividad)
+        let cu = '';
+        if (N.t) cu += `<p class="nt-t">${B(N.t)}</p>`;
+        if (N.it) cu += `<div class="nt-it">${N.it.map(([h, x]) => `<div><b>${B(h)}</b><span>${B(x)}</span></div>`).join('')}</div>`;
+        if (N.ruta) cu += `<div class="nt-ruta">${N.ruta.map(x => `<span>${B(x)}</span>`).join('<i>➜</i>')}</div>`;
+        if (N.fa) cu += `<div class="nt-fa">${N.fa.map(([h, d, x], q) => `<div class="f${q}"><b>${B(h)}</b><small>${B(d)}</small><span>${B(x)}</span></div>`).join('')}</div>`;
+        if (N.t2) cu += `<p class="nt-t">${B(N.t2)}</p>`;
+        if (N.sab) cu += `<div class="nt-sab">💡 <b>¿Sabías que…?</b> ${B(N.sab)}</div>`;
+        return `<div class="cv-sl cv-not" style="--c1:${c1};--c2:${c2}">${crumb(it)}<div class="nt-pap"><div class="nt-top"><span>📰 El Diario Científico de 6.°</span><small>Actividad ${it.j} · Leemos la noticia · ${+it.p.slice(1) + 1}/${it.x.not.length}</small></div>
+          ${N.sec ? `<span class="nt-sec">${B(N.sec)}</span>` : ''}<h2 class="${N.big ? 'big' : ''}">${B(N.h)}</h2>${cu}</div></div>`; }
       if (it.k === 'ej' || it.k === 'nx' || it.k === 'cu') { const ok = it.k !== 'nx', cu = it.k === 'cu', E = (cu ? it.x.cu : ok ? it.x.ej : it.x.nx) || {}, [c1, c2] = cu ? ['#1e3a8a', '#3b82f6'] : ok ? ['#065f46', '#10b981'] : ['#7f1d1d', '#ef4444'];   // ✅ ejemplo / ❌ contraejemplo de la actividad
         const gr = G => { const v = G.v || [], mx = Math.max(0.5, ...v.map(z => +z[1] || 0)), top = Math.ceil(mx / 0.5) * 0.5 + 0.5, H = 200, W = 560, x0 = 70, y0 = 230, bw = Math.min(110, (W - x0 - 30) / v.length - 40), CL = ['#60a5fa', '#34d399', '#fbbf24', '#f472b6'];   // 📊 gráfico de barras de ejemplo
           const yy = c => y0 - c / top * H, f1 = c => String(c.toFixed(1)).replace('.', ',');
