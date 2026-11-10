@@ -757,8 +757,9 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
         if (N.fa) cu += `<div class="nt-fa">${N.fa.map(([h, d, x], q) => `<div class="f${q}"><b>${B(h)}</b><small>${B(d)}</small><span>${B(x)}</span></div>`).join('')}</div>`;
         if (N.t2) cu += `<p class="nt-t">${B(N.t2)}</p>`;
         if (N.sab) cu += `<div class="nt-sab">💡 <b>¿Sabías que…?</b> ${B(N.sab)}</div>`;
-        return `<div class="cv-sl cv-not" style="--c1:${c1};--c2:${c2}">${crumb(it)}<div class="nt-pap"><div class="nt-top"><span>📰 El Diario Científico de 6.°</span><small>Actividad ${it.j} · Leemos la noticia · ${+it.p.slice(1) + 1}/${it.x.not.length}</small></div>
-          ${N.sec ? `<span class="nt-sec">${B(N.sec)}</span>` : ''}<h2 class="${N.big ? 'big' : ''}">${B(N.h)}</h2>${cu}</div></div>`; }
+        const ancho = N.it || N.fa || N.ruta, fig = N.ico && !ancho ? `<div class="nt-fig"><i>${esc(N.ico)}</i>${N.big ? `<img src="${IMG('curiosa')}" alt="">` : ''}</div>` : '';
+        return `<div class="cv-sl cv-not" style="--c1:${c1};--c2:${c2}">${crumb(it)}<div class="nt-pap"><div class="nt-mast"><span class="nt-logo">📰 El Diario Científico <em>de 6.°</em></span><small>Actividad ${it.j} · Leemos la noticia<br>Página ${+it.p.slice(1) + 1} de ${it.x.not.length}</small></div>
+          <div class="nt-cuerpo"><div class="nt-main">${N.sec ? `<span class="nt-sec">${ancho && N.ico ? esc(N.ico) + ' ' : ''}${B(N.sec)}</span>` : ''}<h2 class="${N.big ? 'big' : ''}">${B(N.h)}</h2>${cu}</div>${fig}</div></div></div>`; }
       if (it.k === 'ej' || it.k === 'nx' || it.k === 'cu') { const ok = it.k !== 'nx', cu = it.k === 'cu', E = (cu ? it.x.cu : ok ? it.x.ej : it.x.nx) || {}, [c1, c2] = cu ? ['#1e3a8a', '#3b82f6'] : ok ? ['#065f46', '#10b981'] : ['#7f1d1d', '#ef4444'];   // ✅ ejemplo / ❌ contraejemplo de la actividad
         const gr = G => { const v = G.v || [], mx = Math.max(0.5, ...v.map(z => +z[1] || 0)), top = Math.ceil(mx / 0.5) * 0.5 + 0.5, H = 200, W = 560, x0 = 70, y0 = 230, bw = Math.min(110, (W - x0 - 30) / v.length - 40), CL = ['#60a5fa', '#34d399', '#fbbf24', '#f472b6'];   // 📊 gráfico de barras de ejemplo
           const yy = c => y0 - c / top * H, f1 = c => String(c.toFixed(1)).replace('.', ',');

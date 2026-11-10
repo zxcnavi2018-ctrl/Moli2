@@ -1030,26 +1030,26 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 @keyframes auOk { 0% { transform: scale(0) rotate(-40deg); } 100% { transform: scale(1); } }
 .au-m { margin: 0; color: #fff; font-weight: 900; font-size: .9em; display: flex; gap: .4em; align-items: flex-end; } .au-m i { flex: 1; border-bottom: .12em dashed rgba(255,255,255,.75); height: 1em; }
 .au-n { display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: #7c3aed; color: #fff; font-size: .8em; font-weight: 900; margin-right: .45em; vertical-align: .1em; }
-/* 📰 la noticia de la actividad (lectura para proyectar, letra grande) */
+/* 📰 la noticia de la actividad: «El Diario Científico de 6.°» (para proyectar, letra grande) */
 .cv-not { justify-content: flex-start; padding-top: 2.2em; }
-.cv-not .nt-pap { flex: 1; display: flex; flex-direction: column; background: #fbf7ee; color: #1f2937; border-radius: .8em; padding: .7em 1.2em .8em; box-shadow: 0 .4em 1.2em rgba(0,0,0,.25); text-align: left; min-height: 0; }
-.nt-top { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: .22em double #1f2937; padding-bottom: .2em; margin-bottom: .45em; }
-.nt-top span { font: 800 1.35em Georgia, 'Times New Roman', serif; } .nt-top small { font-weight: 700; font-size: .7em; color: #6b7280; }
-.nt-sec { align-self: flex-start; background: var(--c2); color: #fff; font-weight: 800; font-size: .72em; letter-spacing: .12em; padding: .15em .6em; border-radius: .3em; margin-bottom: .3em; }
-.cv-not h2 { font: 800 2em/1.08 Georgia, 'Times New Roman', serif; margin: 0 0 .35em; color: #111827; } .cv-not h2.big { font-size: 2.6em; }
-.nt-t { font-size: 1.32em; line-height: 1.42; font-weight: 600; margin: 0 0 .45em; } .cv-not b { color: var(--c2); }
-.nt-it { display: grid; grid-template-columns: repeat(auto-fit, minmax(10em, 1fr)); gap: .5em; }
-.nt-it div { background: #fff; border-left: .35em solid var(--c2); border-radius: .5em; padding: .45em .65em; font-size: 1.1em; line-height: 1.3; box-shadow: 0 .1em .4em rgba(0,0,0,.08); }
-.nt-it div b { display: block; font-size: 1.12em; margin-bottom: .1em; }
-.nt-ruta { display: flex; flex-wrap: wrap; align-items: center; gap: .35em; margin: .2em 0 .6em; } .nt-ruta span { background: #fff; border: .15em solid var(--c2); border-radius: .6em; padding: .35em .6em; font-weight: 800; font-size: 1.1em; } .nt-ruta i { font-style: normal; color: var(--c2); font-size: 1.4em; }
-.nt-fa { display: grid; grid-template-columns: repeat(4, 1fr); gap: .45em; } .nt-fa div { border-radius: .6em; padding: .5em .6em; font-size: 1.05em; line-height: 1.3; } .nt-fa div b { display: block; font-size: 1.08em; color: #111827; } .nt-fa small { display: block; font-weight: 800; opacity: .7; margin-bottom: .2em; }
+.cv-not .nt-pap { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #fffdf8; color: #1f2937; border-radius: .9em; overflow: hidden; box-shadow: 0 .5em 1.4em rgba(0,0,0,.3); text-align: left; position: relative;
+  background-image: linear-gradient(transparent calc(100% - 1px), rgba(15,23,42,.04) 1px); background-size: 100% 1.6em; }
+.nt-mast { display: flex; justify-content: space-between; align-items: center; gap: 1em; padding: .45em 3.6em .45em 1.1em; background: linear-gradient(90deg, var(--c1), var(--c2)); color: #fff; }
+.nt-logo { font: 800 1.7em Georgia, 'Times New Roman', serif; letter-spacing: .01em; white-space: nowrap; } .nt-logo em { font-style: italic; color: #fde68a; }
+.nt-mast small { font-weight: 800; font-size: .85em; opacity: .9; text-align: right; }
+.nt-cuerpo { flex: 1; min-height: 0; display: flex; align-items: center; gap: 1.2em; padding: .7em 3.6em .9em 1.3em; }
+.nt-main { flex: 1; min-width: 0; }
+.nt-sec { display: inline-flex; align-items: center; gap: .4em; background: color-mix(in srgb, var(--c2) 14%, #fff); color: var(--c1); font-weight: 900; font-size: 1em; letter-spacing: .1em; padding: .25em .8em; border-radius: 99em; margin-bottom: .45em; border: .1em solid color-mix(in srgb, var(--c2) 35%, #fff); }
+.cv-not h2 { font: 800 3em/1.06 Georgia, 'Times New Roman', serif; margin: 0 0 .35em; color: #0f172a; padding-bottom: .2em; background: linear-gradient(90deg, var(--c2), transparent) bottom left / 40% .12em no-repeat; }
+.cv-not h2.big { font-size: 3.9em; }
+.nt-t { font-size: 2.05em; line-height: 1.38; font-weight: 600; margin: 0 0 .4em; } .cv-not .nt-main b { color: var(--c1); background: color-mix(in srgb, var(--c2) 12%, transparent); border-radius: .2em; padding: 0 .12em; }
+.nt-fig { flex: none; width: 13em; height: 13em; border-radius: 50%; display: grid; place-items: center; position: relative; background: radial-gradient(circle at 35% 30%, #fff, color-mix(in srgb, var(--c2) 22%, #fff)); border: .35em solid color-mix(in srgb, var(--c2) 45%, #fff); box-shadow: 0 .5em 1.2em rgba(0,0,0,.15); }
+.nt-fig i { font-style: normal; font-size: 7em; line-height: 1; filter: drop-shadow(0 .06em .1em rgba(0,0,0,.2)); }
+.nt-fig img { position: absolute; right: -1.6em; bottom: -1.2em; height: 9em; width: auto; }
+.nt-it { display: grid; grid-template-columns: repeat(auto-fit, minmax(9em, 1fr)); gap: .7em; }
+.nt-it div { background: #fff; border-radius: .8em; padding: .7em .9em; font-size: 1.65em; line-height: 1.3; box-shadow: 0 .2em .6em rgba(0,0,0,.1); border-top: .35em solid var(--c2); }
+.nt-it div b { display: block; font: 800 1.2em Georgia, serif; color: var(--c1) !important; background: none !important; margin-bottom: .15em; }
+.nt-ruta { display: flex; flex-wrap: wrap; align-items: center; gap: .4em; margin: .3em 0 .7em; } .nt-ruta span { background: #fff; border: .14em solid var(--c2); border-radius: .7em; padding: .4em .7em; font-weight: 800; font-size: 1.7em; box-shadow: 0 .15em .4em rgba(0,0,0,.08); } .nt-ruta i { font-style: normal; color: var(--c2); font-size: 2.1em; font-weight: 900; }
+.nt-fa { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6em; } .nt-fa div { border-radius: .8em; padding: .6em .7em; font-size: 1.5em; line-height: 1.3; box-shadow: 0 .15em .4em rgba(0,0,0,.08); } .nt-fa div b { display: block; font: 800 1.15em Georgia, serif; color: #0f172a !important; background: none !important; } .nt-fa small { display: block; font-weight: 800; opacity: .7; margin-bottom: .2em; }
 .nt-fa .f0 { background: #fee2e2; } .nt-fa .f1 { background: #fde7f1; } .nt-fa .f2 { background: #ede4ff; } .nt-fa .f3 { background: #e0f2fe; }
-.nt-sab { margin-top: auto; background: #fff7d6; border: .12em dashed #eab308; border-radius: .6em; padding: .4em .7em; font-size: 1.12em; font-weight: 700; }
-.nt-sab b { color: #92400e; }
-.nt-top span { font-size: 1.6em; } .nt-top small { font-size: .9em; } .nt-sec { font-size: 1em; margin-top: auto; }
-.cv-not h2 { font-size: 3.1em; } .cv-not h2.big { font-size: 4em; }
-.nt-t { font-size: 2.15em; line-height: 1.38; }
-.nt-it div { font-size: 1.75em; padding: .5em .7em; } .nt-ruta span { font-size: 1.8em; } .nt-ruta i { font-size: 2.2em; }
-.nt-fa div { font-size: 1.6em; } .nt-sab { font-size: 1.7em; margin-top: .4em; }
-.nt-pap > :last-child { margin-bottom: auto; }
-.cv-not .nt-pap { padding-right: 3.4em; }
+.nt-sab { margin-top: .5em; background: #fff7d6; border-left: .35em solid #eab308; border-radius: .6em; padding: .5em .8em; font-size: 1.6em; font-weight: 700; } .nt-sab b { color: #92400e !important; background: none !important; }

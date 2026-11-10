@@ -29,19 +29,23 @@ window.MX8 = {
       { m: 'decidida', t: 'Escribe el significado con tus palabras, no lo copies. Así lo entiendes de verdad.', a: [{ k: 'ok', x: '✍️ Con mis propias palabras' }] },
       { m: 'genial', t: 'Seguiremos completando tu diccionario en cada sesión. ¡Al final tendrás un gran tesoro científico!', a: [{ k: 'dato', x: '📖 Mi diccionario crece cada clase' }] }],
     '2-1': [
+      { m: 'hola', t: '¡Llegó una noticia al Diario Científico de sexto! Hoy la leeremos juntos.', a: [{ k: 'tag', x: '📰 Leemos la noticia · Cuaderno' }, { k: 'tit', x: '📰 El Diario Científico de 6.°' }] },
+      { m: 'curiosa', t: 'Mientras leemos, busca los nombres de los órganos, y fíjate para qué sirve cada uno.', a: [{ k: 'chips', x: ['🔎 Los órganos', '⚙️ Su función'] }] },
+      { m: 'pensativa', t: 'Anota en tu cuaderno las palabras nuevas: testículos, escroto, conductos deferentes, vesícula seminal, uretra y pene.', a: [{ k: 'nota', x: '📓 Testículos · escroto · conductos deferentes · vesícula seminal · uretra · pene' }] },
+      { m: 'genial', t: '¡Con esta noticia y el video, después completarás tu cuadro de apuntes!', a: [{ k: 'ok', x: '➡️ Luego: el cuadro de apuntes' }] }],
+    '2-2': [
       { m: 'hola', t: 'Hoy conoceremos el sistema reproductor masculino. Tomaremos apuntes de un video, cada uno en su cuaderno.', a: [{ k: 'tag', x: '🧑 Individual · Cuaderno' }] },
       { m: 'curiosa', t: 'Veremos el video dos veces: la primera de corrido, para entender. La segunda con pausas, para tomar apuntes.', a: [{ k: 'fila', n: 1, i: '👀', x: '1.ª vez: de corrido' }, { k: 'fila', n: 2, i: '⏸️', x: '2.ª vez: con pausas y apuntes' }] },
       { m: 'pensativa', t: 'Copien el cuadro: cada órgano, si es interno o externo, sus características, su función y un dato interesante.', a: [{ k: 'tabla', c: ['Órgano', 'Interno o externo', 'Función'], d: [['Testículos', '', ''], ['Conductos deferentes', '', ''], ['Uretra', '', ''], ['Vesícula seminal', '', ''], ['Pene', '', ''], ['Escroto', '', '']] }] },
       { m: 'idea', t: 'Por ejemplo: los testículos son externos, están dentro del escroto, y producen los espermatozoides y la testosterona.', a: [{ k: 'dato', x: '🔵 Testículos · externos · producen espermatozoides y testosterona' }] },
       { m: 'decidida', t: '¡Muy importante! Sintetizar no es copiar. Escribe ideas cortas, con tus palabras y con lenguaje científico.', a: [{ k: 'ok', x: '✂️ Ideas cortas · 🔬 lenguaje científico' }] },
       { m: 'genial', t: '¡Listos para tomar apuntes como verdaderos científicos!', a: [] }],
-    '2-2': [
-      { m: 'hola', t: 'Ahora trabajamos en dúos: vamos a revisar los apuntes del compañero.', a: [{ k: 'tag', x: '👫 En dúo · Cuaderno' }] },
-      { m: 'pensativa', t: 'Intercambien cuadernos. Revisen tres criterios: identifica los órganos, detalla sus funciones, y las ideas son claras con letra legible.', a: [{ k: 'tabla', c: ['Criterio', '⭐ o 🌠'], d: [['Identifica los órganos', ''], ['Detalla las funciones', ''], ['Ideas claras y letra legible', '']] }] },
-      { m: 'idea', t: 'Usamos la estrategia tres estrellas y un deseo. Una estrella por cada criterio que cumple.', a: [{ k: 'tit', x: '⭐⭐⭐ + 🌠' }] },
-      { m: 'curiosa', t: 'El deseo es una oportunidad de mejora: una idea amable para que tu compañero mejore.', a: [{ k: 'nota', x: '🌠 Mi deseo para ti es ________.' }] },
-      { m: 'decidida', t: 'Opinamos con respeto: primero lo bueno, después el deseo.', a: [{ k: 'ok', x: '💛 Primero lo bueno · luego el deseo' }] },
-      { m: 'genial', t: 'Y para la próxima clase, en casa, verás el video del sistema femenino y completarás tu cuadro. ¡Buen trabajo!', a: [{ k: 'dato', x: '🏠 Flipped: sistema reproductor femenino' }] }],
+    '2-3': [
+      { m: 'hola', t: 'Ahora compartimos en equipo. Primero, cada uno escribe su descripción con el andamio y sus apuntes.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }] },
+      { m: 'pensativa', t: 'El andamio te ayuda: el sistema reproductor masculino se encarga de… sus órganos principales son… y así, hasta completar todo.', a: [{ k: 'nota', x: 'El sistema reproductor masculino se encarga de ____. Sus órganos principales son ____.' }] },
+      { m: 'decidida', t: 'Luego, el portavoz del equipo lee en voz alta la descripción. Los demás escuchan y la comparan con lo que escribieron.', a: [{ k: 'fila', n: 1, i: '✍️', x: 'Cada uno completa el andamio' }, { k: 'fila', n: 2, i: '🎤', x: 'El portavoz lee en voz alta' }, { k: 'fila', n: 3, i: '👂', x: 'Los demás comparan y escuchan' }] },
+      { m: 'idea', t: 'Si les faltó algo, lo agregan con otro color. ¡Así aprendemos entre todos!', a: [{ k: 'chips', x: ['🖍️ Agrego con otro color', '🤝 Aprendemos juntos'] }] },
+      { m: 'genial', t: 'Y en casa, verás el video del sistema femenino y completarás tu cuadro. ¡Buen trabajo, equipo!', a: [{ k: 'ok', x: '🏠 Flipped: video del sistema femenino' }] }],
     '3-1': [
       { m: 'hola', t: 'Hoy conocemos el sistema reproductor femenino y el ciclo ovárico. Trabajamos en parejas y en el cuaderno.', a: [{ k: 'tag', x: '👫 En pareja · Cuaderno' }] },
       { m: 'curiosa', t: 'Recordemos sus órganos: los ovarios, las trompas de Falopio, el útero y la vagina.', a: [{ k: 'chips', x: ['🌸 Ovarios', '〰️ Trompas de Falopio', '🫖 Útero', '🚪 Vagina'] }] },
