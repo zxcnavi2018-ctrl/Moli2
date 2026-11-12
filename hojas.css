@@ -1087,3 +1087,33 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .rq-tit { font-size: 2.8em; } .rq-b { grid-template-columns: 1fr 1fr; } .rq-mo img { height: 12em; }
 .rq-bub { padding: .9em 1.2em; } .rq-n { font-size: 1.2em; } .rq-q { font-size: 2.5em; } .rq-r { font-size: 2.3em; }
 .rq-jaula svg { max-height: 66vh; } .rq-btn { font-size: 1.8em; }
+/* 🌸 el ciclo ovárico: rueda de 28 días y el calendario de Clara (paso a paso con A) */
+.cv-ciclo { justify-content: flex-start; gap: .4em; padding-top: 2.2em; background: radial-gradient(90% 80% at 50% 0, #4c1d95, #1e1036 70%) !important; color: #fff; overflow: hidden; }
+.cc-tit { font: 900 2.6em/1.1 system-ui; color: #fbcfe8; text-align: center; text-shadow: 0 .08em 0 #831843; } .cc-tit small { display: block; font-size: .4em; color: #e9d5ff; text-shadow: none; font-weight: 800; }
+.cc-b { flex: 1; min-height: 0; display: grid; grid-template-columns: .9fr 1.1fr; gap: 1em; align-items: center; }
+.cc-mo { display: flex; align-items: flex-end; gap: .6em; } .cc-mo img { height: 11em; width: auto; flex: none; animation: anFlota 3s ease-in-out infinite; }
+.cc-bub { background: #fff; color: #1e293b; border-radius: 1em; padding: .9em 1.1em; box-shadow: 0 .4em 1em rgba(0,0,0,.35); flex: 1; }
+.cc-n { display: inline-block; background: #fce7f3; color: #9d174d; font-weight: 900; padding: .1em .6em; border-radius: 99em; font-size: 1.1em; }
+.cc-bub p { font: 700 1.8em/1.3 system-ui; margin: .3em 0 0; } .cc-bub p.nue { animation: tlSub .6s ease-out both; }
+.cc-pan { position: relative; height: 100%; display: grid; } .cc-v1, .cc-v2 { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity .7s, transform .7s; }
+.cc-rueda { width: 100%; max-height: 50vh; overflow: visible; animation: ccEntra 1s cubic-bezier(.3,1.4,.5,1) both; } @keyframes ccEntra { from { transform: scale(.3) rotate(-90deg); opacity: 0; } }
+.cc-aguja { transform-origin: 150px 150px; animation: ccGira 9s linear infinite; } @keyframes ccGira { to { transform: rotate(360deg); } }
+.cc-ley { display: flex; flex-wrap: wrap; justify-content: center; gap: .35em; margin-top: .4em; } .cc-ley span { background: color-mix(in srgb, var(--c) 30%, #1e1036); border: .12em solid var(--c); border-radius: 99em; padding: .2em .7em; font-size: 1.15em; } .cc-ley small { opacity: .8; }
+.cc-gen { margin-top: .5em; background: #fef3c7; color: #78350f; border-radius: .8em; padding: .35em .9em; font-size: 1.45em; font-weight: 800; opacity: 0; transform: scale(.5); transition: .6s cubic-bezier(.3,1.6,.5,1); }
+.cv-ciclo[data-paso="1"] .cc-gen { opacity: 1; transform: none; } .cv-ciclo[data-paso="1"] .cc-rueda { animation: ccLatido 1.4s ease-in-out infinite; } @keyframes ccLatido { 50% { transform: scale(.96); } }
+.cc-v2 { opacity: 0; transform: translateY(2em) scale(.95); pointer-events: none; }
+.cv-ciclo[data-paso="2"] .cc-v1, .cv-ciclo[data-paso="3"] .cc-v1, .cv-ciclo[data-paso="4"] .cc-v1 { opacity: 0; transform: scale(.8); }
+.cv-ciclo[data-paso="2"] .cc-v2, .cv-ciclo[data-paso="3"] .cc-v2, .cv-ciclo[data-paso="4"] .cc-v2 { opacity: 1; transform: none; }
+.cc-cal { background: #fff; color: #1e293b; border-radius: 1em; padding: .7em .8em; width: 100%; box-shadow: 0 .5em 1.2em rgba(0,0,0,.35); }
+.cc-mes { font: 900 1.4em system-ui; color: #7c3aed; margin-bottom: .35em; text-align: center; }
+.cc-g { display: grid; grid-template-columns: repeat(7, 1fr); gap: .22em; } .cc-g i { font-style: normal; text-align: center; border-radius: .4em; min-height: 2.2em; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.05em; }
+.cc-dn { font-weight: 900; color: #64748b; min-height: 1.4em !important; } .cc-d { background: #f1f5f9; font-weight: 700; }
+.cc-c small { font-size: .62em; font-weight: 800; opacity: 0; } .cc-c b { font-weight: 900; }
+.cv-ciclo[data-paso="3"] .cc-c:nth-of-type(n) { } 
+.cv-ciclo[data-paso="3"] .cc-c { } 
+.cv-ciclo[data-paso="3"] .cc-g i:nth-child(25) { background: #ef4444; color: #fff; transform: scale(1.18); box-shadow: 0 0 0 .2em #fecaca; transition: .5s cubic-bezier(.3,1.6,.5,1); } .cv-ciclo[data-paso="3"] .cc-g i:nth-child(25) small { opacity: 1; }
+.cv-ciclo[data-paso="4"] .cc-c { background: var(--c); color: #fff; animation: ccPinta .5s var(--q) both; } .cv-ciclo[data-paso="4"] .cc-c small { opacity: 1; }
+@keyframes ccPinta { from { background: #f1f5f9; color: #1e293b; transform: scale(.7); } }
+.cc-nota { margin-top: .5em; text-align: center; font-weight: 800; font-size: 1.2em; color: #1e3a8a; opacity: 0; transition: opacity .6s 1.6s; } .cv-ciclo[data-paso="4"] .cc-nota { opacity: 1; }
+.cv-ciclo .rq-btn { background: linear-gradient(135deg, #f9a8d4, #c084fc); }
+.cv-ciclo .cc-b { padding-right: 3.2em; }
