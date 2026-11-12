@@ -47,17 +47,17 @@ window.MX8 = {
       { m: 'idea', t: 'Si les faltó algo, lo agregan con otro color. ¡Así aprendemos entre todos!', a: [{ k: 'chips', x: ['🖍️ Agrego con otro color', '🤝 Aprendemos juntos'] }] },
       { m: 'genial', t: 'Y en casa, verás el video del sistema femenino y completarás tu cuadro. ¡Buen trabajo, equipo!', a: [{ k: 'ok', x: '🏠 Flipped: video del sistema femenino' }] }],
     '3-1': [
-      { m: 'hola', t: 'Hoy conocemos el sistema reproductor femenino y el ciclo ovárico. Trabajamos en parejas y en el cuaderno.', a: [{ k: 'tag', x: '👫 En pareja · Cuaderno' }] },
+      { m: 'hola', t: 'Hoy conocemos el sistema reproductor femenino y el ciclo ovárico. Primero, cada uno piensa solo, en su cuaderno.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }] },
       { m: 'curiosa', t: 'Recordemos sus órganos: los ovarios, las trompas de Falopio, el útero y la vagina.', a: [{ k: 'chips', x: ['🌸 Ovarios', '〰️ Trompas de Falopio', '🫖 Útero', '🚪 Vagina'] }] },
       { m: 'pensativa', t: 'Ahora piensa: ¿será lo mismo menstruación y ciclo menstrual? ¿Y por qué se le llama ciclo?', a: [{ k: 'tit', x: '🤔 ¿Menstruación = ciclo menstrual?' }] },
-      { m: 'idea', t: 'Copia el cuadro. Primero escribe lo que piensas tú. Luego conversa con tu compañero y escribe lo que piensa él o ella.', a: [{ k: 'tabla', c: ['Pregunta', 'Lo que pienso yo', 'Lo que piensa mi compañero'], d: [['¿Es lo mismo?', '', ''], ['¿Por qué «ciclo»?', '', '']] }] },
+      { m: 'idea', t: 'Copia el cuadro y escribe lo que piensas tú, con tus propias ideas. La última columna la completarás al final de la clase.', a: [{ k: 'tabla', c: ['Pregunta', 'Lo que pienso yo', 'Lo que sé ahora'], d: [['¿Es lo mismo?', '', ''], ['¿Por qué «ciclo»?', '', '']] }] },
       { m: 'decidida', t: 'No importa si no estás seguro: son tus ideas iniciales. ¡Al final de la clase veremos qué cambió!', a: [{ k: 'ok', x: '🔄 Volveremos a estas respuestas al final' }] },
-      { m: 'genial', t: '¡A pensar y conversar!', a: [] }],
+      { m: 'genial', t: '¡A pensar como científicos!', a: [] }],
     '3-2': [
-      { m: 'hola', t: 'Ahora, cada uno construirá su propio organizador del ciclo ovárico.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }] },
+      { m: 'hola', t: 'Ahora construiremos, en parejas, un organizador del ciclo ovárico.', a: [{ k: 'tag', x: '👫 En pareja · Cuaderno' }] },
       { m: 'pensativa', t: 'Primero lee el Anexo cuatro en silencio y subraya las palabras nuevas. ¡Van a tu diccionario científico!', a: [{ k: 'fila', n: 1, i: '📄', x: 'Leo en silencio' }, { k: 'fila', n: 2, i: '🖍️', x: 'Subrayo palabras nuevas' }, { k: 'fila', n: 3, i: '📖', x: 'Las paso a mi diccionario' }] },
       { m: 'curiosa', t: 'El ciclo dura unos veintiocho días y tiene tres fases: la fase folicular, la ovulación, y la fase lútea.', a: [{ k: 'chips', x: ['🌱 Folicular · días 1 a 13', '🥚 Ovulación · día 14', '🫖 Lútea · días 15 a 28'] }] },
-      { m: 'idea', t: 'Copia el organizador: qué le pasa al óvulo, a la pared del útero y a las trompas en cada etapa. Algunas casillas ya tienen una pista.', a: [{ k: 'tabla', c: ['', 'Días 1-5', 'Días 6-13', 'Día 14', 'Días 15-28'], d: [['Óvulo', '', 'Madura', '', ''], ['Pared del útero', 'Se desprende', '', '', 'Se engrosa'], ['Trompas', '', '', '', '']] }] },
+      { m: 'idea', t: 'Copien el organizador: qué le pasa al óvulo, a la pared del útero y a las trompas en cada etapa. Algunas casillas ya tienen una pista.', a: [{ k: 'tabla', c: ['', 'Días 1-5', 'Días 6-13', 'Día 14', 'Días 15-28'], d: [['Óvulo', '', 'Madura', '', ''], ['Pared del útero', 'Se desprende', '', '', 'Se engrosa'], ['Trompas', '', '', '', '']] }] },
       { m: 'decidida', t: 'Recuerden: si el óvulo no es fecundado, la pared del útero se desprende. Eso es la menstruación, y es natural.', a: [{ k: 'ok', x: '🌷 La menstruación es natural' }] },
       { m: 'genial', t: 'Al final, vuelvan a sus respuestas del inicio. ¿Qué cambió? ¡Eso es aprender!', a: [{ k: 'nota', x: '🔄 Antes pensaba… ahora sé…' }] }],
     '4-1': [
