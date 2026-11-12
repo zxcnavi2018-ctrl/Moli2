@@ -643,6 +643,29 @@
     if (x.k === 'cuad') return `<div class="fic-q">${n}<div><p>${esc(corta(x.t, 160))}</p><div class="fic-cuad"></div></div></div>`;
     return `<div class="fic-q">${n}<div><p>${esc(corta(x.t || x.h, 170))}</p>${x.op && x.op.length ? `<div class="fic-op">${x.op.slice(0, 4).map(o => `<span>☐ ${esc(corta(o, 40))}</span>`).join('')}</div>` : `<div class="fic-ln" style="height:${1.5 * Math.min(3, Math.max(1, x.ln || 1))}em">${L(x.f) ? `<span>${esc(corta(x.f, 60))}</span>` : ''}</div>`}</div></div>`;
   }
+  // 🦌 RenoQ: el paso a paso de la diapositiva del reno (lo usa el botón A del mando, un clic o Enter)
+  window.RenoQ = (() => {
+    let ac = null; const A = () => ac || (ac = new (window.AudioContext || window.webkitAudioContext)());
+    const tono = (f, t0, d, v = .2, tipo = 'triangle') => { try { const a = A(), o = a.createOscillator(), g = a.createGain(); o.type = tipo; o.frequency.value = f; g.gain.setValueAtTime(0, a.currentTime + t0); g.gain.linearRampToValueAtTime(v, a.currentTime + t0 + .01); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + t0 + d); o.connect(g).connect(a.destination); o.start(a.currentTime + t0); o.stop(a.currentTime + t0 + d + .05); } catch (e) {} };
+    const sl = () => { const s = document.querySelector('.cv-stage > .cv-reno'); return s && s.offsetParent ? s : null; };
+    function avanzar() {
+      const S = sl(); if (!S) return false; try { A().resume(); } catch (e) {}
+      const Q = JSON.parse(S.dataset.qa || '[]'), k = +(S.dataset.k || 0), ver = S.dataset.ver === '1', b = S.querySelector('.rq-btn');
+      if (k >= 3) return true;
+      if (!ver) {                                                      // muestra la respuesta y abre el candado
+        S.dataset.ver = '1'; const r = S.querySelector('.rq-r'); r.textContent = '✅ ' + Q[k][1]; r.classList.add('on');
+        const c = S.querySelector(`.rq-cand[data-c="${k}"]`); c && c.classList.add('abre'); S.querySelector('.rq-mo img').src = IMG('genial');
+        [880, 1175].forEach((f, j) => tono(f, j * .09, .25, .18)); tono(220, 0, .08, .25, 'square');
+        if (k === 2) { setTimeout(() => { S.classList.add('libre'); [523, 659, 784, 1047, 1319].forEach((f, j) => tono(f, .1 + j * .12, .45, .2)); for (let i = 0; i < 24; i++) [2637, 3136].forEach((f, q) => tono(f, .2 + i * .09 + q * .01, .1, .03)); S.querySelector('.rq-mo img').src = IMG('estrellas'); }, 700);
+          S.dataset.k = 3; b.innerHTML = '🎉 ¡Liberamos al reno! ¡Muy bien!'; return true; }
+        b.innerHTML = '🎮 Presiona <b>A</b> para la siguiente pregunta'; return true; }
+      S.dataset.k = k + 1; S.dataset.ver = '0'; const n = k + 1;      // siguiente pregunta
+      S.querySelector('.rq-n').textContent = `Pregunta ${n + 1} de 3`; const q = S.querySelector('.rq-q'); q.textContent = Q[n][0]; q.classList.remove('nue'); void q.offsetWidth; q.classList.add('nue');
+      S.querySelector('.rq-r').classList.remove('on'); S.querySelector('.rq-r').textContent = ''; S.querySelector('.rq-mo img').src = IMG('pensativa'); tono(660, 0, .12, .12);
+      b.innerHTML = '🎮 Presiona <b>A</b> para ver la respuesta'; return true; }
+    addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && sl() && !/INPUT|TEXTAREA|SELECT|BUTTON/.test((document.activeElement || {}).tagName || '')) { e.preventDefault(); avanzar(); } });
+    return { activo: () => !!sl() && +(sl().dataset.k || 0) < 3, avanzar };
+  })();
   function flujoPresentacion(host) {
     const P = { L: [], i: 0, ia: {}, pide: new Set() }, RT = rutina(host);
     const actOk = x => x && (L(x.title) || L(x.desc));
@@ -653,10 +676,11 @@
         Lst.push({ k: 'uni', u, ss });
         ss.forEach(({ s, n }, q) => {
           const b = { u, s, n, prev: q ? ss[q - 1] : null }, C = cacheIA(hashQ(b)) || {}, SB = sabDe(b);
-          Lst.push({ ...b, k: 'ses' }, { ...b, k: 'meta' }, { ...b, k: 'mq' });
+          const qa = b.prev && ((b.prev.s.ticket && b.prev.s.ticket.questions) || []).filter(x => x && L(x.q) && x.options && x.options[x.answer] != null).slice(0, 3);   // 🦌 3 preguntitas de la clase anterior
+          Lst.push({ ...b, k: 'ses' }, { ...b, k: 'meta' }, qa && qa.length === 3 ? { ...b, k: 'reno', qa } : { ...b, k: 'mq' });
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
-          if (String(u.num) === '8' && window.MoliExp && MoliExp.E['8:pro-' + (n === 1 ? 1 : 2)]) Lst.push({ ...b, k: 'mx', pro: 1, x: { title: 'Equipo Pro' }, j: n === 1 ? 1 : 2 });   // 🏅 Molí enseña las tarjetas del Equipo Pro (completo en la sesión 1, repaso en las demás)
+          // (el Equipo Pro ya no se muestra)
           const acts = actsDe(u, s).slice(0, 3), ok = acts.map((x, j) => actOk(x) ? j + 1 : 0).filter(Boolean), sj = ok.includes(2) ? 2 : ok[ok.length - 1];
           acts.forEach((x, j) => { if (!actOk(x)) return; Lst.push({ ...b, k: 'act', x, j: j + 1 }); (x.not || []).forEach((_, q) => Lst.push({ ...b, k: 'not', x, j: j + 1, p: 'n' + q })); if (window.MoliExp && MoliExp.tiene(u, s, n, j + 1)) Lst.push({ ...b, k: 'mx', x, j: j + 1 }); if (x.en) Lst.push({ ...b, k: 'reto', x, j: j + 1, p: 'en' }, { ...b, k: 'reto', x, j: j + 1, p: x.pistas ? 'pis' : 'fig' }); ficTrozos(fichaParte(s, j + 1)).forEach((_, q) => Lst.push({ ...b, k: 'fic', x, j: j + 1, p: q ? 'f' + (q + 1) : '' })); if (x.cu) Lst.push({ ...b, k: 'cu', x, j: j + 1 }); if (x.ej) Lst.push({ ...b, k: 'ej', x, j: j + 1 }); if (x.nx) Lst.push({ ...b, k: 'nx', x, j: j + 1 }); if (String(u.num) === '8' && /group|grupo|pair|pareja/.test(x.mode || '')) Lst.push({ ...b, k: 'aut', x, j: j + 1 }); Lst.push({ ...b, k: 'aq', x, j: j + 1 }); if (window.Sincro) Lst.push({ ...b, k: 'sync', x, j: j + 1 }); if (L(SB) && j + 1 === sj) Lst.push({ ...b, k: 'sab' }); });
           if (L(SB) && !sj) Lst.push({ ...b, k: 'sab' });
@@ -783,6 +807,18 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
       if (it.k === 'aut') { const par = /pair|pareja/.test(it.x.mode || ''), C = Array.isArray(it.x.auto) && it.x.auto.length ? it.x.auto : ['¿Nuestro trabajo está completo?', '¿La información está organizada y se entiende?', '¿La información es correcta y tiene coherencia?', '¿Usamos lenguaje científico?'];   // 🪞 autoevaluación: ¿nuestro trabajo cumple con lo que debe tener? (Unidad 8)
         return `<div class="cv-sl cv-aut" ${st}>${crumb(it)}<div class="au-h"><img src="${IMG('estrellas')}" alt="Molí"><div><b>🪞 ¡Nos autoevaluamos!</b><small>Actividad ${it.j}${L(it.x.title) ? ' · ' + esc(it.x.title) : ''} · ${par ? 'en pareja' : 'en equipo'}</small></div></div><p class="au-i">Miren su trabajo y revisen pregunta por pregunta: ¿cumple con lo que debe tener? Marquen con honestidad. ✍️ ${par ? 'Cada uno dibuja' : 'El secretario dibuja'} las estrellas en el cuaderno.</p><table class="au-t"><tr><th>¿Nuestro trabajo cumple?</th><th>⭐⭐⭐<small>Sí</small></th><th>⭐⭐<small>En parte</small></th><th>⭐<small>Aún no</small></th></tr>${C.map((c, r) => `<tr><td><span class="au-n">${r + 1}</span>${esc(c)}</td>${[0, 1, 2].map(q => `<td data-aut="${r}" data-q="${q}"></td>`).join('')}</tr>`).join('')}</table><p class="au-m">🌱 Para mejorar nuestro trabajo, haremos: <i></i></p></div>`; }
       if (it.k === 'acu') return `<div class="cv-sl" ${st}>${crumb(it)}<h2 class="cv-h2">🤝 Acuerdos de convivencia</h2><ul class="cv-cards cv-c3">${CV_ACU.map(([i, t]) => `<li class="cv-role"><span>${i}</span><b>${t}</b></li>`).join('')}</ul></div>`;
+      if (it.k === 'reno') {                                            // 🦌🔒 Molí pregunta y con cada «A» se abre un candado; al tercero el reno queda libre
+        const cand = q => `<g class="rq-cand" data-c="${q}" transform="translate(${110 + q * 90} 58)"><path class="rq-asa" d="M-14 0 V-14 a14 14 0 0 1 28 0 V0" fill="none" stroke="#94a3b8" stroke-width="7"/><rect x="-22" y="-2" width="44" height="36" rx="7" fill="#facc15" stroke="#a16207" stroke-width="3"/><circle cx="0" cy="13" r="5" fill="#713f12"/><rect x="-2" y="14" width="4" height="10" fill="#713f12"/><text x="0" y="60" text-anchor="middle" font-size="22" font-weight="900" fill="#fff">${q + 1}</text></g>`;
+        const reno = `<g class="rq-reno"><path d="M150 230 l-8 40 M165 232 l-2 38 M222 232 l4 38 M236 230 l10 36" stroke="#5b3416" stroke-width="10" stroke-linecap="round"/><ellipse cx="192" cy="215" rx="58" ry="30" fill="#8b5a2b"/><ellipse cx="188" cy="226" rx="36" ry="12" fill="#c8a27a"/><path d="M136 205 q-16 -8 -10 -22 q10 6 12 16z" fill="#fff"/>
+          <path d="M226 205 Q246 182 252 158 L272 164 Q262 196 246 216 Z" fill="#8b5a2b"/><path d="M226 208 Q246 196 254 172" stroke="#dc2626" stroke-width="9" fill="none"/><circle cx="244" cy="198" r="7" fill="#facc15" stroke="#a16207" stroke-width="2"/>
+          <path d="M256 150 q-8 -22 -22 -28 M250 136 q-10 -2 -16 -14 M268 148 q4 -22 16 -30 M276 132 q12 -2 14 -14" stroke="#6b3f1d" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <ellipse cx="262" cy="160" rx="21" ry="15" fill="#8b5a2b"/><circle cx="265" cy="154" r="4.5" fill="#111827"/><circle cx="266.5" cy="152.5" r="1.4" fill="#fff"/><circle class="rq-nariz" cx="283" cy="163" r="8" fill="#ef4444"/></g>`;
+        const barras = Array.from({ length: 8 }, (_, q) => `<rect class="rq-bar" x="${48 + q * 40}" y="40" width="9" height="250" rx="4" fill="#475569" style="--d:${q * .06}s"/>`).join('');
+        return `<div class="cv-sl cv-reno" ${st} data-qa='${esc(JSON.stringify(it.qa.map(x => [x.q, x.options[x.answer]])))}'>${crumb(it)}
+          <div class="rq-tit">🦌 ¡Liberemos al reno! <small>Recordamos la sesión ${it.prev.n} · 3 preguntas = 3 candados</small></div>
+          <div class="rq-b"><div class="rq-mo"><img src="${IMG('pensativa')}" alt="Molí"><div class="rq-bub"><span class="rq-n">Pregunta 1 de 3</span><p class="rq-q">${esc(it.qa[0].q)}</p><p class="rq-r"></p></div></div>
+          <div class="rq-jaula"><svg viewBox="0 0 400 320" aria-hidden="true"><ellipse cx="200" cy="292" rx="170" ry="14" fill="rgba(0,0,0,.25)"/>${reno}<g class="rq-rejas"><rect x="36" y="28" width="330" height="16" rx="6" fill="#334155"/>${barras}<rect x="36" y="282" width="330" height="14" rx="6" fill="#334155"/></g>${[0, 1, 2].map(cand).join('')}</svg><div class="rq-chis"></div></div></div>
+          <button type="button" class="rq-btn" onclick="RenoQ.avanzar()">🎮 Presiona <b>A</b> para ver la respuesta</button></div>`; }
       if (it.k === 'mq' || it.k === 'aq') { const Q = preguntasDe(it), tt = it.k === 'aq' ? `Sobre la actividad ${it.j}${L(it.x.title) ? ': ' + esc(it.x.title) : ''}` : it.prev ? `Recordamos la sesión ${it.prev.n}` : '¡Empezamos la unidad!';
         return mol(it.k === 'aq' ? 'curiosa' : it.prev ? 'pensativa' : 'hola', `<p class="cv-mqt">${tt}</p><ol>${Q.q.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${Q.wait ? '<p class="cv-think">✨ Molí está leyendo la sesión…</p>' : ''}`); }
       if (it.k === 'voc' || it.k === 'sab') { const C = cacheIA(hashQ(it)) || {}, w = C.w || {};

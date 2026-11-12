@@ -90,6 +90,7 @@
       if (G.TOUR.i !== 0) return G.go(-G.TOUR.i); return; }
     if (a === 'aceptar') {
       const sh = document.getElementById('sheet'), f = document.activeElement;
+      if (window.RenoQ && RenoQ.activo()) return RenoQ.avanzar();      // 🦌 la diapositiva del reno: A abre el siguiente candado
       if (sh && sh.style.display === 'block' && window.Sincro && Sincro.activo()) return Sincro.avanzar();
       if (sh && sh.style.display === 'block' && window.Guion && Guion.activo()) return Guion.avanzar();   // 🤝👥 acuerdos y roles: A hace el siguiente paso   // 🚩 «Molí nos sincroniza»: A hace el siguiente paso
       if (sh && sh.style.display === 'block' && f && sh.contains(f) && /BUTTON|A/.test(f.tagName)) return f.click();

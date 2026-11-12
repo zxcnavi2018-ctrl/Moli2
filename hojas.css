@@ -1059,3 +1059,31 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .an-tel.canta .tl-main img { animation: tlCanta .6s ease-in-out infinite; } @keyframes tlCanta { 50% { transform: translateY(-1.4vh) rotate(3deg) scale(1.03); } }
 .an-tel.canta .tl-kar { font-size: clamp(30px, 7.2vh, 74px); background: rgba(15,6,26,.6); color: #fde68a; text-shadow: 0 .4vh 0 #9d174d, 0 0 2vh rgba(250,204,21,.6); }
 .an-tel.canta .tl-mus { animation-duration: 1.2s; }
+/* 🦌 ¡Liberemos al reno!: 3 preguntas de la clase anterior = 3 candados */
+.cv-reno { justify-content: flex-start; gap: .4em; padding-top: 2.2em; background: radial-gradient(90% 80% at 50% 0, #1e3a8a, #0b1437 70%) !important; color: #fff; overflow: hidden; }
+.rq-tit { font: 900 2.1em/1.1 system-ui; color: #fde047; text-shadow: 0 .08em 0 #b91c1c; text-align: center; } .rq-tit small { display: block; font-size: .42em; color: #bfdbfe; font-weight: 800; letter-spacing: .04em; margin-top: .2em; text-shadow: none; }
+.rq-b { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.15fr 1fr; gap: 1em; align-items: center; }
+.rq-mo { display: flex; align-items: flex-end; gap: .6em; } .rq-mo img { height: 9em; width: auto; flex: none; animation: anFlota 3s ease-in-out infinite; }
+.rq-bub { background: #fff; color: #1e293b; border-radius: 1em; padding: .7em 1em; box-shadow: 0 .4em 1em rgba(0,0,0,.35); position: relative; flex: 1; }
+.rq-bub::before { content: ''; position: absolute; left: -.6em; bottom: 1.4em; border: .4em solid transparent; border-right: .6em solid #fff; border-left: 0; }
+.rq-n { display: inline-block; background: #dbeafe; color: #1e3a8a; font-weight: 900; font-size: .9em; padding: .1em .6em; border-radius: 99em; }
+.rq-q { font: 800 1.75em/1.25 system-ui; margin: .3em 0 .2em; } .rq-q.nue { animation: tlSub .6s ease-out both; }
+.rq-r { font: 900 1.6em/1.25 system-ui; color: #047857; margin: 0; opacity: 0; transform: scale(.6); transition: .5s cubic-bezier(.3,1.6,.5,1); } .rq-r.on { opacity: 1; transform: none; }
+.rq-jaula { position: relative; } .rq-jaula svg { width: 100%; max-height: 62vh; display: block; overflow: visible; }
+.rq-reno { transform-box: fill-box; transform-origin: center bottom; animation: rqTiembla 1.6s ease-in-out infinite; } @keyframes rqTiembla { 50% { transform: translateY(-3px) rotate(-1deg); } }
+.rq-cand { transition: transform .6s cubic-bezier(.3,1.5,.5,1), opacity .6s; transform-box: fill-box; transform-origin: center; }
+.rq-cand .rq-asa { transition: transform .35s; transform-box: fill-box; transform-origin: right bottom; }
+.rq-cand.abre .rq-asa { transform: translateY(-8px) rotate(30deg); } .rq-cand.abre rect:first-of-type { fill: #4ade80; stroke: #15803d; }
+.rq-cand.abre { animation: rqCae 1s .5s ease-in both; } @keyframes rqCae { to { transform: translateY(200px) rotate(70deg); opacity: 0; } }
+.rq-bar { transition: transform .8s cubic-bezier(.6,.05,.3,1) var(--d); transform-box: fill-box; }
+.cv-reno.libre .rq-rejas { animation: rqRejas 1s ease-in both; } @keyframes rqRejas { to { transform: translateY(-420px); opacity: 0; } }
+.cv-reno.libre .rq-reno { animation: rqVuela 3.2s .6s cubic-bezier(.4,0,.3,1) both; } @keyframes rqVuela { 0% { transform: none; } 25% { transform: translate(10px,-20px) rotate(-8deg); } 100% { transform: translate(520px,-520px) rotate(-18deg) scale(.6); } }
+.cv-reno.libre .rq-nariz { animation: anNariz .4s ease-in-out infinite alternate; }
+.rq-chis { position: absolute; inset: 0; pointer-events: none; } .cv-reno.libre .rq-chis { background: radial-gradient(circle, rgba(253,224,71,.9) 0 2px, transparent 3px) 0 0 / 34px 34px; animation: rqChis 1.6s ease-out both; }
+@keyframes rqChis { from { opacity: 0; transform: scale(.4); } 40% { opacity: 1; } to { opacity: 0; transform: scale(1.4); } }
+.rq-btn { align-self: center; border: 0; border-radius: 99em; padding: .45em 1.4em; font: 800 1.3em system-ui; color: #1e293b; background: linear-gradient(135deg, #fde047, #fb923c); box-shadow: 0 .3em .8em rgba(0,0,0,.35); cursor: pointer; }
+.rq-btn b { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%; background: #dc2626; color: #fff; }
+.cv-reno.libre .rq-btn { background: linear-gradient(135deg, #4ade80, #22d3ee); }
+.rq-tit { font-size: 2.8em; } .rq-b { grid-template-columns: 1fr 1fr; } .rq-mo img { height: 12em; }
+.rq-bub { padding: .9em 1.2em; } .rq-n { font-size: 1.2em; } .rq-q { font-size: 2.5em; } .rq-r { font-size: 2.3em; }
+.rq-jaula svg { max-height: 66vh; } .rq-btn { font-size: 1.8em; }
