@@ -54,10 +54,10 @@ window.MX8 = {
       { m: 'decidida', t: 'No importa si no estás seguro: son tus ideas iniciales. ¡Al final de la clase veremos qué cambió!', a: [{ k: 'ok', x: '🔄 Volveremos a estas respuestas al final' }] },
       { m: 'genial', t: '¡A pensar y conversar!', a: [] }],
     '3-2': [
-      { m: 'hola', t: 'Ahora construiremos, en parejas, un organizador del ciclo ovárico.', a: [{ k: 'tag', x: '👫 En pareja · Cuaderno' }] },
+      { m: 'hola', t: 'Ahora, cada uno construirá su propio organizador del ciclo ovárico.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }] },
       { m: 'pensativa', t: 'Primero lee el Anexo cuatro en silencio y subraya las palabras nuevas. ¡Van a tu diccionario científico!', a: [{ k: 'fila', n: 1, i: '📄', x: 'Leo en silencio' }, { k: 'fila', n: 2, i: '🖍️', x: 'Subrayo palabras nuevas' }, { k: 'fila', n: 3, i: '📖', x: 'Las paso a mi diccionario' }] },
       { m: 'curiosa', t: 'El ciclo dura unos veintiocho días y tiene tres fases: la fase folicular, la ovulación, y la fase lútea.', a: [{ k: 'chips', x: ['🌱 Folicular · días 1 a 13', '🥚 Ovulación · día 14', '🫖 Lútea · días 15 a 28'] }] },
-      { m: 'idea', t: 'Copien el organizador: qué le pasa al óvulo, a la pared del útero y a las trompas en cada etapa. Algunas casillas ya tienen una pista.', a: [{ k: 'tabla', c: ['', 'Días 1-5', 'Días 6-13', 'Día 14', 'Días 15-28'], d: [['Óvulo', '', 'Madura', '', ''], ['Pared del útero', 'Se desprende', '', '', 'Se engrosa'], ['Trompas', '', '', '', '']] }] },
+      { m: 'idea', t: 'Copia el organizador: qué le pasa al óvulo, a la pared del útero y a las trompas en cada etapa. Algunas casillas ya tienen una pista.', a: [{ k: 'tabla', c: ['', 'Días 1-5', 'Días 6-13', 'Día 14', 'Días 15-28'], d: [['Óvulo', '', 'Madura', '', ''], ['Pared del útero', 'Se desprende', '', '', 'Se engrosa'], ['Trompas', '', '', '', '']] }] },
       { m: 'decidida', t: 'Recuerden: si el óvulo no es fecundado, la pared del útero se desprende. Eso es la menstruación, y es natural.', a: [{ k: 'ok', x: '🌷 La menstruación es natural' }] },
       { m: 'genial', t: 'Al final, vuelvan a sus respuestas del inicio. ¿Qué cambió? ¡Eso es aprender!', a: [{ k: 'nota', x: '🔄 Antes pensaba… ahora sé…' }] }],
     '4-1': [
