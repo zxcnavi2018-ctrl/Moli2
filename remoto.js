@@ -69,7 +69,7 @@
   }
   const escenas = () => { const B = [...document.querySelectorAll('#dots button')]; return B.length ? B.map(b => { const t = b.textContent.trim(), i = t.split(' ')[0]; return [i, t.slice(i.length).trim()]; }) : ESC; };   // las escenas reales del aula (incluye las nuevas)
   const ESC = [['🏫', 'Mi aula'], ['📗', 'Sesiones'], ['🎟️', 'Exit tickets'], ['💻', 'Laboratorio'], ['📌', 'Corcho'], ['📂', 'Notas'], ['💪', 'Misiones'], ['📽️', 'Pizarra']];
-  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
+  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['rap', '🎤', 'Rap del ciclo'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
   const GC = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
   let cuerpo = null;
   function abrirControl() {
@@ -250,25 +250,43 @@
   const TEL_TXT = ['¿Cómo están, estos niños tan buenos del sexto A?', 'Hoy les dedico unas palabras…', 'En el poco tiempo que hemos compartido, he aprendido mucho de ustedes… y seguramente, ustedes, mucho de mí.', 'Los felicito: está a punto de culminar una parte importante de su largo camino.', 'Les deseo lo mejor.', 'Atentamente… Molí 💙'];
   const TEL_DUR = [3.1, 2.04, 6.17, 4.92, 1.51, 1.51];
   // 🎤🎶 LA CANCIÓN DE MOLÍ: se abre el telón y Molí canta (canción original, épica) con su orquesta; la letra aparece como karaoke; al final, telón y aplausos
-  const CANCION = { lin: [[4.8, '¡Sexto aaah… prepárense ya!'], [9.6, 'la ciencia nos va a despertar,'], [14.4, 'con cuaderno y lápiz en la mano,'], [19.2, '¡hoy descubrimos el cuerpo humano!'],
-    [24, '🎶 ¡Aprender, aprender,'], [28.8, 'nadie nos va a detener! 🎶'], [33.6, '¡Molí te ayudará,'], [38.4, 'juntos vamos a brillar! ✨'], [43.2, '🎶 ¡Aprender, aprender,'], [48, 'todos vamos a mejorar! 🌟']], d: 4.8, fin: 57.6, dur: 61.9 };
-  function cancion() {
+  const CANCIONES = { cancion: { lin: [[4.8, '¡Sexto aaah… prepárense ya!'], [9.6, 'la ciencia nos va a despertar,'], [14.4, 'con cuaderno y lápiz en la mano,'], [19.2, '¡hoy descubrimos el cuerpo humano!'],
+    [24, '🎶 ¡Aprender, aprender,'], [28.8, 'nadie nos va a detener! 🎶'], [33.6, '¡Molí te ayudará,'], [38.4, 'juntos vamos a brillar! ✨'], [43.2, '🎶 ¡Aprender, aprender,'], [48, 'todos vamos a mejorar! 🌟']], d: 4.8, fin: 57.6, dur: 61.9, mp3: 'cancion' },
+    rap: { lin: [[5.68, "¡Veintiocho días, el ciclo da la vuelta,"],
+    [8.5, "el cuerpo se prepara, la ciencia no es secreta!"],
+    [11.32, "Día uno: menstruación, el endometrio se va,"],
+    [14.15, "es natural y sano, ¡nadie se debe burlar!"],
+    [16.97, "Fase folicular: la FSH despierta,"],
+    [19.79, "madura un óvulo, y el estrógeno se alerta."],
+    [22.62, "Día catorce, ovulación: ¡sale el campeón!"],
+    [25.44, "el óvulo a la trompa, comienza la misión."],
+    [28.27, "¡Ciclo, ciclo, cada mes vuelve a empezar!"],
+    [31.09, "¡Cada cuerpo es distinto, aprende a respetar!"],
+    [33.91, "Fase lútea: progesterona en acción,"],
+    [36.74, "el útero se prepara con dedicación."],
+    [39.56, "Estrógeno y progesterona, hormonas del ovario,"],
+    [42.38, "la FSH y la LH las manda el cerebro a diario."],
+    [45.21, "Si no hay fecundación, el ciclo vuelve a girar,"],
+    [48.03, "y un nuevo día uno empieza a contar."],
+    [50.85, "¡Ciclo, ciclo, cada mes vuelve a empezar!"],
+    [53.68, "¡Cada cuerpo es distinto, aprende a respetar!"]], d: 2.82, fin: 62.12, dur: 66.42, mp3: 'rap', rap: 1 } };
+  function cancion(cual) { const CANCION = CANCIONES[cual] || CANCIONES.cancion, RAP = !!CANCION.rap;
     const fig = n => window.moliDibujo ? moliDibujo(n) : IMG(n);
-    const ORQ = [['🎻', 'feliz'], ['🎺', 'genial'], ['🥁', 'salta'], ['🎸', 'idea'], ['🎻', 'curiosa'], ['🎷', 'estrellas']];
+    const ORQ = RAP ? [['🎧', 'feliz'], ['🎛️', 'genial'], ['🥁', 'salta'], ['🔊', 'idea'], ['🎹', 'curiosa'], ['🎤', 'estrellas']] : [['🎻', 'feliz'], ['🎺', 'genial'], ['🥁', 'salta'], ['🎸', 'idea'], ['🎻', 'curiosa'], ['🎷', 'estrellas']];
     const notas = Array.from({ length: 12 }, (_, q) => `<i class="tl-nota" style="left:${4 + q * 8}%;--d:${3 + q % 3}s;--r:${-q * .5}s">${q % 3 ? '🎵' : '🎶'}</i>`).join('');
     const focos = Array.from({ length: 5 }, (_, q) => `<i class="tl-foco" style="left:${10 + q * 20}%;--r:${q * .3}s;--c:${['#f472b6', '#60a5fa', '#facc15', '#4ade80', '#c084fc'][q]}"></i>`).join('');
-    mostrar(`<div class="an-st an-tel desp canta">${focos}<div class="tl-luz"></div>${notas}<div class="tl-esc"><div class="tl-orq">${ORQ.map(([e, im], q) => `<div class="tl-mus" style="--r:${q * .37}s"><img src="${fig(im)}" alt=""><i>${e}</i></div>`).join('')}</div>
+    mostrar(`<div class="an-st an-tel desp canta${RAP ? ' rap' : ''}">${focos}${RAP ? '<div class="rp-ban">🎤 El Rap del Ciclo Ovárico 🌸</div>' : ''}<div class="tl-luz"></div>${notas}<div class="tl-esc"><div class="tl-orq">${ORQ.map(([e, im], q) => `<div class="tl-mus" style="--r:${q * .37}s"><img src="${fig(im)}" alt=""><i>${e}</i></div>`).join('')}</div>
       <div class="tl-piano"><img src="${fig('genial')}" alt=""><svg viewBox="0 0 220 120" aria-hidden="true"><path d="M10 40 L150 40 Q210 40 212 80 L212 92 L10 92 Z" fill="#111827" stroke="#374151" stroke-width="3"/><path d="M30 40 L110 6 L120 10 L60 40Z" fill="#1f2937"/><rect x="14" y="60" width="140" height="16" fill="#f8fafc"/>${Array.from({ length: 13 }, (_, q) => `<rect x="${20 + q * 10.5}" y="60" width="5" height="9" fill="#111827"/>`).join('')}<rect x="20" y="92" width="8" height="26" fill="#111827"/><rect x="190" y="92" width="8" height="26" fill="#111827"/></svg><i class="tl-notas">🎵</i></div>
       <div class="tl-main"><img src="${fig('estrellas')}" alt=""><svg class="tl-mic" viewBox="0 0 60 200" aria-hidden="true"><rect x="27" y="40" width="6" height="150" fill="#9ca3af"/><ellipse cx="30" cy="194" rx="26" ry="6" fill="#4b5563"/><rect x="18" y="8" width="24" height="38" rx="12" fill="#374151"/><rect x="18" y="8" width="24" height="20" rx="10" fill="#9ca3af"/></svg></div></div>
       <div class="tl-sub tl-kar"></div><div class="tl-cort izq"></div><div class="tl-cort der"></div><div class="tl-val"></div></div>`, CANCION.dur * 1000, 'teatro');
     const S = capa.querySelector('.an-tel'), sub = S.querySelector('.tl-sub'), vivo = () => S.isConnected && capa.classList.contains('on');
-    const au = new Audio('audio/telon/cancion.mp3'); au.volume = 1; let t0 = performance.now(), tick = null;
+    const au = new Audio(`audio/telon/${CANCION.mp3}.mp3`); au.volume = 1; let t0 = performance.now(), tick = null;
     const ahora = () => (au.currentTime > 0 && !au.paused ? au.currentTime : (performance.now() - t0) / 1000);
     au.play().then(() => { t0 = performance.now() - au.currentTime * 1000; }).catch(() => {});
     setTimeout(() => S.classList.add('abre'), 150);
     let iL = -1, cerro = false;
     tick = setInterval(() => { if (!vivo()) { clearInterval(tick); try { au.pause(); } catch (e) {} return; }
-      const t = ahora(); S.style.setProperty('--beat', (t / .6 % 1).toFixed(2));
+      const t = ahora(); S.style.setProperty('--beat', (t / (RAP ? 60 / 85 : .6) % 1).toFixed(2));
       const k = CANCION.lin.findIndex(([a]) => t >= a && t < a + CANCION.d);
       if (k !== iL) { iL = k; if (k >= 0) { sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = CANCION.lin[k][1]; sub.classList.add('ve'); S.classList.add('habla'); } else { S.classList.remove('habla'); if (t > CANCION.lin[CANCION.lin.length - 1][0]) sub.classList.remove('ve'); } }
       if (!cerro && t >= CANCION.fin) { cerro = true; S.classList.remove('abre'); S.classList.add('cierra'); setTimeout(() => { if (vivo()) { sub.textContent = '👏👏👏'; sub.classList.add('ve'); } }, 1500); }
@@ -328,7 +346,7 @@
       return mostrar(`<div class="an-st an-shh2">${nubes}<div class="an-vuelo"><div class="an-estela"></div>${AVION(IMG('decidida'))}</div>
         <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielo'); }
     if (k === 'telon' || k === 'desp') return teatro(k === 'desp');
-    if (k === 'cancion') return cancion();
+    if (k === 'cancion' || k === 'rap') return cancion(k);
     if (k === 'drum' && NAV) { molí3d('feliz', 'saltar');                     // 🥁🦌 Molí toca el tambor en su trineo con renos que flotan: ¡PUM! ¡PUM! ¡PUM! y cascabeles
       for (let i = 0; i < 22; i++) { const t0 = i * .3; tono(i % 3 ? 80 : 70, t0, .3, 'sine', i % 3 ? .55 : .85); ruido(t0, .07, 160, i % 3 ? .35 : .55); }
       for (let i = 0; i < 40; i++) { const t0 = i * .17 + (i % 2) * .05; [2637, 3136, 3520].forEach((f, q) => tono(f + (i % 3) * 40, t0 + q * .012, .18, 'triangle', .035)); }

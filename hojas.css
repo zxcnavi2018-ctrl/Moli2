@@ -1149,3 +1149,12 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .cv-ciclo[data-paso="4"] .cc-nuevo { background: #ef4444; color: #fff; box-shadow: 0 0 0 .2em #fecaca, 0 0 1em #ef4444; animation: ccPinta .5s var(--q) both, ccLate 1s calc(var(--q) + .6s) ease-in-out infinite alternate; } .cv-ciclo[data-paso="4"] .cc-nuevo small { opacity: 1; }
 @keyframes ccLate { to { transform: scale(1.12); } }
 .sc-santa { height: 19em; } .sc-reg { width: 10.5em; } .sc-caja { height: 8.5em; } .sc-tapa { bottom: 8.1em; }
+/* 🎤 el Rap del Ciclo Ovárico */
+.an-tel.rap .tl-luz { background: radial-gradient(50% 60% at 50% 100%, rgba(236,72,153,.45), transparent 70%); }
+.an-tel.rap .tl-piano { display: none; }
+.an-tel.rap .tl-orq { left: 3vw; right: 3vw; width: auto; grid-template-columns: repeat(3, 1fr) 30vw repeat(3, 1fr); bottom: 20vh; }
+.an-tel.rap .tl-orq .tl-mus:nth-child(4) { grid-column: 5; }
+.an-tel.rap .tl-main img { animation: rpFlow .353s ease-in-out infinite alternate; } @keyframes rpFlow { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-1.6vh) rotate(3deg); } }
+.an-tel.rap .tl-kar { color: #a5f3fc; text-shadow: 0 .4vh 0 #7e22ce, 0 0 2vh rgba(34,211,238,.7); font-size: clamp(26px, 6.4vh, 64px); }
+.rp-ban { position: absolute; top: 12vh; left: 50%; transform: translateX(-50%) rotate(-2deg); z-index: 3; font: 900 clamp(24px, 6vh, 60px) system-ui; color: #fff; background: linear-gradient(90deg, #ec4899, #8b5cf6, #22d3ee); padding: .2em .8em; border-radius: .4em; box-shadow: 0 0 3vh rgba(236,72,153,.6); white-space: nowrap; animation: rpBan .706s ease-in-out infinite alternate; }
+@keyframes rpBan { to { transform: translateX(-50%) rotate(2deg) scale(1.04); } }
