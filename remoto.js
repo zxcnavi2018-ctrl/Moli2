@@ -250,8 +250,8 @@
   const TEL_TXT = ['¿Cómo están, estos niños tan buenos del sexto A?', 'Hoy les dedico unas palabras…', 'En el poco tiempo que hemos compartido, he aprendido mucho de ustedes… y seguramente, ustedes, mucho de mí.', 'Los felicito: está a punto de culminar una parte importante de su largo camino.', 'Les deseo lo mejor.', 'Atentamente… Molí 💙'];
   const TEL_DUR = [3.1, 2.04, 6.17, 4.92, 1.51, 1.51];
   // 🎤🎶 LA CANCIÓN DE MOLÍ: se abre el telón y Molí canta (canción original, épica) con su orquesta; la letra aparece como karaoke; al final, telón y aplausos
-  const CANCION = { lin: [[4.8, '¡Sexto A, prepárense ya!'], [9.6, 'la ciencia nos va a despertar,'], [14.4, 'con cuaderno y lápiz en la mano,'], [19.2, '¡hoy descubrimos el cuerpo humano!'],
-    [24, '🎶 ¡Aprender, aprender,'], [28.8, 'nadie nos va a detener! 🎶'], [33.6, '¡Molí y sexto A,'], [38.4, 'juntos vamos a brillar! ✨']], d: 4.8, fin: 48, dur: 52.3 };
+  const CANCION = { lin: [[4.8, '¡Sexto aaah… prepárense ya!'], [9.6, 'la ciencia nos va a despertar,'], [14.4, 'con cuaderno y lápiz en la mano,'], [19.2, '¡hoy descubrimos el cuerpo humano!'],
+    [24, '🎶 ¡Aprender, aprender,'], [28.8, 'nadie nos va a detener! 🎶'], [33.6, '¡Molí te ayudará,'], [38.4, 'juntos vamos a brillar! ✨'], [43.2, '🎶 ¡Aprender, aprender,'], [48, 'todos vamos a mejorar! 🌟']], d: 4.8, fin: 57.6, dur: 61.9 };
   function cancion() {
     const fig = n => window.moliDibujo ? moliDibujo(n) : IMG(n);
     const ORQ = [['🎻', 'feliz'], ['🎺', 'genial'], ['🥁', 'salta'], ['🎸', 'idea'], ['🎻', 'curiosa'], ['🎷', 'estrellas']];
@@ -270,7 +270,7 @@
     tick = setInterval(() => { if (!vivo()) { clearInterval(tick); try { au.pause(); } catch (e) {} return; }
       const t = ahora(); S.style.setProperty('--beat', (t / .6 % 1).toFixed(2));
       const k = CANCION.lin.findIndex(([a]) => t >= a && t < a + CANCION.d);
-      if (k !== iL) { iL = k; if (k >= 0) { sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = CANCION.lin[k][1]; sub.classList.add('ve'); S.classList.add('habla'); } else { S.classList.remove('habla'); if (t > CANCION.lin[7][0]) sub.classList.remove('ve'); } }
+      if (k !== iL) { iL = k; if (k >= 0) { sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = CANCION.lin[k][1]; sub.classList.add('ve'); S.classList.add('habla'); } else { S.classList.remove('habla'); if (t > CANCION.lin[CANCION.lin.length - 1][0]) sub.classList.remove('ve'); } }
       if (!cerro && t >= CANCION.fin) { cerro = true; S.classList.remove('abre'); S.classList.add('cierra'); setTimeout(() => { if (vivo()) { sub.textContent = '👏👏👏'; sub.classList.add('ve'); } }, 1500); }
     }, 100);
   }
