@@ -269,13 +269,25 @@
     [45.21, "Si no hay fecundación, el ciclo vuelve a girar,"],
     [48.03, "y un nuevo día uno empieza a contar."],
     [50.85, "¡Ciclo, ciclo, cada mes vuelve a empezar!"],
-    [53.68, "¡Cada cuerpo es distinto, aprende a respetar!"]], d: 2.82, fin: 62.12, dur: 66.42, mp3: 'rap', rap: 1 } };
+    [53.68, "¡Cada cuerpo es distinto, aprende a respetar!"]], con: {
+      0: [['🔄', 'Ciclo ovárico', 'Cambios que se repiten cada mes (unos 28 días).']],
+      2: [['🩸', 'Menstruación', 'Se desprende la capa interna del útero (días 1 a 5).'], ['🧱', 'Endometrio', 'La capa que recubre el útero por dentro.']],
+      4: [['🌱', 'Fase folicular', 'Días 6 a 13: madura un óvulo en el ovario.'], ['🧠', 'FSH', 'Hormona del cerebro que hace madurar el óvulo.']],
+      5: [['🥚', 'Óvulo', 'La célula sexual femenina (gameto).'], ['🌸', 'Estrógeno', 'Hormona del ovario que engrosa el endometrio.']],
+      6: [['✨', 'Ovulación', 'Día 14: el ovario libera el óvulo.']],
+      7: [['〰️', 'Trompa de Falopio', 'Conducto que lleva el óvulo hacia el útero.']],
+      10: [['🫖', 'Fase lútea', 'Días 15 a 28: el útero se prepara.'], ['💜', 'Progesterona', 'Hormona que mantiene el endometrio listo.']],
+      11: [['🏠', 'Útero', 'Órgano donde puede crecer un bebé.']],
+      12: [['🟣', 'Ovario', 'Produce los óvulos y las hormonas femeninas.']],
+      13: [['🧠', 'LH', 'Hormona del cerebro que provoca la ovulación.'], ['🧠', 'Hipófisis', 'Glándula del cerebro que envía la FSH y la LH.']],
+      14: [['💞', 'Fecundación', 'Unión del óvulo con un espermatozoide.']],
+      15: [['📅', 'Día 1', 'Es el primer día del periodo: empieza un nuevo ciclo.']] }, d: 2.82, fin: 62.12, dur: 66.42, mp3: 'rap', rap: 1 } };
   function cancion(cual) { const CANCION = CANCIONES[cual] || CANCIONES.cancion, RAP = !!CANCION.rap;
     const fig = n => window.moliDibujo ? moliDibujo(n) : IMG(n);
     const ORQ = RAP ? [['🎧', 'feliz'], ['🎛️', 'genial'], ['🥁', 'salta'], ['🔊', 'idea'], ['🎹', 'curiosa'], ['🎤', 'estrellas']] : [['🎻', 'feliz'], ['🎺', 'genial'], ['🥁', 'salta'], ['🎸', 'idea'], ['🎻', 'curiosa'], ['🎷', 'estrellas']];
     const notas = Array.from({ length: 12 }, (_, q) => `<i class="tl-nota" style="left:${4 + q * 8}%;--d:${3 + q % 3}s;--r:${-q * .5}s">${q % 3 ? '🎵' : '🎶'}</i>`).join('');
     const focos = Array.from({ length: 5 }, (_, q) => `<i class="tl-foco" style="left:${10 + q * 20}%;--r:${q * .3}s;--c:${['#f472b6', '#60a5fa', '#facc15', '#4ade80', '#c084fc'][q]}"></i>`).join('');
-    mostrar(`<div class="an-st an-tel desp canta${RAP ? ' rap' : ''}">${focos}${RAP ? '<div class="rp-ban">🎤 El Rap del Ciclo Ovárico 🌸</div>' : ''}<div class="tl-luz"></div>${notas}<div class="tl-esc"><div class="tl-orq">${ORQ.map(([e, im], q) => `<div class="tl-mus" style="--r:${q * .37}s"><img src="${fig(im)}" alt=""><i>${e}</i></div>`).join('')}</div>
+    mostrar(`<div class="an-st an-tel desp canta${RAP ? ' rap' : ''}">${focos}${RAP ? '<div class="rp-ban">🎤 El Rap del Ciclo Ovárico 🌸</div><div class="rp-con"></div>' : ''}<div class="tl-luz"></div>${notas}<div class="tl-esc"><div class="tl-orq">${ORQ.map(([e, im], q) => `<div class="tl-mus" style="--r:${q * .37}s"><img src="${fig(im)}" alt=""><i>${e}</i></div>`).join('')}</div>
       <div class="tl-piano"><img src="${fig('genial')}" alt=""><svg viewBox="0 0 220 120" aria-hidden="true"><path d="M10 40 L150 40 Q210 40 212 80 L212 92 L10 92 Z" fill="#111827" stroke="#374151" stroke-width="3"/><path d="M30 40 L110 6 L120 10 L60 40Z" fill="#1f2937"/><rect x="14" y="60" width="140" height="16" fill="#f8fafc"/>${Array.from({ length: 13 }, (_, q) => `<rect x="${20 + q * 10.5}" y="60" width="5" height="9" fill="#111827"/>`).join('')}<rect x="20" y="92" width="8" height="26" fill="#111827"/><rect x="190" y="92" width="8" height="26" fill="#111827"/></svg><i class="tl-notas">🎵</i></div>
       <div class="tl-main"><img src="${fig('estrellas')}" alt=""><svg class="tl-mic" viewBox="0 0 60 200" aria-hidden="true"><rect x="27" y="40" width="6" height="150" fill="#9ca3af"/><ellipse cx="30" cy="194" rx="26" ry="6" fill="#4b5563"/><rect x="18" y="8" width="24" height="38" rx="12" fill="#374151"/><rect x="18" y="8" width="24" height="20" rx="10" fill="#9ca3af"/></svg></div></div>
       <div class="tl-sub tl-kar"></div><div class="tl-cort izq"></div><div class="tl-cort der"></div><div class="tl-val"></div></div>`, CANCION.dur * 1000, 'teatro');
@@ -288,7 +300,7 @@
     tick = setInterval(() => { if (!vivo()) { clearInterval(tick); try { au.pause(); } catch (e) {} return; }
       const t = ahora(); S.style.setProperty('--beat', (t / (RAP ? 60 / 85 : .6) % 1).toFixed(2));
       const k = CANCION.lin.findIndex(([a]) => t >= a && t < a + CANCION.d);
-      if (k !== iL) { iL = k; if (k >= 0) { sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = CANCION.lin[k][1]; sub.classList.add('ve'); S.classList.add('habla'); } else { S.classList.remove('habla'); if (t > CANCION.lin[CANCION.lin.length - 1][0]) sub.classList.remove('ve'); } }
+      if (k !== iL) { iL = k; const RC = S.querySelector('.rp-con'); if (RC && CANCION.con && k >= 0) { const C = CANCION.con[k]; if (C) RC.innerHTML = C.map(([e, h, x], q) => `<div class="rp-c rp-c${q}"><i>${e}</i><b>${h}</b><span>${x}</span></div>`).join(''); else if (!CANCION.con[k - 1]) RC.innerHTML = ''; } if (k >= 0) { sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = CANCION.lin[k][1]; sub.classList.add('ve'); S.classList.add('habla'); } else { S.classList.remove('habla'); if (t > CANCION.lin[CANCION.lin.length - 1][0]) sub.classList.remove('ve'); } }
       if (!cerro && t >= CANCION.fin) { cerro = true; S.classList.remove('abre'); S.classList.add('cierra'); setTimeout(() => { if (vivo()) { sub.textContent = '👏👏👏'; sub.classList.add('ve'); } }, 1500); }
     }, 100);
   }

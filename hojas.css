@@ -1158,3 +1158,10 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .an-tel.rap .tl-kar { color: #a5f3fc; text-shadow: 0 .4vh 0 #7e22ce, 0 0 2vh rgba(34,211,238,.7); font-size: clamp(26px, 6.4vh, 64px); }
 .rp-ban { position: absolute; top: 12vh; left: 50%; transform: translateX(-50%) rotate(-2deg); z-index: 3; font: 900 clamp(24px, 6vh, 60px) system-ui; color: #fff; background: linear-gradient(90deg, #ec4899, #8b5cf6, #22d3ee); padding: .2em .8em; border-radius: .4em; box-shadow: 0 0 3vh rgba(236,72,153,.6); white-space: nowrap; animation: rpBan .706s ease-in-out infinite alternate; }
 @keyframes rpBan { to { transform: translateX(-50%) rotate(2deg) scale(1.04); } }
+/* 🎤 rap: tarjetitas de conceptos al fondo */
+.rp-con { position: absolute; left: 0; right: 0; top: 22vh; z-index: 1; pointer-events: none; }
+.rp-c { position: absolute; width: 27vw; max-width: 380px; background: rgba(255,255,255,.93); color: #1e293b; border-radius: 1.6vh; padding: 1.2vh 1.4vw; box-shadow: 0 0 3vh rgba(236,72,153,.45), 0 1vh 2vh rgba(0,0,0,.35); border: .5vh solid #c084fc; animation: rpCon .6s cubic-bezier(.3,1.6,.5,1) both, rpFlo 2.4s .6s ease-in-out infinite alternate; }
+.rp-c0 { left: 4vw; transform: rotate(-3deg); } .rp-c1 { right: 4vw; transform: rotate(3deg); border-color: #22d3ee; animation-delay: .35s, 1s; }
+.rp-c i { font-style: normal; font-size: 4.4vh; float: left; margin-right: .8vw; line-height: 1; } .rp-c b { display: block; font: 900 3.2vh/1.1 system-ui; color: #7e22ce; } .rp-c1 b { color: #0e7490; }
+.rp-c span { display: block; font: 700 2.3vh/1.25 system-ui; margin-top: .4vh; }
+@keyframes rpCon { from { opacity: 0; transform: scale(.3) rotate(-12deg); } } @keyframes rpFlo { to { translate: 0 -1.2vh; } }
