@@ -666,7 +666,7 @@
       const Q = JSON.parse(S.dataset.qa || '[]'), k = +(S.dataset.k || 0), ver = S.dataset.ver === '1', b = S.querySelector('.rq-btn');
       if (k >= 3) return true;
       if (!ver) {                                                      // muestra la respuesta y abre el candado
-        S.dataset.ver = '1'; const r = S.querySelector('.rq-r'); r.textContent = '✅ ' + Q[k][1]; r.classList.add('on');
+        S.dataset.ver = '1'; const r = S.querySelector('.rq-r'); r.textContent = '💡 ' + Q[k][1]; r.classList.add('on');
         const c = S.querySelector(`.rq-cand[data-c="${k}"]`); c && c.classList.add('abre'); S.querySelector('.rq-mo img').src = IMG('genial');
         [880, 1175].forEach((f, j) => tono(f, j * .09, .25, .18)); tono(220, 0, .08, .25, 'square');
         if (k === 2) { setTimeout(() => { S.classList.add('libre'); [523, 659, 784, 1047, 1319].forEach((f, j) => tono(f, .1 + j * .12, .45, .2)); for (let i = 0; i < 24; i++) [2637, 3136].forEach((f, q) => tono(f, .2 + i * .09 + q * .01, .1, .03)); S.querySelector('.rq-mo img').src = IMG('estrellas'); }, 700);
@@ -689,7 +689,8 @@
         Lst.push({ k: 'uni', u, ss });
         ss.forEach(({ s, n }, q) => {
           const b = { u, s, n, prev: q ? ss[q - 1] : null }, C = cacheIA(hashQ(b)) || {}, SB = sabDe(b);
-          const qa = b.prev && ((b.prev.s.ticket && b.prev.s.ticket.questions) || []).filter(x => x && L(x.q) && x.options && x.options[x.answer] != null).slice(0, 3);   // 🦌 3 preguntitas de la clase anterior
+          const qa = b.prev && (Array.isArray(s.repaso) && s.repaso.length >= 3 ? s.repaso.slice(0, 3).map(([q, r]) => ({ q, options: [r], answer: 0 }))   // 🦌 3 preguntas abiertas de la clase anterior (o, si no hay, del exit ticket)
+            : ((b.prev.s.ticket && b.prev.s.ticket.questions) || []).filter(x => x && L(x.q) && /^¿/.test(x.q.trim()) && x.options && x.options[x.answer] != null).slice(0, 3));
           Lst.push({ ...b, k: 'ses' }, { ...b, k: 'meta' }, qa && qa.length === 3 ? { ...b, k: 'reno', qa } : { ...b, k: 'mq' });
           if (C.w && L(C.w.p)) Lst.push({ ...b, k: 'voc' });
           Lst.push({ ...b, k: 'rol' }, { ...b, k: 'acu' });
