@@ -69,7 +69,7 @@
   }
   const escenas = () => { const B = [...document.querySelectorAll('#dots button')]; return B.length ? B.map(b => { const t = b.textContent.trim(), i = t.split(' ')[0]; return [i, t.slice(i.length).trim()]; }) : ESC; };   // las escenas reales del aula (incluye las nuevas)
   const ESC = [['🏫', 'Mi aula'], ['📗', 'Sesiones'], ['🎟️', 'Exit tickets'], ['💻', 'Laboratorio'], ['📌', 'Corcho'], ['📂', 'Notas'], ['💪', 'Misiones'], ['📽️', 'Pizarra']];
-  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['rap', '🎤', 'Rap del ciclo'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
+  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['titan', '🔴', 'Modo titán'], ['rap', '🎤', 'Rap del ciclo'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
   const GC = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
   let cuerpo = null;
   function abrirControl() {
@@ -282,6 +282,27 @@
       13: [['🧠', 'LH', 'Hormona del cerebro que provoca la ovulación.'], ['🧠', 'Hipófisis', 'Glándula del cerebro que envía la FSH y la LH.']],
       14: [['💞', 'Fecundación', 'Unión del óvulo con un espermatozoide.']],
       15: [['📅', 'Día 1', 'Es el primer día del periodo: empieza un nuevo ciclo.']] }, d: 2.82, fin: 62.12, dur: 66.42, mp3: 'rap', rap: 1 } };
+  // 🔴 MODO TITÁN: Molí canta una canción épica (original) y de sus ojos salen rayos de luz roja
+  const TITAN = { lin: [[4.8, 'Algo despierta en el salón…'], [9.6, 'la ciencia enciende su poder…'], [14.4, '¡sexto, nadie nos va a detener!'], [19.2, '¡AAAAAAH! 🔴']], rayo: 19.2, fin: 26.5, dur: 30.3 };
+  function titan() {
+    const nav = window.esNavidad && esNavidad(), ojo = nav ? [[39.5, 42.9], [58.6, 42.9]] : [[37, 29], [61, 29]];
+    const brasas = Array.from({ length: 30 }, (_, q) => `<i class="ti-br" style="left:${(q * 37) % 100}%;--d:${3 + q % 4}s;--r:${-q * .4}s;--s:${.4 + (q % 3) * .3}"></i>`).join('');
+    const edif = Array.from({ length: 14 }, (_, q) => `<i class="ti-ed" style="left:${q * 7.4}%;height:${12 + (q * 37) % 22}vh;width:${5 + q % 3}vw"></i>`).join('');
+    mostrar(`<div class="an-st an-titan"><div class="ti-cielo"></div>${brasas}<div class="ti-ciudad">${edif}</div>
+      <div class="ti-mo"><img src="${window.moliDibujo ? moliDibujo('enojado') : IMG('enojado')}" alt="">${ojo.map(([x, y], q) => `<i class="ti-ojo" style="left:${x}%;top:${y}%"><b class="ti-rayo r${q}"></b></i>`).join('')}</div>
+      <div class="ti-tit">🔴 ¡Molí, modo titán!</div><div class="tl-sub ti-kar"></div><div class="ti-flash"></div></div>`, TITAN.dur * 1000, 'titan');
+    const S = capa.querySelector('.an-titan'), sub = S.querySelector('.ti-kar'), vivo = () => S.isConnected && capa.classList.contains('on');
+    const au = new Audio('audio/telon/titan.mp3'); let t0 = performance.now(); au.play().then(() => { t0 = performance.now() - au.currentTime * 1000; }).catch(() => {});
+    const ahora = () => (au.currentTime > 0 && !au.paused ? au.currentTime : (performance.now() - t0) / 1000);
+    let iL = -1, fase = 0;
+    const tk = setInterval(() => { if (!vivo()) { clearInterval(tk); try { au.pause(); } catch (e) {} return; }
+      const t = ahora(); S.style.setProperty('--carga', Math.min(1, t / TITAN.rayo).toFixed(3));
+      const k = TITAN.lin.findIndex(([a], q) => t >= a && (q === TITAN.lin.length - 1 ? t < TITAN.fin : t < TITAN.lin[q + 1][0]));
+      if (k !== iL) { iL = k; if (k >= 0) { sub.classList.remove('ve'); void sub.offsetWidth; sub.textContent = TITAN.lin[k][1]; sub.classList.add('ve'); } else sub.classList.remove('ve'); }
+      if (fase === 0 && t >= TITAN.rayo) { fase = 1; S.classList.add('rayo'); }
+      if (fase === 1 && t >= TITAN.fin) { fase = 2; S.classList.remove('rayo'); S.classList.add('fin'); }
+    }, 80);
+  }
   function cancion(cual) { const CANCION = CANCIONES[cual] || CANCIONES.cancion, RAP = !!CANCION.rap;
     const fig = n => window.moliDibujo ? moliDibujo(n) : IMG(n);
     const ORQ = RAP ? [['🎧', 'feliz'], ['🎛️', 'genial'], ['🥁', 'salta'], ['🔊', 'idea'], ['🎹', 'curiosa'], ['🎤', 'estrellas']] : [['🎻', 'feliz'], ['🎺', 'genial'], ['🥁', 'salta'], ['🎸', 'idea'], ['🎻', 'curiosa'], ['🎷', 'estrellas']];
@@ -359,6 +380,7 @@
         <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielo'); }
     if (k === 'telon' || k === 'desp') return teatro(k === 'desp');
     if (k === 'cancion' || k === 'rap') return cancion(k);
+    if (k === 'titan') return titan();
     if (k === 'drum' && NAV) { molí3d('feliz', 'saltar');                     // 🥁🦌 Molí toca el tambor en su trineo con renos que flotan: ¡PUM! ¡PUM! ¡PUM! y cascabeles
       for (let i = 0; i < 22; i++) { const t0 = i * .3; tono(i % 3 ? 80 : 70, t0, .3, 'sine', i % 3 ? .55 : .85); ruido(t0, .07, 160, i % 3 ? .35 : .55); }
       for (let i = 0; i < 40; i++) { const t0 = i * .17 + (i % 2) * .05; [2637, 3136, 3520].forEach((f, q) => tono(f + (i % 3) * 40, t0 + q * .012, .18, 'triangle', .035)); }

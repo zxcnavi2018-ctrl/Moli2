@@ -1165,3 +1165,23 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .rp-c i { font-style: normal; font-size: 4.4vh; float: left; margin-right: .8vw; line-height: 1; } .rp-c b { display: block; font: 900 3.2vh/1.1 system-ui; color: #7e22ce; } .rp-c1 b { color: #0e7490; }
 .rp-c span { display: block; font: 700 2.3vh/1.25 system-ui; margin-top: .4vh; }
 @keyframes rpCon { from { opacity: 0; transform: scale(.3) rotate(-12deg); } } @keyframes rpFlo { to { translate: 0 -1.2vh; } }
+/* 🔴 Molí modo titán: ciudad en llamas, ojos que se cargan y rayos rojos */
+#anim.titan { background: #0a0204; }
+.an-titan { width: 100vw; height: 100vh; overflow: hidden; box-sizing: border-box; justify-content: flex-end; padding-bottom: 5vh; --carga: 0; }
+.ti-cielo { position: absolute; inset: 0; background: radial-gradient(80% 60% at 50% 100%, rgba(220,38,38,calc(.25 + .5 * var(--carga))), transparent 70%), linear-gradient(180deg, #12030a, #3b0a0a 70%, #7c2d12); }
+.ti-ciudad { position: absolute; left: 0; right: 0; bottom: 0; height: 35vh; } .ti-ed { position: absolute; bottom: 0; background: #0b0b10; box-shadow: inset 0 0 0 .3vh #1f1f2a; background-image: radial-gradient(circle, rgba(251,191,36,.7) 0 .25vh, transparent .35vh); background-size: 1.6vw 2.4vh; }
+.ti-br { position: absolute; bottom: -2vh; width: calc(1.2vh * var(--s)); height: calc(1.2vh * var(--s)); border-radius: 50%; background: #fb923c; box-shadow: 0 0 1.2vh #f97316; animation: tiBr var(--d) linear var(--r) infinite; }
+@keyframes tiBr { to { transform: translate(4vw, -105vh); opacity: 0; } }
+.ti-mo { position: absolute; left: 50%; bottom: 6vh; width: 62vh; transform: translateX(-50%); z-index: 2; animation: tiRespira 2.4s ease-in-out infinite; } .ti-mo img { width: 100%; display: block; filter: drop-shadow(0 0 4vh rgba(239,68,68,calc(.2 + .6 * var(--carga)))); }
+@keyframes tiRespira { 50% { transform: translateX(-50%) translateY(-1vh) scale(1.015); } }
+.ti-ojo { position: absolute; width: 7vh; height: 7vh; margin: -3.5vh 0 0 -3.5vh; border-radius: 50%; background: radial-gradient(circle, #fff 0 18%, #ff2a2a 35%, rgba(255,0,0,0) 70%); opacity: calc(.15 + .85 * var(--carga)); transform: scale(calc(.6 + .9 * var(--carga))); filter: blur(.2vh); }
+.ti-rayo { position: absolute; left: 50%; top: 50%; height: 4vh; width: 0; margin-top: -2vh; transform-origin: left center; border-radius: 99em; background: linear-gradient(90deg, #fff, #ff3b3b 15%, #ff0000 60%, rgba(255,0,0,0)); box-shadow: 0 0 3vh #ff0000, 0 0 8vh #ff4d4d; }
+.ti-rayo.r0 { transform: rotate(-160deg); } .ti-rayo.r1 { transform: rotate(-20deg); }
+.an-titan.rayo .ti-rayo { width: 140vw; animation: tiBarre 1.6s ease-in-out infinite alternate; } .an-titan.rayo .ti-rayo.r0 { animation-name: tiBarre0; }
+@keyframes tiBarre { from { transform: rotate(-35deg); } to { transform: rotate(5deg); } } @keyframes tiBarre0 { from { transform: rotate(-145deg); } to { transform: rotate(-185deg); } }
+.an-titan.rayo .ti-ojo { opacity: 1; transform: scale(1.8); }
+.an-titan.rayo { animation: tiTiembla .12s linear infinite; } @keyframes tiTiembla { 25% { transform: translate(.6vh, -.4vh); } 75% { transform: translate(-.6vh, .4vh); } }
+.ti-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 5; } .an-titan.rayo .ti-flash { animation: tiFlash 1s ease-out; } @keyframes tiFlash { 0% { opacity: .95; } 30% { opacity: .4; background: #ff1a1a; } 100% { opacity: 0; } }
+.an-titan.fin .ti-rayo { width: 0; transition: width .6s; } .an-titan.fin .ti-ojo { opacity: .5; }
+.ti-tit { position: absolute; top: 5vh; left: 50%; transform: translateX(-50%); z-index: 3; font: 900 clamp(26px, 7vh, 70px) system-ui; color: #fecaca; text-shadow: 0 0 2vh #ef4444, 0 .5vh 0 #7f1d1d; white-space: nowrap; }
+.ti-kar { z-index: 4; font-size: clamp(28px, 7vh, 70px); color: #fff; background: rgba(40,0,0,.6); text-shadow: 0 0 2vh #ef4444; }
