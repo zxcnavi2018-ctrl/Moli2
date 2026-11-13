@@ -937,6 +937,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
         if (k === 'ses' && window.Intro) Intro.play(el, { n, titulo: tema(it) }, avion);   // ✨ Molí lee el nombre de la sesión; después despega el avión
         else P.avT = setTimeout(avion, /^(acu|rol|sync)$/.test(k) ? 1500 : 400); }
       if (it.s && it.u && window.Sincro) syncDe({ ...it, j: 1 });
+      window.cvSes = it.u && it.n != null ? { u: String(it.u.num), n: +it.n } : null;   // 🎤 el «+» del mando pone el rap de esta sesión
       if (it.u && it.n != null) RT.sesion(it.u.key + ':' + it.n);                // Molí piensa las preguntas de la sesión desde antes
       if (it.s) { preguntasDe({ ...it, k: 'mq' }); const nx = P.L.slice(P.i + 1).find(z => z.k === 'ses' && !(z.u === it.u && z.n === it.n)); nx && preguntasDe({ ...nx, k: 'mq' }); }
       el.querySelector('.cv-n').textContent = `${P.i + 1} / ${P.L.length}`;
