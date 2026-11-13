@@ -1185,3 +1185,15 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .an-titan.fin .ti-rayo { width: 0; transition: width .6s; } .an-titan.fin .ti-ojo { opacity: .5; }
 .ti-tit { position: absolute; top: 5vh; left: 50%; transform: translateX(-50%); z-index: 3; font: 900 clamp(26px, 7vh, 70px) system-ui; color: #fecaca; text-shadow: 0 0 2vh #ef4444, 0 .5vh 0 #7f1d1d; white-space: nowrap; }
 .ti-kar { z-index: 4; font-size: clamp(28px, 7vh, 70px); color: #fff; background: rgba(40,0,0,.6); text-shadow: 0 0 2vh #ef4444; }
+/* ▶️ animación paso a paso (ruta de la vida, tamaños, ecografía) */
+.cv-pasos { justify-content: flex-start; gap: .4em; padding-top: 2.2em; background: radial-gradient(90% 80% at 50% 0, #0f766e, #062a28 72%) !important; color: #fff; overflow: hidden; }
+.ps-tit { color: #a7f3d0; text-shadow: 0 .08em 0 #064e3b; }
+.ps-b { flex: 1; min-height: 0; display: grid; grid-template-columns: .8fr 1.2fr; gap: 1em; align-items: center; padding-right: 3.2em; }
+.ps-ruta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .3em .2em; }
+.ps-it { opacity: .12; filter: grayscale(1); transform: scale(.85); transition: .6s cubic-bezier(.3,1.5,.5,1); } .ps-it.on { opacity: 1; filter: none; transform: none; }
+.ps-it.ya .ps-card { box-shadow: 0 0 0 .2em #fde047, 0 0 1.4em rgba(253,224,71,.7); transform: scale(1.12); }
+.ps-card { width: 6.2em; background: #fff; color: #0f172a; border-radius: .8em; padding: .35em; text-align: center; transition: .5s; }
+.ps-fig { height: 4.6em; display: grid; place-items: center; } .ps-fig svg { width: 100%; height: 100%; } .ps-emo { font-size: 3.6em; line-height: 1; }
+.ps-card b { display: block; font: 800 .95em/1.1 system-ui; margin-top: .15em; } .ps-fl { font-style: normal; color: #a7f3d0; font-size: 1.4em; opacity: .7; }
+.cv-pasos .rq-btn { background: linear-gradient(135deg, #a7f3d0, #fde047); }
+.ps-card { width: 8.4em; } .ps-fig { height: 6.2em; } .ps-emo { font-size: 4.8em; } .ps-card b { font-size: 1.15em; } .ps-ruta { gap: .5em .3em; }
