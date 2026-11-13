@@ -62,9 +62,8 @@ window.MX8 = {
       { m: 'genial', t: 'Al final, vuelvan a sus respuestas del inicio. ¿Qué cambió? ¡Eso es aprender!', a: [{ k: 'nota', x: '🔄 Antes pensaba… ahora sé…' }] }],
     '4-1': [
       { m: 'hola', t: '¡Llegó la caja sorpresa! Cada uno saca piezas: el óvulo, el espermatozoide, la trompa, el cigoto, el blastocisto y el útero.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '🎁 La caja sorpresa' }, { k: 'chips', x: ['Óvulo', 'Espermatozoide', 'Trompa', 'Cigoto', 'Blastocisto', 'Útero'] }] },
-      { m: 'curiosa', t: 'En tu cuaderno, al lado izquierdo, pega las piezas en el orden que creas correcto. ¡Es la ruta de la vida!', a: [{ k: 'col', i: '🧩', h: 'Lado izquierdo', x: 'Pego mis piezas en orden' }] },
-      { m: 'pensativa', t: 'Al lado derecho responderás las preguntas que te traerá un espermatozoide. ¡Atentos!', a: [{ k: 'col', i: '✍️', h: 'Lado derecho', x: 'Respondo las preguntas' }] },
-      { m: 'idea', t: 'Luego vemos el video de la fecundación y comprobamos si nuestro orden era correcto. Si no, lo corregimos con otro color.', a: [{ k: 'fila', n: 1, i: '📺', x: 'Vemos el video' }, { k: 'fila', n: 2, i: '✅', x: 'Comprobamos el orden' }, { k: 'fila', n: 3, i: '🖍️', x: 'Corregimos con otro color' }] },
+      { m: 'curiosa', t: 'Observa bien tus piezas y copia esta tabla en tu cuaderno: escribe lo que ves, lo que piensas y lo que te preguntas.', a: [{ k: 'tabla', c: ['👀 Veo', '💭 Pienso', '❓ Me pregunto'], d: [['', '', ''], ['', '', ''], ['', '', '']] }] },
+      { m: 'pensativa', t: 'Cuando termines la tabla, un espermatozoide te traerá unas preguntas. Respóndelas en tu cuaderno. ¡Atentos!', a: [{ k: 'col', i: '🏊', h: 'Las preguntas del espermatozoide', x: 'Las respondo en mi cuaderno' }] },
       { m: 'genial', t: '¡A descubrir cómo empieza la vida!', a: [{ k: 'ok', x: '🌱 Todo empieza con una sola célula' }] }],
     '4-2': [
       { m: 'hola', t: 'Ahora leemos la ficha del primer trimestre. Cada uno lee en silencio y subraya las ideas importantes.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '📖 El primer trimestre' }] },
