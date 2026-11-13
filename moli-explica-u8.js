@@ -61,10 +61,10 @@ window.MX8 = {
       { m: 'decidida', t: 'Recuerden: si el óvulo no es fecundado, la pared del útero se desprende. Eso es la menstruación, y es natural.', a: [{ k: 'ok', x: '🌷 La menstruación es natural' }] },
       { m: 'genial', t: 'Al final, vuelvan a sus respuestas del inicio. ¿Qué cambió? ¡Eso es aprender!', a: [{ k: 'nota', x: '🔄 Antes pensaba… ahora sé…' }] }],
     '4-1': [
-      { m: 'hola', t: 'Hoy empezamos con una imagen misteriosa. Obsérvala con atención y escribe en tu cuaderno: veo, pienso, me pregunto.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'chips', x: ['👀 Veo', '💭 Pienso', '❓ Me pregunto'] }] },
-      { m: 'curiosa', t: '¡Llegó la caja sorpresa! Un voluntario saca una tarjeta y la pega en la pizarra. Entre todos ordenamos la ruta de la vida.', a: [{ k: 'tit', x: '🎁 La caja sorpresa' }, { k: 'chips', x: ['Óvulo', 'Espermatozoide', 'Trompa', 'Cigoto', 'Blastocisto', 'Útero'] }] },
-      { m: 'pensativa', t: 'Después vemos el video de la fecundación. Atentos: dónde se unen las células y qué se forma.', a: [{ k: 'fila', n: 1, i: '📺', x: 'Vemos el video' }, { k: 'fila', n: 2, i: '📍', x: '¿Dónde se unen?' }, { k: 'fila', n: 3, i: '🔬', x: '¿Qué se forma?' }] },
-      { m: 'idea', t: 'Al final, cada uno completa el andamio en su cuaderno con tres preguntas.', a: [{ k: 'tabla', c: ['Pregunta', 'Mi respuesta'], d: [['¿Qué células se unen?', ''], ['¿Por qué se unen?', ''], ['¿Qué pasa después?', '']] }] },
+      { m: 'hola', t: '¡Llegó la caja sorpresa! Cada uno saca piezas: el óvulo, el espermatozoide, la trompa, el cigoto, el blastocisto y el útero.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '🎁 La caja sorpresa' }, { k: 'chips', x: ['Óvulo', 'Espermatozoide', 'Trompa', 'Cigoto', 'Blastocisto', 'Útero'] }] },
+      { m: 'curiosa', t: 'En tu cuaderno, al lado izquierdo, pega las piezas en el orden que creas correcto. ¡Es la ruta de la vida!', a: [{ k: 'col', i: '🧩', h: 'Lado izquierdo', x: 'Pego mis piezas en orden' }] },
+      { m: 'pensativa', t: 'Al lado derecho responderás las preguntas que te traerá un espermatozoide. ¡Atentos!', a: [{ k: 'col', i: '✍️', h: 'Lado derecho', x: 'Respondo las preguntas' }] },
+      { m: 'idea', t: 'Luego vemos el video de la fecundación y comprobamos si nuestro orden era correcto. Si no, lo corregimos con otro color.', a: [{ k: 'fila', n: 1, i: '📺', x: 'Vemos el video' }, { k: 'fila', n: 2, i: '✅', x: 'Comprobamos el orden' }, { k: 'fila', n: 3, i: '🖍️', x: 'Corregimos con otro color' }] },
       { m: 'genial', t: '¡A descubrir cómo empieza la vida!', a: [{ k: 'ok', x: '🌱 Todo empieza con una sola célula' }] }],
     '4-2': [
       { m: 'hola', t: 'Ahora leemos la ficha del primer trimestre. Cada uno lee en silencio y subraya las ideas importantes.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '📖 El primer trimestre' }] },

@@ -1197,3 +1197,16 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .ps-card b { display: block; font: 800 .95em/1.1 system-ui; margin-top: .15em; } .ps-fl { font-style: normal; color: #a7f3d0; font-size: 1.4em; opacity: .7; }
 .cv-pasos .rq-btn { background: linear-gradient(135deg, #a7f3d0, #fde047); }
 .ps-card { width: 8.4em; } .ps-fig { height: 6.2em; } .ps-emo { font-size: 4.8em; } .ps-card b { font-size: 1.15em; } .ps-ruta { gap: .5em .3em; }
+/* 🏊 el espermatozoide trae las preguntas */
+.cv-esper { justify-content: flex-start; gap: .4em; padding-top: 2.2em; background: radial-gradient(80% 70% at 30% 40%, #1d4ed8, #0b1437 75%) !important; color: #fff; overflow: hidden; }
+.es-tit { color: #bfdbfe; text-shadow: 0 .08em 0 #1e3a8a; }
+.es-mar { flex: 1; min-height: 0; position: relative; display: flex; align-items: center; padding-right: 3.4em; background: radial-gradient(circle, rgba(255,255,255,.18) 0 2px, transparent 3px) 0 0 / 40px 40px; }
+.es-nado { display: flex; align-items: center; gap: .6em; width: 100%; }
+.es-nado.va { animation: esNada 1.6s cubic-bezier(.2,.9,.3,1) both; } @keyframes esNada { from { transform: translateX(-110%); } 70% { transform: translateX(3%); } }
+.es-svg { width: 11em; flex: none; animation: esOndea .5s ease-in-out infinite alternate; } @keyframes esOndea { to { transform: translateY(-.25em) rotate(-3deg); } }
+.es-cola { animation: esCola .35s ease-in-out infinite alternate; transform-origin: 80px 45px; } @keyframes esCola { to { transform: scaleY(-1); } }
+.es-q { flex: 1; } .es-q p { font-size: 2.5em !important; line-height: 1.2; }
+.cv-esper .rq-btn { background: linear-gradient(135deg, #93c5fd, #fde047); }
+/* 🪞 autoevaluación: solo el título y la tabla (más limpio al proyectar) */
+.cv-aut .au-i, .cv-aut .au-m, .cv-aut .au-h img, .cv-aut .au-h small { display: none !important; }
+.cv-aut .au-h { justify-content: center; } .cv-aut .au-h b { font-size: 1.25em; } .cv-aut .au-t { margin-top: .6em; font-size: 1.12em; }
