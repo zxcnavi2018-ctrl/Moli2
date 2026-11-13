@@ -25,9 +25,9 @@
     rol_speaker: '¡Levanten la mano los speakers! Ustedes presentan y hablan por el equipo.',
     rol_fin: '¡Excelente! Cada uno cumple su rol para que el equipo funcione.',
     sab_hola: '¡Miren mi caja secreta! ¿Qué habrá adentro?', sab_intro: '¿Sabías que…?',
-    ref_hola: '¡Es hora de la reflexión! Pensemos en lo que aprendimos hoy.',
-    ref_q1: '¿Qué aprendí el día de hoy?', ref_q2: '¿Qué necesité para alcanzar la meta?', ref_q3: '¿Cómo o dónde aplicaría lo que aprendí?',
-    ref_fin: '¡Muy bien! Gracias por compartir sus ideas.',
+    ref_hola: '¡Hora del chequeo de la doctora Molí! Revisemos cómo está nuestro aprendizaje.',
+    ref_q1: '¿Qué parte me costó más y qué hice para entenderla?', ref_q2: '¿Qué idea de hoy cambió lo que yo pensaba antes?', ref_q3: '¿Cómo podría usar lo que aprendí para cuidar mi salud o la de mi familia?',
+    ref_fin: '¡Excelente! Su aprendizaje está muy sano. ¡Gracias por compartir sus ideas!',
     rt_hola: '¡Hola! Les cuento nuestra secuencia de clase.',
     rt_1: 'Primero, nos saludamos con alegría.', rt_2: 'Luego, organizamos el aula y recordamos nuestros roles.',
     rt_3: 'Después, conocemos la meta y los criterios de éxito.', rt_4: 'Luego, realizamos las actividades de clase.',
@@ -62,10 +62,10 @@
       <div class="sy-bub" hidden></div>
       <div class="gu-dato" hidden>${HW() ? ARANA : ''}<b>💡 ¿Sabías que…?</b><p>${esc(limpiaSab(D && D.t) || '✨ Molí está buscando un dato curioso…')}</p></div>
       <div class="sy-bt"><button type="button" class="sy-rep" data-gurep title="Repetir desde el inicio">🔁</button><button type="button" class="sy-a" data-gua hidden>Ⓐ Abrir la caja secreta</button></div></div>`;
-    if (tipo === 'ref') return `<div class="cv-sl sy gu gu-ref" style="--c1:#7c2d12;--c2:#f59e0b"><div class="sy-luz"></div>
+    if (tipo === 'ref') return `<div class="cv-sl sy gu gu-ref" style="--c1:#0f766e;--c2:#2dd4bf"><div class="sy-luz"></div>
       <div class="sy-mo"><canvas></canvas><img class="sy-img" src="img/moli/feliz.webp" alt="Molí" hidden></div>
       <div class="sy-bub" hidden></div>
-      <div class="gu-pan" hidden><h2 class="gu-t">🪞 Reflexionamos</h2><ol class="gu-ref-l">${REF.map((k, j) => `<li class="gu-c" data-k="${j}"><b>${esc(SUB[k])}</b></li>`).join('')}</ol></div>
+      <div class="gu-pan" hidden><h2 class="gu-t">🩺 Chequeo de mi aprendizaje</h2><ol class="gu-ref-l">${REF.map((k, j) => `<li class="gu-c" data-k="${j}"><b>${esc(SUB[k])}</b></li>`).join('')}</ol></div>
       <div class="sy-bt"><button type="button" class="sy-rep" data-gurep title="Repetir desde el inicio">🔁</button><button type="button" class="sy-a" data-gua hidden>Ⓐ Siguiente pregunta</button></div></div>`;
     const acu = tipo === 'acu', L = acu ? ACU : ROL;
     return `<div class="cv-sl sy gu gu-${tipo}" style="--c1:${acu ? '#065f46' : '#4c1d95'};--c2:${acu ? '#10b981' : '#8b5cf6'}"><div class="sy-luz"></div>

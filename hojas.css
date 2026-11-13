@@ -1223,3 +1223,15 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .rev .sy-op.no .sy-roca { display: none; }
 .rev .sy-op.no::after { content: '💤'; }
 @keyframes syLate { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1.02); } 45% { transform: scale(1.12); } }
+
+/* 🩺 cierre de la doctora Molí: con cada respuesta se pone una curita; al final el corazón queda sano, sonríe y late */
+.cv-doc { background: radial-gradient(ellipse at 70% 60%, #ffe4e6, #fda4af 55%, #e11d48) !important; }
+.cv-doc .rq-tit { color: #fff; text-shadow: 0 .08em 0 #9f1239; } .cv-doc .rq-tit small { color: #fff1f2; }
+.cv-doc .rq-btn { background: linear-gradient(135deg, #fecdd3, #fde047); }
+.cv-doc .rq-cand.abre { animation: none; } .cv-doc .rq-cand .rq-asa { transition: opacity .3s; } .cv-doc .rq-cand.abre .rq-asa { transform: none; opacity: 0; }
+.cv-doc .rq-cand .mt-ok { opacity: 0; transition: opacity .4s .2s; } .cv-doc .rq-cand.abre .mt-ok { opacity: 1; } .cv-doc .rq-cand.abre circle { fill: #dcfce7; stroke: #4ade80; }
+.cv-doc .mt-cor { transform-box: fill-box; transform-origin: center; animation: rqTiembla 1.6s ease-in-out infinite; }
+.cv-doc .mt-fel { opacity: 0; } .cv-doc.libre .mt-fel { opacity: 1; } .cv-doc.libre .mt-tri { opacity: 0; }
+.cv-doc.libre .mt-cor { animation: syLate .9s ease-in-out infinite; }
+.cv-doc .mt-ecg { stroke-dasharray: 600; stroke-dashoffset: 600; opacity: .35; } .cv-doc.libre .mt-ecg { opacity: 1; animation: mtEcg 1.6s linear infinite; } @keyframes mtEcg { to { stroke-dashoffset: 0; } }
+.cv-doc.libre .rq-chis { background: radial-gradient(circle, rgba(255,255,255,.95) 0 2px, transparent 3px) 0 0 / 34px 34px; }

@@ -670,7 +670,7 @@
         const c = S.querySelector(`.rq-cand[data-c="${k}"]`); c && c.classList.add('abre'); S.querySelector('.rq-mo img').src = IMG('genial');
         [880, 1175].forEach((f, j) => tono(f, j * .09, .25, .18)); tono(220, 0, .08, .25, 'square');
         if (k === 2) { setTimeout(() => { S.classList.add('libre'); [523, 659, 784, 1047, 1319].forEach((f, j) => tono(f, .1 + j * .12, .45, .2)); for (let i = 0; i < 24; i++) [2637, 3136].forEach((f, q) => tono(f, .2 + i * .09 + q * .01, .1, .03)); S.querySelector('.rq-mo img').src = IMG('estrellas'); }, 700);
-          S.dataset.k = 3; b.innerHTML = '🎉 ¡Liberamos al reno! ¡Muy bien!'; return true; }
+          S.dataset.k = 3; b.innerHTML = S.classList.contains('cv-doc') ? '❤️ ¡El corazón está sano! ¡Muy bien!' : '🎉 ¡Liberamos al reno! ¡Muy bien!'; return true; }
         b.innerHTML = '🎮 Presiona <b>A</b> para la siguiente pregunta'; return true; }
       S.dataset.k = k + 1; S.dataset.ver = '0'; const n = k + 1;      // siguiente pregunta
       S.querySelector('.rq-n').textContent = `Pregunta ${n + 1} de 3`; const q = S.querySelector('.rq-q'); q.textContent = Q[n][0]; q.classList.remove('nue'); void q.offsetWidth; q.classList.add('nue');
@@ -886,6 +886,16 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
           <path d="M256 150 q-8 -22 -22 -28 M250 136 q-10 -2 -16 -14 M268 148 q4 -22 16 -30 M276 132 q12 -2 14 -14" stroke="#6b3f1d" stroke-width="6" fill="none" stroke-linecap="round"/>
           <ellipse cx="262" cy="160" rx="21" ry="15" fill="#8b5a2b"/><circle cx="265" cy="154" r="4.5" fill="#111827"/><circle cx="266.5" cy="152.5" r="1.4" fill="#fff"/><circle class="rq-nariz" cx="283" cy="163" r="8" fill="#ef4444"/></g>`;
         const barras = Array.from({ length: 8 }, (_, q) => `<rect class="rq-bar" x="${48 + q * 40}" y="40" width="9" height="250" rx="4" fill="#475569" style="--d:${q * .06}s"/>`).join('');
+        if (it.cierre) { const cura = q => `<g class="rq-cand" data-c="${q}" transform="translate(${90 + q * 110} 300)"><circle r="30" fill="#fff" stroke="#fda4af" stroke-width="5"/><path class="rq-asa" d="M-12 0 h24 M0 -12 v24" stroke="#ef4444" stroke-width="9" stroke-linecap="round"/><path class="mt-ok" d="M-13 1 l9 9 l17 -19" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+          const cor = `<g class="mt-cor"><path d="M200 252 C90 180 60 120 92 78 C120 42 176 52 200 92 C224 52 280 42 308 78 C340 120 310 180 200 252Z" fill="url(#mtg)" stroke="#9f1239" stroke-width="5"/><ellipse cx="128" cy="92" rx="22" ry="12" fill="#fff" opacity=".5" transform="rotate(-30 128 92)"/>
+            <g class="mt-tri"><circle cx="168" cy="140" r="9" fill="#1f2937"/><circle cx="232" cy="140" r="9" fill="#1f2937"/><path d="M178 186 Q200 168 222 186" stroke="#4c0519" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M150 166 q4 10 0 16" stroke="#60a5fa" stroke-width="5" fill="none"/></g>
+            <g class="mt-fel"><path d="M156 142 q12 -14 24 0 M220 142 q12 -14 24 0" stroke="#1f2937" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M172 174 Q200 204 228 174" stroke="#4c0519" stroke-width="7" fill="#fda4af" stroke-linecap="round"/><circle cx="150" cy="170" r="10" fill="#fda4af"/><circle cx="250" cy="170" r="10" fill="#fda4af"/></g></g>`;
+          return `<div class="cv-sl cv-reno cv-doc" ${st} data-qa='${esc(JSON.stringify(it.qa.map(x => [x.q, x.options[x.answer]])))}'>${crumb(it)}
+          <div class="rq-tit">🩺 ¡Consulta de la doctora Molí! <small>Cerramos la sesión ${it.n} · 3 preguntas para pensar = 3 curitas para el corazón</small></div>
+          <div class="rq-b"><div class="rq-mo"><img src="${IMG('pensativa')}" alt="Molí"><div class="rq-bub"><span class="rq-n">Pregunta 1 de 3</span><p class="rq-q">${esc(it.qa[0].q)}</p><p class="rq-r"></p></div></div>
+          <div class="rq-jaula"><svg viewBox="0 0 400 340" aria-hidden="true"><defs><radialGradient id="mtg" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fecdd3"/><stop offset=".55" stop-color="#fb7185"/><stop offset="1" stop-color="#be123c"/></radialGradient></defs>
+            <path class="mt-ecg" d="M10 22 H120 L135 2 L150 42 L165 22 H250 L262 8 L274 36 L286 22 H390" stroke="#4ade80" stroke-width="5" fill="none" stroke-linejoin="round"/>${cor}${[0, 1, 2].map(cura).join('')}</svg><div class="rq-chis"></div></div></div>
+          <button type="button" class="rq-btn" onclick="RenoQ.avanzar()">🎮 Presiona <b>A</b> para ver la respuesta</button></div>`; }
         return `<div class="cv-sl cv-reno" ${st} data-qa='${esc(JSON.stringify(it.qa.map(x => [x.q, x.options[x.answer]])))}'>${crumb(it)}
           <div class="rq-tit">🦌 ¡Liberemos al reno! <small>${it.cierre ? `Cerramos la sesión ${it.n} · preguntas abiertas` : `Recordamos la sesión ${it.prev.n}`} · 3 preguntas = 3 candados</small></div>
           <div class="rq-b"><div class="rq-mo"><img src="${IMG('pensativa')}" alt="Molí"><div class="rq-bub"><span class="rq-n">Pregunta 1 de 3</span><p class="rq-q">${esc(it.qa[0].q)}</p><p class="rq-r"></p></div></div>
