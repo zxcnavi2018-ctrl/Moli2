@@ -1210,3 +1210,16 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 /* 🪞 autoevaluación: solo el título y la tabla (más limpio al proyectar) */
 .cv-aut .au-i, .cv-aut .au-m, .cv-aut .au-h img, .cv-aut .au-h small { display: none !important; }
 .cv-aut .au-h { justify-content: center; } .cv-aut .au-h b { font-size: 1.25em; } .cv-aut .au-t { margin-top: .6em; font-size: 1.12em; }
+
+/* 🩺 versión del cuerpo humano: los barcos ahora son glóbulos rojos que viajan por la sangre; el correcto llega al corazón */
+.sy-mar .sy-op { box-shadow: 0 .45em 0 #be123c, 0 .7em 0 #881337; }
+.rev .sy-op.ok { box-shadow: 0 .45em 0 #be123c, 0 .7em 0 #881337, 0 0 0 .25em #fecdd3, 0 0 2em rgba(244,63,94,.9); }
+.sy-mar .sy-op::before { display: none; }
+.sy-olas { background: radial-gradient(ellipse .55em .32em at 1.3em 1em, #ef4444 98%, transparent) 0 0 / 2.6em 1.9em repeat-x, radial-gradient(ellipse .4em .24em at .4em .5em, #f87171 98%, transparent) .9em 0 / 3.1em 1.9em repeat-x, linear-gradient(#fecdd3, #fb7185); }
+.sy-mundo { background: radial-gradient(ellipse at 50% 40%, #fff1f2, #fecdd3 35%, #fda4af 70%, #fb7185); }
+.sy-sol { left: 50%; top: 8%; width: auto; height: auto; margin-left: -.5em; background: none; -webkit-mask: none; mask: none; font-size: 5.5em; line-height: 1; animation: syLate .9s ease-in-out infinite; }
+.sy-sol::before { content: '❤️'; }
+.sy-arco { background: radial-gradient(circle, transparent 50%, #fecdd3 50% 55%, #fda4af 55% 60%, #fb7185 60% 65%, transparent 65%); opacity: .7; }
+.rev .sy-op.no .sy-roca { display: none; }
+.rev .sy-op.no::after { content: '💤'; }
+@keyframes syLate { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1.02); } 45% { transform: scale(1.12); } }

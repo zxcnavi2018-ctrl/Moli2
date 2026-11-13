@@ -1,5 +1,5 @@
 // ===================================================================
-//  🚩 MOLÍ NOS SINCRONIZA (diapositiva de Mi presentación, después de las preguntas de cada actividad)
+//  🩺 MOLÍ NOS SINCRONIZA (la doctora Molí) (diapositiva de Mi presentación, después de las preguntas de cada actividad)
 //  Suena un silbato y Molí, con una bandera en cada mano, hace levantar la mano derecha y la izquierda
 //  (3, 2, 1), luego explica cómo se responde y se va a la izquierda. La docente aprieta A (teclado o mando):
 //    A → sale la pregunta con una respuesta a cada lado · A → «¡Manos arriba!» 3, 2, 1 · A → la respuesta correcta.
@@ -9,12 +9,12 @@
 // ===================================================================
 (function () {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  // 🏴‍☠️ la capitana Molí: «levanten la vela» (la mano) derecha o izquierda; su voz pirata está en audio/sync/pirata/
-  const SUB = { hola: '¡Ahoy, marineros! ¡Soy la capitana Molí! ¡Vamos a sincronizarnos!', der: 'Levanten la vela derecha en…', izq: 'Ahora, la vela izquierda en…', bien: '¡Muy bien, marineros!', rapido: '¡Ahora, más rápido!', d: '¡Derecha!', i: '¡Izquierda!',
-    listos: '¡Excelente, tripulación! ¡Ya estamos sincronizados!', expl1: 'Ahora, vamos a responder la pregunta.', expl2: '⛵ Vela izquierda si la respuesta es el barco de la izquierda.', expl3: 'Vela derecha si la respuesta es el barco de la derecha. ⛵',
-    lee: '¡Lee la pregunta, marinero, y piensa bien tu respuesta!', arriba1: '¡Velas arriba en…', arriba: '¡Arriba!', correcta: '¡Este es el barco correcto! ¡Muy bien, marineros!' };
-  const DUR = { silbato: 1.6, hola: 3.4, der: 1.8, izq: 1.7, n3: 0.6, n2: 0.6, n1: 0.6, bien: 1.3, rapido: 1.3, d: 0.8, i: 0.8, listos: 3, expl1: 2.1, expl2: 3.1, expl3: 3.1, lee: 3.1, arriba1: 1.2, arriba: 0.7, correcta: 2.5, ding: 0.6 };
-  const AUD = {}, audio = k => AUD[k] || (AUD[k] = Object.assign(new Audio('audio/sync/' + (/^(silbato|ding)$/.test(k) ? '' : 'pirata/') + k + '.mp3'), { preload: 'auto' }));
+  // 🩺 la doctora Molí: «levanten el brazo» derecho o izquierdo; cada respuesta es un glóbulo rojo que viaja al corazón; su voz está en audio/sync/salud/
+  const SUB = { hola: '¡Hola, equipo de científicos! ¡Soy la doctora Molí! ¡Vamos a sincronizarnos!', der: 'Levanten el brazo derecho en…', izq: 'Ahora, el brazo izquierdo en…', bien: '¡Muy bien, equipo!', rapido: '¡Ahora, más rápido!', d: '¡Derecha!', i: '¡Izquierda!',
+    listos: '¡Excelente! ¡Nuestros corazones laten al mismo ritmo! ❤️', expl1: 'Ahora, vamos a responder la pregunta.', expl2: '🔴 Mano izquierda si la respuesta es el glóbulo de la izquierda.', expl3: 'Mano derecha si la respuesta es el glóbulo de la derecha. 🔴',
+    lee: '¡Lee la pregunta y piensa bien tu respuesta!', arriba1: '¡Manos arriba en…', arriba: '¡Arriba!', correcta: '¡Este glóbulo llegó al corazón! ¡Muy bien, equipo!' };
+  const DUR = { silbato: 1.6, hola: 4.2, der: 1.8, izq: 1.7, n3: 0.6, n2: 0.6, n1: 0.6, bien: 1.3, rapido: 1.3, d: 0.8, i: 0.8, listos: 3.1, expl1: 2.1, expl2: 3.1, expl3: 3.1, lee: 2.5, arriba1: 1.2, arriba: 0.7, correcta: 2.6, ding: 0.6 };
+  const AUD = {}, audio = k => AUD[k] || (AUD[k] = Object.assign(new Audio('audio/sync/' + (/^(silbato|ding)$/.test(k) ? '' : 'salud/') + k + '.mp3'), { preload: 'auto' }));
   const BOT = ['', 'Ⓐ Mostrar la pregunta', 'Ⓐ ¡Manos arriba!', 'Ⓐ Ver la respuesta', ''];
   const cur = () => S && (S.k ? (S.Q && S.Q.mas || [])[S.k - 1] : S.Q);            // la pregunta que está en pantalla (la 1.ª o una más difícil)
   const hayMas = () => !!(S && S.Q && S.Q.mas && (S.k || 0) < S.Q.mas.length);
@@ -22,7 +22,7 @@
   let S = null;
 
   function html(Q) {
-    return `<div class="cv-sl sy" style="--c1:#0b3b6f;--c2:#0ea5e9"><div class="sy-luz"></div>
+    return `<div class="cv-sl sy" style="--c1:#9f1239;--c2:#fb7185"><div class="sy-luz"></div>
       <div class="sy-mo"><canvas></canvas><img class="sy-img" src="img/moli/hola.webp" alt="Molí" hidden><div class="sy-fl i"></div><div class="sy-fl d"></div></div>
       <div class="sy-bub" hidden></div><div class="sy-num"></div>
       <div class="sy-pre" hidden>${preHtml(Q)}</div>
@@ -30,17 +30,14 @@
   }
   const preHtml = (Q, nv) => !Q || !Q.q ? '<p class="sy-q">✨ Molí está pensando la pregunta…</p>'
     : `${nv ? `<p class="sy-nv">${nv === 1 ? '🔥 ¡Más difícil!' : '🔥🔥 ¡La más difícil!'}</p>` : ''}<p class="sy-q">${esc(Q.q)}</p><div class="sy-ops sy-mar"><i class="sy-mundo"><i class="sy-arco"></i><i class="sy-sol"></i></i><div class="sy-op i">${VELA('#2563eb')}<span class="sy-lado">✋ IZQUIERDA</span><b>${esc(Q.i)}</b><i class="sy-roca"></i></div><div class="sy-op d">${VELA('#f97316')}<span class="sy-lado">DERECHA ✋</span><b>${esc(Q.d)}</b><i class="sy-roca"></i></div><i class="sy-olas"></i></div>`;
-  // ⛵ cada respuesta es un barco: vela de su color y la respuesta escrita en el casco
-  function VELA(c) { return `<svg class="sy-vela" viewBox="0 0 220 130" aria-hidden="true">
-    <path d="M150 30 L208 104" stroke="#78350f" stroke-width="4"/><path d="M152 34 L200 98 L152 98 Z" fill="#fff7ed" stroke="#78350f" stroke-width="2"/>
-    <line x1="72" y1="34" x2="72" y2="130" stroke="#78350f" stroke-width="6"/><line x1="138" y1="6" x2="138" y2="130" stroke="#78350f" stroke-width="7"/>
-    <path d="M44 44 Q72 38 100 44 L104 96 Q72 104 40 96 Z" fill="#fff7ed" stroke="#78350f" stroke-width="2.5"/>
-    <path d="M102 24 Q138 16 174 24 L180 70 Q138 78 96 70 Z" fill="${c}" stroke="#78350f" stroke-width="2.5"/>
-    <path d="M110 22 L106 72 M126 19 L124 75 M152 19 L152 75 M166 21 L170 72" stroke="#fff" stroke-width="6" opacity=".85"/>
-    <path d="M96 78 Q138 72 180 78 L176 112 Q138 118 100 112 Z" fill="#fff7ed" stroke="#78350f" stroke-width="2.5"/>
-    <rect x="128" y="10" width="20" height="8" rx="2" fill="#92400e"/>
-    <path d="M138 6 L170 10 L138 22 Z" fill="#1f1b16"/><circle cx="150" cy="13" r="4.5" fill="#fff"/><circle cx="148.3" cy="12.5" r="1.2" fill="#2563eb"/><circle cx="151.7" cy="12.5" r="1.2" fill="#2563eb"/>
-    <path d="M72 34 L92 38 L72 44 Z" fill="${c}"/></svg>`; }
+  // 🔴 cada respuesta es un glóbulo rojo (con su burbuja de oxígeno del color de su lado) que viaja por la sangre hasta el corazón
+  function VELA(c) { const id = 'gl' + c.slice(1); return `<svg class="sy-vela" viewBox="0 0 220 130" aria-hidden="true"><defs><radialGradient id="${id}" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fda4af"/><stop offset=".55" stop-color="#ef4444"/><stop offset="1" stop-color="#9f1239"/></radialGradient></defs>
+    <ellipse cx="104" cy="122" rx="64" ry="7" fill="rgba(0,0,0,.18)"/><ellipse cx="104" cy="72" rx="74" ry="48" fill="url(#${id})" stroke="#881337" stroke-width="3"/><ellipse cx="104" cy="76" rx="42" ry="24" fill="#be123c" opacity=".55"/>
+    <ellipse cx="74" cy="44" rx="18" ry="8" fill="#fff" opacity=".55" transform="rotate(-20 74 44)"/>
+    <circle cx="86" cy="70" r="10" fill="#fff"/><circle cx="122" cy="70" r="10" fill="#fff"/><circle cx="88" cy="72" r="5.5" fill="#1f2937"/><circle cx="124" cy="72" r="5.5" fill="#1f2937"/><circle cx="90" cy="69.5" r="1.8" fill="#fff"/><circle cx="126" cy="69.5" r="1.8" fill="#fff"/>
+    <path d="M94 88 Q104 97 114 88" stroke="#4c0519" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="76" cy="86" r="6" fill="#fda4af" opacity=".7"/><circle cx="132" cy="86" r="6" fill="#fda4af" opacity=".7"/>
+    <circle cx="186" cy="34" r="24" fill="${c}" stroke="#fff" stroke-width="4"/><circle cx="178" cy="26" r="6" fill="#fff" opacity=".6"/><text x="186" y="42" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" font-family="system-ui">O₂</text>
+    <circle cx="214" cy="64" r="5" fill="${c}" opacity=".7"/><circle cx="160" cy="10" r="4" fill="${c}" opacity=".6"/></svg>`; }
 
   // ---- Molí 3D con sus dos banderas (si no hay 3D, su foto con banderitas de CSS) ----
   function tres(cv) {
@@ -57,10 +54,11 @@
       g.fillStyle = '#1c1917'; [-1, 1].forEach(e => { g.beginPath(); g.moveTo(cx + e * r * .45, cy - r * .35); g.lineTo(cx + e * r * .2, cy + r * .05); g.lineTo(cx + e * r * .7, cy + r * .05); g.fill(); });
       g.beginPath(); g.moveTo(cx - r * .65, cy + r * .25); for (let k = 0; k <= 6; k++) g.lineTo(cx - r * .65 + k * r * .217, cy + r * (k % 2 ? .38 : .25)); g.lineTo(cx + r * .5, cy + r * .6); g.lineTo(cx - r * .5, cy + r * .6); g.fill(); };
     const estrella = (g, cx, cy, r, col) => { g.fillStyle = col; g.beginPath(); for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, q = k % 2 ? r * .45 : r; g.lineTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q); } g.fill(); };
+    const corazon = (g, cx, cy, r, col) => { g.fillStyle = col; g.beginPath(); g.moveTo(cx, cy + r * .9); g.bezierCurveTo(cx - r * 1.3, cy + r * .1, cx - r * .95, cy - r * 1.05, cx, cy - r * .35); g.bezierCurveTo(cx + r * .95, cy - r * 1.05, cx + r * 1.3, cy + r * .1, cx, cy + r * .9); g.fill(); };
     const telaTex = sx => new T.CanvasTexture(lienzo(256, 168, (g, w, h) => {
       g.fillStyle = HW ? (sx < 0 ? '#6d28d9' : '#f97316') : (sx < 0 ? COL.i : COL.d); g.fillRect(0, 0, w, h);
       g.fillStyle = 'rgba(255,255,255,.28)'; g.fillRect(0, 0, w, 12); g.fillRect(0, h - 12, w, 12);
-      if (!HW) return estrella(g, w / 2, h / 2, 52, '#fff');
+      if (!HW) return corazon(g, w / 2, h / 2 + 4, 50, '#fff');
       if (sx < 0) calabaza(g, w / 2, h / 2 + 8, 50); else { g.fillStyle = '#1c1917'; [-1, 1].forEach(e => { g.beginPath(); g.moveTo(w / 2 + e * 52, 40); g.lineTo(w / 2 + e * 22, 86); g.lineTo(w / 2 + e * 82, 86); g.fill(); });
         g.beginPath(); g.moveTo(60, 104); for (let k = 0; k <= 8; k++) g.lineTo(60 + k * 17, k % 2 ? 122 : 104); g.lineTo(190, 140); g.lineTo(66, 140); g.fill(); } }));
     [-1, 1].forEach(sx => {                                             // palito + tela que flamea; sale de la manito hacia afuera cuando el brazo sube
@@ -77,21 +75,19 @@
     const spr = dib => new T.SpriteMaterial({ map: new T.CanvasTexture(lienzo(64, 64, dib)), transparent: true, depthWrite: false });
     const MATS = HW ? [spr(g => { g.fillStyle = '#1f1235'; g.beginPath(); g.moveTo(32, 26); g.quadraticCurveTo(20, 8, 2, 18); g.quadraticCurveTo(10, 26, 8, 36); g.quadraticCurveTo(18, 30, 22, 40); g.quadraticCurveTo(28, 34, 32, 44); g.quadraticCurveTo(36, 34, 42, 40); g.quadraticCurveTo(46, 30, 56, 36); g.quadraticCurveTo(54, 26, 62, 18); g.quadraticCurveTo(44, 8, 32, 26); g.fill(); g.beginPath(); g.arc(32, 30, 7, 0, 7); g.fill(); }),
         spr(g => { g.fillStyle = '#f97316'; g.beginPath(); g.ellipse(32, 32, 14, 10, 0, 0, 7); g.fill(); g.fillStyle = '#facc15'; [[10, 32, 18, 24, 18, 40], [54, 32, 46, 24, 46, 40]].forEach(([a, b, c, d, e, h]) => { g.beginPath(); g.moveTo(a, b); g.lineTo(c, d); g.lineTo(e, h); g.fill(); }); })]
-      : [spr(g => estrella(g, 32, 32, 28, '#facc15')), spr(g => estrella(g, 32, 32, 22, '#fff'))];
+      : [spr(g => corazon(g, 32, 32, 24, '#ef4444')), spr(g => estrella(g, 32, 32, 22, '#fff'))];
     const parts = [], pw = new T.Vector3();
     const chispas = F => { F.tela.getWorldPosition(pw); for (let k = 0; k < 8; k++) { const s = new T.Sprite(MATS[k % 2].clone()); s.position.copy(pw); s.scale.setScalar(HW ? 0.24 : 0.14); sc.add(s);
       parts.push({ s, v: new T.Vector3((Math.random() - 0.5) * 1.4, 0.7 + Math.random() * 0.9, Math.random() * 0.5), t: 0 }); } };
-    if (m.head) {                                                       // 🏴‍☠️ sombrero pirata y parche en el ojo
-      const top = HW ? 0.6 : 0.47, fz = HW ? 0.74 : 0.56, NEG = new T.MeshStandardMaterial({ color: 0x1f1b16, roughness: 0.7 }), ORO = new T.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.3 });
-      const som = new T.Group(); som.position.set(0, top, -0.02); som.rotation.set(-0.12, 0, 0.1); m.head.add(som);
-      const ala = new T.Mesh(new T.CylinderGeometry(0.66, 0.66, 0.04, 40), NEG); ala.scale.set(1, 1, 0.78); som.add(ala);
-      [-1, 1].forEach(l => { const p = new T.Mesh(new T.SphereGeometry(0.2, 16, 10), NEG); p.scale.set(1.1, 0.5, 0.9); p.position.set(l * 0.52, 0.06, 0); som.add(p); });   // las puntas levantadas
-      const copa = new T.Mesh(new T.SphereGeometry(0.4, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), NEG); copa.scale.set(1, 0.75, 0.9); som.add(copa);
-      const cinta = new T.Mesh(new T.TorusGeometry(0.39, 0.03, 8, 40), ORO); cinta.rotation.x = Math.PI / 2; cinta.scale.set(1, 0.9, 1); cinta.position.y = 0.04; som.add(cinta);
-      const em = new T.Mesh(new T.CircleGeometry(0.09, 24), new T.MeshStandardMaterial({ color: 0xffffff })); em.position.set(0, 0.17, 0.355); em.rotation.x = -0.35; som.add(em);
-      [-1, 1].forEach(l => { const o = new T.Mesh(new T.CircleGeometry(0.022, 12), new T.MeshBasicMaterial({ color: 0x1d4ed8 })); o.position.set(l * 0.035, 0.18, 0.362); o.rotation.x = -0.35; som.add(o); });
-      const par = new T.Mesh(new T.CircleGeometry(0.15, 28), NEG); par.scale.set(1, 1.15, 1); par.position.set(-0.225, -0.04, fz); m.head.add(par);   // parche en el ojo derecho de Molí
-      if (!HW) { const tira = new T.Mesh(new T.TorusGeometry(0.6, 0.014, 6, 60), NEG); tira.rotation.set(0, 0, 0.55); tira.scale.set(1, 1, 0.9); tira.position.y = 0.05; m.head.add(tira); }   // con la calabaza, el parche va pegado
+    if (m.head) {                                                       // 🩺 vincha con el espejo frontal de doctora
+      const top = HW ? 0.42 : 0.3, fz = HW ? 0.66 : 0.5, MET = new T.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.15, metalness: 0.85 }), BAN = new T.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+      const vin = new T.Mesh(new T.TorusGeometry(HW ? 0.74 : 0.6, 0.026, 10, 64), BAN); vin.rotation.x = Math.PI / 2 - 0.12; vin.position.y = top; vin.scale.set(1.02, 1, 0.98); m.head.add(vin);
+      const esp = new T.Group(); esp.position.set(HW ? 0.5 : 0.4, top - 0.02, HW ? 0.48 : 0.38); esp.rotation.set(-0.2, 0.75, 0); m.head.add(esp);
+      const disco = new T.Mesh(new T.CylinderGeometry(0.15, 0.15, 0.025, 36), MET); disco.rotation.x = Math.PI / 2; esp.add(disco);
+      const aro = new T.Mesh(new T.TorusGeometry(0.15, 0.016, 10, 40), new T.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.3, metalness: 0.7 })); aro.position.z = 0.012; esp.add(aro);
+      const hoyo = new T.Mesh(new T.CircleGeometry(0.03, 20), new T.MeshBasicMaterial({ color: 0x0f172a })); hoyo.position.z = 0.0135; esp.add(hoyo);
+      const cruz = new T.Group(); cruz.position.set(-0.2, top + 0.08, fz - 0.02); cruz.rotation.set(-0.3, -0.3, 0); m.head.add(cruz);   // crucecita roja de salud
+      const ROJO = new T.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 }); [[0.09, 0.03], [0.03, 0.09]].forEach(([w, h]) => cruz.add(new T.Mesh(new T.BoxGeometry(w, h, 0.02), ROJO)));
     }
     const brazo0 = m.brazo.bind(m);
     m.brazo = (l, on) => { brazo0(l, on); const F = flags[l > 0 ? 1 : -1]; if (!F) return; if (on && !F.up) { F.sw = 1; setTimeout(() => chispas(F), 180); } F.up = !!on; };
@@ -165,7 +161,7 @@
         M.expr('estrellas'); M.accion('saltar'); await espera(500); ok(); await decir('correcta'); ok(); await espera(1200); ok(); M.expr('feliz'); }
     } catch (e) {}
   }
-  // 🔊 efectos del barco: «¡crash!» del que choca y campanitas mágicas del que llega al mundo brillante
+  // 🔊 efectos: «¡pff!» del glóbulo que se cansa y campanitas mágicas del que llega al corazón
   let AC = null;
   function sonido(tipo, retraso = 0) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); const c = AC, t = c.currentTime + retraso;
     if (tipo === 'choque') { const n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * 0.6, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2.5);
@@ -175,9 +171,9 @@
   } catch (e) {} }
   function chispas(op) { if (!op) return; for (let k = 0; k < 16; k++) { const i = document.createElement('i'); i.className = 'sy-chis'; i.textContent = ['✨', '⭐', '🌟', '💫'][k % 4];
     i.style.left = (10 + Math.random() * 80) + '%'; i.style.top = (Math.random() * 60) + '%'; i.style.animationDelay = (0.3 + Math.random() * 1.2) + 's'; op.appendChild(i); } }
-  // 🎶 canción pirata suave de fondo (6/8, compuesta aquí): melodía de punteo, bajo y pandereta; baja cuando Molí habla
-  const MEL = [[62,2],[65,1],[69,2],[69,1],[67,2],[65,1],[64,3],[64,2],[67,1],[70,2],[69,1],[65,3],[62,3],[62,2],[65,1],[69,2],[72,1],[70,2],[69,1],[67,3],[65,2],[64,1],[62,3],[0,3]];
-  const BAJO = [38, 38, 45, 45, 43, 45, 38, 38];
+  // 🎶 música alegre de fondo (compuesta aquí): melodía en do mayor y un bajo que late como el corazón (pum-pum); baja cuando Molí habla
+  const MEL = [[72,1],[76,1],[79,2],[76,1],[77,1],[79,1],[81,3],[79,1],[77,1],[76,2],[74,1],[72,1],[74,3],[72,1],[76,1],[79,2],[84,1],[83,1],[81,1],[79,3],[77,1],[76,1],[74,1],[72,3],[0,1]];
+  const BAJO = [48, 48, 53, 53, 55, 55, 48, 48];
   let MUS = null;
   function musica(on) { try {
     if (!on) { if (MUS) { clearInterval(MUS.iv); MUS.g.gain.setTargetAtTime(0, MUS.c.currentTime, 0.3); MUS = null; } return; }
@@ -188,7 +184,7 @@
     const ruido = t0 => { const b = c.createBuffer(1, c.sampleRate * 0.08, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); const n = c.createBufferSource(), f = c.createBiquadFilter(), e = c.createGain(); f.type = 'highpass'; f.frequency.value = 5000; e.gain.value = 0.25; n.buffer = b; n.connect(f); f.connect(e); e.connect(g); n.start(t0); };
     const prog = () => { while (t < c.currentTime + 0.6) {                     // cada «pulso» es una corchea (6 por compás)
         if (ma <= 0) { const [n, d] = MEL[mi % MEL.length]; if (n) { nota(hz(n), t, d * paso * 1.1, 'triangle', 0.5); nota(hz(n + 12), t, d * paso * 0.5, 'sine', 0.08); } ma = d; mi++; }
-        if (pulso % 3 === 0) nota(hz(BAJO[Math.floor(pulso / 6) % BAJO.length]), t, paso * 2.6, 'sine', 0.45);
+        if (pulso % 6 === 0 || pulso % 6 === 1) nota(hz(BAJO[Math.floor(pulso / 6) % BAJO.length] - (pulso % 6 ? 0 : 12)), t, paso * 1.2, 'sine', pulso % 6 ? 0.35 : 0.5);   // pum-pum
         if (pulso % 6 === 3) ruido(t);
         ma--; pulso++; t += paso; } };
     prog(); MUS = { c, g, iv: setInterval(prog, 200) };
