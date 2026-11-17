@@ -31,7 +31,7 @@
       A.push(['escS', '⏭ Escena siguiente'], ['escA', '⏮ Escena anterior'], ['abrir', '📖 Abrir o cerrar lo de la escena']);
       [...document.querySelectorAll('#dots button')].forEach((b, k) => A.push(['e:' + k, '➡ Ir a ' + b.textContent.trim()]));
       A.push(['crono', '⏱️ Cronómetro (elige el tiempo con las flechas)'], ['bib', '📚 Ir a la Biblioteca'], ['fs', '⛶ Pantalla completa'], ['moli', '🤖 Molí salta y saluda'],
-        ['an:telon', '🎭 Telón: Molí saluda «¡Buenos días, niños del sexto A!»'], ['an:titan', '🔴 Molí modo titán: canta y lanza rayos rojos por los ojos'], ['an:rap', '🎤 Telón: el Rap del Ciclo Ovárico (Molí rapea las fases)'], ['an:cancion', '🎶 Telón: Molí canta su canción con la orquesta (y aplausos)'], ['an:desp', '🎤 Telón: la despedida de Molí (orquesta, piano y aplausos)'], ['an:palmas', '👏 Animación: Palmas (Molí aplaude y los niños responden)'], ['an:shh', '🤫 Animación: Silencio'], ['an:drum', '🥁 Animación: Tambor'], ['an:angry', '😠 Animación: Atención'], ['an:acu', '🤝 Animación: Acuerdos'], ['an:rol', '👥 Animación: Roles'], ['an:fin', '🏆 Animación: Final'],
+        ['an:telon', '🎭 Telón: Molí saluda «¡Buenos días, niños del sexto A!»'], ['an:titan', '🔴 Molí modo titán: canta y lanza rayos rojos por los ojos'], ['an:rap', '🎤 Telón: el rap de la sesión que está en pantalla'], ['an:ruleta', '🌸 Sorteo de roles: crece una flor y sale un rol y un grupo (también: mantén + y aprieta A)'], ['an:cancion', '🎶 Telón: Molí canta su canción con la orquesta (y aplausos)'], ['an:desp', '🎤 Telón: la despedida de Molí (orquesta, piano y aplausos)'], ['an:palmas', '👏 Animación: Palmas (Molí aplaude y los niños responden)'], ['an:shh', '🤫 Animación: Silencio'], ['an:drum', '🥁 Animación: Tambor'], ['an:angry', '😠 Animación: Atención'], ['an:acu', '🤝 Animación: Acuerdos'], ['an:rol', '👥 Animación: Roles'], ['an:fin', '🏆 Animación: Final'],
         ['panel', '🎮 Abrir este panel']);
       A.push(['tabS', '➡ Pestaña siguiente (en la Revista)'], ['tabA', '⬅ Pestaña anterior (en la Revista)'], ['revista', '📰 Abrir la Revista Innovadora'], ['grupos', '🏅 Grupos: mantén apretado y da +1 punto'], ['video', '🎬 Video: iniciar o pausar'], ['vidGrande', '🎬 Video: agrandar o achicar'], ['zoomP', '🔍 Acercar (zoom +)'], ['zoomM', '🔎 Alejar (zoom −)'], ['aula', '🏫 Volver al salón general']);
     } else A.push(['escS', '⏭ Estante siguiente (Biblioteca)'], ['escA', '⏮ Estante anterior (Biblioteca)'], ['tabS', '➡ Pestaña siguiente'], ['tabA', '⬅ Pestaña anterior'], ['revista', '📰 Abrir la Revista Innovadora'], ['zoomP', '🔍 Acercar (zoom +)'], ['zoomM', '🔎 Alejar (zoom −)'], ['aula', '🏫 Volver al aula'], ['fs', '⛶ Pantalla completa']);
@@ -218,7 +218,7 @@
 
   // ---- 🖱️ modo mouse: ZL + ZR juntos lo prenden y lo apagan; L3 mueve la flecha, A hace clic, R3 baja o sube ----
   let MM = false, mx = innerWidth / 2, my = innerHeight / 2, cur = null, combo = false, sobre = null;
-  const pend = {};
+  const pend = {}; let plusA = false;
   function boton(i) {
     if (ENS) return;
     if (MM) { if (i === 1) return clicMouse(); if (i === 0) return cerrarAnim(); if (i === 6 || i === 7) return; }   // en modo mouse: A = clic · ZR sirve para dibujar (no abre la Revista)
@@ -373,12 +373,16 @@
       if (o && !prev[i]) { ultimo = i; volverFS(); if (ver) ver(i);
         if (combo && (i === 6 || i === 7)) {}
         else if (i === 6 || i === 7) pend[i] = ahora;                   // ZL / ZR esperan un instante: por si apretaste los dos juntos
+        else if (i === 9) pend[9] = ahora;                              // + espera un instante: + y A juntos = 🎰 sorteo de roles
+        else if (i === 1 && (on[9] || pend[9] != null)) { delete pend[9]; plusA = true; if (CFG.on && !panelAbierto()) hacer('an:ruleta'); }
         else boton(i); }
       if (o && prev[i] && i >= 12 && i <= 15) { const t0 = rep[i] || (rep[i] = { t: ahora, n: 0 }); const espera = t0.n ? 140 : 420;   // cruceta mantenida: repite (primero espera, luego rápido)
         if (ahora - t0.t > espera) { t0.t = ahora; t0.n++; boton(i); } }
       if (!o) delete rep[i];
       if (!o && prev[i] && GR && i === grBtn) cerrarGrupos();           // soltaste ZL: se cierran los grupos
       prev[i] = o; });
+    if (!on[9]) plusA = false;
+    if (pend[9] != null && ahora - pend[9] > 280 && !plusA) { delete pend[9]; ultimo = 9; boton(9); }
     [6, 7].forEach(i => { if (pend[i] != null && ahora - pend[i] > 160) { delete pend[i]; if (!combo) { ultimo = i; boton(i); if (!on[i] && GR && i === grBtn) cerrarGrupos(); } } });
     if (MM) { moverMouse(g.axes[0] || 0, g.axes[1] || 0, g.axes[3] || 0, k60); trazo(on[7] && !on[6] && !combo && !panelAbierto()); if (ver) ver(null, g); raf = requestAnimationFrame(leer); return; }   // modo mouse: los joysticks mueven la flecha y bajan la página
     if (ZM) { const x = g.axes[0] || 0, y = g.axes[1] || 0; if (Math.abs(x) > 0.15 || Math.abs(y) > 0.15) mirar(x * k60, y * k60); }

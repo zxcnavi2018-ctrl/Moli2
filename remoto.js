@@ -69,7 +69,7 @@
   }
   const escenas = () => { const B = [...document.querySelectorAll('#dots button')]; return B.length ? B.map(b => { const t = b.textContent.trim(), i = t.split(' ')[0]; return [i, t.slice(i.length).trim()]; }) : ESC; };   // las escenas reales del aula (incluye las nuevas)
   const ESC = [['🏫', 'Mi aula'], ['📗', 'Sesiones'], ['🎟️', 'Exit tickets'], ['💻', 'Laboratorio'], ['📌', 'Corcho'], ['📂', 'Notas'], ['💪', 'Misiones'], ['📽️', 'Pizarra']];
-  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['titan', '🔴', 'Modo titán'], ['rap', '🎤', 'Rap de la sesión'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
+  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['titan', '🔴', 'Modo titán'], ['rap', '🎤', 'Rap de la sesión'], ['ruleta', '🌸', 'Sorteo de roles'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
   const GC = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
   let cuerpo = null;
   function abrirControl() {
@@ -290,6 +290,29 @@
       con: { 0: [["🔬", "Ciencia y tecnología", "Al servicio de la vida"]], 2: [["🖥️", "Ecografía", "Imagen con ultrasonido"]], 3: [["✅", "Sin daño", "No duele ni usa rayos X"]], 4: [["🦇", "El eco", "Las ondas rebotan y vuelven"]], 6: [["💓", "Monitor fetal", "Escucha los latidos del bebé"]], 8: [["🧬", "Ciencia para la vida", "Beneficios para la salud"]], 10: [["🛏️", "Incubadora", "Para bebés que nacen antes"]], 12: [["💉", "Vacunas y controles", "Cuidan a la mamá y al bebé"]], 14: [["⚠️", "Uso responsable", "Siempre con personal de salud"]], 15: [["🧑‍🔬", "¡Tu opinión!", "Investiga y argumenta"]] }, d: 2.82, fin: 62.12, dur: 66.12, mp3: 'rap6', rap: 1 } };
   // 🔴 MODO TITÁN: Molí canta una canción épica (original) y de sus ojos salen rayos de luz roja
   const TITAN = { lin: [[4.8, 'Algo despierta en el salón…'], [9.6, 'la ciencia enciende su poder…'], [14.4, '¡sexto, nadie nos va a detener!'], [19.2, '¡AAAAAAH! 🔴']], rayo: 19.2, fin: 26.5, dur: 30.3 };
+  // 🌱🌸 SORTEO DE ROLES: crece una plantita y, al abrirse la flor, sale un rol (Helper, Líder, Designer, Timer o Speaker) y un grupo (G1 a G5)
+  function ruleta() {
+    const ROLES = [['🧰', 'HELPER', '#2563eb'], ['⭐', 'LÍDER', '#f59e0b'], ['🎨', 'DESIGNER', '#db2777'], ['⏱️', 'TIMER', '#16a34a'], ['🎤', 'SPEAKER', '#7c3aed']];
+    const r = Math.floor(Math.random() * 5), g = 1 + Math.floor(Math.random() * 5), [e, nm, c] = ROLES[r];
+    const PC = ['#f472b6', '#fb7185', '#f9a8d4', '#ec4899'];
+    const pet = Array.from({ length: 10 }, (_, q) => `<g transform="rotate(${q * 36} 200 150)"><ellipse class="pl-pet" cx="200" cy="88" rx="30" ry="58" fill="${PC[q % 4]}" stroke="#be185d" stroke-width="3" style="--r:${q * .04}s"/></g>`).join('');
+    const brillo = Array.from({ length: 14 }, (_, q) => `<i class="pl-br" style="left:${8 + (q * 47) % 84}%;top:${6 + (q * 29) % 60}%;--r:${(q % 7) * .15}s">${['✨', '🌟', '💫'][q % 3]}</i>`).join('');
+    mostrar(`<div class="an-st an-pl"><div class="pl-tit">🌱 ¡Sorteo de roles!</div>
+      <svg class="pl-svg" viewBox="0 0 400 520" aria-hidden="true">
+        <path class="pl-tallo" d="M200 430 C190 360 214 300 200 240 C192 205 204 180 200 150" stroke="#16a34a" stroke-width="14" fill="none" stroke-linecap="round"/>
+        <g class="pl-hoja h1"><path d="M198 360 C150 350 120 320 112 290 C150 290 185 315 198 360Z" fill="#22c55e" stroke="#15803d" stroke-width="3"/></g>
+        <g class="pl-hoja h2"><path d="M202 300 C250 290 280 262 290 232 C252 230 215 255 202 300Z" fill="#4ade80" stroke="#15803d" stroke-width="3"/></g>
+        <g class="pl-flor">${pet}<circle class="pl-cen" cx="200" cy="150" r="46" fill="#fde047" stroke="#ca8a04" stroke-width="4"/></g>
+        <ellipse class="pl-boton" cx="200" cy="150" rx="22" ry="30" fill="#f472b6" stroke="#be185d" stroke-width="3"/>
+        <path d="M120 430 H280 L262 515 H138 Z" fill="#c2410c" stroke="#7c2d12" stroke-width="4"/><rect x="110" y="418" width="180" height="26" rx="8" fill="#ea580c" stroke="#7c2d12" stroke-width="4"/><ellipse cx="200" cy="432" rx="80" ry="8" fill="#422006"/>
+      </svg>
+      <div class="pl-res"><span>${e}</span><b style="color:${c}">${nm}</b><i>G${g}</i></div><div class="pl-brs">${brillo}</div>
+      <img class="pl-mo" src="${window.moliDibujo ? moliDibujo('curiosa') : IMG('curiosa')}" alt=""></div>`, 14000, 'planta');
+    const S = capa.querySelector('.an-pl'), vivo = () => S.isConnected && capa.classList.contains('on');
+    for (let q = 0; q < 14; q++) tono(300 + q * 40, q * .28, .25, 'sine', .08);       // la plantita crece: notitas que suben
+    setTimeout(() => { if (!vivo()) return; const cr = S.querySelector('.pl-boton').getBoundingClientRect(), rs = S.querySelector('.pl-res'); rs.style.left = (cr.left + cr.width / 2) + 'px'; rs.style.top = (cr.top + cr.height / 2) + 'px'; S.classList.add('abre'); S.querySelector('.pl-mo').src = window.moliDibujo ? moliDibujo('estrellas') : IMG('estrellas');
+      [523, 659, 784, 1047].forEach((f, q) => tono(f, q * .12, .5, 'triangle', .22)); tono(1319, .5, 1, 'triangle', .2); for (let q = 0; q < 12; q++) tono(2093 + (q % 3) * 300, .2 + q * .08, .12, 'sine', .04); }, 4300);
+  }
   function titan() {
     const nav = window.esNavidad && esNavidad(), ojo = nav ? [[39.5, 42.9], [58.6, 42.9]] : [[37, 29], [61, 29]];
     const brasas = Array.from({ length: 30 }, (_, q) => `<i class="ti-br" style="left:${(q * 37) % 100}%;--d:${3 + q % 4}s;--r:${-q * .4}s;--s:${.4 + (q % 3) * .3}"></i>`).join('');
@@ -372,6 +395,7 @@
   }
   function animar(k) {
     try { A().resume && A().resume(); } catch (e) {}
+    if (k === 'ruleta') return ruleta();
     if (k === 'palmas') return palmas();
     const NAV = window.esNavidad && esNavidad();                       // 🎄 del 1 de noviembre al 6 de enero: avión navideño, tambor = trineo, atención = árbol
     if (k === 'shh' && NAV) { molí3d('guiño'); jet(7); for (let i = 0; i < 30; i++) [2637, 3136].forEach((f, q) => tono(f, .3 + i * .22 + q * .01, .12, 'triangle', .02));   // 🤫✈️🎄 avión navideño

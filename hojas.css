@@ -1238,3 +1238,24 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 
 /* 👀💭❓ tabla grande «Veo, pienso y me pregunto» */
 .fic-t.big { table-layout: fixed; } .fic-t.big th { font-size: 1.7em; padding: .35em; text-align: center; } .fic-t.big td { height: 9em; }
+
+/* 🌱🌸 sorteo de roles: crece una plantita y al abrirse la flor sale el rol y el grupo */
+#anim.planta { background: radial-gradient(ellipse at 50% 30%, #ecfccb, #bbf7d0 45%, #86efac 100%); }
+.an-pl { width: 100vw; height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+.pl-tit { margin-top: 3vh; font: 900 clamp(30px, 7vh, 76px) system-ui; color: #15803d; text-shadow: 0 .06em 0 #fff; }
+.pl-svg { height: 82vh; width: auto; overflow: visible; }
+.pl-tallo { stroke-dasharray: 320; stroke-dashoffset: 320; animation: plTallo 2.6s .3s ease-out forwards; }
+.pl-hoja { transform-box: fill-box; transform: scale(0); } .pl-hoja.h1 { transform-origin: 100% 100%; animation: plHoja .8s 1.3s cubic-bezier(.3,1.5,.5,1) forwards; } .pl-hoja.h2 { transform-origin: 0% 100%; animation: plHoja .8s 1.9s cubic-bezier(.3,1.5,.5,1) forwards; }
+.pl-boton { transform-box: fill-box; transform-origin: 50% 100%; transform: scale(0); animation: plBoton .9s 2.8s ease-out forwards, plLate .5s 3.7s ease-in-out 1 alternate; }
+.pl-flor { transform-box: fill-box; transform-origin: center; } .pl-pet { transform-box: fill-box; transform-origin: 50% 100%; transform: scale(0); }
+.pl-cen { transform-box: fill-box; transform-origin: center; transform: scale(0); }
+.an-pl.abre .pl-boton { opacity: 0; transition: opacity .2s; } .an-pl.abre .pl-pet { animation: plPet .7s var(--r) cubic-bezier(.3,1.6,.5,1) forwards; } .an-pl.abre .pl-cen { animation: plPet .6s .3s cubic-bezier(.3,1.6,.5,1) forwards; }
+.an-pl.abre .pl-flor { animation: plGira 6s 1s linear infinite; }
+.pl-res { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%) scale(0); background: #fff; border-radius: 3vh; padding: 1.4vh 3vw; display: flex; align-items: center; gap: 1.2vw; box-shadow: 0 0 0 .7vh #fde047, 0 1.4vh 3vh rgba(0,0,0,.25); white-space: nowrap; z-index: 2; }
+.pl-res span { font-size: 9vh; } .pl-res b { font: 900 clamp(30px, 11vh, 120px)/1 system-ui; } .pl-res i { font: 900 clamp(30px, 11vh, 120px)/1 system-ui; font-style: normal; color: #fff; background: #16a34a; border-radius: 2vh; padding: .5vh 1.5vw; }
+.an-pl.abre .pl-res { animation: plRes .8s .6s cubic-bezier(.3,1.5,.5,1) forwards; }
+.pl-mo { position: absolute; left: 4vw; bottom: 5vh; height: 30vh; animation: anFlota 2s ease-in-out infinite; }
+.pl-br { position: absolute; font-style: normal; font-size: 5vh; opacity: 0; } .an-pl.abre .pl-br { animation: plBr 1.6s calc(.6s + var(--r)) ease-out infinite; }
+@keyframes plTallo { to { stroke-dashoffset: 0; } } @keyframes plHoja { to { transform: scale(1); } } @keyframes plBoton { to { transform: scale(1); } }
+@keyframes plLate { to { transform: scale(1.15); } } @keyframes plPet { to { transform: scale(1); } } @keyframes plGira { to { transform: rotate(360deg); } }
+@keyframes plRes { to { transform: translate(-50%, -50%) scale(1); } } @keyframes plBr { 0% { opacity: 0; transform: scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-4vh) scale(1.2); } }
