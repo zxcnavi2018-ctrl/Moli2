@@ -1350,3 +1350,35 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .rv-bub:empty { display: none; } .rv-bub.pop { animation: neCard .5s cubic-bezier(.3,1.6,.5,1); }
 .rv-x { position: absolute; top: 2vh; right: 2vw; z-index: 6; width: 6vh; height: 6vh; border: 0; border-radius: 50%; background: rgba(255,255,255,.85); font: 900 3vh system-ui; cursor: pointer; }
 #rtViaje.fin .rv-tit::after { content: ' 🎉'; }
+
+/* 🩺❓ la doctora Molí trae las preguntas del trabajo en equipo */
+.cv-equipo { justify-content: flex-start; gap: .5em; padding-top: 2.2em; overflow: hidden; background: radial-gradient(ellipse at 30% 60%, #ccfbf1, #5eead4 45%, #0f766e) !important; }
+.eq-cel { position: absolute; bottom: -2em; width: 2.2em; height: 2.2em; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.7), rgba(153,246,228,.25)); border: 2px solid rgba(255,255,255,.4); transform: scale(var(--s)); animation: miBu var(--d) linear var(--r) infinite; pointer-events: none; }
+.eq-tit { color: #fff !important; text-shadow: 0 .08em 0 #115e59 !important; } .eq-tit small { color: #f0fdfa !important; }
+.eq-b { flex: 1; min-height: 0; display: grid; grid-template-columns: .85fr 1.15fr; gap: 1em; align-items: center; position: relative; z-index: 1; }
+.eq-izq { display: flex; flex-direction: column; align-items: flex-start; gap: .5em; } .eq-mo { position: relative; } .eq-mo img { height: 8em; animation: anFlota 3s ease-in-out infinite; } .eq-mo i { position: absolute; right: -.4em; top: 45%; font-style: normal; font-size: 2.6em; transform: rotate(-15deg); }
+.eq-izq .cc-bub { font-size: 1.15em; }
+.eq-cs { display: flex; flex-direction: column; gap: .7em; }
+.eq-c { background: #fff; border-radius: 1em; padding: .7em 1em; box-shadow: 0 .3em 0 #99f6e4, 0 .5em 1.2em rgba(0,0,0,.2); border-left: .5em solid #14b8a6; transition: .4s; }
+.eq-c:not(.on) { opacity: .75; } .eq-c.ya, .eq-c.on:has(.eq-ej.ya) { box-shadow: 0 0 0 .25em #fde047, 0 .5em 1.4em rgba(0,0,0,.25); transform: scale(1.02); }
+.eq-n { display: inline-block; font: 900 .9em system-ui; color: #fff; background: #0d9488; border-radius: 99em; padding: .1em .7em; }
+.eq-c b { display: block; font: 900 1.55em/1.2 system-ui; color: #1e293b; margin-top: .25em; }
+.eq-ej { margin: .4em 0 0; font: 800 1.1em/1.3 system-ui; color: #0f766e; background: #f0fdfa; border-radius: .6em; padding: .4em .6em; max-height: 0; opacity: 0; overflow: hidden; padding-block: 0; transition: .5s; }
+.eq-ej.on { max-height: 8em; opacity: 1; padding-block: .4em; } .eq-ej i { font-style: normal; color: #0d9488; }
+.cv-equipo .eq-c b { font-size: 2.3em; } .cv-equipo .eq-ej { font-size: 1.45em; } .cv-equipo .eq-n { font-size: 1.2em; } .cv-equipo .eq-mo img { height: 10em; } .cv-equipo .eq-izq .cc-bub { font-size: 1em; } .cv-equipo .eq-cs { gap: 1em; }
+
+/* 🩺✨ versión épica: laboratorio de neón con ADN, latidos y tarjetas de cristal */
+.cv-equipo { background: radial-gradient(ellipse at 22% 70%, rgba(20,184,166,.35), transparent 45%), radial-gradient(ellipse at 85% 20%, rgba(236,72,153,.25), transparent 45%), radial-gradient(ellipse at 50% 50%, #1e1b4b, #0b0a24 75%) !important; }
+.cv-equipo .eq-cel { background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(94,234,212,.15)); border-color: rgba(94,234,212,.5); box-shadow: 0 0 12px rgba(94,234,212,.5); }
+.eq-adn { position: absolute; right: 2%; top: 4%; height: 92%; opacity: .45; animation: eqAdn 9s ease-in-out infinite alternate; pointer-events: none; } @keyframes eqAdn { from { transform: rotateY(0) translateY(0); } to { transform: rotateY(180deg) translateY(-2%); } }
+.eq-ecg { position: absolute; left: 0; top: 13%; width: 100%; height: 3em; pointer-events: none; opacity: .8; } .eq-ecg path { fill: none; stroke: #5eead4; stroke-width: 3; stroke-dasharray: 1400; stroke-dashoffset: 1400; animation: coEcg 2.4s linear infinite; filter: drop-shadow(0 0 6px #5eead4); }
+.cv-equipo .eq-tit { position: relative; z-index: 2; color: #fde047 !important; text-shadow: 0 0 .4em rgba(253,224,71,.7), 0 .08em 0 #92400e !important; font-size: 2.6em; } .cv-equipo .eq-tit small { color: #a5f3fc !important; text-shadow: none !important; }
+.cv-equipo .eq-mo img { height: 12em; filter: drop-shadow(0 0 .6em rgba(94,234,212,.8)); position: relative; z-index: 1; }
+.eq-holo { position: absolute; left: 50%; bottom: -.6em; width: 9em; height: 2.2em; margin-left: -4.5em; border-radius: 50%; background: radial-gradient(ellipse, rgba(94,234,212,.85), rgba(94,234,212,0) 70%); box-shadow: 0 0 1.5em #5eead4; animation: eqHolo 1.6s ease-in-out infinite alternate; } @keyframes eqHolo { to { opacity: .5; transform: scaleX(1.15); } }
+.cv-equipo .cc-bub { background: rgba(255,255,255,.95); box-shadow: 0 0 0 .2em #5eead4, 0 0 1.4em rgba(94,234,212,.6); }
+.cv-equipo .eq-c { background: linear-gradient(135deg, rgba(30,41,59,.85), rgba(15,23,42,.9)); border: .15em solid rgba(94,234,212,.6); border-left: .45em solid #5eead4; box-shadow: 0 0 1.2em rgba(94,234,212,.35), inset 0 0 1.5em rgba(94,234,212,.12); backdrop-filter: blur(4px); }
+.cv-equipo .eq-c b { color: #fff; text-shadow: 0 0 .3em rgba(255,255,255,.35); } .cv-equipo .eq-n { background: linear-gradient(135deg, #14b8a6, #6366f1); box-shadow: 0 0 .6em rgba(99,102,241,.7); }
+.cv-equipo .eq-c:not(.on) { opacity: .55; filter: saturate(.6); }
+.cv-equipo .eq-c.ya, .cv-equipo .eq-c.on:has(.eq-ej.ya) { border-color: #fde047; border-left-color: #fde047; box-shadow: 0 0 0 .15em #fde047, 0 0 2.2em rgba(253,224,71,.6); animation: eqLate 1.4s ease-in-out infinite; } @keyframes eqLate { 50% { box-shadow: 0 0 0 .15em #fde047, 0 0 3.2em rgba(253,224,71,.9); } }
+.cv-equipo .eq-ej { background: rgba(16,185,129,.15); color: #a7f3d0; border: .1em dashed rgba(167,243,208,.6); } .cv-equipo .eq-ej i { color: #6ee7b7; }
+.cv-equipo .rq-btn { background: linear-gradient(135deg, #5eead4, #fde047); box-shadow: 0 0 1.2em rgba(94,234,212,.7); position: relative; z-index: 2; }
