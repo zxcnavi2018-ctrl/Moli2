@@ -1264,7 +1264,7 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 #anim.carrera { background: linear-gradient(180deg, #fdf2f8, #fce7f3 50%, #fbcfe8); }
 .an-cr { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 .cr-tit { position: absolute; top: 3vh; left: 9vw; right: 22vw; text-align: center; font: 900 clamp(26px, 6.5vh, 70px) system-ui; color: #9d174d; text-shadow: 0 .06em 0 #fff; z-index: 3; }
-.cr-ov { position: absolute; right: -30vh; top: 50%; width: 76vh; height: 76vh; margin-top: -38vh; border-radius: 50%; background: radial-gradient(circle at 38% 40%, #fffbeb, #fde68a 55%, #f59e0b); box-shadow: 0 0 0 3.5vh rgba(253,230,138,.55), 0 0 0 5vh rgba(251,191,36,.25), 0 0 80px rgba(245,158,11,.5); }
+.cr-ov { position: absolute; right: -30vh; top: 50%; width: 76vh; height: 76vh; margin-top: -38vh; border-radius: 50%; background: radial-gradient(circle at 38% 40%, #ffffff, #f8fafc 55%, #e2e8f0); box-shadow: 0 0 0 3.5vh rgba(255,255,255,.6), 0 0 0 5vh rgba(253,230,138,.35), 0 0 80px rgba(255,255,255,.8); }
 .cr-zona { position: absolute; inset: -5vh; border-radius: 50%; border: 1.4vh dotted #fbbf24; animation: sySol 30s linear infinite; }
 .cr-nuc { position: absolute; left: 22%; top: 40%; width: 16vh; height: 16vh; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fed7aa, #fb923c 60%, #c2410c); }
 .cr-meta { position: absolute; right: 2vw; bottom: 4vh; font: 900 3.4vh system-ui; color: #92400e; background: #fff; border-radius: 99em; padding: .6vh 1.6vw; z-index: 3; }

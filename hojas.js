@@ -849,7 +849,7 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
           <div class="eq-b"><div class="eq-izq"><div class="cc-mo eq-mo"><img src="${IMG('decidida')}" alt="Molí"><i>🩺</i><span class="eq-holo"></span></div><div class="cc-bub"><span class="cc-n">1 / 5</span><p>${esc(T[0])}</p></div></div><div class="eq-cs">${card(0)}${card(1)}</div></div>
           <button type="button" class="rq-btn" onclick="PasosQ.avanzar()">🎮 Presiona <b>A</b> para empezar</button></div>`; }
       if (it.k === 'ciclo') {                                           // 🌸 Molí explica el ciclo ovárico (4 fases) y el calendario de Clara · paso a paso con A
-        const F = [['Menstruación', 1, 5, '#ef4444', '🩸'], ['Fase folicular', 6, 13, '#ec4899', '🌱'], ['Ovulación', 14, 14, '#f59e0b', '🥚'], ['Fase lútea', 15, 28, '#3b82f6', '🫖']];
+        const F = [['Menstruación', 1, 5, '#ef4444', '🩸'], ['Fase folicular', 6, 13, '#ec4899', '🌱'], ['Ovulación', 14, 14, '#f59e0b', '⚪'], ['Fase lútea', 15, 28, '#3b82f6', '🫖']];
         const R = 118, cx = 150, cy = 150, pol = (d, r) => { const a = (d - 1) / 28 * 2 * Math.PI - Math.PI / 2; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
         const arco = (a, b, c) => { const [x1, y1] = pol(a - .5, R), [x2, y2] = pol(b + .5, R), big = (b - a + 1) > 14 ? 1 : 0; return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 ${big} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke="${c}" stroke-width="44" fill="none"/>`; };
         const marcas = [1, 5, 6, 13, 14, 15, 28].map(d => { const [x, y] = pol(d, R + 36); return `<text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle" font-size="15" font-weight="900" fill="#e2e8f0">${d}</text>`; }).join('');

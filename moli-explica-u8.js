@@ -23,7 +23,7 @@ window.MX8 = {
       { m: 'genial', t: 'Hablamos con respeto y con palabras científicas. ¡Así aprendemos a conocer nuestro cuerpo!', a: [{ k: 'ok', x: '🔬 Palabras científicas · 💛 respeto' }] }],
     '1-2': [
       { m: 'hola', t: 'Ahora, cada uno empezará su diccionario científico, en una hoja de su cuaderno.', a: [{ k: 'tag', x: '🧑 Individual · Cuaderno' }] },
-      { m: 'curiosa', t: 'En esta unidad aparecerán muchas palabras nuevas, como óvulo, espermatozoide o útero. ¡Vamos a guardarlas!', a: [{ k: 'chips', x: ['🥚 Óvulo', '🔵 Espermatozoide', '🫖 Útero', '🌸 Ovario'] }] },
+      { m: 'curiosa', t: 'En esta unidad aparecerán muchas palabras nuevas, como óvulo, espermatozoide o útero. ¡Vamos a guardarlas!', a: [{ k: 'chips', x: ['⚪ Óvulo', '🔵 Espermatozoide', '🫖 Útero', '🌸 Ovario'] }] },
       { m: 'pensativa', t: 'Haz un cuadro de tres columnas: la palabra nueva, qué significa con tus palabras, y un dibujo pequeño.', a: [{ k: 'col', i: '🔤', h: 'Palabra nueva', x: '' }, { k: 'col', i: '💬', h: '¿Qué significa?', x: '' }, { k: 'col', i: '✏️', h: 'Dibujo', x: '' }] },
       { m: 'idea', t: 'Usa las palabras del video y de la sopa de letras.', a: [{ k: 'nota', x: '🔍 Sopa de letras + video = palabras nuevas' }] },
       { m: 'decidida', t: 'Escribe el significado con tus palabras, no lo copies. Así lo entiendes de verdad.', a: [{ k: 'ok', x: '✍️ Con mis propias palabras' }] },
@@ -56,7 +56,7 @@ window.MX8 = {
     '3-2': [
       { m: 'hola', t: 'Ahora trabajamos en equipo: armaremos el organizador del ciclo ovárico en un papelote.', a: [{ k: 'tag', x: '👥 En equipo · Papelote' }] },
       { m: 'pensativa', t: 'Primero vemos el video de las fases del ciclo. Fíjense bien: qué le pasa al óvulo, a la pared del útero y a las trompas.', a: [{ k: 'fila', n: 1, i: '📺', x: 'Vemos el video' }, { k: 'fila', n: 2, i: '👀', x: 'Óvulo · útero · trompas' }, { k: 'fila', n: 3, i: '📝', x: 'Anotamos ideas cortas' }] },
-      { m: 'curiosa', t: 'El ciclo dura unos veintiocho días y tiene tres fases: la fase folicular, la ovulación, y la fase lútea.', a: [{ k: 'chips', x: ['🌱 Folicular · días 1 a 13', '🥚 Ovulación · día 14', '🫖 Lútea · días 15 a 28'] }] },
+      { m: 'curiosa', t: 'El ciclo dura unos veintiocho días y tiene tres fases: la fase folicular, la ovulación, y la fase lútea.', a: [{ k: 'chips', x: ['🌱 Folicular · días 1 a 13', '⚪ Ovulación · día 14', '🫖 Lútea · días 15 a 28'] }] },
       { m: 'idea', t: 'Copien el organizador en su papelote: qué le pasa al óvulo, a la pared del útero y a las trompas en cada etapa. Algunas casillas ya tienen una pista.', a: [{ k: 'tabla', c: ['', 'Días 1-5', 'Días 6-13', 'Día 14', 'Días 15-28'], d: [['Óvulo', '', 'Madura', '', ''], ['Pared del útero', 'Se desprende', '', '', 'Se engrosa'], ['Trompas', '', '', '', '']] }] },
       { m: 'decidida', t: 'Recuerden: si el óvulo no es fecundado, la pared del útero se desprende. Eso es la menstruación, y es natural.', a: [{ k: 'ok', x: '🌷 La menstruación es natural' }] },
       { m: 'genial', t: 'Al final, vuelvan a sus respuestas del inicio. ¿Qué cambió? ¡Eso es aprender!', a: [{ k: 'nota', x: '🔄 Antes pensaba… ahora sé…' }] }],
