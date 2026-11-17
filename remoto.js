@@ -398,30 +398,43 @@
     if (k === 'ruleta') return ruleta();
     if (k === 'palmas') return palmas();
     const NAV = window.esNavidad && esNavidad();                       // 🎄 del 1 de noviembre al 6 de enero: avión navideño, tambor = trineo, atención = árbol
-    if (k === 'shh' && NAV) { molí3d('guiño'); jet(7); for (let i = 0; i < 30; i++) [2637, 3136].forEach((f, q) => tono(f, .3 + i * .22 + q * .01, .12, 'triangle', .02));   // 🤫✈️🎄 avión navideño
-      const nubes = Array.from({ length: 7 }, (_, q) => `<i class="an-nube" style="top:${8 + (q * 37) % 78}%;--d:${5 + (q % 4) * 1.6}s;--r:${-(q * 1.3)}s;--s:${.7 + (q % 3) * .35}"></i>`).join('');
-      const nieve = Array.from({ length: 30 }, (_, q) => `<i class="an-copo" style="left:${(q * 31) % 100}%;--d:${4 + q % 5}s;--r:${-(q * .7)}s;--s:${.5 + (q % 4) * .25}">${['❄', '✦', '❄', '★'][q % 4]}</i>`).join('');
-      const regalos = ['🎁', '🍬', '⭐', '🎀', '🔔', '🎁'].map((e, q) => `<i class="an-reg" style="--x:${12 + q * 15}vw;--d:${1.2 + q * .55}s">${e}</i>`).join('');
-      return mostrar(`<div class="an-st an-shh2 an-shnav">${nubes}${nieve}<div class="an-vuelo"><div class="an-banda"><span>🎄 ¡Feliz Navidad! 🎄</span></div>${AVIONNAV(window.moliDibujo ? moliDibujo('decidida') : IMG('decidida'))}${regalos}</div>
-        <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielonav'); }
-    if (k === 'shh') { molí3d('guiño'); jet(7);                       // 🤫✈️ Molí viaja en su avión: la turbina hace «shhhhh»
-      const nubes = Array.from({ length: 9 }, (_, q) => `<i class="an-nube" style="top:${8 + (q * 37) % 78}%;--d:${5 + (q % 4) * 1.6}s;--r:${-(q * 1.3)}s;--s:${.7 + (q % 3) * .35}"></i>`).join('');
-      return mostrar(`<div class="an-st an-shh2">${nubes}<div class="an-vuelo"><div class="an-estela"></div>${AVION(IMG('decidida'))}</div>
-        <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Respetamos las normas!</div></div>`, 7600, 'cielo'); }
+    // ===== 🫀 ANIMACIONES DEL CUERPO HUMANO (todas con respeto) =====
+    const MI = n => window.moliDibujo ? moliDibujo(n) : IMG(n);
+    if (k === 'shh') { molí3d('guiño'); sonido(7, (a, s, t) => { const f = a.createBiquadFilter(), g = a.createGain(); f.type = 'lowpass'; f.frequency.value = 500; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.35, t + 1.5); g.gain.linearRampToValueAtTime(0, t + 7); s.connect(f).connect(g).connect(a.destination); });
+      for (let i = 0; i < 9; i++) { tono(60, i * .8, .18, 'sine', .45); tono(55, i * .8 + .22, .16, 'sine', .3); }      // 🤫🔴 Molí viaja en su nave por la sangre; se oye el corazón «pum-pum»
+      const cel = Array.from({ length: 16 }, (_, q) => `<i class="vs-gl" style="top:${10 + (q * 37) % 78}%;--d:${2.2 + (q % 5) * .6}s;--r:${-(q * .45)}s;--s:${.6 + (q % 3) * .3}"></i>`).join('');
+      return mostrar(`<div class="an-st an-vaso">${cel}<div class="vs-nave"><div class="vs-cap"><img src="${MI('decidida')}" alt=""></div><i class="vs-luz"></i></div>
+        <div class="an-big shh">🤫 Shhhhh…</div><div class="an-bub">¡Viajamos en silencio por el cuerpo! ¡Respetamos las normas!</div></div>`, 7600, 'sangre'); }
+    if (k === 'drum') { molí3d('feliz', 'saltar');                     // ❤️ ¡PUM-PUM! un corazón gigante late y la línea del monitor salta: ¡atentos!
+      for (let i = 0; i < 7; i++) { const t0 = .3 + i * .85; tono(62, t0, .3, 'sine', .9); ruido(t0, .07, 160, .5); tono(58, t0 + .24, .25, 'sine', .6); ruido(t0 + .24, .06, 160, .35); }
+      return mostrar(`<div class="an-st an-cora"><svg class="co-ecg" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 H300 L330 10 L360 110 L390 30 L410 60 H600 L630 10 L660 110 L690 30 L710 60 H1000"/></svg>
+        <div class="co-cor"><svg viewBox="0 0 400 360" aria-hidden="true"><defs><radialGradient id="cog" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fecdd3"/><stop offset=".5" stop-color="#f43f5e"/><stop offset="1" stop-color="#9f1239"/></radialGradient></defs><path d="M200 340 C70 250 20 170 40 100 C62 30 160 20 200 90 C240 20 338 30 360 100 C380 170 330 250 200 340Z" fill="url(#cog)" stroke="#881337" stroke-width="8"/><ellipse cx="110" cy="100" rx="40" ry="20" fill="#fff" opacity=".45" transform="rotate(-30 110 100)"/></svg></div>
+        <img class="co-mo" src="${MI('salta')}" alt=""><div class="an-pum"><b>¡PUM!</b><b>¡PUM!</b><b>¡PUM!</b></div><div class="an-bub">❤️ ¡Nuestro corazón late al mismo ritmo! ¡Atentos!</div></div>`, 6800, 'corazon'); }
+    if (k === 'acu') {                                                  // 🧠⚡ acuerdos: cada norma es un impulso que viaja por las neuronas y se enciende
+      const L = [['✋', 'Levantamos la mano para participar'], ['🤐', 'No conversamos cuando otro habla'], ['🪑', 'Nos quedamos en nuestro sitio'], ['🤝', 'Respetamos a todos']], PASO = 4400;
+      const N = [[14, 30], [38, 18], [62, 30], [86, 18]]; molí3d('feliz', 'señalar'); let i = 0;
+      const lin = N.slice(1).map(([x, y], q) => `<line x1="${N[q][0]}" y1="${N[q][1]}" x2="${x}" y2="${y}"/>`).join('');
+      const neu = N.map(([x, y], q) => `<div class="ne-n" style="left:${x}%;top:${y}%"><i></i><b>${q + 1}</b></div>`).join('');
+      const paso = () => { if (!capa.classList.contains('on')) return; const x = L[i], n = capa.querySelectorAll('.ne-n')[i]; if (!n) return;
+        const z = capa.querySelector('.ne-imp'); z.style.left = N[i][0] + '%'; z.style.top = N[i][1] + '%'; z.classList.remove('va'); void z.offsetWidth; z.classList.add('va');
+        [1200, 1600, 2100].forEach((f, j) => tono(f, j * .05, .12, 'square', .05)); ruido(0, .15, 4000, .12);
+        setTimeout(() => { n.classList.add('on'); [659, 880, 1047].forEach((f, j) => tono(f, j * .08, .35, 'triangle', .2));
+          const c = capa.querySelector('.ne-card'); c.classList.remove('ve'); void c.offsetWidth; c.innerHTML = `<i>${x[0]}</i><b>${x[1]}</b>`; c.classList.add('ve'); i++; if (i < L.length) setTimeout(paso, PASO - 600); }, 600); };
+      mostrar(`<div class="an-st an-neu"><h2>🧠 Acuerdos de convivencia: ¡encendemos nuestras neuronas!</h2><div class="ne-red"><svg viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden="true">${lin}</svg>${neu}<i class="ne-imp"></i></div>
+        <div class="ne-card"><i>⚡</i><b>¡Cada norma enciende una neurona!</b></div><img class="ne-mo" src="${MI('feliz')}" alt=""></div>`, L.length * PASO + 2200, 'cerebro');
+      return setTimeout(paso, 900); }
+    if (k === 'rol') {                                                  // 👥🫀 roles: como los órganos, cada uno cumple su función y juntos somos un cuerpo
+      const L = [['🧠', 'LÍDER', 'Como el cerebro: organiza al equipo y anima a todos'], ['🖐️', 'HELPER', 'Como las manos: trae y organiza los materiales'], ['👁️', 'DESIGNER', 'Como los ojos: cuida que el trabajo se vea bonito y ordenado'], ['❤️', 'TIMER', 'Como el corazón: marca el ritmo y cuida el tiempo'], ['👄', 'SPEAKER', 'Como la boca: presenta y habla por el equipo']];
+      molí3d('feliz', 'señalar'); let i = 0;
+      const paso = () => { if (!capa.classList.contains('on')) return; const x = L[i]; tono(660, 0, .15); tono(880, .12, .2);
+        capa.querySelector('.an-sc').innerHTML = `<div class="an-card"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`;
+        capa.querySelectorAll('.an-dots i').forEach((d, j) => d.classList.toggle('on', j === i)); i++; if (i < L.length) setTimeout(paso, 4200); };
+      mostrar(`<div class="an-st an-sq an-org"><img class="an-m flota" src="${MI('decidida')}" alt=""><h2>👥 Roles de trabajo: ¡juntos somos un cuerpo!</h2><div class="an-sc"></div><div class="an-dots">${L.map(() => '<i></i>').join('')}</div></div>`, L.length * 4200 + 1800, 'organos');
+      return setTimeout(paso, 600); }
     if (k === 'telon' || k === 'desp') return teatro(k === 'desp');
     if (k === 'rap') { const c = window.cvSes, n = c && c.u === '8' ? c.n : 0; return cancion(CANCIONES['rap' + n] ? 'rap' + n : 'rap'); }   // 🎤 el rap de la sesión que está en pantalla (S3: el del ciclo)
     if (k === 'cancion') return cancion(k);
     if (k === 'titan') return titan();
-    if (k === 'drum' && NAV) { molí3d('feliz', 'saltar');                     // 🥁🦌 Molí toca el tambor en su trineo con renos que flotan: ¡PUM! ¡PUM! ¡PUM! y cascabeles
-      for (let i = 0; i < 22; i++) { const t0 = i * .3; tono(i % 3 ? 80 : 70, t0, .3, 'sine', i % 3 ? .55 : .85); ruido(t0, .07, 160, i % 3 ? .35 : .55); }
-      for (let i = 0; i < 40; i++) { const t0 = i * .17 + (i % 2) * .05; [2637, 3136, 3520].forEach((f, q) => tono(f + (i % 3) * 40, t0 + q * .012, .18, 'triangle', .035)); }
-      golpe(6.7); tono(55, 6.7, 1, 'triangle', .5);
-      const nieve = Array.from({ length: 34 }, (_, q) => `<i class="an-copo" style="left:${(q * 31) % 100}%;--d:${4 + q % 5}s;--r:${-(q * .7)}s;--s:${.5 + (q % 4) * .25}">❄</i>`).join('');
-      const est = Array.from({ length: 36 }, (_, q) => `<b class="an-est" style="left:${(q * 53) % 100}%;top:${(q * 29) % 70}%;--t:${1 + q % 4 * .5}s"></b>`).join('');
-      return mostrar(`<div class="an-st an-navi">${est}<i class="an-lunag"></i>${nieve}<div class="an-pum"><b>¡PUM!</b><b>¡PUM!</b><b>¡PUM!</b></div>
-        <div class="an-vtr"><div class="an-chisp"></div>${TRINEO(window.moliDibujo ? moliDibujo('salta') : IMG('salta'))}</div><div class="an-bub">🎄 ¡Jo, jo, jo! ¡Atentos!</div></div>`, 7800, 'noche'); }
-    if (k === 'drum') { molí3d('feliz', 'saltar'); for (let i = 0; i < 16; i++) golpe(i * .14); golpe(2.6); tono(55, 2.6, 1.2, 'triangle', .5);
-      return mostrar(`<div class="an-st an-drum"><img class="an-m bota" src="${IMG('salta')}" alt=""><div class="an-tam">🥁</div><div class="an-pum"><b>¡PUM!</b><b>¡PUM!</b><b>¡PUM!</b></div></div>`, 4600, 'naranja'); }
     const falta = () => { const h = new Date(), d0 = new Date(h.getFullYear(), h.getMonth(), h.getDate()); let nav = new Date(h.getFullYear(), 11, 25);   // ⭐ cuenta regresiva a Navidad
       if (h.getMonth() === 0) return '🎄 ¡Feliz Navidad y feliz Año Nuevo! 🎉'; const n = Math.round((nav - d0) / 864e5);
       return n === 0 ? '🎄 ¡Hoy es Navidad! 🎁' : n < 0 ? '🎄 ¡Feliz Navidad! 🎁' : n === 1 ? '⭐ ¡Falta <b>1</b> día para Navidad! ⭐' : `⭐ ¡Faltan <b>${n}</b> días para Navidad! ⭐`; };
@@ -447,40 +460,6 @@
     if (k === 'angry') { molí3d('enojado'); helice(6.5); tono(110, .2, .9, 'sawtooth', .14); tono(98, .8, .9, 'sawtooth', .14);   // 😠🚁 Molí enojado en su helicóptero
       return mostrar(`<div class="an-st an-heli"><div class="an-hv">${HELI(IMG('enojado'))}<div class="an-vena">💢</div><div class="an-humo l">💨</div><div class="an-humo r">💨</div>
         <div class="an-soga"></div><div class="an-bub rojo an-colg">¡Prestamos atención!</div></div></div>`, 7000, 'rojo'); }
-    if (k === 'acu' && NAV) {                                           // 🤝🎁 acuerdos en Navidad: cada regalo se abre y muestra una norma
-      const L = [['✋', 'Levantamos la mano para participar'], ['🤐', 'No conversamos cuando otro habla'], ['🪑', 'Nos quedamos en nuestro sitio'], ['🤝', 'Respetamos a todos']];
-      const C = [['#dc2626', '#fde047'], ['#16a34a', '#f87171'], ['#2563eb', '#fde047'], ['#a855f7', '#4ade80']], PASO = 4200;
-      molí3d('feliz', 'señalar'); let i = 0;
-      const nieve = Array.from({ length: 26 }, (_, q) => `<i class="an-copo" style="left:${(q * 31) % 100}%;--d:${4 + q % 5}s;--r:${-(q * .7)}s;--s:${.5 + (q % 4) * .25}">❄</i>`).join('');
-      const regalos = L.map((x, q) => `<div class="an-gift" style="--c:${C[q][0]};--l:${C[q][1]}"><div class="an-gnum">${q + 1}</div><div class="an-gcar"><i>${x[0]}</i><b>${x[1]}</b></div><div class="an-gcaja"></div><div class="an-gtapa"><span class="an-glazo"></span></div></div>`).join('');
-      const paso = () => { if (!capa.classList.contains('on')) return; const g = capa.querySelectorAll('.an-gift')[i], x = L[i]; if (!g) return;
-        g.classList.add('sacude'); ruido(0, .5, 900, .12); [0, .12, .24, .36].forEach(t0 => tono(180, t0, .08, 'square', .06));
-        setTimeout(() => { g.classList.remove('sacude'); g.classList.add('abre'); ruido(0, .12, 2500, .3); [784, 988, 1175, 1568].forEach((f, j) => tono(f, j * .08, .4, 'triangle', .22));
-          const n = capa.querySelector('.an-gnorma'); n.style.setProperty('--c', C[i][0]); n.classList.remove('ve'); void n.offsetWidth; n.innerHTML = `<i>${x[0]}</i><b>${x[1]}</b>`; n.classList.add('ve'); i++; if (i < L.length) setTimeout(paso, PASO - 900); }, 900); };
-      mostrar(`<div class="an-st an-gifts">${nieve}<h2>🎁 Acuerdos de convivencia</h2><div class="an-gnorma"><i>🎄</i><b>¡Abramos los regalos!</b></div>
-        <div class="an-gfila"><img class="an-m flota" src="${IMG('feliz')}" alt="">${regalos}</div></div>`, L.length * PASO + 2400, 'noche');
-      return setTimeout(paso, 1000); }
-    if (k === 'acu') {                                                  // 🤝🚀 acuerdos en la nave espacial (tipo Orión): todo flota, Molí levanta su letrero
-      const L = [['✋', 'Levantamos la mano para participar'], ['🤐', 'No conversamos cuando otro habla'], ['🪑', 'Nos quedamos en nuestro sitio'], ['🤝', 'Respetamos a todos']];
-      molí3d('feliz', 'señalar'); espacio(L.length * 4800 / 1000 + 1.5); let i = 0;
-      const flot = ['✏️', '📚', '🍎', '🧪', '🔭', '🧃', '📏', '🪐', '🎒', '🖍️'].map((e, q) => `<i class="an-flo" style="left:${(q * 23) % 92}%;top:${(q * 41) % 80}%;--d:${7 + q % 5}s;--r:${q * 37}deg;--x:${(q % 2 ? 1 : -1) * (3 + q % 4)}vw;--y:${(q % 3 - 1) * 4}vh">${e}</i>`).join('');
-      const est = Array.from({ length: 40 }, (_, q) => `<b class="an-est" style="left:${(q * 53) % 100}%;top:${(q * 29) % 100}%;--t:${1 + q % 4 * .5}s"></b>`).join('');
-      const paso = () => { if (!capa.classList.contains('on')) return; const x = L[i]; tono(988, 0, .12, 'sine', .18); tono(1318, .1, .18, 'sine', .15);
-        const c = capa.querySelector('.an-letr'); c.classList.remove('gira'); void c.offsetWidth; c.classList.add('gira');
-        setTimeout(() => { c.innerHTML = `<i>${x[0]}</i><b>${x[1]}</b>`; }, 260);
-        capa.querySelectorAll('.an-dots i').forEach((d, j) => d.classList.toggle('on', j === i)); i++; if (i < L.length) setTimeout(paso, 4800); };
-      mostrar(`<div class="an-st an-orion">${est}<div class="an-pared"><span class="an-vent v1"><i class="an-tierra"></i></span><span class="an-vent v2"><i class="an-luna"></i></span><em class="an-rot">ORIÓN · MOLÍ 🚀</em>
-        <div class="an-led">${'<i></i>'.repeat(8)}</div></div>${flot}<h2>🤝 Acuerdos de convivencia</h2>
-        <div class="an-grav"><img class="an-m" src="${IMG('feliz')}" alt=""><div class="an-palo"></div><div class="an-letr"></div></div><div class="an-dots">${L.map(() => '<i></i>').join('')}</div></div>`, L.length * 4800 + 1800, 'espacio');
-      return setTimeout(paso, 700); }
-    if (k === 'rol') {
-      const L = [['🎤', 'VOCERO', 'Presenta lo que hizo el equipo'], ['📦', 'AYUDANTE', 'Trae y guarda los materiales'], ['⏳', 'CONTROLADOR DEL TIEMPO', 'Avisa cuánto tiempo queda'], ['✏️', 'DISEÑADOR', 'Escribe y dibuja el trabajo']];
-      molí3d('feliz', 'señalar'); let i = 0;
-      const paso = () => { if (!capa.classList.contains('on')) return; const x = L[i]; tono(660, 0, .15); tono(880, .12, .2);
-        capa.querySelector('.an-sc').innerHTML = `<div class="an-card"><i>${x[0]}</i><b>${x[1]}</b>${x[2] ? `<small>${x[2]}</small>` : ''}</div>`;
-        capa.querySelectorAll('.an-dots i').forEach((d, j) => d.classList.toggle('on', j === i)); i++; if (i < L.length) setTimeout(paso, 4200); };
-      mostrar(`<div class="an-st an-sq"><img class="an-m flota" src="${IMG(k === 'acu' ? 'feliz' : 'decidida')}" alt=""><h2>${k === 'acu' ? '🤝 Acuerdos de convivencia' : '👥 Roles de trabajo'}</h2><div class="an-sc"></div><div class="an-dots">${L.map(() => '<i></i>').join('')}</div></div>`, L.length * 4200 + 1800, 'azul');
-      return setTimeout(paso, 600); }
     if (/^g[1-6]$/.test(k)) { const g = +k[1] - 1, p = puntos(), antes = p[g] || 0; if (R.rol !== 'phone') { p[g] = antes + 1; LS.set(PK, p); } const ahora = p[g], lleno = ahora >= 10;
       molí3d(lleno ? 'estrellas' : 'feliz', 'saltar'); [523, 659, 784].forEach((f, j) => tono(f, j * .1, .25, 'triangle', .3)); if (lleno) [784, 988, 1175, 1568].forEach((f, j) => tono(f, .4 + j * .12, .35, 'triangle', .3));
       // 🏊🥚 carrera de espermatozoides: cada grupo es un espermatozoide; con cada punto avanza hacia el óvulo (10 puntos = llega)

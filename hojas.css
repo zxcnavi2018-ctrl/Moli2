@@ -1278,3 +1278,40 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .cr-esp em { position: absolute; left: 30%; top: -5vh; font: 900 5vh system-ui; font-style: normal; color: var(--c); animation: crMas 1.6s .4s ease-out both; } @keyframes crMas { 0% { opacity: 0; transform: scale(.4); } 30% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: translateY(-4vh); } }
 .cr-mo { position: absolute; left: 1vw; top: .5vh; height: 13vh; z-index: 4; animation: anFlota 2s ease-in-out infinite; }
 .an-cr.lleno .cr-ov { animation: crBrilla 1s ease-in-out infinite alternate; } @keyframes crBrilla { to { box-shadow: 0 0 0 4vh rgba(253,230,138,.8), 0 0 0 7vh rgba(251,191,36,.4), 0 0 140px rgba(245,158,11,.9); } }
+
+/* ===== 🫀 animaciones del cuerpo humano ===== */
+/* 🤫 viaje por la sangre */
+#anim.sangre { background: radial-gradient(ellipse at 50% 50%, #fecdd3 0, #fb7185 35%, #be123c 75%, #881337); }
+.an-vaso { width: 100vw; height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 8vh; gap: 2vh; }
+.an-vaso::before { content: ''; position: absolute; left: -10%; right: -10%; top: 18%; height: 64%; border-radius: 50%; background: radial-gradient(ellipse, rgba(255,241,242,.45), transparent 70%); }
+.vs-gl { position: absolute; left: -12vh; width: 9vh; height: 6vh; border-radius: 50%; background: radial-gradient(ellipse, #be123c 30%, #ef4444 45%, #f87171 75%); box-shadow: inset 0 0 0 .6vh #dc2626; transform: scale(var(--s)); animation: vsFlu var(--d) linear var(--r) infinite; }
+@keyframes vsFlu { to { left: 112vw; transform: scale(var(--s)) rotate(200deg); } }
+.vs-nave { position: absolute; left: 50%; top: 32%; transform: translate(-50%, -50%); animation: vsNave 2.4s ease-in-out infinite alternate; z-index: 2; }
+.vs-cap { width: 36vh; height: 20vh; border-radius: 10vh; background: linear-gradient(180deg, rgba(224,242,254,.85), rgba(125,211,252,.7)); border: .8vh solid #e0f2fe; box-shadow: 0 0 40px rgba(255,255,255,.7), inset 0 -2vh 3vh rgba(14,165,233,.4); display: grid; place-items: center; overflow: hidden; }
+.vs-cap img { height: 17vh; } .vs-luz { position: absolute; right: -14vh; top: 50%; width: 16vh; height: 4vh; margin-top: -2vh; border-radius: 50%; background: radial-gradient(ellipse, #fef9c3, transparent 70%); }
+@keyframes vsNave { from { transform: translate(-50%, -52%) rotate(-2deg); } to { transform: translate(-50%, -46%) rotate(2deg); } }
+.an-vaso .an-big, .an-vaso .an-bub { position: relative; z-index: 3; }
+/* ❤️ el corazón que late */
+#anim.corazon { background: radial-gradient(ellipse at 50% 45%, #ffe4e6, #fda4af 60%, #e11d48); }
+.an-cora { width: 100vw; height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; }
+.co-ecg { position: absolute; left: 0; top: 40%; width: 100%; height: 22vh; } .co-ecg path { fill: none; stroke: #fff; stroke-width: 6; stroke-dasharray: 2400; stroke-dashoffset: 2400; animation: coEcg 1.7s linear infinite; filter: drop-shadow(0 0 6px #fff); }
+@keyframes coEcg { to { stroke-dashoffset: 0; } }
+.co-cor { width: 40vh; animation: syLate .85s ease-in-out .3s infinite; z-index: 2; } .co-cor svg { width: 100%; display: block; filter: drop-shadow(0 1.5vh 2vh rgba(136,19,55,.4)); }
+.co-mo { position: absolute; right: 6vw; top: 8vh; height: 30vh; z-index: 3; animation: anFlota 1.7s ease-in-out infinite; }
+.an-cora .an-pum, .an-cora .an-bub { z-index: 2; }
+/* 🧠 neuronas que se encienden */
+#anim.cerebro { background: radial-gradient(ellipse at 50% 40%, #312e81, #1e1b4b 60%, #0b0a24); }
+.an-neu { width: 100vw; height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; padding-top: 4vh; }
+.an-neu h2 { font: 900 clamp(24px, 5.5vh, 60px) system-ui; color: #fde047; text-align: center; margin: 0 4vw; text-shadow: 0 0 20px rgba(250,204,21,.5); }
+.ne-red { position: relative; width: 84vw; height: 34vh; margin-top: 2vh; } .ne-red svg { position: absolute; inset: 0; width: 100%; height: 100%; } .ne-red line { stroke: #818cf8; stroke-width: .6; stroke-dasharray: 2 1.5; opacity: .7; }
+.ne-n { position: absolute; transform: translate(-50%, -50%); width: 10vh; height: 10vh; } .ne-n i { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #c7d2fe, #6366f1 60%, #312e81); box-shadow: 0 0 0 .6vh rgba(129,140,248,.3); transition: .4s; }
+.ne-n b { position: absolute; inset: 0; display: grid; place-items: center; font: 900 4.5vh system-ui; color: #fff; }
+.ne-n.on i { background: radial-gradient(circle at 40% 35%, #fff, #fde047 55%, #f59e0b); box-shadow: 0 0 0 1vh rgba(253,224,71,.4), 0 0 50px #fde047; transform: scale(1.15); } .ne-n.on b { color: #713f12; }
+.ne-imp { position: absolute; width: 4vh; height: 4vh; margin: -2vh 0 0 -2vh; border-radius: 50%; background: #fef08a; box-shadow: 0 0 30px 10px #fde047; opacity: 0; left: 0; top: 50%; }
+.ne-imp.va { animation: neImp .6s ease-in forwards; } @keyframes neImp { 0% { opacity: 1; transform: scale(.4); } 100% { opacity: 0; transform: scale(2.4); } }
+.ne-card { margin-top: 4vh; background: #fff; border-radius: 3vh; padding: 2.5vh 4vw; display: flex; align-items: center; gap: 2vw; box-shadow: 0 0 0 .8vh #fde047, 0 0 60px rgba(253,224,71,.5); max-width: 80vw; }
+.ne-card i { font-style: normal; font-size: 10vh; } .ne-card b { font: 900 clamp(26px, 6.5vh, 70px)/1.1 system-ui; color: #1e1b4b; }
+.ne-card.ve { animation: neCard .7s cubic-bezier(.3,1.6,.5,1); } @keyframes neCard { from { transform: scale(.5); opacity: 0; } }
+.ne-mo { position: absolute; left: 3vw; bottom: 3vh; height: 22vh; animation: anFlota 2s ease-in-out infinite; }
+/* 👥 roles como órganos */
+#anim.organos { background: radial-gradient(ellipse at 50% 30%, #ccfbf1, #5eead4 55%, #0f766e); } .an-org h2 { color: #fff; text-shadow: 0 .08em 0 #115e59; }
