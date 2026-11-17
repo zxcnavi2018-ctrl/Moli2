@@ -1235,3 +1235,6 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .cv-doc.libre .mt-cor { animation: syLate .9s ease-in-out infinite; }
 .cv-doc .mt-ecg { stroke-dasharray: 600; stroke-dashoffset: 600; opacity: .35; } .cv-doc.libre .mt-ecg { opacity: 1; animation: mtEcg 1.6s linear infinite; } @keyframes mtEcg { to { stroke-dashoffset: 0; } }
 .cv-doc.libre .rq-chis { background: radial-gradient(circle, rgba(255,255,255,.95) 0 2px, transparent 3px) 0 0 / 34px 34px; }
+
+/* 👀💭❓ tabla grande «Veo, pienso y me pregunto» */
+.fic-t.big { table-layout: fixed; } .fic-t.big th { font-size: 1.7em; padding: .35em; text-align: center; } .fic-t.big td { height: 9em; }

@@ -76,10 +76,9 @@ window.MX8 = {
       { m: 'pensativa', t: 'Usen las ideas que anotaron. Cada etapa debe tener sus semanas y lo que sucede.', a: [{ k: 'fila', n: 1, i: '📓', x: 'Juntamos nuestras ideas' }, { k: 'fila', n: 2, i: '🎨', x: 'Organizamos el papelote' }, { k: 'fila', n: 3, i: '✅', x: 'Revisamos con la tabla' }] },
       { m: 'decidida', t: 'Antes de exponer, revisen su trabajo con la tabla del equipo. Luego cada integrante explica una etapa.', a: [{ k: 'ok', x: '🎤 ¡Todos exponemos!' }] }],
     '5-1': [
-      { m: 'curiosa', t: 'Cada uno tiene una tirita de siete centímetros. ¿Qué crees que representa?', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '📏 ¿Qué será esta tirita?' }] },
-      { m: 'idea', t: '¡De la caja sorpresa salen frutas! Las ordenamos en la pizarra de la más pequeña a la más grande.', a: [{ k: 'chips', x: ['🍋', '🥑', '🍌', '🌽', '🥦', '🍈', '🍍', '🍉'] }] },
-      { m: 'pensativa', t: 'En tu cuaderno escribe tu predicción: qué representa la tirita, el orden de las frutas y cuánto mide el bebé al nacer.', a: [{ k: 'tabla', c: ['Pregunta', 'Mi respuesta'], d: [['¿Qué representa la tirita?', ''], ['¿Orden de las frutas?', ''], ['¿Cuánto mide al nacer?', '']] }] },
-      { m: 'genial', t: '¡Después lo comprobamos juntos!', a: [{ k: 'ok', x: '🍉 ¡A comprobar!' }] }],
+      { m: 'hola', t: '¡Llegó la caja sorpresa! Cada uno saca una tarjeta de fruta y la pegamos en la pizarra.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '🎁 La caja sorpresa de las frutas' }, { k: 'chips', x: ['🍋', '🥑', '🍌', '🌽', '🥦', '🍈', '🍍', '🍉'] }] },
+      { m: 'curiosa', t: 'Observa bien las frutas de la pizarra y copia esta tabla en tu cuaderno: escribe lo que ves, lo que piensas y lo que te preguntas.', a: [{ k: 'tabla', c: ['👀 Veo', '💭 Pienso', '❓ Me pregunto'], d: [['', '', ''], ['', '', ''], ['', '', '']] }] },
+      { m: 'pensativa', t: '¿Qué tendrán que ver estas frutas con el bebé? ¡Pronto lo descubriremos!', a: [{ k: 'ok', x: '🍉 ¿Qué tendrán que ver con el bebé?' }] }],
     '5-2': [
       { m: 'hola', t: 'Ahora leemos la ficha del segundo y del tercer trimestre, hasta el parto. Subraya lo importante.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '📖 Segundo y tercer trimestre' }] },
       { m: 'pensativa', t: 'Anota en tu cuaderno qué sucede en cada etapa: de la catorce a la veinte, de la veintiuno a la veintisiete, y así hasta el parto.', a: [{ k: 'tabla', c: ['Etapa', '¿Qué sucede?'], d: [['Sem. 14 a 20', ''], ['Sem. 21 a 27', ''], ['Sem. 28 a 35', ''], ['Sem. 36 a 39', ''], ['Sem. 40: el parto', '']] }] },
