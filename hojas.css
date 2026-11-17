@@ -1259,3 +1259,22 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 @keyframes plTallo { to { stroke-dashoffset: 0; } } @keyframes plHoja { to { transform: scale(1); } } @keyframes plBoton { to { transform: scale(1); } }
 @keyframes plLate { to { transform: scale(1.15); } } @keyframes plPet { to { transform: scale(1); } } @keyframes plGira { to { transform: rotate(360deg); } }
 @keyframes plRes { to { transform: translate(-50%, -50%) scale(1); } } @keyframes plBr { 0% { opacity: 0; transform: scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-4vh) scale(1.2); } }
+
+/* 🏊🥚 puntos por grupo: carrera de espermatozoides hacia el óvulo */
+#anim.carrera { background: linear-gradient(180deg, #fdf2f8, #fce7f3 50%, #fbcfe8); }
+.an-cr { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+.cr-tit { position: absolute; top: 3vh; left: 9vw; right: 22vw; text-align: center; font: 900 clamp(26px, 6.5vh, 70px) system-ui; color: #9d174d; text-shadow: 0 .06em 0 #fff; z-index: 3; }
+.cr-ov { position: absolute; right: -30vh; top: 50%; width: 76vh; height: 76vh; margin-top: -38vh; border-radius: 50%; background: radial-gradient(circle at 38% 40%, #fffbeb, #fde68a 55%, #f59e0b); box-shadow: 0 0 0 3.5vh rgba(253,230,138,.55), 0 0 0 5vh rgba(251,191,36,.25), 0 0 80px rgba(245,158,11,.5); }
+.cr-zona { position: absolute; inset: -5vh; border-radius: 50%; border: 1.4vh dotted #fbbf24; animation: sySol 30s linear infinite; }
+.cr-nuc { position: absolute; left: 22%; top: 40%; width: 16vh; height: 16vh; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fed7aa, #fb923c 60%, #c2410c); }
+.cr-meta { position: absolute; right: 2vw; bottom: 4vh; font: 900 3.4vh system-ui; color: #92400e; background: #fff; border-radius: 99em; padding: .6vh 1.6vw; z-index: 3; }
+.cr-pis { position: absolute; left: 0; right: 0; top: 14vh; bottom: 5vh; display: flex; flex-direction: column; justify-content: space-around; }
+.cr-ln { position: relative; height: 11vh; border-bottom: .4vh dashed rgba(157,23,77,.2); }
+.cr-ln b { position: absolute; left: 1vw; top: 50%; transform: translateY(-50%); font: 900 4.5vh system-ui; color: var(--c); }
+.cr-pt { position: absolute; left: 5vw; top: 50%; transform: translateY(-50%); font: 900 3vh system-ui; color: #fff; background: var(--c); border-radius: 99em; padding: .2vh 1vw; }
+.cr-esp { position: absolute; top: 50%; width: 24vh; transform: translateY(-50%); transition: left 2.2s cubic-bezier(.3,1,.4,1); } .cr-esp svg { width: 100%; display: block; overflow: visible; transform: scaleX(-1); }
+.cr-cola { animation: crCola .35s ease-in-out infinite alternate; transform-origin: 30% 50%; } @keyframes crCola { from { transform: scaleY(.6); } to { transform: scaleY(1.3); } }
+.cr-ln:not(.yo) { opacity: .75; } .cr-ln.yo { background: linear-gradient(90deg, color-mix(in srgb, var(--c) 18%, transparent), transparent 80%); }
+.cr-esp em { position: absolute; left: 30%; top: -5vh; font: 900 5vh system-ui; font-style: normal; color: var(--c); animation: crMas 1.6s .4s ease-out both; } @keyframes crMas { 0% { opacity: 0; transform: scale(.4); } 30% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: translateY(-4vh); } }
+.cr-mo { position: absolute; left: 1vw; top: .5vh; height: 13vh; z-index: 4; animation: anFlota 2s ease-in-out infinite; }
+.an-cr.lleno .cr-ov { animation: crBrilla 1s ease-in-out infinite alternate; } @keyframes crBrilla { to { box-shadow: 0 0 0 4vh rgba(253,230,138,.8), 0 0 0 7vh rgba(251,191,36,.4), 0 0 140px rgba(245,158,11,.9); } }

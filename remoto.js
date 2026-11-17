@@ -483,9 +483,13 @@
       return setTimeout(paso, 600); }
     if (/^g[1-6]$/.test(k)) { const g = +k[1] - 1, p = puntos(), antes = p[g] || 0; if (R.rol !== 'phone') { p[g] = antes + 1; LS.set(PK, p); } const ahora = p[g], lleno = ahora >= 10;
       molí3d(lleno ? 'estrellas' : 'feliz', 'saltar'); [523, 659, 784].forEach((f, j) => tono(f, j * .1, .25, 'triangle', .3)); if (lleno) [784, 988, 1175, 1568].forEach((f, j) => tono(f, .4 + j * .12, .35, 'triangle', .3));
-      mostrar(`<div class="an-st an-gp${lleno ? ' lleno' : ''}" style="--gc:${GC[g]}"><img class="an-m bota" src="${IMG(lleno ? 'estrellas' : 'feliz')}" alt=""><div class="an-mas">+1</div>
-        <div class="an-term"><div class="an-tubo"><i style="height:${Math.min(100, ahora * 10)}%"></i></div><span>🏆</span></div><h2>${lleno ? `🏆 ¡El Grupo ${g + 1} llenó el termómetro!` : `¡+1 punto para el Grupo ${g + 1}!`}</h2>
-        <div class="an-all">${GC.map((c, j) => `<div style="--c:${c}"><i style="height:${Math.min(100, (p[j] || 0) * 10)}%"></i><b>${p[j] || 0}</b></div>`).join('')}</div>${lleno ? '<div class="an-conf">' + '<i></i>'.repeat(20) + '</div>' : ''}</div>`, lleno ? 7600 : 5400, 'claro');
+      // 🏊🥚 carrera de espermatozoides: cada grupo es un espermatozoide; con cada punto avanza hacia el óvulo (10 puntos = llega)
+      const X = n => 9 + 64 * Math.min(10, n) / 10, ESP = c => `<svg viewBox="0 0 120 40" aria-hidden="true"><path class="cr-cola" d="M40 20 C55 8 70 32 85 20 S105 8 118 20" stroke="${c}" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="24" cy="20" rx="20" ry="14" fill="${c}" stroke="#fff" stroke-width="3"/><ellipse cx="18" cy="15" rx="7" ry="4" fill="#fff" opacity=".6"/><circle cx="12" cy="20" r="3" fill="#1e293b"/></svg>`;
+      mostrar(`<div class="an-st an-cr${lleno ? ' lleno' : ''}"><div class="cr-tit">${lleno ? `🏆 ¡El espermatozoide del Grupo ${g + 1} llegó al óvulo!` : `🏊 ¡+1 punto para el Grupo ${g + 1}!`}</div>
+        <div class="cr-ov"><i class="cr-zona"></i><i class="cr-nuc"></i></div><div class="cr-meta">🥚 Meta: 10 puntos</div>
+        <div class="cr-pis">${GC.map((c, j) => { const v = p[j] || 0, de = j === g ? (R.rol !== 'phone' ? antes : Math.max(0, v - 1)) : v; return `<div class="cr-ln${j === g ? ' yo' : ''}" style="--c:${c}"><b>G${j + 1}</b><span class="cr-pt">${v}</span><div class="cr-esp" style="left:${X(de)}vw" data-x="${X(v)}">${ESP(c)}${j === g ? '<em>+1</em>' : ''}</div></div>`; }).join('')}</div>
+        <img class="cr-mo" src="${IMG(lleno ? 'estrellas' : 'feliz')}" alt="">${lleno ? '<div class="an-conf">' + '<i></i>'.repeat(20) + '</div>' : ''}</div>`, lleno ? 7600 : 5400, 'carrera');
+      setTimeout(() => { const e = capa.querySelector('.cr-ln.yo .cr-esp'); if (e) e.style.left = e.dataset.x + 'vw'; }, 500);
       return estado(); }
     if (k === 'fin') { const p = puntos(), mx = Math.max(0, ...GC.map((c, j) => p[j] || 0)), gan = GC.map((c, j) => j).filter(j => (p[j] || 0) === mx && mx > 0);
       for (let i = 0; i < 18; i++) golpe(i * .12); setTimeout(() => { [523, 659, 784, 1047].forEach((f, j) => tono(f, j * .15, .5, 'triangle', .35)); ruido(.6, 2.5, 2000, .15); }, 2600);
@@ -548,6 +552,7 @@
   const PK = 'moli2:grpts';
   const puntos = () => LS.get(PK, [0, 0, 0, 0, 0, 0]);
   const puntosReset = () => LS.set(PK, [0, 0, 0, 0, 0, 0]);
+  try { const nv = performance.getEntriesByType('navigation')[0]; if (nv && nv.type === 'reload') puntosReset(); } catch (e) {}   // 🔄 al recargar la página (F5) los puntos de los grupos empiezan de cero
 
   window.Remoto = { comoLaptop, comoCelular, detener, animar, timer, sorteo, ejecutar, estado: () => ({ ...R }) };
 })();
