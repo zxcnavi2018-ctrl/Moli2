@@ -1315,3 +1315,20 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .ne-mo { position: absolute; left: 3vw; bottom: 3vh; height: 22vh; animation: anFlota 2s ease-in-out infinite; }
 /* 👥 roles como órganos */
 #anim.organos { background: radial-gradient(ellipse at 50% 30%, #ccfbf1, #5eead4 55%, #0f766e); } .an-org h2 { color: #fff; text-shadow: 0 .08em 0 #115e59; }
+
+/* 🔬 ¿qué hay en el microscopio? */
+#anim.micro { background: radial-gradient(ellipse at 50% 45%, #134e4a, #042f2e 70%, #021716); }
+.an-micro { width: 100vw; height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; }
+.an-micro h2 { margin: 0; font: 900 clamp(28px, 7vh, 76px) system-ui; color: #5eead4; text-shadow: 0 0 24px rgba(94,234,212,.6); }
+.mi-lente { position: relative; width: 38vh; height: 38vh; border-radius: 50%; background: radial-gradient(circle, #f0fdfa, #99f6e4 60%, #14b8a6); border: 2.4vh solid #1e293b; box-shadow: 0 0 0 1vh #64748b, 0 0 60px rgba(94,234,212,.6), inset 0 0 40px rgba(15,118,110,.6); display: grid; place-items: center; overflow: hidden; }
+.mi-lente span { font-size: 22vh; filter: blur(18px); opacity: .4; transform: scale(.6); animation: miFoco 2.6s .2s cubic-bezier(.3,1.2,.5,1) forwards; }
+.mi-q { position: absolute; font: 900 20vh system-ui; font-style: normal; color: #0f766e; animation: miQ 2.6s ease-in forwards; }
+@keyframes miFoco { 60% { filter: blur(8px); opacity: .7; } 100% { filter: none; opacity: 1; transform: scale(1); } } @keyframes miQ { 0%, 60% { opacity: .8; transform: scale(1) rotate(0); } 100% { opacity: 0; transform: scale(2) rotate(30deg); } }
+.mi-dato { max-width: 76vw; background: #fff; border-radius: 3vh; padding: 2vh 3vw; text-align: center; box-shadow: 0 0 0 .8vh #5eead4, 0 0 50px rgba(94,234,212,.5); opacity: 0; transform: translateY(4vh) scale(.8); animation: miDato .8s 2.6s cubic-bezier(.3,1.5,.5,1) forwards; }
+.mi-dato b { display: block; font: 900 4vh system-ui; color: #0f766e; } .mi-dato p { margin: .6vh 0 0; font: 800 clamp(22px, 5vh, 54px)/1.2 system-ui; color: #1e293b; }
+@keyframes miDato { to { opacity: 1; transform: none; } }
+.mi-mo { position: absolute; left: 3vw; bottom: 3vh; height: 24vh; animation: anFlota 2s ease-in-out infinite; }
+.mi-bu { position: absolute; bottom: -6vh; width: 4vh; height: 4vh; border-radius: 50%; border: .3vh solid rgba(153,246,228,.5); transform: scale(var(--s)); animation: miBu var(--d) linear var(--r) infinite; } @keyframes miBu { to { bottom: 110vh; } }
+
+/* S1 S2 S3…: botoncitos para ir directo a cada sesión */
+.cv-ss { flex: none; display: flex; gap: .2em; } .cv-ss button { border: 0; border-radius: .5em; padding: .25em .4em; font: 800 .72em system-ui; color: #fff; background: rgba(255,255,255,.22); cursor: pointer; } .cv-ss button:hover { background: rgba(255,255,255,.45); }

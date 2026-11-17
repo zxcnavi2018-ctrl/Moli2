@@ -995,7 +995,11 @@ Nada de «todas las anteriores», «ninguna» ni preguntas de opinión.`;
         const b = e.target.closest('[data-cv]'); if (!b) return; e.stopPropagation(); mover(+b.dataset.cv); });
       { const ult = () => { for (let k = P.L.length - 1; k >= 0; k--) if (P.L[k].k === 'uni' && P.L[k].ss && P.L[k].ss.length) return k; return -1; }, z = P.L[ult()];   // ⏩ atajo a la unidad que estamos trabajando (la última con sesiones)
         if (z) { const b = document.createElement('button'); b.type = 'button'; b.className = 'cv-atajo'; b.innerHTML = `⏩ Ir a la Unidad ${z.u.num}`; b.title = `Unidad ${z.u.num} · ${z.u.title || ''}`;
-          b.addEventListener('click', e => { e.stopPropagation(); const k = ult(); if (k >= 0) { P.i = k; pinta(true); } }); el.querySelector('.cv-bar select').after(b); } }
+          b.addEventListener('click', e => { e.stopPropagation(); const k = ult(); if (k >= 0) { P.i = k; pinta(true); } }); el.querySelector('.cv-bar select').after(b);
+          const ss = document.createElement('span'); ss.className = 'cv-ss';                    // S1 S2 S3…: ir directo a cada sesión de esa unidad
+          ss.innerHTML = z.ss.map(({ n }) => `<button type="button" data-ss="${n}" title="Sesión ${n}">S${n}</button>`).join('');
+          ss.addEventListener('click', e => { const q = e.target.closest('[data-ss]'); if (!q) return; e.stopPropagation(); const k = P.L.findIndex(y => y.k === 'ses' && y.u === z.u && y.n === +q.dataset.ss); if (k >= 0) { P.i = k; pinta(true); } });
+          b.after(ss); } }
       el.querySelector('select').addEventListener('change', e => { const v = e.target.value.split(':'); const k = P.L.findIndex(z => v[0] === 'u' ? z.k === 'uni' && z.u.key === v[1] : z.k === 'ses' && z.u.key === v[1] && z.n === +v[2]); if (k >= 0) { P.i = k; pinta(true); } });
       let x0 = null; el.addEventListener('pointerdown', e => { x0 = e.target.closest('.cv-bar,.cv-add,.cv-ved,.cv-form') ? null : e.clientX; }); el.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) mover(dx < 0 ? 1 : -1); });
       pinta(true);

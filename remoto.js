@@ -69,7 +69,7 @@
   }
   const escenas = () => { const B = [...document.querySelectorAll('#dots button')]; return B.length ? B.map(b => { const t = b.textContent.trim(), i = t.split(' ')[0]; return [i, t.slice(i.length).trim()]; }) : ESC; };   // las escenas reales del aula (incluye las nuevas)
   const ESC = [['🏫', 'Mi aula'], ['📗', 'Sesiones'], ['🎟️', 'Exit tickets'], ['💻', 'Laboratorio'], ['📌', 'Corcho'], ['📂', 'Notas'], ['💪', 'Misiones'], ['📽️', 'Pizarra']];
-  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['titan', '🔴', 'Modo titán'], ['rap', '🎤', 'Rap de la sesión'], ['ruleta', '🌸', 'Sorteo de roles'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '👥', 'Roles'], ['fin', '🏆', 'Final']];
+  const ANIM = [['telon', '🎭', 'Telón: saludo'], ['titan', '🔴', 'Modo titán'], ['rap', '🎤', 'Rap de la sesión'], ['ruleta', '🌸', 'Sorteo de roles'], ['cancion', '🎶', 'Canción'], ['desp', '🎤', 'Despedida'], ['palmas', '👏', 'Palmas'], ['shh', '🤫', 'Silencio'], ['drum', '🥁', 'Tambor'], ['angry', '😠', 'Atención'], ['acu', '🤝', 'Acuerdos'], ['rol', '🔬', 'Curiosidad'], ['fin', '🏆', 'Final']];
   const GC = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
   let cuerpo = null;
   function abrirControl() {
@@ -423,14 +423,17 @@
       mostrar(`<div class="an-st an-neu"><h2>🧠 Acuerdos de convivencia: ¡encendemos nuestras neuronas!</h2><div class="ne-red"><svg viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden="true">${lin}</svg>${neu}<i class="ne-imp"></i></div>
         <div class="ne-card"><i>⚡</i><b>¡Cada norma enciende una neurona!</b></div><img class="ne-mo" src="${MI('feliz')}" alt=""></div>`, L.length * PASO + 2200, 'cerebro');
       return setTimeout(paso, 900); }
-    if (k === 'rol') {                                                  // 👥🫀 roles: como los órganos, cada uno cumple su función y juntos somos un cuerpo
-      const L = [['🧠', 'LÍDER', 'Como el cerebro: organiza al equipo y anima a todos'], ['🖐️', 'HELPER', 'Como las manos: trae y organiza los materiales'], ['👁️', 'DESIGNER', 'Como los ojos: cuida que el trabajo se vea bonito y ordenado'], ['❤️', 'TIMER', 'Como el corazón: marca el ritmo y cuida el tiempo'], ['👄', 'SPEAKER', 'Como la boca: presenta y habla por el equipo']];
-      molí3d('feliz', 'señalar'); let i = 0;
-      const paso = () => { if (!capa.classList.contains('on')) return; const x = L[i]; tono(660, 0, .15); tono(880, .12, .2);
-        capa.querySelector('.an-sc').innerHTML = `<div class="an-card"><i>${x[0]}</i><b>${x[1]}</b><small>${x[2]}</small></div>`;
-        capa.querySelectorAll('.an-dots i').forEach((d, j) => d.classList.toggle('on', j === i)); i++; if (i < L.length) setTimeout(paso, 4200); };
-      mostrar(`<div class="an-st an-sq an-org"><img class="an-m flota" src="${MI('decidida')}" alt=""><h2>👥 Roles de trabajo: ¡juntos somos un cuerpo!</h2><div class="an-sc"></div><div class="an-dots">${L.map(() => '<i></i>').join('')}</div></div>`, L.length * 4200 + 1800, 'organos');
-      return setTimeout(paso, 600); }
+    if (k === 'rol') {                                                  // 🔬❓ ¡Misterio del microscopio! suena algo curioso, la imagen se enfoca y aparece un dato del cuerpo humano
+      const D = [['🥚', 'El óvulo es la célula más grande del cuerpo humano: ¡casi se puede ver a simple vista!'], ['<svg viewBox="0 0 120 60" width="1.4em"><path d="M45 30 C60 14 75 46 90 30 S108 16 118 30" stroke="#2563eb" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="26" cy="30" rx="22" ry="16" fill="#60a5fa" stroke="#1d4ed8" stroke-width="3"/><ellipse cx="18" cy="24" rx="7" ry="4" fill="#fff" opacity=".7"/></svg>', 'El espermatozoide es una de las células más pequeñas: ¡mide unos 0,05 milímetros!'],
+        ['❤️', 'El corazón del bebé empieza a latir en la semana 6 del embarazo.'], ['🖐️', 'Las huellas digitales se forman antes de nacer y son únicas: ¡ni los gemelos las tienen iguales!'],
+        ['👂', 'Desde la semana 20, el bebé ya puede escuchar la voz de su mamá.'], ['🦴', 'Un recién nacido tiene cerca de 300 huesos; al crecer, algunos se unen y el adulto tiene 206.'],
+        ['🫁', 'Antes de nacer, el bebé practica movimientos de respiración para entrenar sus pulmones.'], ['😴', 'En el tercer trimestre el bebé tiene horas de sueño y de vigilia, ¡como nosotros!']];
+      const x = D[(LS.get('moli2:cur', -1) + 1) % D.length]; LS.set('moli2:cur', D.indexOf(x)); molí3d('sorpresa');
+      [392, 466, 523, 622, 698, 784].forEach((f, j) => tono(f, j * .32, .28, 'sine', .14)); for (let j = 0; j < 10; j++) tono(1800 + (j % 3) * 260, 2 + j * .07, .1, 'triangle', .05);   // tururú misterioso… ¡ding!
+      setTimeout(() => [784, 1047, 1319].forEach((f, j) => tono(f, j * .1, .5, 'triangle', .22)), 2600);
+      const bur = Array.from({ length: 14 }, (_, q) => `<i class="mi-bu" style="left:${(q * 37) % 100}%;--d:${4 + q % 4}s;--r:${-(q * .6)}s;--s:${.5 + (q % 3) * .4}"></i>`).join('');
+      return mostrar(`<div class="an-st an-micro">${bur}<h2>🔬 ¿Qué hay en el microscopio?</h2><div class="mi-lente"><span>${x[0]}</span><i class="mi-q">?</i></div>
+        <div class="mi-dato"><b>💡 ¿Sabías que…?</b><p>${x[1]}</p></div><img class="mi-mo" src="${MI('curiosa')}" alt=""></div>`, 11000, 'micro'); }
     if (k === 'telon' || k === 'desp') return teatro(k === 'desp');
     if (k === 'rap') { const c = window.cvSes, n = c && c.u === '8' ? c.n : 0; return cancion(CANCIONES['rap' + n] ? 'rap' + n : 'rap'); }   // 🎤 el rap de la sesión que está en pantalla (S3: el del ciclo)
     if (k === 'cancion') return cancion(k);
