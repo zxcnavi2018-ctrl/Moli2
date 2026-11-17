@@ -138,13 +138,14 @@
       GR.addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (b) { grI = +b.dataset.g; grupoTecla('aceptar'); } else if (e.target === GR) cerrarGrupos(); }); }
     pintaGrupos(); }
   function pintaGrupos() { let p = []; try { p = JSON.parse(localStorage.getItem('moli2:grpts') || '[]'); } catch (e) {}
-    GR.innerHTML = `<div class="gm"><h3>🏅 ¿Qué grupo gana un punto?</h3><p>Mueve con el joystick o la cruceta · <b>A</b> da +1 punto · suelta para cerrar</p><div class="gg">${GCOL.map((c, i) => `<button type="button" data-g="${i}" style="--c:${c}" class="${i === grI ? 'on' : ''}">Grupo ${i + 1}<small>${p[i] || 0} pts</small></button>`).join('')}</div></div>`; }
+    GR.innerHTML = `<div class="gm"><h3>🏅 ¿Qué grupo gana un punto?</h3><p>Mueve con el joystick o la cruceta · <b>A</b> da +1 punto · suelta para cerrar</p><div class="gg">${GCOL.map((c, i) => `<button type="button" data-g="${i}" style="--c:${c}" class="${i === grI ? 'on' : ''}">Grupo ${i + 1}<small>${p[i] || 0} pts</small></button>`).join('')}<button type="button" data-g="6" style="--c:#16a34a" class="sorteo${grI === 6 ? ' on' : ''}">🌸 Sorteo<small>rol y grupo</small></button></div></div>`; }
   function cerrarGrupos() { if (GR) { GR.remove(); GR = null; } grBtn = -1; }
   function grupoTecla(a) {
     if (a === 'salir') return cerrarGrupos();
-    if (a === 'aceptar') { window.RemotoCmd('an', 'g' + (grI + 1)); return setTimeout(() => GR && pintaGrupos(), 300); }
+    if (a === 'aceptar') { if (grI === 6) { cerrarGrupos(); return window.RemotoCmd('an', 'ruleta'); }   // 🌸 el cuadrito «Sorteo»: crece la flor y sale un rol y un grupo
+      window.RemotoCmd('an', 'g' + (grI + 1)); return setTimeout(() => GR && pintaGrupos(), 300); }
     const m = { pagS: 1, sig: 1, escS: 1, tabS: 1, pagA: -1, ant: -1, escA: -1, tabA: -1 }[a]; if (!m) return;
-    grI = (grI + m + 6) % 6; pintaGrupos(); }
+    grI = (grI + m + 7) % 7; pintaGrupos(); }
   const dirMov = d => ({ '>': 1, '<': -1, 'v': 3, '^': -3 }[d] || 0);   // en las listas: ← → de uno en uno, ↑ ↓ por filas de 3
 
   // ---- 🎬 videos de YouTube (en las hojas o la proyección): Captura inicia / pausa, R3 agranda, R3 ← → salta 10 s ----
@@ -197,14 +198,14 @@
   document.head.appendChild(cssC);
 
   function moverSel(d) { const m = dirMov(d);
-    if (GR) { grI = (grI + m + 6) % 6; return pintaGrupos(); }
+    if (GR) { grI = (grI + m + 7) % 7; return pintaGrupos(); }
     if (CR) { crI = (crI + m + TIEMPOS.length) % TIEMPOS.length; pintaCrono(); } }
   const cssG = document.createElement('style');
   cssG.textContent = `#gruposM { position: fixed; inset: 0; z-index: 2147483080; display: grid; place-items: center; background: rgba(15,23,42,.45); font-family: "Trebuchet MS", system-ui, sans-serif; }
   #gruposM .gm { background: #fff; border: 4px solid #2b2547; border-radius: 24px; padding: 20px 24px; text-align: center; box-shadow: 0 8px 0 #2b2547, 0 30px 60px rgba(0,0,0,.4); }
   #gruposM h3 { margin: 0; font: 900 30px "Trebuchet MS", sans-serif; color: #1e3a8a; } #gruposM p { margin: 6px 0 14px; font-weight: 700; color: #475569; }
   #gruposM .gg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; } #gruposM button { min-width: 170px; border: 4px solid var(--c); border-radius: 18px; padding: 16px 18px; background: #fff; font: 900 26px "Trebuchet MS", sans-serif; color: var(--c); cursor: pointer; }
-  #gruposM button small { display: block; font-size: 15px; color: #64748b; } #gruposM button.on { background: var(--c); color: #fff; transform: scale(1.1); box-shadow: 0 6px 0 rgba(0,0,0,.25); } #gruposM button.on small { color: #fff; }`;
+  #gruposM button small { display: block; font-size: 15px; color: #64748b; } #gruposM button.on { background: var(--c); color: #fff; transform: scale(1.1); box-shadow: 0 6px 0 rgba(0,0,0,.25); } #gruposM button.on small { color: #fff; } #gruposM button.sorteo { grid-column: 1 / -1; } #gruposM button.sorteo:not(.on) { background: #f0fdf4; }`;
   document.head.appendChild(cssG);
 
   // ---- pantalla completa: si venía en pantalla completa (aula → Biblioteca → Revista), cualquier botón la devuelve ----
