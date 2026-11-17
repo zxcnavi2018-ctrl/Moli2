@@ -88,10 +88,9 @@ window.MX8 = {
       { m: 'idea', t: 'Pueden hacer una línea de tiempo con frutas, una historieta, un organizador gráfico o el diario del bebé.', a: [{ k: 'chips', x: ['🍌 Línea con frutas', '💬 Historieta', '🗂️ Organizador', '📔 Diario del bebé'] }] },
       { m: 'decidida', t: 'Revisen su papelote con la tabla del equipo, y luego cada integrante expone una etapa.', a: [{ k: 'ok', x: '🎤 ¡Todos exponemos!' }] }],
     '6-1': [
-      { m: 'curiosa', t: 'Hoy jugamos: ¡adivina sin mirar! Un voluntario toca con un palito el objeto escondido en la caja y describe su forma.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '🔍 ¡Adivina sin mirar!' }] },
-      { m: 'idea', t: 'Así funciona la ecografía: no mira con luz, sino con ondas que rebotan y forman una imagen.', a: [{ k: 'chips', x: ['🔊 Ultrasonido', '🔁 Rebota', '🖥️ Imagen'] }] },
-      { m: 'pensativa', t: 'Vemos el video de las ecografías y cada uno responde en su cuaderno.', a: [{ k: 'tabla', c: ['Pregunta', 'Mi respuesta'], d: [['¿Cómo funciona?', ''], ['¿Para qué en el 1.er trimestre?', ''], ['¿En el 2.°?', ''], ['¿En el 3.er?', '']] }] },
-      { m: 'genial', t: '¡La ciencia nos ayuda a cuidar la vida!', a: [{ k: 'ok', x: '🩺 Una tecnología segura' }] }],
+      { m: 'hola', t: '¡Llegó la caja sorpresa! Cada uno saca una tarjeta de tecnología y la pegamos en la pizarra.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '🎁 La caja sorpresa de las tecnologías' }, { k: 'chips', x: ['🩻 Ecografía', '🍼 Incubadora', '💓 Monitor fetal', '💉 Vacunas y controles'] }] },
+      { m: 'curiosa', t: 'Observa bien las tarjetas de la pizarra y copia esta tabla en tu cuaderno: escribe lo que ves, lo que piensas y lo que te preguntas.', a: [{ k: 'tabla', c: ['👀 Veo', '💭 Pienso', '❓ Me pregunto'], d: [['', '', ''], ['', '', ''], ['', '', '']] }] },
+      { m: 'pensativa', t: '¿Cómo ayudarán estas tecnologías a la mamá y al bebé? ¡Pronto lo descubriremos!', a: [{ k: 'ok', x: '🩺 ¿Cómo nos ayudan?' }] }],
     '6-2': [
       { m: 'hola', t: 'En equipo, saquen una tecnología de la caja sorpresa: ecografía, incubadora, monitor fetal o vacunas.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }, { k: 'chips', x: ['🩻 Ecografía', '🍼 Incubadora', '💓 Monitor fetal', '💉 Vacunas'] }] },
       { m: 'pensativa', t: 'Escriban sus consecuencias positivas, sus cuidados, y una opinión fundamentada con una fuente.', a: [{ k: 'nota', x: 'Opinamos que ____ porque ____. Según ____, ____.' }] },
