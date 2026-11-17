@@ -1332,3 +1332,21 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 
 /* S1 S2 S3…: botoncitos para ir directo a cada sesión */
 .cv-ss { flex: none; display: flex; gap: .2em; } .cv-ss button { border: 0; border-radius: .5em; padding: .25em .4em; font: 800 .72em system-ui; color: #fff; background: rgba(255,255,255,.22); cursor: pointer; } .cv-ss button:hover { background: rgba(255,255,255,.45); }
+
+/* 🫀🚀 la secuencia de clase: Molí viaja por el cuerpo y pasa por cada medalla */
+#rtViaje { position: fixed; inset: 0; z-index: 2147483000; overflow: hidden; background: radial-gradient(ellipse at 50% 50%, #fecdd3 0, #fb7185 40%, #be123c 80%, #881337); opacity: 0; transition: opacity .5s; font-family: system-ui, sans-serif; }
+#rtViaje.in { opacity: 1; }
+.rv-tit { position: absolute; top: 3vh; left: 0; right: 0; text-align: center; font: 900 clamp(22px, 5vh, 56px) system-ui; color: #fff; text-shadow: 0 .08em 0 #881337; z-index: 3; }
+.rv-ruta { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; } .rv-ruta path { fill: none; stroke: rgba(255,241,242,.75); stroke-width: .8; stroke-dasharray: 2 1.6; vector-effect: non-scaling-stroke; stroke-width: 6px; }
+.rv-med { position: absolute; z-index: 2; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: .6vh; opacity: .55; transition: .5s; }
+.rv-med span { width: 13vh; height: 13vh; border-radius: 50%; display: grid; place-items: center; font-size: 7vh; background: rgba(255,255,255,.75); border: .7vh solid #fff; box-shadow: 0 .6vh 0 rgba(136,19,55,.4); }
+.rv-med b { font: 900 2.6vh system-ui; color: #fff; background: rgba(136,19,55,.55); border-radius: 99em; padding: .3vh 1vw; white-space: nowrap; }
+.rv-med.on { opacity: 1; } .rv-med.on span { background: linear-gradient(135deg, var(--c1), var(--c2)); box-shadow: 0 0 0 1vh rgba(255,255,255,.5), 0 0 40px #fde047; animation: rvPop .6s cubic-bezier(.3,1.6,.5,1); } .rv-med.on b { background: var(--c1); }
+@keyframes rvPop { 50% { transform: scale(1.25); } }
+.rv-nave { position: absolute; z-index: 4; transform: translate(-50%, -112%); transition: left 1.2s cubic-bezier(.5,0,.3,1), top 1.2s cubic-bezier(.5,0,.3,1); }
+.rv-cap { width: 22vh; height: 13vh; border-radius: 7vh; background: linear-gradient(180deg, rgba(224,242,254,.9), rgba(125,211,252,.75)); border: .6vh solid #e0f2fe; box-shadow: 0 0 30px rgba(255,255,255,.8); display: grid; place-items: center; overflow: hidden; animation: vsNave 1.4s ease-in-out infinite alternate; }
+.rv-cap img { height: 11vh; } #rtViaje.habla .rv-cap img { animation: rvHabla .3s ease-in-out infinite alternate; } @keyframes rvHabla { to { transform: translateY(-.6vh) scale(1.04); } }
+.rv-bub { position: absolute; left: 50%; bottom: 4vh; transform: translateX(-50%); z-index: 5; max-width: 80vw; background: #fff; border-radius: 3vh; padding: 1.6vh 3vw; font: 900 clamp(22px, 4.6vh, 52px)/1.2 system-ui; color: #1e293b; text-align: center; box-shadow: 0 0 0 .7vh #fde047, 0 1vh 3vh rgba(0,0,0,.25); }
+.rv-bub:empty { display: none; } .rv-bub.pop { animation: neCard .5s cubic-bezier(.3,1.6,.5,1); }
+.rv-x { position: absolute; top: 2vh; right: 2vw; z-index: 6; width: 6vh; height: 6vh; border: 0; border-radius: 50%; background: rgba(255,255,255,.85); font: 900 3vh system-ui; cursor: pointer; }
+#rtViaje.fin .rv-tit::after { content: ' 🎉'; }

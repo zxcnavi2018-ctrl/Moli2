@@ -28,11 +28,11 @@
     ref_hola: '¡Hora del chequeo de la doctora Molí! Revisemos cómo está nuestro aprendizaje.',
     ref_q1: '¿Qué parte me costó más y qué hice para entenderla?', ref_q2: '¿Qué idea de hoy cambió lo que yo pensaba antes?', ref_q3: '¿Cómo podría usar lo que aprendí para cuidar mi salud o la de mi familia?',
     ref_fin: '¡Excelente! Su aprendizaje está muy sano. ¡Gracias por compartir sus ideas!',
-    rt_hola: '¡Hola! Les cuento nuestra secuencia de clase.',
+    rt_hola: '¡Hola! Hoy viajo por el cuerpo humano para contarles nuestra secuencia de clase.',
     rt_1: 'Primero, nos saludamos con alegría.', rt_2: 'Luego, organizamos el aula y recordamos nuestros roles.',
     rt_3: 'Después, conocemos la meta y los criterios de éxito.', rt_4: 'Luego, realizamos las actividades de clase.',
     rt_5: 'Después, reflexionamos sobre lo que aprendimos.', rt_6: 'Y al final, dejamos el aula limpia y ordenada.',
-    rt_fin: '¡Esa es nuestra secuencia de clase!' };
+    rt_fin: '¡Esa es nuestra secuencia de clase! ¡A trabajar con respeto!' };
   const REF = ['ref_q1', 'ref_q2', 'ref_q3'];
   // el texto del «¿Sabías que…?» cambia en cada sesión: su voz se busca por su huella (audio/guion/sab/<huella>.mp3)
   const huella = t => { let h = 5381; t = String(t || '').trim(); for (let i = 0; i < t.length; i++) h = 33 * h + t.charCodeAt(i) | 0; return (h >>> 0).toString(36); };
@@ -166,25 +166,30 @@
     if (!document.body.contains(S.el)) return parar(); e.preventDefault(); e.stopPropagation(); avanzar(); }, true);
   // ---- 🔢 la secuencia de la clase: un Molí pequeño, al lado de las bolitas de la rutina, la cuenta con su voz ----
   let Q = null;
-  function secuencia(nav) {
+  function secuencia(nav) {                                            // 🔴🚀 Molí viaja por dentro del cuerpo (por la sangre) y en cada medalla nos cuenta un paso de la clase
     if (Q) return finSec();
-    const r = nav.getBoundingClientRect(), box = document.createElement('div'); box.id = 'rtMoli';
-    box.innerHTML = '<div class="rm-mo"><canvas></canvas><img src="img/moli/hola.webp" alt="Molí" hidden></div><div class="rm-bub"></div><button type="button" class="rm-x" aria-label="Cerrar">✕</button>';
-    Object.assign(box.style, { left: (r.right + 8) + 'px', top: Math.max(8, r.top + r.height * 0.18) + 'px' });
+    const B = [...nav.querySelectorAll('.rt-b')].map(b => ({ i: (b.querySelector('.rt-i') || {}).textContent || '⭐', t: b.title, c1: b.style.getPropertyValue('--c1'), c2: b.style.getPropertyValue('--c2') }));
+    const P = [[12, 34], [28, 62], [44, 30], [60, 64], [76, 32], [90, 62]];
+    const box = document.createElement('div'); box.id = 'rtViaje';
+    const cel = Array.from({ length: 18 }, (_, q) => `<i class="vs-gl" style="top:${8 + (q * 37) % 84}%;--d:${2.4 + (q % 5) * .6}s;--r:${-(q * .45)}s;--s:${.5 + (q % 3) * .3}"></i>`).join('');
+    box.innerHTML = `${cel}<div class="rv-tit">🫀 Molí viaja por el cuerpo · Nuestra secuencia de clase</div><svg class="rv-ruta" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M2 50 ${P.map(([x, y]) => `L${x} ${y}`).join(' ')} L99 50"/></svg>
+      ${B.map((b, j) => `<div class="rv-med" style="left:${P[j][0]}%;top:${P[j][1]}%;--c1:${b.c1};--c2:${b.c2}"><span>${b.i}</span><b>${j + 1}. ${esc(b.t)}</b></div>`).join('')}
+      <div class="rv-nave" style="left:2%;top:50%"><div class="rv-cap"><img src="img/moli/hola.webp" alt="Molí"></div></div><div class="rv-bub"></div><button type="button" class="rv-x" aria-label="Cerrar">✕</button>`;
     document.body.appendChild(box);
-    const cv = box.querySelector('canvas'), x = tres(cv); if (!x) { cv.hidden = true; box.querySelector('img').hidden = false; }
-    const q = Q = { box, nav, x, M: x ? x.m : M2D(box.querySelector('.rm-mo')), T: [], a: null };
-    box.querySelector('.rm-x').addEventListener('click', e => { e.stopPropagation(); finSec(); });
-    ['pointerdown', 'pointerup'].forEach(t => box.addEventListener(t, e => e.stopPropagation()));
+    const q = Q = { box, nav, x: null, M: { hablar() {}, expr() {} }, T: [], a: null }, nave = box.querySelector('.rv-nave'), img = nave.querySelector('img');
+    box.querySelector('.rv-x').addEventListener('click', e => { e.stopPropagation(); finSec(); });
+    ['pointerdown', 'pointerup', 'click'].forEach(t => box.addEventListener(t, e => e.stopPropagation()));
     const vivo = () => { if (Q !== q) throw 0; };
-    const decirQ = k => new Promise(res => { const a = audio(k), d = dur(k); let fin = false; const listo = () => { if (fin) return; fin = true; q.M.hablar(false); res(); };
-      box.querySelector('.rm-bub').textContent = SUB[k] || ''; q.M.hablar(true); q.a = a; a.onended = () => setTimeout(listo, 150); a.onerror = () => q.T.push(setTimeout(listo, d * 1000));
+    const decirQ = k => new Promise(res => { const a = audio(k), d = dur(k); let fin = false; const listo = () => { if (fin) return; fin = true; box.classList.remove('habla'); res(); };
+      const bb = box.querySelector('.rv-bub'); bb.textContent = SUB[k] || ''; bb.classList.remove('pop'); void bb.offsetWidth; bb.classList.add('pop'); box.classList.add('habla'); q.a = a; a.onended = () => setTimeout(listo, 150); a.onerror = () => q.T.push(setTimeout(listo, d * 1000));
       try { a.currentTime = 0; } catch (e) {} const p = a.play(); if (p && p.catch) p.catch(() => q.T.push(setTimeout(listo, d * 1000))); q.T.push(setTimeout(listo, d * 1000 + 5000)); });
     const guia = i => nav.querySelectorAll('.rt-b').forEach((b, j) => b.classList.toggle('guia', j === i));
+    const ir = (x, y) => new Promise(r => { nave.style.left = x + '%'; nave.style.top = y + '%'; q.T.push(setTimeout(r, 1300)); });
     (async () => { try {
-      box.classList.add('in'); q.M.expr('feliz'); q.M.accion && q.M.accion('saludar'); await decirQ('rt_hola'); vivo();
-      for (let i = 0; i < 6; i++) { guia(i); q.M.accion && q.M.accion('asentir'); await decirQ('rt_' + (i + 1)); vivo(); await new Promise(r => q.T.push(setTimeout(r, 350))); vivo(); }
-      guia(-1); q.M.expr('estrellas'); q.M.accion && q.M.accion('saltar'); await decirQ('rt_fin'); vivo(); await new Promise(r => q.T.push(setTimeout(r, 1200))); vivo(); finSec();
+      requestAnimationFrame(() => box.classList.add('in')); await new Promise(r => q.T.push(setTimeout(r, 500))); vivo(); await decirQ('rt_hola'); vivo();
+      for (let i = 0; i < Math.min(6, B.length); i++) { await ir(P[i][0], P[i][1]); vivo(); guia(i); const m = box.querySelectorAll('.rv-med')[i]; m.classList.add('on'); img.src = 'img/moli/' + ['feliz', 'decidida', 'idea', 'genial', 'pensativa', 'orgullosa'][i] + '.webp';
+        await decirQ('rt_' + (i + 1)); vivo(); await new Promise(r => q.T.push(setTimeout(r, 300))); vivo(); }
+      guia(-1); await ir(97, 50); vivo(); img.src = 'img/moli/estrellas.webp'; box.classList.add('fin'); await decirQ('rt_fin'); vivo(); await new Promise(r => q.T.push(setTimeout(r, 1500))); vivo(); finSec();
     } catch (e) {} })();
   }
   function finSec() { const q = Q; if (!q) return; Q = null; q.T.forEach(clearTimeout); if (q.a) { try { q.a.pause(); } catch (e) {} } q.nav.querySelectorAll('.rt-b').forEach(b => b.classList.remove('guia')); if (q.x) q.x.parar(); q.box.remove(); }
