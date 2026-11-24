@@ -88,13 +88,15 @@ window.MX8 = {
       { m: 'idea', t: 'Pueden hacer una línea de tiempo con frutas, una historieta, un organizador gráfico o el diario del bebé.', a: [{ k: 'chips', x: ['🍌 Línea con frutas', '💬 Historieta', '🗂️ Organizador', '📔 Diario del bebé'] }] },
       { m: 'decidida', t: 'Revisen su papelote con la tabla del equipo, y luego cada integrante expone una etapa.', a: [{ k: 'ok', x: '🎤 ¡Todos exponemos!' }] }],
     '6-1': [
-      { m: 'hola', t: '¡Llegó la caja sorpresa! Cada uno saca una tarjeta de tecnología y la pegamos en la pizarra.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '🎁 La caja sorpresa de las tecnologías' }, { k: 'chips', x: ['🩻 Ecografía', '🍼 Incubadora', '💓 Monitor fetal', '💉 Vacunas y controles'] }] },
-      { m: 'curiosa', t: 'Observa bien las tarjetas de la pizarra y copia esta tabla en tu cuaderno: escribe lo que ves, lo que piensas y lo que te preguntas.', a: [{ k: 'tabla', c: ['👀 Veo', '💭 Pienso', '❓ Me pregunto'], d: [['', '', ''], ['', '', ''], ['', '', '']] }] },
-      { m: 'pensativa', t: '¿Cómo ayudarán estas tecnologías a la mamá y al bebé? ¡Pronto lo descubriremos!', a: [{ k: 'ok', x: '🩺 ¿Cómo nos ayudan?' }] }],
+      { m: 'hola', t: 'Hoy vamos a ver un video sobre la tecnología que ayuda a cuidar a la mamá y al bebé en el embarazo y el parto.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '📺 Observamos el video' }] },
+      { m: 'curiosa', t: 'Mira con atención: fíjate qué aparatos aparecen, para qué sirven y en qué momento se usan.', a: [{ k: 'chips', x: ['🖥️ ¿Qué aparato?', '🎯 ¿Para qué sirve?', '⏱️ ¿Cuándo se usa?'] }] },
+      { m: 'pensativa', t: 'Después del video, copia las preguntas en tu cuaderno y respóndelas con lo que viste.', a: [{ k: 'tabla', c: ['Pregunta', 'Mi respuesta'], d: [['¿Qué aparatos aparecen?', ''], ['¿Para qué sirve la ecografía?', ''], ['¿Qué se usa en el parto?', '']] }] },
+      { m: 'genial', t: '¡A ver el video con mucha atención!', a: [{ k: 'ok', x: '📺 ¡Ojos atentos!' }] }],
     '6-2': [
-      { m: 'hola', t: 'En equipo, saquen una tecnología de la caja sorpresa: ecografía, incubadora, monitor fetal o vacunas.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }, { k: 'chips', x: ['🩻 Ecografía', '🍼 Incubadora', '💓 Monitor fetal', '💉 Vacunas'] }] },
-      { m: 'pensativa', t: 'Escriban sus consecuencias positivas, sus cuidados, y una opinión fundamentada con una fuente.', a: [{ k: 'nota', x: 'Opinamos que ____ porque ____. Según ____, ____.' }] },
-      { m: 'decidida', t: 'El portavoz presenta su opinión. ¡Y recuerden traer imágenes para el póster!', a: [{ k: 'ok', x: '🖼️ Imágenes para el póster' }] }],
+      { m: 'hola', t: 'Ahora, en equipo, hacemos la tabla de los aparatos que cuidan la vida en el embarazo, el parto y después del nacimiento.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }, { k: 'tit', x: '🩺 Los aparatos que cuidan la vida' }] },
+      { m: 'idea', t: 'Para cada aparato escriban para qué sirve, cuándo se usa y qué cuidados tiene.', a: [{ k: 'tabla', c: ['Aparato', '¿Para qué sirve?', '¿Cuándo?', 'Cuidados'], d: [['Ecografía', '', '', ''], ['Monitor fetal', '', '', ''], ['Incubadora', '', '', '']] }] },
+      { m: 'decidida', t: 'Por ejemplo: la ecografía sirve para ver al bebé dentro del útero, se usa en el embarazo y la debe hacer personal de salud.', a: [{ k: 'ok', x: '💡 Usen lo que vieron en el video' }] },
+      { m: 'genial', t: 'Revisen su tabla con la autoevaluación y prepárense para explicarla. ¡Juntos aprendemos más!', a: [{ k: 'ok', x: '👥 ¡A trabajar en equipo!' }] }],
     '7-1': [
       { m: 'hola', t: '¡Llegó el momento del reto! Hoy planificamos nuestros pósters científicos. Trabajamos en equipo y en el cuaderno.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }] },
       { m: 'curiosa', t: 'Primero observemos un póster científico modelo. ¿Qué partes tiene?', a: [{ k: 'chips', x: ['📌 Título', '🖼️ Imágenes', '✍️ Textos cortos', '➡️ Flechas', '📚 Fuentes'] }] },
