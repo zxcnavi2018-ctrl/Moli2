@@ -1382,3 +1382,65 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .cv-equipo .eq-c.ya, .cv-equipo .eq-c.on:has(.eq-ej.ya) { border-color: #fde047; border-left-color: #fde047; box-shadow: 0 0 0 .15em #fde047, 0 0 2.2em rgba(253,224,71,.6); animation: eqLate 1.4s ease-in-out infinite; } @keyframes eqLate { 50% { box-shadow: 0 0 0 .15em #fde047, 0 0 3.2em rgba(253,224,71,.9); } }
 .cv-equipo .eq-ej { background: rgba(16,185,129,.15); color: #a7f3d0; border: .1em dashed rgba(167,243,208,.6); } .cv-equipo .eq-ej i { color: #6ee7b7; }
 .cv-equipo .rq-btn { background: linear-gradient(135deg, #5eead4, #fde047); box-shadow: 0 0 1.2em rgba(94,234,212,.7); position: relative; z-index: 2; }
+
+/* 🗳️ Molí en las elecciones (votacion.js) */
+#rutina .rt-voto { pointer-events: auto; flex: none; width: 34px; height: 34px; border-radius: 50%; border: 3px solid #1e3a8a; background: linear-gradient(135deg, #fff, #dbeafe); font: 18px/1 system-ui; cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,.25); padding: 0; }
+#rutina .rt-voto:hover { transform: scale(1.12); }
+#moVoto { position: fixed; inset: 0; z-index: 2147483000; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, #1e40af 0, #172554 55%, #0b1026); opacity: 0; transition: opacity .5s; font-family: "Trebuchet MS", system-ui, sans-serif; color: #fff; }
+#moVoto.in { opacity: 1; }
+#moVoto::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 13vh; background: linear-gradient(#7f1d1d, #450a0a); border-top: .6vh solid #facc15; }
+.vo-est { position: absolute; color: #fde68a; font-style: normal; font-size: calc(1.6vh * var(--s)); opacity: .6; animation: voBri 2.4s ease-in-out infinite; animation-delay: var(--r); }
+@keyframes voBri { 50% { opacity: .15; transform: scale(.7); } }
+.vo-luz { position: absolute; top: -10vh; width: 30vw; height: 120vh; background: linear-gradient(rgba(254,240,138,.28), transparent 75%); clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%); transform-origin: 50% 0; animation: voLuz 6s ease-in-out infinite alternate; pointer-events: none; }
+.vo-luz.l1 { left: 5vw; } .vo-luz.l2 { right: 5vw; animation-delay: -3s; }
+@keyframes voLuz { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+.vo-ban { position: absolute; top: 0; left: 0; right: 0; display: flex; height: 5vh; }
+.vo-ban i { flex: 1; clip-path: polygon(0 0, 100% 0, 50% 100%); } .vo-ban .r { background: #dc2626; } .vo-ban .b { background: #f8fafc; }
+.vo-tit { position: absolute; top: 6vh; left: 0; right: 0; text-align: center; transform: scale(0); transition: transform .9s cubic-bezier(.3,1.6,.5,1) .3s; }
+#moVoto.in .vo-tit { transform: none; }
+.vo-tit span { display: block; font-size: 5.4vh; font-weight: 900; color: #facc15; text-shadow: 0 .4vh 0 #92400e, 0 0 2.5vh rgba(250,204,21,.6); letter-spacing: .1vh; }
+.vo-tit small { display: block; font-size: 2.6vh; font-weight: 700; color: #e0e7ff; margin-top: .4vh; letter-spacing: .5vh; text-transform: uppercase; }
+.vo-esc { position: absolute; left: 0; width: 50vw; bottom: 0; height: 75vh; }
+.vo-cab { position: absolute; left: 3vw; bottom: 13vh; width: 15vw; height: 44vh; background: linear-gradient(#e2e8f0, #94a3b8); border: .5vh solid #1e293b; border-radius: 1vh 1vh 0 0; overflow: hidden; }
+.vo-cab-t { background: #1e3a8a; color: #fff; text-align: center; font-weight: 900; font-size: 1.8vh; padding: .8vh 0; line-height: 1.2; }
+.vo-cor { position: absolute; left: 0; right: 0; top: 6.6vh; height: 0; background: repeating-linear-gradient(90deg, #b91c1c 0 1.4vw, #dc2626 1.4vw 2.8vw); transition: height .5s; box-shadow: inset 0 -1vh 1vh rgba(0,0,0,.3); }
+#moVoto.cort .vo-cor { height: 100%; }
+.vo-anf { position: absolute; left: 30vw; bottom: 13vh; width: 14vw; height: 22vh; }
+.vo-ran { position: absolute; top: 0; left: -1vw; right: -1vw; height: 3vh; background: #1e3a8a; border: .4vh solid #0f172a; border-radius: .8vh; }
+.vo-ran::after { content: ''; position: absolute; left: 30%; right: 30%; top: 40%; height: 25%; background: #0f172a; border-radius: 1vh; }
+.vo-den { position: absolute; top: 3vh; bottom: 0; left: 0; right: 0; background: rgba(219,234,254,.25); border: .4vh solid #e0e7ff; border-top: none; border-radius: 0 0 1vh 1vh; overflow: hidden; backdrop-filter: blur(2px); }
+.vo-pap { position: absolute; bottom: calc(var(--k) * 1.5vh + .5vh); left: calc(15% + var(--k) * 9%); width: 5vw; height: 2.4vh; background: #fff; border: 1px solid #94a3b8; transform: rotate(calc(var(--k) * 17deg - 30deg)); animation: voCae .5s ease-in; }
+@keyframes voCae { from { transform: translateY(-16vh); } }
+.vo-emb { position: absolute; left: 0; right: 0; top: 45%; text-align: center; font-size: 4.5vh; line-height: 1; }
+.vo-emb b { display: block; font-size: 1.8vh; letter-spacing: .4vh; color: #fff; text-shadow: 0 .2vh 0 #1e3a8a; }
+.vo-mo { position: absolute; left: -16vw; bottom: 12vh; height: 30vh; transition: left 1s cubic-bezier(.4,.1,.3,1), transform .6s; }
+.vo-mo img { height: 100%; display: block; filter: drop-shadow(0 1.5vh 1.5vh rgba(0,0,0,.5)); animation: voPaso .5s ease-in-out infinite alternate; }
+@keyframes voPaso { to { transform: translateY(-1vh); } }
+.vo-mo.en-cab { left: 4.5vw; } .vo-mo.en-anf { left: 13vw; } .vo-mo.centro { left: 17vw; transform: scale(1.15); }
+#moVoto.habla .vo-mo img { animation: voHab .28s ease-in-out infinite alternate; } @keyframes voHab { to { transform: translateY(-.8vh) scale(1.03); } }
+.vo-ced { position: absolute; right: -4.5vw; top: 42%; width: 6vw; height: 8vh; background: #fff; color: #1e293b; border: .3vh solid #1e3a8a; border-radius: .5vh; padding: .5vh; box-shadow: 0 .6vh 1vh rgba(0,0,0,.4); transform: rotate(8deg); transition: opacity .3s; }
+.vo-ced b { display: block; font-size: 1.2vh; text-align: center; letter-spacing: .2vh; }
+.vo-ced i { display: block; height: .5vh; background: #cbd5e1; margin: .9vh .3vw; }
+.vo-ced i.x { position: absolute; right: .5vw; bottom: .8vh; width: 2.4vh; height: 2.4vh; margin: 0; background: none; border: .25vh solid #1e293b; }
+.vo-ced i.x::after { content: '✗'; position: absolute; inset: -.6vh 0 0; text-align: center; font-size: 2.6vh; font-style: normal; color: #dc2626; font-weight: 900; transform: scale(0); }
+.vo-ced.marca i.x::after { animation: voX .5s .4s forwards; } @keyframes voX { to { transform: scale(1); } }
+.vo-ced.marca i.x::after, .vo-ced.cae i.x::after { transform: scale(1); }
+.vo-ced.cae { animation: voDep .8s ease-in forwards; }
+@keyframes voDep { 0% { transform: rotate(8deg); } 45% { transform: translate(5vw, -13vh) rotate(90deg) scale(.8); } 100% { transform: translate(6.5vw, -5vh) rotate(90deg) scaleX(.2) scaleY(.6); opacity: 0; } }
+.vo-cnt { position: absolute; left: 31vw; bottom: 37vh; width: 12vw; text-align: center; font-size: 2.4vh; font-weight: 800; color: #fde68a; }
+.vo-cnt b { font-size: 3.4vh; color: #fff; } .vo-cnt.pop { animation: voPop .5s; } @keyframes voPop { 40% { transform: scale(1.4); } }
+.vo-tips { position: absolute; left: 51vw; right: 3vw; top: 20vh; bottom: 16vh; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; justify-content: space-between; }
+.vo-tips li { display: flex; align-items: center; gap: 1.4vw; background: rgba(255,255,255,.08); border: .3vh dashed rgba(255,255,255,.25); border-radius: 2vh; padding: 1.2vh 1.4vw; opacity: .35; filter: grayscale(1); transform: translateX(4vw); transition: all .6s cubic-bezier(.3,1.5,.5,1); }
+.vo-tips li.on { opacity: 1; filter: none; transform: none; background: linear-gradient(90deg, #fff, #eff6ff); color: #1e293b; border: .4vh solid #facc15; box-shadow: 0 .8vh 2vh rgba(0,0,0,.35); }
+.vo-tips li span { font-size: 4.4vh; flex: none; width: 6.5vh; height: 6.5vh; display: grid; place-items: center; border-radius: 50%; background: #1e3a8a; }
+.vo-tips li b { display: block; font-size: 2.9vh; } .vo-tips li.on b { color: #1e3a8a; }
+.vo-tips li small { display: block; font-size: 2.1vh; margin-top: .3vh; }
+.vo-bub { position: absolute; left: 3vw; top: 19vh; width: 44vw; background: #fff; color: #1e293b; font-size: 2.7vh; font-weight: 700; line-height: 1.3; padding: 1.4vh 1.4vw; border-radius: 2vh; border: .4vh solid #1e3a8a; box-shadow: 0 .8vh 2vh rgba(0,0,0,.4); opacity: 0; }
+.vo-bub.pop { animation: voBub .4s forwards; } @keyframes voBub { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+.vo-sello { position: absolute; left: 25vw; top: 44vh; transform: translate(-50%, -50%) rotate(-12deg) scale(4); opacity: 0; font-size: 6vh; font-weight: 900; color: #dc2626; border: .8vh solid #dc2626; border-radius: 1.5vh; padding: .5vh 2vw; background: rgba(255,255,255,.92); pointer-events: none; }
+#moVoto.fin .vo-sello { animation: voSel .5s .4s cubic-bezier(.5,0,.7,1.6) forwards; } @keyframes voSel { to { opacity: 1; transform: translate(-50%, -50%) rotate(-12deg) scale(1); } }
+.vo-cfs { position: absolute; inset: 0; pointer-events: none; display: none; } #moVoto.fin .vo-cfs { display: block; }
+.vo-cf { position: absolute; top: -3vh; width: 1vh; height: 1.6vh; background: var(--c); animation: voCf var(--d) linear infinite; animation-delay: var(--r); }
+@keyframes voCf { to { transform: translate(var(--x), 110vh) rotate(720deg); } }
+.vo-x { position: absolute; top: 6vh; right: 1.5vw; width: 5vh; height: 5vh; border-radius: 50%; border: .3vh solid #fff; background: rgba(0,0,0,.4); color: #fff; font-size: 2.4vh; cursor: pointer; z-index: 2; }
+#moVoto.fin .vo-ced { opacity: 0; }

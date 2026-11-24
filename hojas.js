@@ -602,9 +602,9 @@
     }
     R.montar = () => {
       R.el = document.createElement('nav'); R.el.id = 'rutina'; R.el.setAttribute('aria-label', 'Rutina de la clase');
-      R.el.innerHTML = '<button type="button" class="rt-mas" data-rtmas title="Molí nos cuenta nuestra secuencia de clase" aria-label="Molí nos cuenta nuestra secuencia de clase">+</button>' + RUT.map(([ic, t, c1, c2], i) => `${i === 3 ? '<i class="rt-esp"></i>' : ''}<button type="button" class="rt-b" data-rt="${i}" style="--c1:${c1};--c2:${c2}" title="${esc(t)}"><span class="rt-o"><span class="rt-i">${ic}</span><span class="rt-ok">✓</span></span><small>${esc(t)}</small></button>`).join('') ;
+      R.el.innerHTML = '<button type="button" class="rt-mas" data-rtmas title="Molí nos cuenta nuestra secuencia de clase" aria-label="Molí nos cuenta nuestra secuencia de clase">+</button><button type="button" class="rt-voto" data-rtvoto title="🗳️ Molí en las elecciones: cómo ejercer un buen voto" aria-label="Molí en las elecciones">🗳️</button>' + RUT.map(([ic, t, c1, c2], i) => `${i === 3 ? '<i class="rt-esp"></i>' : ''}<button type="button" class="rt-b" data-rt="${i}" style="--c1:${c1};--c2:${c2}" title="${esc(t)}"><span class="rt-o"><span class="rt-i">${ic}</span><span class="rt-ok">✓</span></span><small>${esc(t)}</small></button>`).join('') ;
       document.body.appendChild(R.el);
-      R.el.addEventListener('click', e => { if (e.target.closest('[data-rtmas]')) { e.stopPropagation(); if (window.Guion) Guion.secuencia(R.el); return; }
+      R.el.addEventListener('click', e => { if (e.target.closest('[data-rtvoto]')) { e.stopPropagation(); if (window.Votacion) Votacion.abrir(); return; } if (e.target.closest('[data-rtmas]')) { e.stopPropagation(); if (window.Guion) Guion.secuencia(R.el); return; }
         const b = e.target.closest('[data-rt]'); if (!b) return; e.stopPropagation(); const i = +b.dataset.rt;
         if (i < R.n) { if (i === R.n - 1) { R.n--; guardar(); pinta(); } return; }     // tocar la última coloreada la despinta (por si fue sin querer)
         R.n = i + 1; guardar(); pinta(i); ding(); if (R.n >= RUT.length) setTimeout(() => { const t = window.toast || window.aviso; t && t('🎉 ¡Rutina completa! ¡Excelente clase!', 3.5); }, 500); });
