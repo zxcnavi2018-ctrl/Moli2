@@ -88,14 +88,14 @@ window.MX8 = {
       { m: 'idea', t: 'Pueden hacer una línea de tiempo con frutas, una historieta, un organizador gráfico o el diario del bebé.', a: [{ k: 'chips', x: ['🍌 Línea con frutas', '💬 Historieta', '🗂️ Organizador', '📔 Diario del bebé'] }] },
       { m: 'decidida', t: 'Revisen su papelote con la tabla del equipo, y luego cada integrante expone una etapa.', a: [{ k: 'ok', x: '🎤 ¡Todos exponemos!' }] }],
     '6-1': [
-      { m: 'hola', t: 'Hoy vamos a ver un video sobre la tecnología que ayuda a cuidar a la mamá y al bebé en el embarazo y el parto.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '📺 Observamos el video' }] },
-      { m: 'curiosa', t: 'Mira con atención: fíjate qué aparatos aparecen, para qué sirven y en qué momento se usan.', a: [{ k: 'chips', x: ['🖥️ ¿Qué aparato?', '🎯 ¿Para qué sirve?', '⏱️ ¿Cuándo se usa?'] }] },
-      { m: 'pensativa', t: 'Después del video, copia las preguntas en tu cuaderno y respóndelas con lo que viste.', a: [{ k: 'tabla', c: ['Pregunta', 'Mi respuesta'], d: [['¿Qué aparatos aparecen?', ''], ['¿Para qué sirve la ecografía?', ''], ['¿Qué se usa en el parto?', '']] }] },
+      { m: 'hola', t: 'Hoy vamos a ver un video sobre las tecnologías perinatales: herramientas sencillas que ayudan a cuidar a la mamá y al bebé.', a: [{ k: 'tag', x: '👤 Individual · Cuaderno' }, { k: 'tit', x: '📺 Observamos el video' }] },
+      { m: 'curiosa', t: 'Fíjate en cada herramienta: cómo se llama, para qué sirve y en qué momento se usa.', a: [{ k: 'chips', x: ['📅 Gestograma', '📏 Cinta obstétrica', '🩺 Estetoscopio de Pinard', '🖐️ Dilatómetro', '👶 Cinta neonatal'] }] },
+      { m: 'pensativa', t: 'Después del video, copia las preguntas en tu cuaderno y respóndelas con lo que viste.', a: [{ k: 'tabla', c: ['Pregunta', 'Mi respuesta'], d: [['¿Para qué sirve el gestograma?', ''], ['¿Qué mide la cinta obstétrica?', ''], ['¿Qué mide el dilatómetro?', '']] }] },
       { m: 'genial', t: '¡A ver el video con mucha atención!', a: [{ k: 'ok', x: '📺 ¡Ojos atentos!' }] }],
     '6-2': [
-      { m: 'hola', t: 'Ahora, en equipo, hacemos la tabla de los aparatos que cuidan la vida en el embarazo, el parto y después del nacimiento.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }, { k: 'tit', x: '🩺 Los aparatos que cuidan la vida' }] },
-      { m: 'idea', t: 'Para cada aparato escriban para qué sirve, cuándo se usa y qué cuidados tiene.', a: [{ k: 'tabla', c: ['Aparato', '¿Para qué sirve?', '¿Cuándo?', 'Cuidados'], d: [['Ecografía', '', '', ''], ['Monitor fetal', '', '', ''], ['Incubadora', '', '', '']] }] },
-      { m: 'decidida', t: 'Por ejemplo: la ecografía sirve para ver al bebé dentro del útero, se usa en el embarazo y la debe hacer personal de salud.', a: [{ k: 'ok', x: '💡 Usen lo que vieron en el video' }] },
+      { m: 'hola', t: 'Ahora, en equipo, hacemos la tabla de las herramientas que cuidan la vida en el embarazo, el parto y con el recién nacido.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }, { k: 'tit', x: '🩺 Las herramientas que cuidan la vida' }] },
+      { m: 'idea', t: 'Para cada herramienta escriban para qué sirve, cuándo se usa y qué ventaja tiene.', a: [{ k: 'tabla', c: ['Herramienta', '¿Para qué sirve?', '¿Cuándo?', 'Ventaja'], d: [['Gestograma', '', '', ''], ['Estetoscopio de Pinard', '', '', ''], ['Dilatómetro', '', '', '']] }] },
+      { m: 'decidida', t: 'Por ejemplo: el estetoscopio de Pinard sirve para escuchar los latidos del bebé, se usa en el embarazo y no necesita baterías.', a: [{ k: 'ok', x: '💡 Usen lo que vieron en el video' }] },
       { m: 'genial', t: 'Revisen su tabla con la autoevaluación y prepárense para explicarla. ¡Juntos aprendemos más!', a: [{ k: 'ok', x: '👥 ¡A trabajar en equipo!' }] }],
     '7-1': [
       { m: 'hola', t: '¡Llegó el momento del reto! Hoy planificamos nuestros pósters científicos. Trabajamos en equipo y en el cuaderno.', a: [{ k: 'tag', x: '👥 En equipo · Cuaderno' }] },
