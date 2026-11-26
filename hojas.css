@@ -1510,3 +1510,12 @@ body.editando::after { content: ''; position: fixed; inset: 0; border: 5px solid
 .vo-cfs { position: absolute; inset: 0; pointer-events: none; display: none; z-index: 5; } #moVoto.fin .vo-cfs { display: block; }
 .vo-cf { position: absolute; top: -3vh; width: 1vh; height: 1.6vh; background: var(--c); animation: voCf var(--d) linear infinite; animation-delay: var(--r); }
 @keyframes voCf { to { transform: translate(var(--x), 110vh) rotate(720deg); } }
+
+/* 🖼️ galería de ejemplos (pósters bien diseñados) */
+.cv-gal { background: linear-gradient(135deg, var(--c1), var(--c2)); display: flex; flex-direction: column; height: 100%; box-sizing: border-box; padding: 3em 2.4em 3.6em; gap: .8em; }
+.gl-cab { display: flex; align-items: center; gap: .7em; color: #fff; } .gl-cab .cv-h2 { margin: 0; color: #fff; } .gl-cab p { margin: .2em 0 0; font: 700 1.05em "Trebuchet MS", system-ui, sans-serif; color: #d1fae5; }
+.gl-fila { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; }
+.gl-it { display: flex; flex-direction: column; min-height: 0; padding: .5em; border: 0; border-radius: .9em; background: #fff; cursor: zoom-in; box-shadow: 0 .5em 1.2em rgba(0,0,0,.25); text-align: center; transition: transform .2s; }
+.gl-it:hover { transform: translateY(-.3em) rotate(-1deg); }
+.gl-it img { flex: 1; min-height: 0; width: 100%; object-fit: contain; border-radius: .5em; background: #f1f5f9; }
+.gl-it b { font: 900 1.05em "Trebuchet MS", system-ui, sans-serif; color: #065f46; margin-top: .35em; } .gl-it small { font: 700 .78em "Trebuchet MS", system-ui, sans-serif; color: #475569; }
